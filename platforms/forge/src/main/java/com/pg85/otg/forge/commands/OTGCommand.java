@@ -61,6 +61,10 @@ public class OTGCommand
 				Commands.literal("flush").executes(
 					(context -> FlushCommand.flushCache(context.getSource()))
 				)
+			).then(
+				Commands.literal("structure").executes(
+					(context -> StructureCommand.showStructureInfo(context.getSource()))
+				)				
 			).then(					
 				Commands.literal("biome").executes(
 					(context -> BiomeCommand.showBiome(context.getSource()))

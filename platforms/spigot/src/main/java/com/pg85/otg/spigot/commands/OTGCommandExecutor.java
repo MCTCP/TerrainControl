@@ -25,7 +25,7 @@ import java.util.List;
 
 public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 {
-	public static List<String> COMMANDS = new ArrayList<>(Arrays.asList("data", "map", "help", "spawn", "export", "edit", "finishedit", "region", "flush"));
+	public static List<String> COMMANDS = new ArrayList<>(Arrays.asList("data", "map", "help", "spawn", "export", "edit", "finishedit", "region", "flush", "structure"));
 
 	@Override
 	public boolean onCommand (CommandSender sender, Command command, String s, String[] strings)
@@ -54,7 +54,9 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 			case "region":
 				return ExportCommand.region(sender, args);
 			case "flush":
-				return FlushCommand.execute(sender, args);				
+				return FlushCommand.execute(sender, args);
+			case "structure":
+				return StructureCommand.execute(sender, args);				
 			case "help":
 			default:
 				return helpMessage(sender);

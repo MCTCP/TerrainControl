@@ -1,6 +1,6 @@
 package com.pg85.otg.util.interfaces;
 
-public interface IChunkPopulator
+public interface IChunkDecorator
 {
 	Object getLockingObject();
 

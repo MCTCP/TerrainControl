@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 public class BO4CustomStructure extends CustomStructure
 {	
     private Random worldRandom;
-	public SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
+    private SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
     private boolean isStructureAtSpawn = false;
     private int branchesTried = 0;    
     private Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
@@ -45,16 +45,44 @@ public class BO4CustomStructure extends CustomStructure
     private boolean spawnedBranchThisCycle = false;
     private boolean spawnedBranchLastCycle = false;
     private int minY; 
-
-    boolean IsSpawned;
-
-    public boolean startChunkBlockChecksDone = false;
+    private boolean isSpawned;
+    private boolean startChunkBlockChecksDone = false;
 
     // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
-    public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
+    private Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
     // TODO: Make sure this never becomes an issue for memory usage. 
-    private Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();    
+    private Map<ChunkCoordinate, String> objectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();    
     
+	public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> getObjectsToSpawn()
+	{
+		return objectsToSpawn;
+	}
+	
+	public SmoothingAreaGenerator getSmoothingAreaManager()	
+	{
+		return this.smoothingAreaManager;
+	}
+
+	public Map<ChunkCoordinate, String> getObjectsToSpawnInfo()	
+	{
+		return this.objectsToSpawnInfo;
+	}
+	
+	public void setStartChunkBlockChecksDone()
+	{
+		this.startChunkBlockChecksDone = true;
+	}
+	
+	public boolean isStartChunkBlockChecksDone()	
+	{
+		return this.startChunkBlockChecksDone;
+	}
+	
+	public boolean isSpawned()	
+	{
+		return this.isSpawned;
+	}
+	
 	// Branches:
     // BO4 structures are rasterized and split into 16x16 chunks, each BO4 containing the blocks for one chunk. Branch syntax is used to glue all the 
     // chunks of a structure together and allows OTG to spawn one chunk at a time. Each BO4 can have branches that are used to place more BO4's at specified 
@@ -133,17 +161,17 @@ public class BO4CustomStructure extends CustomStructure
     
     // TODO: Don't allow canOverride optional branches in the same branch group as required branches.    
     
+    public BO4CustomStructure()
+    {
+    
+    }    
+    
     public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	this(worldSeed, structureStart, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	this.objectsToSpawn = objectsToSpawn;
     	this.smoothingAreaManager.fillSmoothingLineCaches(smoothingAreasToSpawn);
     	this.minY = minY;
-    }
-
-    public BO4CustomStructure()
-    {
-    
     }
     
     BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
@@ -193,7 +221,7 @@ public class BO4CustomStructure extends CustomStructure
 			throw new RuntimeException();
 		}
 
-		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
+		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : this.objectsToSpawn.entrySet())
 		{
 			if(chunkCoordSet.getValue() != null)
 			{
@@ -205,12 +233,12 @@ public class BO4CustomStructure extends CustomStructure
 				if(structureInfo.length() > 0)
 				{
 					structureInfo = structureInfo.substring(0,  structureInfo.length() - 2);
-					ObjectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
+					objectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
 				}
 			}
 		}
 		
-		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
+		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : this.objectsToSpawn.entrySet())
 		{
 			if(chunkCoordSet.getValue() != null)
 			{
@@ -243,11 +271,11 @@ public class BO4CustomStructure extends CustomStructure
         // that there is a smooth transition in height from the surrounding
         // terrain to the BO3. This way BO3's won't float above the ground
         // or spawn inside a hole with vertical walls.
-		smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		smoothingAreaManager.calculateSmoothingAreas(this.objectsToSpawn, (BO4CustomStructureCoordinate)this.start, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		
 		// Add the structure to the structure caches
 		
-		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
+		for(ChunkCoordinate chunkCoord : this.objectsToSpawn.keySet())
 		{
 			structureCache.addBo4ToStructureCache(chunkCoord, this);		
 		}
@@ -257,15 +285,15 @@ public class BO4CustomStructure extends CustomStructure
 			structureCache.addBo4ToStructureCache(chunkCoord, this);
 		}
 
-		if(objectsToSpawn.size() > 0)
+		if(this.objectsToSpawn.size() > 0)
 		{
-			IsSpawned = true;
+			isSpawned = true;
 			if(spawnLog)
 			{
 				int totalBO3sSpawned = 0;
-				for(ChunkCoordinate entry : objectsToSpawn.keySet())
+				for(ChunkCoordinate entry : this.objectsToSpawn.keySet())
 				{
-					totalBO3sSpawned += objectsToSpawn.get(entry).size();
+					totalBO3sSpawned += this.objectsToSpawn.get(entry).size();
 				}
 
 				logger.log(LogMarker.INFO, this.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).getName() + " " + totalBO3sSpawned + " object(s) plotted in " + (System.currentTimeMillis() - startTime) + " Ms and " + Cycle + " cycle(s), " + (branchesTried + 1) + " object(s) tried.");
@@ -441,7 +469,7 @@ public class BO4CustomStructure extends CustomStructure
 		ChunkCoordinate bottom = startChunk;
 		ChunkCoordinate right = startChunk;
 
-		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
+		for(ChunkCoordinate chunkCoord : this.objectsToSpawn.keySet())
 		{
 			if(chunkCoord.getChunkX() > right.getChunkX())
 			{
@@ -459,7 +487,7 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				top = chunkCoord;
 			}
-			for(CustomStructureCoordinate struct : objectsToSpawn.get(chunkCoord))
+			for(CustomStructureCoordinate struct : this.objectsToSpawn.get(chunkCoord))
 			{
 				if(struct.getY() < minY)
 				{
@@ -490,7 +518,7 @@ public class BO4CustomStructure extends CustomStructure
     		logger.log(LogMarker.INFO, bo4.getName() + " minimum size: Width " + ((Integer)returnValue[1] + (Integer)returnValue[3] + 1) + " Length " + ((Integer)returnValue[0] + (Integer)returnValue[2] + 1) + " top " + (Integer)returnValue[0] + " right " + (Integer)returnValue[1] + " bottom " + (Integer)returnValue[2] + " left " + (Integer)returnValue[3]);
     	}
 
-    	objectsToSpawn.clear();
+    	this.objectsToSpawn.clear();
 
     	return returnValue;
     }
@@ -613,7 +641,7 @@ public class BO4CustomStructure extends CustomStructure
         		{
         			throw new RuntimeException(); // TODO: Remove after testing
         		}
-        		addToChunk(branchToAdd.branch, branchToAdd.chunkCoordinate, objectsToSpawn);
+        		addToChunk(branchToAdd.branch, branchToAdd.chunkCoordinate, this.objectsToSpawn);
         	}
         }
         
@@ -2145,7 +2173,7 @@ public class BO4CustomStructure extends CustomStructure
     void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {   	
     	if (
-			!objectsToSpawn.containsKey(chunkCoordinate) && 
+			!this.objectsToSpawn.containsKey(chunkCoordinate) && 
 			!this.smoothingAreaManager.smoothingAreasToSpawn.containsKey(chunkCoordinate)
 		)
         {
@@ -2154,7 +2182,7 @@ public class BO4CustomStructure extends CustomStructure
     	
         // Get all BO3's that should spawn in the given chunk, if any
         // Note: The given chunk may not necessarily be the chunkCoordinate of this.Start
-        Stack<BO4CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
+        Stack<BO4CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);
     	BO4Config config = ((BO4)this.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig();
         if (objectsInChunk != null)
         {
@@ -2216,7 +2244,7 @@ public class BO4CustomStructure extends CustomStructure
                 	{
                 		logger.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + config.getName());
                 	}
-            		objectsToSpawn.remove(chunkCoordinate);
+            		this.objectsToSpawn.remove(chunkCoordinate);
             		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
             		// Mark the structurecache region for saving.
             		// TODO: Make this prettier?
@@ -2275,7 +2303,7 @@ public class BO4CustomStructure extends CustomStructure
                 	{
                 		logger.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + config.getName());
                 	}
-            		objectsToSpawn.remove(chunkCoordinate);
+            		this.objectsToSpawn.remove(chunkCoordinate);
             		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
             		// Mark the structurecache region for saving.
             		// TODO: Make this prettier?
@@ -2295,7 +2323,7 @@ public class BO4CustomStructure extends CustomStructure
         	smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, chunkBeingPopulated, spawnLog, logger, materialReader);
         }
 
-		objectsToSpawn.remove(chunkCoordinate);
+		this.objectsToSpawn.remove(chunkCoordinate);
 		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
 
 		// Mark the structurecache region for saving.

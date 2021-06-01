@@ -41,58 +41,39 @@ public abstract class LocalMaterialData extends LocalMaterialBase
     {
 		return isLog() || isLeaves();
     }
-    
-    public boolean isLog()
-    {
-		return
-			isMaterial(LocalMaterials.ACACIA_LOG) ||
-			isMaterial(LocalMaterials.BIRCH_LOG) ||
-			isMaterial(LocalMaterials.DARK_OAK_LOG) ||
-			isMaterial(LocalMaterials.OAK_LOG) ||
-			isMaterial(LocalMaterials.SPRUCE_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_ACACIA_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_BIRCH_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_DARK_OAK_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_JUNGLE_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_OAK_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG);
-	}
-        
+           
     /**
      * Gets whether this material can be used as an anchor point for a smoothing area    
      * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves.
-     */    
+     */
     public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
     {
     	return
 			(
-				isSolid() || 
 				(
-					!ignoreWater && isLiquid()
-				)
-			) || (
-	    		(
+					// Any materials that are either solid or liquid
+					(
+						isSolid() &&  
+						(!isLog() || allowWood)											
+					) || (
+						!ignoreWater && isLiquid()
+					)
+				) || (
+					// Whitelist
 					isMaterial(LocalMaterials.ICE) ||
 					isMaterial(LocalMaterials.PACKED_ICE) ||
-					isMaterial(LocalMaterials.FROSTED_ICE) ||
-					(
-						isSolid() || 
-						(
-							!ignoreWater && isLiquid()
-						)
-					)
-				) && (
-					allowWood || 
-					!(
-						isLog()
-					)
-				) &&
+					isMaterial(LocalMaterials.FROSTED_ICE) 
+				)
+			) && (
+				// Blacklist
+				!isLeaves() &&
 				!isMaterial(LocalMaterials.WATER_LILY)
 			);
     }
     
 	public boolean isOre()
 	{
+    	// TODO: Use BlockTags for these?		
     	return
 			isMaterial(LocalMaterials.COAL_ORE) ||
 			isMaterial(LocalMaterials.DIAMOND_ORE) ||
@@ -108,6 +89,7 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
     public boolean isLeaves()
     {
+    	// TODO: Use BlockTags for these?    	
 		return
 			isMaterial(LocalMaterials.ACACIA_LEAVES) ||
 			isMaterial(LocalMaterials.BIRCH_LEAVES) ||
@@ -117,6 +99,28 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.SPRUCE_LEAVES);
     }
 
+    public boolean isLog()
+    {
+    	// TODO: Use BlockTags for these?
+		return
+			isMaterial(LocalMaterials.ACACIA_LOG) ||
+			isMaterial(LocalMaterials.BIRCH_LOG) ||
+			isMaterial(LocalMaterials.DARK_OAK_LOG) ||
+			isMaterial(LocalMaterials.OAK_LOG) ||
+			isMaterial(LocalMaterials.SPRUCE_LOG) ||
+			isMaterial(LocalMaterials.ACACIA_WOOD) ||
+			isMaterial(LocalMaterials.BIRCH_WOOD) ||
+			isMaterial(LocalMaterials.DARK_OAK_WOOD) ||
+			isMaterial(LocalMaterials.OAK_WOOD) ||
+			isMaterial(LocalMaterials.SPRUCE_WOOD) ||			
+			isMaterial(LocalMaterials.STRIPPED_ACACIA_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_BIRCH_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_DARK_OAK_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_JUNGLE_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_OAK_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG);
+	}
+    
     /**
      * Gets a new material that is rotated 90 degrees. North -> west -> south ->
      * east. If this material cannot be rotated, the material itself is

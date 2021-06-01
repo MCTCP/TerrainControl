@@ -96,16 +96,24 @@ class ForgeLegacyMaterials
 	{
 		switch(oldBlockName)
 		{
+			// TODO: These minecraft:xxx blocks no longer exist, so cannot be parsed by mc.
+			// We should parse them here, but atm we're not falling back to legacy parsing
+			// for those blocks. Should make that work, and also handle minecraft:xxx:data.
+			/*
+			case "minecraft:silver_shulker_box":
+				return Blocks.LIGHT_GRAY_SHULKER_BOX.defaultBlockState();
+			case "minecraft:silver_glazed_terracotta":
+				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
+			*/				
 			case "stationary_water":
 				return Blocks.WATER.defaultBlockState();
 			case "stationary_lava":
 				return Blocks.LAVA.defaultBlockState();
 			case "stained_clay":
-				return Blocks.WHITE_TERRACOTTA.defaultBlockState();
 			case "hard_clay":
 				return Blocks.TERRACOTTA.defaultBlockState();
 			case "step":
-				return Blocks.STONE_SLAB.defaultBlockState();
+				return Blocks.SMOOTH_STONE_SLAB.defaultBlockState();
 			case "sugar_cane_block":
 				return Blocks.SUGAR_CANE.defaultBlockState();
 			case "melon_block":
@@ -127,7 +135,7 @@ class ForgeLegacyMaterials
 			case "leaves_2":
 				return Blocks.ACACIA_LEAVES.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1);
 			case "red_rose":
-				return Blocks.ROSE_BUSH.defaultBlockState();
+				return Blocks.POPPY.defaultBlockState();
 			// TODO: This only spawns the bottom half?
 			case "double_plant":
 				return Blocks.SUNFLOWER.defaultBlockState();
@@ -166,7 +174,9 @@ class ForgeLegacyMaterials
 			case "stone_brick_stairs":
 			case "smooth_stairs":
 				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
-				
+			
+			case "quartz_ore":
+				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
 			case "yellow_flower":
 				return Blocks.DANDELION.defaultBlockState();
 			case "web":
@@ -194,16 +204,20 @@ class ForgeLegacyMaterials
 				return Blocks.IRON_BARS.defaultBlockState();
 			case "workbench":
 				return Blocks.CRAFTING_TABLE.defaultBlockState();
+			case "enchantment_table":
+				return Blocks.ENCHANTING_TABLE.defaultBlockState();
 			case "mob_spawner":
 				return Blocks.INFESTED_STONE.defaultBlockState();
 			case "double_step":
-				return Blocks.SMOOTH_STONE.defaultBlockState();
+				return Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
 			case "smooth_brick":
 				return Blocks.STONE_BRICKS.defaultBlockState();
 			case "rails":
 				return Blocks.RAIL.defaultBlockState();
 			case "fence":
 				return Blocks.OAK_FENCE.defaultBlockState();
+			case "nether_fence":
+				return Blocks.NETHER_BRICK_FENCE.defaultBlockState();
 			case "wood_step":
 				return Blocks.OAK_SLAB.defaultBlockState();
 			case "thin_glass":
@@ -224,6 +238,20 @@ class ForgeLegacyMaterials
 				return Blocks.CARROTS.defaultBlockState();
 			case "skull":
 				return Blocks.SKELETON_SKULL.defaultBlockState();
+			case "nether_wart":
+				return Blocks.NETHER_WART.defaultBlockState();				
+			case "nether_wart_block":
+				return Blocks.NETHER_WART_BLOCK.defaultBlockState();
+			case "nether_brick":
+				return Blocks.NETHER_BRICKS.defaultBlockState();
+			case "red_nether_brick":
+				return Blocks.RED_NETHER_BRICKS.defaultBlockState();				
+			case "end_bricks":
+			case "ender_bricks":
+				return Blocks.END_STONE_BRICKS.defaultBlockState();
+			case "end_stone":
+			case "ender_stone":
+				return Blocks.END_STONE.defaultBlockState();
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.defaultBlockState();
 			case "pg85":
@@ -608,6 +636,7 @@ class ForgeLegacyMaterials
 							return Blocks.INFESTED_CHISELED_STONE_BRICKS.defaultBlockState();
 					}
 				case "planks":
+				case "wood":
 				case "oak_planks":
 					switch(data)
 					{
@@ -639,8 +668,11 @@ class ForgeLegacyMaterials
 					}
 				case "purpur_slab":
 					return Blocks.PURPUR_SLAB.defaultBlockState()
-						.setValue(SlabBlock.TYPE, data == 2 ? SlabType.BOTTOM : data == 10 ? SlabType.TOP : SlabType.BOTTOM);
+						.setValue(SlabBlock.TYPE, data == 0 ? SlabType.BOTTOM : data == 8 ? SlabType.TOP : SlabType.BOTTOM);
+				case "purpur_double_slab":
+					return Blocks.PURPUR_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);					
 				case "red_flower":
+				case "red_rose":
 					switch(data)
 					{
 						case 0:
@@ -682,8 +714,11 @@ class ForgeLegacyMaterials
 						default:
 							return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
 						case 8:
-							return Blocks.CHISELED_RED_SANDSTONE.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
+							return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 					}
+				case "double_red_sandstone_slab":
+				case "double_stone_slab2": 
+					return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
 				case "sand":
 					switch(data)
 					{
@@ -828,7 +863,6 @@ class ForgeLegacyMaterials
 					}
 				case "stained_hardened_clay":
 				case "stained_clay":
-				case "hard_clay":
 				case "white_terracotta":
 					switch(data)
 					{
@@ -891,7 +925,7 @@ class ForgeLegacyMaterials
 					{
 						case 0:
 						default:
-							return Blocks.STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+							return Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
 						case 1:
 							return Blocks.SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
 						//case 2:
@@ -906,7 +940,7 @@ class ForgeLegacyMaterials
 						case 7:
 							return Blocks.QUARTZ_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
 						case 8:
-							return Blocks.STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
+							return Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 						case 9:
 							return Blocks.SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 						//case 10:
@@ -921,6 +955,26 @@ class ForgeLegacyMaterials
 						case 15:
 							return Blocks.QUARTZ_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 					}
+				case "double_step":
+					switch(data)
+					{
+						case 0:
+						default:
+							return Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 1:
+							return Blocks.SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						//case 2:
+						case 3:
+							return Blocks.COBBLESTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 4:
+							return Blocks.BRICK_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 5:
+							return Blocks.STONE_BRICK_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 6:
+							return Blocks.NETHER_BRICK_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 7:
+							return Blocks.QUARTZ_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+					}					
 				case "stonebrick":
 				case "stone_bricks":
 				case "smooth_brick":
@@ -1030,8 +1084,10 @@ class ForgeLegacyMaterials
 				case "oak_pressure_plate":
 					return Blocks.OAK_PRESSURE_PLATE.defaultBlockState().setValue(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
 				case "light_weighted_pressure_plate":
+				case "gold_plate":				
 					return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.defaultBlockState().setValue(WeightedPressurePlateBlock.POWER, data);
 				case "heavy_weighted_pressure_plate":
+				case "iron_plate":
 					return Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE.defaultBlockState().setValue(WeightedPressurePlateBlock.POWER, data);
 				case "snow_layer":
 					return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, data);
@@ -1059,7 +1115,6 @@ class ForgeLegacyMaterials
 				case "anvil":
 					return getAnvilWithData(0, data);
 				case "log":
-				case "wood":
 				case "oak_log":
 					return getLogWithData(data);
 				case "log_2":
@@ -1084,7 +1139,7 @@ class ForgeLegacyMaterials
 				case "activator_rail":
 					return getRailsWithData(2, data);				
 				case "hay_block":
-					return Blocks.HAY_BLOCK.defaultBlockState().setValue(HayBlock.AXIS, getAxisXYZ(data));
+					return Blocks.HAY_BLOCK.defaultBlockState().setValue(HayBlock.AXIS, getPillarAxisXYZ(data));
 				case "bone_block":
 					return Blocks.BONE_BLOCK.defaultBlockState().setValue(RotatedPillarBlock.AXIS, getAxisXYZ(data));			
 				case "wood_stairs":
@@ -1103,10 +1158,8 @@ class ForgeLegacyMaterials
 				case "stone_stairs":
 					return getStairsWithData(4, data);
 				case "brick_stairs":
+				case "smooth_stairs":					
 					return getStairsWithData(5, data);
-				// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
-				case "smooth_stairs":
-					return getStairsWithData(6, data);
 				case "nether_brick_stairs":
 					return getStairsWithData(7, data);
 				case "sandstone_stairs":
@@ -1152,7 +1205,7 @@ class ForgeLegacyMaterials
 				case "sign": // TODO: This will also pick up wall signs
 					return getSignPostWithData(data);
 				case "standing_banner":
-					return Blocks.WHITE_BANNER.defaultBlockState().setValue(BannerBlock.ROTATION, data);
+					return Blocks.RED_BANNER.defaultBlockState().setValue(BannerBlock.ROTATION, data);
 				case "wall_banner":
 					return Blocks.WHITE_WALL_BANNER.defaultBlockState().setValue(WallBannerBlock.FACING, getFacingNorthSouthWestEast(data));
 				case "end_rod":
@@ -1278,7 +1331,7 @@ class ForgeLegacyMaterials
 				case "red_mushroom_block":
 					return getHugeMushroomWithData(1, data);
 				case "vine":
-					return getVineWithData(data);				
+					return getVineWithData(data);
 				case "fence_gate":
 				case "oak_fence_gate":
 					return getFenceGateWithData(0, data);
@@ -1300,7 +1353,7 @@ class ForgeLegacyMaterials
 				case "tripwire":
 					return getTripWireWithData(data);
 				case "purpur_pillar":
-					return Blocks.PURPUR_PILLAR.defaultBlockState().setValue(RotatedPillarBlock.AXIS, getAxisXYZ(data));
+					return Blocks.PURPUR_PILLAR.defaultBlockState().setValue(RotatedPillarBlock.AXIS, getPillarAxisXYZ(data));
 				case "nether_wart":
 					return Blocks.NETHER_WART.defaultBlockState().setValue(NetherWartBlock.AGE, data);
 				case "brewing_stand":
@@ -1314,6 +1367,7 @@ class ForgeLegacyMaterials
 				case "portal":
 					return Blocks.NETHER_PORTAL.defaultBlockState().setValue(NetherPortalBlock.AXIS, getAxisXZ(data));
 				case "end_portal_frame":
+				case "ender_portal_frame":
 					return getEndPortalFrameWithData(data);
 				case "structure_block":
 					return getStructureBlockWithData(data);
@@ -1466,9 +1520,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.WEST);
 					case 3:
-						return Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.NORTH);
-					case 4:
 						return Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.SOUTH);
+					case 4:
+						return Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.NORTH);
 				}
 			case 1:
 				switch(data)
@@ -1482,9 +1536,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, false).setValue(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, false).setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
-					case 4:
 						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, false).setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
+					case 4:
+						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, false).setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 				}
 			case 2:
 				switch(data)
@@ -1492,15 +1546,15 @@ class ForgeLegacyMaterials
 					case 0:
 					case 5:
 					default:
-						return Blocks.TORCH.defaultBlockState();
+						return Blocks.REDSTONE_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true);
 					case 1:
 						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true).setValue(RedstoneWallTorchBlock.FACING, Direction.EAST);						
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true).setValue(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true).setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
-					case 4:
 						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true).setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
+					case 4:
+						return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.LIT, true).setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 				}				
 			default:
 				return null;
@@ -1830,7 +1884,7 @@ class ForgeLegacyMaterials
 		}
 		return blockState
 			.setValue(RepeaterBlock.DELAY, delay)
-			.setValue(RepeaterBlock.FACING, getFacingNorthEastSouthWest(facing))
+			.setValue(RepeaterBlock.FACING, getFacingSouthWestNorthEast(facing))
 		;
 	}
 	
@@ -1840,7 +1894,7 @@ class ForgeLegacyMaterials
 		int mode = getBit(data, 2);
 		int powered = material == 1 ? 1 : getBit(data, 3);
 		return Blocks.COMPARATOR.defaultBlockState()
-			.setValue(ComparatorBlock.FACING, getFacingNorthEastSouthWest(facing))
+			.setValue(ComparatorBlock.FACING, getFacingSouthWestNorthEast(facing))
 			.setValue(ComparatorBlock.MODE, mode == 0 ?	ComparatorMode.COMPARE : ComparatorMode.SUBTRACT)
 			.setValue(ComparatorBlock.POWERED, powered == 1)
 		;
@@ -1851,7 +1905,7 @@ class ForgeLegacyMaterials
 		int facing = getBits(data, 0, 2);
 		int occupied = getBit(data, 2);
 		int part = getBit(data, 3);
-		return Blocks.WHITE_BED.defaultBlockState()
+		return Blocks.RED_BED.defaultBlockState()
 			.setValue(BedBlock.FACING, getFacingSouthWestNorthEast(facing))
 			.setValue(BedBlock.OCCUPIED, occupied == 1)
 			.setValue(BedBlock.PART, part == 0 ? BedPart.FOOT : BedPart.HEAD)
@@ -2007,7 +2061,7 @@ class ForgeLegacyMaterials
 		return Blocks.TRIPWIRE_HOOK.defaultBlockState()
 			.setValue(TripWireHookBlock.ATTACHED, attached == 1)
 			.setValue(TripWireHookBlock.FACING, getFacingSouthWestNorthEast(facing))
-			.setValue(TripWireHookBlock.POWERED, powered == 1)			
+			.setValue(TripWireHookBlock.POWERED, powered == 1)
 		;
 	}
 	
@@ -2272,6 +2326,21 @@ class ForgeLegacyMaterials
 		}
 	}
 		
+	private static Direction.Axis getPillarAxisXYZ(int data)
+	{
+		switch(data)
+		{
+			case 0:
+				return Direction.Axis.Y;
+			case 4:
+				return Direction.Axis.X;
+			case 8:
+				return Direction.Axis.Z;
+			default:
+				return Direction.Axis.Y;
+		}
+	}
+	
 	// TODO: Test this
 	private static Direction getFacingLever(int data)
 	{

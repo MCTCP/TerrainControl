@@ -21,7 +21,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.gen.OTGChunkGenerator;
-import com.pg85.otg.gen.OTGChunkPopulator;
+import com.pg85.otg.gen.OTGChunkDecorator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.BlockPos2D;
@@ -119,7 +119,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final int noiseHeight;
 
 	private final OTGChunkGenerator internalGenerator;
-	private final OTGChunkPopulator chunkPopulator;
+	private final OTGChunkDecorator chunkPopulator;
 	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
 	// Unloaded chunk data caches for BO4's
@@ -179,7 +179,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
 
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
-		this.chunkPopulator = new OTGChunkPopulator();
+		this.chunkPopulator = new OTGChunkDecorator();
 	}
 
 	public void saveStructureCache()
@@ -218,7 +218,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void fillFromNoise(IWorld world, StructureManager manager, IChunk chunk)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
-	
+		
 		// If we've already generated and cached this	
 		// chunk while it was unloaded, use cached data.		
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
@@ -331,8 +331,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
 		try
 		{
-			// Override normal population (Biome.func_242427_a()) with OTG's.
-			biomePopulate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			// Override normal decoration (Biome.func_242427_a()) with OTG's.
+			biomeDecorate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
 			crashreport.addCategory("Generation").setDetail("CenterX", chunkX).setDetail("CenterZ", chunkZ).setDetail("Seed", decorationSeed);
@@ -340,8 +340,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}	
 	}
 
-	// Chunk population method taken from Biome (Biome.func_242427_a())
-	private void biomePopulate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
+	// Chunk population method taken from Biome class
+	private void biomeDecorate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = world.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
@@ -349,7 +349,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		

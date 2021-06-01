@@ -1,6 +1,7 @@
 package com.pg85.otg.customobject.resource;
 
 import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -45,7 +46,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
 
         biomeConfig.setStructureGen(this);
     }
-        
+
     @Override
 	public Double getObjectChance(int i)
     {
@@ -85,6 +86,16 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
     public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
+    }
+    
+    @Override
+    public void process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    {
+    	// Don't process BO4's, they're plotted and spawned separately from other resources.
+    	if(worldGenRegion.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
+    	{
+    		super.process(structureCache, worldGenRegion, random, villageInChunk, chunkBeingPopulated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    	}
     }
 
     // Only used for BO3 CustomStructure

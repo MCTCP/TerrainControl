@@ -42,11 +42,14 @@ import com.pg85.otg.util.minecraft.DefaultStructurePart;
 
 public class BO3Config extends CustomObjectConfigFile
 {
+	// TODO: Split this up into multiple config classes like common-core
+	// does for world/biome configs, add getters etc.
+	
 	private boolean isOTGPlus; // Legacy setting
 	boolean doReplaceBlocks;
 	
-	private String author;
-	private String description;
+	public String author;
+	public String description;
 	ConfigMode settingsMode;
 	boolean tree;
 	int frequency;

@@ -485,14 +485,14 @@ public class CustomStructureFileManager
 
 					if(
 						structure instanceof BO4CustomStructure &&
-						((BO4CustomStructure)structure).objectsToSpawn.entrySet().size() > 0
+						((BO4CustomStructure)structure).getObjectsToSpawn().entrySet().size() > 0
 					)
 					{
 						dos.writeBoolean(true);
 												
 						Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsInRegion = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
 						int size = 0;
-						for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).objectsToSpawn.entrySet())
+						for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).getObjectsToSpawn().entrySet())
 						{
 							if(objectToSpawn.getKey().toRegionCoord().equals(regionCoord))
 							{
@@ -525,7 +525,7 @@ public class CustomStructureFileManager
 	
 					if(
 						structure instanceof BO4CustomStructure && 
-						((BO4CustomStructure)structure).smoothingAreaManager.smoothingAreasToSpawn.entrySet().size() > 0 
+						((BO4CustomStructure)structure).getSmoothingAreaManager().smoothingAreasToSpawn.entrySet().size() > 0 
 					)
 					{
 						ArrayList<SmoothingAreaLine> coords2;
@@ -533,7 +533,7 @@ public class CustomStructureFileManager
 						
 						Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasPerRegion = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 						int size = 0;
-						for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreaManager.smoothingAreasToSpawn.entrySet())
+						for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).getSmoothingAreaManager().smoothingAreasToSpawn.entrySet())
 						{
 							if(smoothingAreaToSpawn.getKey().toRegionCoord().equals(regionCoord))
 							{
@@ -1152,7 +1152,7 @@ public class CustomStructureFileManager
 			    	} else {
 				    	structure = new BO4CustomStructure(worldSeed, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			    	}
-		    		((BO4CustomStructure)structure).startChunkBlockChecksDone = true;
+		    		((BO4CustomStructure)structure).setStartChunkBlockChecksDone();
 			    } else {
 			    	structure = new BO3CustomStructure((BO3CustomStructureCoordinate)structureStart);
 			    }

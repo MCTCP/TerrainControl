@@ -23,12 +23,12 @@ public class CustomStructurePlaceHolder extends BO4CustomStructure
 
 	public void mergeWithCustomStructure(BO4CustomStructure structure)
 	{		
-		structure.objectsToSpawn.putAll(this.objectsToSpawn);
+		structure.getObjectsToSpawn().putAll(this.getObjectsToSpawn());
 		
 		Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> mergedSmoothingAreas = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
-		mergedSmoothingAreas.putAll(structure.smoothingAreaManager.smoothingAreasToSpawn);
-		mergedSmoothingAreas.putAll(this.smoothingAreaManager.smoothingAreasToSpawn);
-		structure.smoothingAreaManager.fillSmoothingLineCaches(mergedSmoothingAreas);
+		mergedSmoothingAreas.putAll(structure.getSmoothingAreaManager().smoothingAreasToSpawn);
+		mergedSmoothingAreas.putAll(this.getSmoothingAreaManager().smoothingAreasToSpawn);
+		structure.getSmoothingAreaManager().fillSmoothingLineCaches(mergedSmoothingAreas);
 		
 		structure.modDataManager.modData.addAll(this.modDataManager.modData);
 		structure.particlesManager.particleData.addAll(this.particlesManager.particleData);
