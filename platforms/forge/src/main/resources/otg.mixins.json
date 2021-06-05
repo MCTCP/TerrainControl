@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "otg.refmap.json",
   "mixins": [
+    "MixinChunkManager",
     "MixinLocateCommand",
     "MixinSpawnLocationHelper"
   ],
