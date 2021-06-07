@@ -58,38 +58,38 @@ public class SpigotLegacyMaterials
 
 			case "wood_stairs":
 			case "oak_stairs":
-				return Blocks.OAK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.OAK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "birch_wood_stairs":
 			case "birch_stairs":
-				return Blocks.BIRCH_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.BIRCH_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "spruce_wood_stairs":
 			case "spruce_stairs":
-				return Blocks.SPRUCE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.SPRUCE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "jungle_wood_stairs":
 			case "jungle_stairs":
-				return Blocks.JUNGLE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.JUNGLE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "cobblestone_stairs":
 			case "stone_stairs":
-				return Blocks.COBBLESTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.COBBLESTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "stone_brick_stairs":
 			case "smooth_stairs":
-				return Blocks.STONE_BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.STONE_BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "brick_stairs":
-				return Blocks.BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "nether_brick_stairs":
-				return Blocks.NETHER_BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.NETHER_BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "sandstone_stairs":
-				return Blocks.SANDSTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.SANDSTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "quartz_stairs":
-				return Blocks.QUARTZ_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.QUARTZ_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "acacia_stairs":
-				return Blocks.ACACIA_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.ACACIA_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "dark_oak_stairs":
-				return Blocks.DARK_OAK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.DARK_OAK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "red_sandstone_stairs":
-				return Blocks.RED_SANDSTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.RED_SANDSTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 			case "purpur_stairs":
-				return Blocks.PURPUR_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.PURPUR_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.NORTH);
 
 			case "quartz_ore":
 				return Blocks.NETHER_QUARTZ_ORE.getBlockData();				
@@ -501,7 +501,6 @@ public class SpigotLegacyMaterials
 				case "stone_stairs":
 					return getStairsWithData(4, data);
 				case "brick_stairs":
-				case "smooth_stairs":					
 					return getStairsWithData(5, data);
 				case "nether_brick_stairs":
 					return getStairsWithData(7, data);
@@ -518,6 +517,7 @@ public class SpigotLegacyMaterials
 				case "purpur_stairs":
 					return getStairsWithData(13, data);
 				case "stone_brick_stairs":
+				case "smooth_stairs":					
 					return getStairsWithData(14, data);
 				case "lever":
 					return getLeverOrButtonWithData(0, data);

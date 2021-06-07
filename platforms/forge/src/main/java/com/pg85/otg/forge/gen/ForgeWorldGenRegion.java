@@ -297,7 +297,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x , y, z);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
 			}
 		}
 		
@@ -317,32 +317,36 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
-		if(highestY > 0)
+		if(highestY >= 0)
 		{
-			highestY += 1;
+			return highestY + 1;
 		} else {
-			highestY = -1;
+			return -1;
 		}
-		return highestY;
 	}
 
 	@Override
 	public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
-		if(highestY > 0)
+		if(highestY >= 0)
 		{
-			highestY += 1;
+			return highestY + 1;
 		} else {
-			highestY = -1;
+			return -1;
 		}
-		return highestY;
 	}
 
 	@Override
 	public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		return getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingPopulated) + 1;
+		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingPopulated);
+		if(highestY >= 0)
+		{
+			return highestY + 1;
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
@@ -371,7 +375,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 			}
 		}
 		

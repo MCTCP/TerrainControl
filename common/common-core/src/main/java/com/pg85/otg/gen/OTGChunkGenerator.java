@@ -62,10 +62,13 @@ public class OTGChunkGenerator
 
 	});
 
+	// TODO: ThreadLocal is used mostly as a crutch here, ideally these classes wouldn't maintain any state.
+	// ThreadLocal may have some overhead for the gets/sets, even when used on a single thread.
+	// Some of these classes may not be thread-safe (tho testing seems ok), need to check all the internal state.
+	
 	private final OctavePerlinNoiseSampler interpolationNoise;     // Volatility noise
 	private final OctavePerlinNoiseSampler lowerInterpolatedNoise; // Volatility1 noise
 	private final OctavePerlinNoiseSampler upperInterpolatedNoise; // Volatility2 noise
-
 	private final OctavePerlinNoiseSampler depthNoise;
 
 	private final Preset preset;
@@ -83,10 +86,10 @@ public class OTGChunkGenerator
 	private final Carver ravines;
 	// Biome blocks noise
 	// TODO: Use new noise?
-	private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
-	private int lastX = Integer.MAX_VALUE;
-	private int lastZ = Integer.MAX_VALUE;
-	private double lastNoise = 0;
+	private ThreadLocal<double[]> biomeBlocksNoise = ThreadLocal.withInitial(() -> new double[CHUNK_SIZE * CHUNK_SIZE]);
+	private ThreadLocal<Integer> lastX = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
+	private ThreadLocal<Integer> lastZ = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
+	private ThreadLocal<Double> lastNoise = ThreadLocal.withInitial(() -> 0d);
 
 	public OTGChunkGenerator(Preset preset, long seed, LayerSource biomeGenerator)
 	{
@@ -128,12 +131,10 @@ public class OTGChunkGenerator
 			if (arrayZ >= 0 && arrayZ < 24)
 			{
 				return arrayY >= 0 && arrayY < 24 ? (double) NOISE_WEIGHT_TABLE[arrayY * 24 * 24 + arrayX * 24 + arrayZ] : 0.0D;
-			} else
-			{
+			} else {
 				return 0.0D;
 			}
-		} else
-		{
+		} else {
 			return 0.0D;
 		}
 	}
@@ -415,12 +416,12 @@ public class OTGChunkGenerator
 		int blockZ = pos.getBlockZ();
 
 		IBiomeConfig[] biomes = new IBiomeConfig[256];
-
+		IBiomeConfig config;
 		for (int x = 0; x < 16; x++)
 		{
 			for (int z = 0; z < 16; z++)
 			{
-				IBiomeConfig config = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
+				config = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
 				biomes[x * 16 + z] = config;
 				// TODO: water levels used to be interpolated via bilinear interpolation. Do we still need to do that?
 				waterLevel[x * 16 + z] = config.getWaterLevelMax();
@@ -595,15 +596,15 @@ public class OTGChunkGenerator
 		// Process surface and ground blocks for each column in the chunk
 		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 		double d1 = 0.03125D;
-		this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
-		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise, heightCap);
+		this.biomeBlocksNoise.set(this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise.get(), chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D));
+		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise.get(), heightCap);
+		IBiomeConfig biomeConfig;
 		for (int x = 0; x < CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
 				// Get the current biome config and some properties
-
-				IBiomeConfig biomeConfig = getBiomeAtWorldCoord(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+				biomeConfig = getBiomeAtWorldCoord(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 				biomeConfig.doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 			}
 		}
@@ -612,14 +613,14 @@ public class OTGChunkGenerator
 	// Used by sagc for generating surface/ground block patterns
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
-		double noise = this.lastNoise;
-		if (this.lastX != blockX || this.lastZ != blockZ)
+		double noise = this.lastNoise.get();
+		if (this.lastX.get() != blockX || this.lastZ.get() != blockZ)
 		{
 			double d1 = 0.03125D;
 			noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
-			this.lastX = blockX;
-			this.lastZ = blockZ;
-			this.lastNoise = noise;
+			this.lastX.set(blockX);
+			this.lastZ.set(blockZ);
+			this.lastNoise.set(noise);
 		}
 		return noise;
 	}

@@ -267,36 +267,36 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public int getBlockAboveLiquidHeight (int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
-		if (highestY > 0)
+		if (highestY >= 0)
 		{
-			highestY += 1;
+			return highestY + 1;
+		} else {
+			return -1;
 		}
-		else
-		{
-			highestY = -1;
-		}
-		return highestY;
 	}
 
 	@Override
 	public int getBlockAboveSolidHeight (int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
-		if (highestY > 0)
+		if (highestY >= 0)
 		{
-			highestY += 1;
+			return highestY + 1;
+		} else {
+			return -1;
 		}
-		else
-		{
-			highestY = -1;
-		}
-		return highestY;
 	}
 
 	@Override
 	public int getHighestBlockAboveYAt (int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		return getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingPopulated) + 1;
+		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingPopulated);
+		if (highestY >= 0)
+		{
+			return highestY + 1;
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
