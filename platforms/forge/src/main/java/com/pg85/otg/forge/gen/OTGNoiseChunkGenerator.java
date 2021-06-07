@@ -30,7 +30,6 @@ import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -611,7 +610,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// base terrain for the chunks in memory and caches the result in a limited size-cache. Cached
 	// data is used if/when the chunk is "properly" generated.
 
-	private LocalMaterialData[] getBlockColumnInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z)
+	private LocalMaterialData[] getBlockColumnInUnloadedChunk(Random worldRandom, int x, int z)
 	{
 		BlockPos2D blockPos = new BlockPos2D(x, z);
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
@@ -621,7 +620,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		byte blockZ = (byte) (z &= 0xF);
 
 		LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
-
+	
 		if (cachedColumn != null)
 		{
 			return cachedColumn;
@@ -631,7 +630,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(worldRandom, chunkCoord).getChunk();
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -654,10 +653,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return blocksInColumn;
 	}
 
-	private IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
+	private ForgeChunkBuffer getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
 	{
 		ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
-		ChunkBuffer buffer = new ForgeChunkBuffer(chunk);
+		ForgeChunkBuffer buffer = new ForgeChunkBuffer(chunk);
 		
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
 		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
@@ -669,25 +668,25 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
 
 		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
-		return chunk;
+		return buffer;
 	}
 
-	LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
+	LocalMaterialData getMaterialInUnloadedChunk(Random worldRandom, int x, int y, int z)
 	{
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldRandom, x, z);
 		return blockColumn[y];
 	}
 
-	int getHighestBlockYInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	int getHighestBlockYInUnloadedChunk(Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
 	{
 		int height = -1;
 
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldRandom, x, z);
 		ForgeMaterialData material;
 		boolean isLiquid;
 		boolean isSolid;
 
-		for (int y = 255; y > -1; y--)
+		for (int y = 255; y >= 0; y--)
 		{
 			material = (ForgeMaterialData) blockColumn[y];
 			isLiquid = material.isLiquid();
@@ -705,6 +704,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 		}
 		return height;
+	}
+	
+	public ForgeChunkBuffer getChunkWithoutLoadingOrCaching(Random random, ChunkCoordinate chunkCoordinate)
+	{
+		return getUnloadedChunk(random, chunkCoordinate);
 	}
 	
 	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkCoordinate chunkCoordinate)

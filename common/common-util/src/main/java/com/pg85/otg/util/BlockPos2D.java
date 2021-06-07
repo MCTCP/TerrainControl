@@ -2,8 +2,8 @@ package com.pg85.otg.util;
 
 public class BlockPos2D
 {
-	private final int x;
-	private final int z;
+	public final int x;
+	public final int z;
 	
 	public BlockPos2D(int x, int z)
 	{
