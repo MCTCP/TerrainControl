@@ -8,8 +8,9 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunk;
 
-class ForgeChunkBuffer extends ChunkBuffer
+public class ForgeChunkBuffer extends ChunkBuffer
 {
 	private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 	private final ChunkPrimer chunk;
@@ -36,5 +37,10 @@ class ForgeChunkBuffer extends ChunkBuffer
 	public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
 	{
 		return ForgeMaterialData.ofBlockState(this.chunk.getBlockState(this.mutable.set(blockX, blockY, blockZ)));
+	}
+	
+	public IChunk getChunk()
+	{
+		return this.chunk;
 	}
 }

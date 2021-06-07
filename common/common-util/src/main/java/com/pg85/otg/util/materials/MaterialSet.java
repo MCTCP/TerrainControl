@@ -96,6 +96,7 @@ public class MaterialSet
     @Override
     public int hashCode()
     {
+    	// TODO: This method is never called, remove?
         final int prime = 31;
         int result = 1;
         result = prime * result + (this.allMaterials ? 1231 : 1237);
@@ -109,6 +110,7 @@ public class MaterialSet
     @Override
     public boolean equals(Object obj)
     {
+    	// TODO: This method is never called, remove?
         if (this == obj)
         {
             return true;

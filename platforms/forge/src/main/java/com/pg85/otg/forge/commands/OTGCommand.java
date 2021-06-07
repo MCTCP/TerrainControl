@@ -38,16 +38,32 @@ public class OTGCommand
 					(context) -> HelpCommand.showHelp(context.getSource())
 				)
 			).then(
-				Commands.literal("map").executes(
-					(context) -> MapCommand.mapBiomes(context.getSource(), 2048, 2048)
+				Commands.literal("mapbiomes").executes(
+					(context) -> MapCommand.mapBiomes(context.getSource(), 2048, 2048, 1)
 				).then(
 					Commands.argument("width", IntegerArgumentType.integer(0)).executes(
-						(context) -> MapCommand.mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"))
+						(context) -> MapCommand.mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"), 1)
 					).then(
 						Commands.argument("height", IntegerArgumentType.integer(0)).executes(
-							(context) -> MapCommand.mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"))
-						)))
+							(context) -> MapCommand.mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), 1)
+						).then(
+							Commands.argument("threads", IntegerArgumentType.integer(0)).executes(
+								(context) -> MapCommand.mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), IntegerArgumentType.getInteger(context, "threads"))
+							))))
 			).then(
+				Commands.literal("mapterrain").executes(
+						(context) -> MapCommand.mapTerrain(context.getSource(), 2048, 2048, 1)
+					).then(
+						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
+							(context) -> MapCommand.mapTerrain(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"), 1)
+						).then(
+							Commands.argument("height", IntegerArgumentType.integer(0)).executes(
+								(context) -> MapCommand.mapTerrain(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), 1)
+							).then(
+								Commands.argument("threads", IntegerArgumentType.integer(0)).executes(
+									(context) -> MapCommand.mapTerrain(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), IntegerArgumentType.getInteger(context, "threads"))
+								))))
+			).then(					
 				Commands.literal("data").then(
 					Commands.argument("type", StringArgumentType.word()).executes(
 						(context -> DataCommand.execute(context.getSource(), context.getArgument("type", String.class)))

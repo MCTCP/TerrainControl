@@ -46,7 +46,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
-	private final CachingLayerSampler layer;
+	private final ThreadLocal<CachingLayerSampler> layer;
 	public final BiomeConfig[] configLookup;
 	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
 	private final String presetName;
@@ -59,7 +59,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
 		this.largeBiomes = largeBiomes;
 		this.registry = registry;
-		this.layer = BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName), OTG.getEngine().getLogger());
+		this.layer = ThreadLocal.withInitial(() -> BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName), OTG.getEngine().getLogger()));
 		this.keyLookup = new Int2ObjectOpenHashMap<>();
 
 		// Default to let us know if we did anything wrong
@@ -109,7 +109,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 
 	public RegistryKey<Biome> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
 	{
-		return keyLookup.get(this.layer.sample(biomeX, biomeZ));
+		return keyLookup.get(this.layer.get().sample(biomeX, biomeZ));
 	}
 
 	@Override
@@ -126,19 +126,19 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		return registry.get(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
+		return registry.get(keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
 	}
 
 	@Override
 	public CachingLayerSampler getSampler()
 	{
-		return this.layer;
+		return this.layer.get();
 	}
 
 	@Override
 	public BiomeConfig getConfig(int biomeX, int biomeZ)
 	{
-		int biomeId = this.layer.sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? configLookup[this.layer.sample(biomeX, biomeZ)] : null;
+		int biomeId = this.layer.get().sample(biomeX, biomeZ);
+		return this.configLookup.length > biomeId ? configLookup[this.layer.get().sample(biomeX, biomeZ)] : null;
 	}
 }

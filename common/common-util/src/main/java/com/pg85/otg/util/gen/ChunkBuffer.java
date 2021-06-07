@@ -43,6 +43,8 @@ public abstract class ChunkBuffer
      */
     public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
 
+    // TODO: Are these really necessary, can use heightmaps?
+    
     private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
 	public int getHighestBlockForColumn(int blockX, int blockZ)
 	{

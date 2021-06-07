@@ -33,7 +33,7 @@ import java.util.Objects;
 public class ForgeMaterialData extends LocalMaterialData
 {
 	private static final LocalMaterialData blank = new ForgeMaterialData(null, null, true);
-	private static final HashMap<BlockState, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
+	private static final HashMap<BlockState, ForgeMaterialData> stateToMaterialDataMap = new HashMap<>();
 
 	private final BlockState blockData;
 	private String name = null;
@@ -165,24 +165,24 @@ public class ForgeMaterialData extends LocalMaterialData
 		return ofBlock(Blocks.AIR, input);
 	}
 		
-	private static LocalMaterialData ofBlock(Block block, String raw)
+	private static ForgeMaterialData ofBlock(Block block, String raw)
 	{
 		return ofBlockState(block.defaultBlockState(), raw);
 	}
 
-	public static LocalMaterialData ofBlockState(BlockState blockData)
+	public static ForgeMaterialData ofBlockState(BlockState blockData)
 	{
 		return ofBlockState(blockData, null);
 	}
 	
-	private static LocalMaterialData ofBlockState(BlockState blockState, String raw)
+	private static ForgeMaterialData ofBlockState(BlockState blockState, String raw)
 	{
 		// Create only one LocalMaterialData object for each BlockState
 		if (stateToMaterialDataMap.containsKey(blockState))
 		{
 			return stateToMaterialDataMap.get(blockState);
 		}
-		LocalMaterialData data = new ForgeMaterialData(blockState, raw);
+		ForgeMaterialData data = new ForgeMaterialData(blockState, raw);
 		stateToMaterialDataMap.put(blockState, data);
 		return data;
 	}	
