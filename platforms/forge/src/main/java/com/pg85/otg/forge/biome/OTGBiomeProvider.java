@@ -139,6 +139,6 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public BiomeConfig getConfig(int biomeX, int biomeZ)
 	{
 		int biomeId = this.layer.get().sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? configLookup[this.layer.get().sample(biomeX, biomeZ)] : null;
+		return this.configLookup.length > biomeId ? configLookup[biomeId] : null;
 	}
 }

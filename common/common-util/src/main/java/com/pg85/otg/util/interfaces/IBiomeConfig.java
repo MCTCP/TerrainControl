@@ -97,7 +97,7 @@ public interface IBiomeConfig
 	LocalMaterialData getBedrockBlockReplaced(int y);
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getDefaultGroundBlock();
-	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
+	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z);
 	boolean hasReplaceBlocksSettings();
 	ReplacedBlocksMatrix getReplaceBlocks();
 	
