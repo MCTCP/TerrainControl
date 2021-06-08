@@ -102,6 +102,8 @@ public class MapCommand
 	
 	static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, OTGBiomeProvider provider, boolean mapBiomes, int threads)
 	{
+		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
+		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
         List<BlockPos2D> coordsToHandle = new ArrayList<BlockPos2D>(width * height);
 		for (int chunkX = 0; chunkX < (int)Math.ceil(height / 16f); chunkX++)
 		{
@@ -109,13 +111,12 @@ public class MapCommand
 			{
 				coordsToHandle.add(new BlockPos2D(chunkX, chunkZ));
 			}
-		}	
+		}
 
-        int maxConcurrent = threads;
-        CountDownLatch latch = new CountDownLatch(maxConcurrent);
+        CountDownLatch latch = new CountDownLatch(threads);
         MapCommand outer = new MapCommand();
         int totalSize = coordsToHandle.size();
-		for(int i = 0; i < maxConcurrent; i++)
+		for(int i = 0; i < threads; i++)
 		{
 			outer.new Worker(latch, source, generator, provider, img, coordsToHandle, totalSize, mapBiomes, width, height).start();
 		}
@@ -226,9 +227,10 @@ public class MapCommand
 					int z = chunkCoords.z * 16 + internalZ;
 					if(x <= width && z <= height)
 					{
+						int biomeId = provider.getSampler().sample(x, z);
 						synchronized(imgLock)
 						{
-							img.setRGB(x, z, provider.configLookup[provider.getSampler().sample(x, z)].getBiomeColor());
+							img.setRGB(x, z, provider.configLookup[biomeId].getBiomeColor());
 						}
 					}
 				}
@@ -238,6 +240,7 @@ public class MapCommand
 	    private void getTerrainPixel(BlockPos2D chunkCoords)
 	    {
 	    	ForgeChunkBuffer chunk = generator.getChunkWithoutLoadingOrCaching(source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
+	    	HighestBlockInfo highestBlockInfo;
 			for (int internalX = 0; internalX < 16; internalX++)
 			{
 				for (int internalZ = 0; internalZ < 16; internalZ++)
@@ -246,12 +249,14 @@ public class MapCommand
 					int z = chunkCoords.z * 16 + internalZ;
 					if(x <= width && z <= height)
 					{
-						HighestBlockInfo highestBlockInfo = getHighestBlockInfoInUnloadedChunk(chunk, internalX, internalZ);
+						highestBlockInfo = getHighestBlockInfoInUnloadedChunk(chunk, internalX, internalZ);
 
+						// Color depth relative to waterlevel
 						//int worldHeight = 255;
 						//int worldWaterLevel = 63;
 						//int min = worldWaterLevel - worldHeight;
 						//int max = worldWaterLevel + worldHeight;
+						// Color depth relative to 0-255
 						int min = 0;
 						int max = 255;
 						int range = max - min;
