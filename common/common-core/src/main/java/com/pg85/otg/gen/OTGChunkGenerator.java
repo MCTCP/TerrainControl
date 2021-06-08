@@ -261,10 +261,28 @@ public class OTGChunkGenerator
 		// TODO: check only for edges
 		this.noiseCache.get().get(buffer, x, z);
 	}
-
-	private void generateNoiseColumn(double[] noiseColumn, int noiseX, int noiseZ)
+	
+	public void getNoiseColumn(IBiomeConfig[] biomes, double[] buffer, int x, int z, int biomeCacheX, int biomeCacheZ, int biomeCacheSize)
 	{
-		IBiomeConfig center = getBiomeAt(noiseX, noiseZ);
+		// TODO: check only for edges
+		this.noiseCache.get().get(biomes, buffer, x, z, biomeCacheX, biomeCacheZ, biomeCacheSize);
+	}
+
+	private void generateNoiseColumn(IBiomeConfig[] biomeCache, double[] noiseColumn, int noiseX, int noiseZ, int biomeCacheX, int biomeCacheZ, int biomeCacheSize)
+	{
+		IBiomeConfig center = null;
+		if(biomeCache != null)
+		{
+			center = biomeCache[biomeCacheX * biomeCacheSize + biomeCacheZ];
+		}
+		if(center == null)
+		{
+			center = getBiomeAt(noiseX, noiseZ);
+			if(biomeCache != null)
+			{
+				biomeCache[biomeCacheX * biomeCacheSize + biomeCacheZ] = center;
+			}
+		}
 
 		final int usedYSections = this.preset.getWorldConfig().getWorldHeightScale() / 8 + 1;
 
@@ -280,13 +298,26 @@ public class OTGChunkGenerator
 		double maxAverageHeight = 0;
 		double[] chc = new double[this.noiseSizeY + 1];
 		float weight = 0;
-
+		
+		IBiomeConfig biome;
 		for (int x1 = -center.getSmoothRadius(); x1 <= center.getSmoothRadius(); ++x1)
 		{
 			for (int z1 = -center.getSmoothRadius(); z1 <= center.getSmoothRadius(); ++z1)
 			{
-				// TODO: thread local lossy cache for biome sampling
-				IBiomeConfig biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+				if(biomeCache != null)
+				{
+					biome = biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)];
+				} else {
+					biome = null;
+				}
+				if(biome == null)
+				{
+					biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+					if(biomeCache != null)
+					{
+						biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)] = biome;
+					}
+				}
 
 				float heightAt = biome.getBiomeHeight();
 				// TODO: vanilla reduces the weight by half when the depth here is greater than the center depth, but OTG doesn't do that?
@@ -314,7 +345,20 @@ public class OTGChunkGenerator
 		{
 			for (int z1 = -center.getCHCSmoothRadius(); z1 <= center.getCHCSmoothRadius(); ++z1)
 			{
-				IBiomeConfig biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+				if(biomeCache != null)
+				{
+					biome = biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)];
+				} else {
+					biome = null;
+				}
+				if(biome == null)
+				{
+					biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+					if(biomeCache != null)
+					{
+						biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)] = biome;
+					}
+				}
 
 				float heightAt = biome.getBiomeHeight();
 				float weightAt = BIOME_WEIGHT_TABLE[x1 + 32 + (z1 + 32) * 65] / (heightAt + 2.0F);
@@ -430,15 +474,27 @@ public class OTGChunkGenerator
 
 		// TODO: this double[][][] is probably really bad for performance
 		double[][][] noiseData = new double[2][this.noiseSizeZ + 1][this.noiseSizeY + 1];
-
+		// Max smoothing radius is 32, so area covered is 32+5+32=69 (noise/biome coords, so *4)
+		int cacheSize = 69;
+		IBiomeConfig[] biomeCache = new IBiomeConfig[cacheSize * cacheSize];
+		
 		// Initialize noise data on the x0 column.
 		for (int noiseZ = 0; noiseZ < this.noiseSizeZ + 1; ++noiseZ)
 		{
 			noiseData[0][noiseZ] = new double[this.noiseSizeY + 1];
-			this.getNoiseColumn(noiseData[0][noiseZ], pos.getChunkX() * this.noiseSizeX, pos.getChunkZ() * this.noiseSizeZ + noiseZ);
+			this.getNoiseColumn(
+				biomeCache, 
+				noiseData[0][noiseZ], 
+				pos.getChunkX() * this.noiseSizeX, 
+				pos.getChunkZ() * this.noiseSizeZ + noiseZ, 
+				32, 
+				32 + noiseZ,
+				cacheSize				
+			);
 			noiseData[1][noiseZ] = new double[this.noiseSizeY + 1];
 		}
 
+		IBiomeConfig biomeConfig;
 		// [0, 4] -> x noise chunks
 		for (int noiseX = 0; noiseX < this.noiseSizeX; ++noiseX)
 		{
@@ -446,7 +502,15 @@ public class OTGChunkGenerator
 			int noiseZ;
 			for (noiseZ = 0; noiseZ < this.noiseSizeZ + 1; ++noiseZ)
 			{
-				this.getNoiseColumn(noiseData[1][noiseZ], pos.getChunkX() * this.noiseSizeX + noiseX + 1, pos.getChunkZ() * this.noiseSizeZ + noiseZ);
+				this.getNoiseColumn(
+					biomeCache, 
+					noiseData[1][noiseZ], 
+					pos.getChunkX() * this.noiseSizeX + noiseX + 1, 
+					pos.getChunkZ() * this.noiseSizeZ + noiseZ, 
+					32 + noiseX + 1, 
+					32 + noiseZ,
+					cacheSize					
+				);
 			}
 
 			// [0, 4] -> z noise chunks
@@ -502,7 +566,7 @@ public class OTGChunkGenerator
 								// Normalize the noise from (-256, 256) to [-1, 1]
 								double density = MathHelper.clamp(rawNoise / 200.0D, -1.0D, 1.0D);
 
-								IBiomeConfig biomeConfig = biomes[localX * 16 + localZ];
+								biomeConfig = biomes[localX * 16 + localZ];
 
 								// TODO: make this bigger and look better
 								// Iterate through structures to add density
@@ -548,7 +612,7 @@ public class OTGChunkGenerator
 			noiseData[1] = xColumn;
 		}
 
-		doSurfaceAndGroundControl(random, worldHeightCap, this.seed, buffer, waterLevel);
+		doSurfaceAndGroundControl(biomes, random, worldHeightCap, this.seed, buffer, waterLevel);
 	}
 
 	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)
@@ -591,21 +655,19 @@ public class OTGChunkGenerator
 	}
 
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
-	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, int[] waterLevel)
+	private void doSurfaceAndGroundControl(IBiomeConfig[] biomes, Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, int[] waterLevel)
 	{
 		// Process surface and ground blocks for each column in the chunk
 		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 		double d1 = 0.03125D;
 		this.biomeBlocksNoise.set(this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise.get(), chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D));
 		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise.get(), heightCap);
-		IBiomeConfig biomeConfig;
 		for (int x = 0; x < CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
 				// Get the current biome config and some properties
-				biomeConfig = getBiomeAtWorldCoord(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
-				biomeConfig.doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+				biomes[x * 16 + z].doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 			}
 		}
 	}
@@ -642,9 +704,14 @@ public class OTGChunkGenerator
 			this.values = new double[size * noiseSize];
 		}
 
-		public double[] get(double[] buffer, int x, int z)
+		public double[] get(double[] buffer, int noiseX, int noiseZ)
 		{
-			long key = key(x, z);
+			return get(null, buffer, noiseX, noiseZ, 0, 0, 0);
+		}
+		
+		public double[] get(IBiomeConfig[] biomeCache, double[] buffer, int noiseX, int noiseZ, int biomeCacheX, int biomeCacheZ, int biomeCacheSize)
+		{
+			long key = key(noiseX, noiseZ);
 			int idx = hash(key) & this.mask;
 
 			// if the entry here has a key that matches ours, we have a cache hit
@@ -652,12 +719,11 @@ public class OTGChunkGenerator
 			{
 				// Copy values into buffer
 				System.arraycopy(this.values, idx * buffer.length, buffer, 0, buffer.length);
-			} else
-			{
+			} else {
 				// cache miss: sample and put the result into our cache entry
 
 				// Sample the noise column to store the new values
-				generateNoiseColumn(buffer, x, z);
+				generateNoiseColumn(biomeCache, buffer, noiseX, noiseZ, biomeCacheX, biomeCacheZ, biomeCacheSize);
 
 				// Create copy of the array
 				System.arraycopy(buffer, 0, this.values, idx * buffer.length, buffer.length);

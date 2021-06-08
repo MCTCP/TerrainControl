@@ -124,6 +124,6 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 	public BiomeConfig getConfig (int biomeX, int biomeZ)
 	{
 		int biomeId = this.layer.sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? configLookup[this.layer.sample(biomeX, biomeZ)] : null;
+		return this.configLookup.length > biomeId ? configLookup[biomeId] : null;
 	}
 }
