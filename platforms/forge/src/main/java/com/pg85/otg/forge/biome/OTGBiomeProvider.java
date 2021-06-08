@@ -66,6 +66,10 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
 		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetName);
+		if(this.configLookup == null)
+		{
+			throw new RuntimeException("No OTG preset found with name \"" + presetName + "\". Install the correct preset or update your server.properties.");
+		}
 		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
 		{
 			BiomeConfig config = this.configLookup[biomeId];
