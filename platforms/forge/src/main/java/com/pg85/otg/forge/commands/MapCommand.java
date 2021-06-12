@@ -45,7 +45,7 @@ public class MapCommand
 		
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
-		Instant start = Instant.now();	
+		Instant start = Instant.now();
 		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, (OTGBiomeProvider) source.getLevel().getChunkSource().generator.getBiomeSource(), true, threads);
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish); // Note: This is probably the least helpful time duration helper class I've ever seen ...
@@ -61,7 +61,10 @@ public class MapCommand
 			e.printStackTrace();
 		}
 
-		source.sendSuccess(new StringTextComponent("Finished mapping in " + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours()) + ":" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60)) + ":" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60)) + "! The resulting image is located at " + fileName + "."), true);
+		String hours = "" + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours());
+		String minutes = "" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60));
+		String seconds = "" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60));
+		source.sendSuccess(new StringTextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
 		
 		return 0;
 	}
@@ -95,7 +98,10 @@ public class MapCommand
 			e.printStackTrace();
 		}
 
-		source.sendSuccess(new StringTextComponent("Finished mapping in " + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours()) + ":" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60)) + ":" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60)) + "! The resulting image is located at " + fileName + "."), true);
+		String hours = "" + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours());
+		String minutes = "" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60));
+		String seconds = "" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60));
+		source.sendSuccess(new StringTextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
 		
 		return 0;
 	}
@@ -105,9 +111,9 @@ public class MapCommand
 		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
 		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
         List<BlockPos2D> coordsToHandle = new ArrayList<BlockPos2D>(width * height);
-		for (int chunkX = 0; chunkX < (int)Math.ceil(height / 16f); chunkX++)
+		for (int chunkX = 0; chunkX < (int)Math.ceil(width / 16f); chunkX++)
 		{
-			for (int chunkZ = 0; chunkZ < (int)Math.ceil(width / 16f); chunkZ++)
+			for (int chunkZ = 0; chunkZ < (int)Math.ceil(height / 16f); chunkZ++)
 			{
 				coordsToHandle.add(new BlockPos2D(chunkX, chunkZ));
 			}
@@ -166,7 +172,7 @@ public class MapCommand
 	        this.provider = provider;
 	        this.source = source;
 	        this.img = img;
-	        this.progressUpdate = (int)Math.floor(totalSize / 100f);
+	        this.progressUpdate = (int)Math.ceil(totalSize / 100f);
 	        this.coordsToHandle = coordsToHandle;
 	        this.totalSize = totalSize;
 	        this.mapBiomes = mapBiomes;
@@ -190,28 +196,28 @@ public class MapCommand
 	    		int sizeLeft;
 	    		synchronized(queueLock)
 	    		{
-	    			sizeLeft = coordsToHandle.size();
+	    			sizeLeft = this.coordsToHandle.size();
 	    			if(sizeLeft > 0)
 	    			{
-	    				coords = coordsToHandle.remove(sizeLeft - 1);
+	    				coords = this.coordsToHandle.remove(sizeLeft - 1);
 	    			}
 	    		}
     			// Send a progress update to let people know the server isn't dying
-    			if (sizeLeft % progressUpdate == 0)
+    			if (sizeLeft % this.progressUpdate == 0)
     			{
-    				source.sendSuccess(new StringTextComponent((int)Math.floor(100 - (((double)sizeLeft / totalSize) * 100)) + "% Done mapping"), true);
+    				this.source.sendSuccess(new StringTextComponent((int)Math.floor(100 - (((double)sizeLeft / this.totalSize) * 100)) + "% Done mapping"), true);
     			}
 	    		
 	    		if(coords != null)
 	    		{
-	    			if(mapBiomes)
+	    			if(this.mapBiomes)
 	    			{
 	    				getBiomePixel(coords);
 	    			} else {
 	    				getTerrainPixel(coords);
 	    			}
 	    		} else {
-    				latch.countDown();
+	    			this.latch.countDown();
     				return;
 	    		}
 	    	}
@@ -225,12 +231,12 @@ public class MapCommand
 				{
 					int x = chunkCoords.x * 16 + internalX;
 					int z = chunkCoords.z * 16 + internalZ;
-					if(x <= width && z <= height)
+					if(x < this.width && z < this.height)
 					{
-						int biomeId = provider.getSampler().sample(x, z);
+						int biomeId = this.provider.getSampler().sample(x, z);
 						synchronized(imgLock)
 						{
-							img.setRGB(x, z, provider.configLookup[biomeId].getBiomeColor());
+							this.img.setRGB(x, z, this.provider.configLookup[biomeId].getBiomeColor());
 						}
 					}
 				}
@@ -239,7 +245,7 @@ public class MapCommand
 	    
 	    private void getTerrainPixel(BlockPos2D chunkCoords)
 	    {
-	    	ForgeChunkBuffer chunk = generator.getChunkWithoutLoadingOrCaching(source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
+	    	ForgeChunkBuffer chunk = this.generator.getChunkWithoutLoadingOrCaching(this.source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
 	    	HighestBlockInfo highestBlockInfo;
 			for (int internalX = 0; internalX < 16; internalX++)
 			{
@@ -247,7 +253,7 @@ public class MapCommand
 				{
 					int x = chunkCoords.x * 16 + internalX;
 					int z = chunkCoords.z * 16 + internalZ;
-					if(x <= width && z <= height)
+					if(x < this.width && z < this.height)
 					{
 						highestBlockInfo = getHighestBlockInfoInUnloadedChunk(chunk, internalX, internalZ);
 
@@ -266,7 +272,7 @@ public class MapCommand
 						int rgbColor = shadeColor(highestBlockInfo.material.internalBlock().getBlock().defaultMaterialColor().col, shadePercentage);
 						synchronized(imgLock)
 						{
-							img.setRGB(x, z, rgbColor);
+							this.img.setRGB(x, z, rgbColor);
 						}
 					}
 				}

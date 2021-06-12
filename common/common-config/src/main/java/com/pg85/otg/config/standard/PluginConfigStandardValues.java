@@ -11,4 +11,5 @@ public class PluginConfigStandardValues extends Settings
     public static final Setting<LogLevels> LOG_LEVEL = enumSetting("LogLevel", LogLevels.Standard);
     public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
+    public static final Setting<Integer> WORKER_THREADS = intSetting("WorkerThreads", 0, 0, 10);    
 }

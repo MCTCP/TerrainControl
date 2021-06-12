@@ -18,6 +18,7 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 {
 	protected LogLevels logLevel;
 	protected boolean developerMode;
+	protected int workerThreads;
 	protected boolean spawnLog;
 	protected ConfigMode settingsMode;
 
@@ -30,6 +31,12 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	public LogLevels getLogLevel()
 	{
 		return this.logLevel;
+	}
+	
+	@Override
+	public int getMaxWorkerThreads()
+	{
+		return this.workerThreads;
 	}
 	
 	@Override

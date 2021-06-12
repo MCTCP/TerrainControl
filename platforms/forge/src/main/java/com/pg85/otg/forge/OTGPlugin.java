@@ -11,12 +11,14 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -79,7 +81,13 @@ public class OTGPlugin
 	
 	@SubscribeEvent
 	public void onSave(Save event)
-	{		
+	{
 		((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());
+	}
+	
+	@SubscribeEvent
+	public void onUnload(WorldEvent.Unload event)
+	{
+		((ForgeEngine)OTG.getEngine()).onUnload(event.getWorld());
 	}
 }

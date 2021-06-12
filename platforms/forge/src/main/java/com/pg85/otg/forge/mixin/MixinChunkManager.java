@@ -19,7 +19,7 @@ public class MixinChunkManager
     private Predicate<ChunkHolder> alwaysAccessibleFlush(Predicate<ChunkHolder> chunk)
     {
         return c -> true;
-    }	
+    }
 	
     @ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 1))
     private Predicate<IChunk> allowChunkPrimerFlush(Predicate<IChunk> chunk)
