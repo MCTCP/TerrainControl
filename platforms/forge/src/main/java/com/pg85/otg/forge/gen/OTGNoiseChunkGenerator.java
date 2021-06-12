@@ -203,8 +203,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		// Fetch any chunks that are cached in the WorldGenRegion, so we can
 		// pre-emptively generate and cache base terrain for them asynchronously.
-		//(WorldGenRegion worldGenRegion, StructureManager manager, IChunk chunk, OTGNoiseChunkGenerator otgNoiseChunkGenerator, OTGBiomeProvider otgBiomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
-		//this.shadowChunkGenerator.queueChunksForWorkerThreads((WorldGenRegion)world, manager, chunk, this, this.biomeSource, this.internalGenerator, this.getSettings(), this.preset.getWorldConfig().getWorldHeightCap());
+		this.shadowChunkGenerator.queueChunksForWorkerThreads((WorldGenRegion)world, manager, chunk, this, this.biomeSource, this.internalGenerator, this.getSettings(), this.preset.getWorldConfig().getWorldHeightCap());
 		
 		// If we've already (shadow-)generated and cached this	
 		// chunk while it was unloaded, use cached data.
@@ -260,7 +259,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate(), structures, junctions);			
-			//this.shadowChunkGenerator.setChunkGenerated(chunkCoord);
+			this.shadowChunkGenerator.setChunkGenerated(chunkCoord);
 		}
 	}
 	

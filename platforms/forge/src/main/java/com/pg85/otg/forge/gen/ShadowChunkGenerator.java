@@ -223,7 +223,7 @@ public class ShadowChunkGenerator
 				}
 			}
 			try {
-				OTG.log(LogMarker.INFO, "Waiting for chunk");
+				//OTG.log(LogMarker.INFO, "Waiting for chunk");
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
