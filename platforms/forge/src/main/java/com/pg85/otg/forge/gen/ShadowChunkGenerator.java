@@ -20,8 +20,10 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
@@ -31,6 +33,7 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.structure.VillageStructure;
@@ -337,16 +340,21 @@ public class ShadowChunkGenerator
 		return false;
 	}
 	
+	// Taken from PillagerOutpostStructure.isNearVillage
 	private static boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DimensionStructuresSettings dimensionStructuresSettings, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
-		StructureSeparationSettings structureseparationsettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
-		if (structureseparationsettings != null)
+		StructureSeparationSettings structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
+		if (structureSeparationSettings != null)
 		{
-			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, chunkGenerator, biomeProvider, templateManager, seed, chunkPos, biome, 0, structureseparationsettings);
-			if(structureStart1 != StructureStart.INVALID_START)
-			{
+			SharedSeedRandom sharedSeedRandom = new SharedSeedRandom();
+			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
+			if (
+				chunkPos.x == chunkPosPotential.x && 
+				chunkPos.z == chunkPosPotential.z
+			) {
 				return true;
 			}
+			return false;
 		}
 		return false;
 	}
