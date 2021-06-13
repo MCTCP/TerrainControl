@@ -296,7 +296,7 @@ public class ShadowChunkGenerator
 					{
 						for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
 						{
-							int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));         
+							int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));		 
 							if (distance == cycle)
 							{
 								searchChunk = ChunkCoordinate.fromChunkCoords(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset);
@@ -481,74 +481,74 @@ public class ShadowChunkGenerator
 		private final List<ChunkCoordinate> chunksToLoad;
 		private final ChunkCoordinate[] chunksBeingLoaded;
 		private final ServerWorld serverWorld;
-	    private final ChunkGenerator chunkGenerator;
-	    private final BiomeProvider biomeProvider;
-	    private final OTGChunkGenerator otgChunkGenerator;
-	    private final DimensionStructuresSettings dimensionStructuresSettings;
-	    private final int worldHeightCap;
+		private final ChunkGenerator chunkGenerator;
+		private final BiomeProvider biomeProvider;
+		private final OTGChunkGenerator otgChunkGenerator;
+		private final DimensionStructuresSettings dimensionStructuresSettings;
+		private final int worldHeightCap;
 		
-	    public Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
-	    {
-	    	this.index = index;
-	    	this.unloadedChunksCache = unloadedChunksCache;
-	    	this.chunksToLoad = chunksToLoad;
-	    	this.chunksBeingLoaded = chunksBeingLoaded;
-	    	this.serverWorld = serverWorld;
-		    this.chunkGenerator = chunkGenerator;
-		    this.biomeProvider  = biomeProvider;
-		    this.otgChunkGenerator = otgChunkGenerator;
-		    this.dimensionStructuresSettings = dimensionStructuresSettings;
-		    this.worldHeightCap = worldHeightCap;
-	    }
-
-	    public void start(Random worldRandom)
-	    {
-	        this.runner = new Thread(this);
-	        this.runner.start();
-	        this.worldRandom = worldRandom;
-	    }
-	    
-	    public void stop()
-	    {
-	    	this.stop = true;
-	    }
-	    
-	    @Override
-	    public void run()
-	    {
-	    	// Process chunks if any are in the queue,
-	    	// otherwise wait for the queue to be filled.
-	    	while(true)
-	    	{
-	    		if(this.stop)
-	    		{
-	    			this.stop = false;
-	    			return;
-	    		}
-	    		
-	    		ChunkCoordinate coords = null;
-	    		int sizeLeft;
-	    		synchronized(workerLock)
-	    		{
-	    			sizeLeft = this.chunksToLoad.size();
-	    			if(sizeLeft > 0)
-	    			{
-	    				coords = this.chunksToLoad.remove(sizeLeft - 1);
-	    				this.chunksBeingLoaded[this.index] = coords;
-	    			}
-	    		}
-	    		if(coords != null)
-	    		{
-	    			if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords))
-	    			{
-						// Generate a chunk without loading/populating it.	    				
-	    				IChunk cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
+		public Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
+		{
+			this.index = index;
+			this.unloadedChunksCache = unloadedChunksCache;
+			this.chunksToLoad = chunksToLoad;
+			this.chunksBeingLoaded = chunksBeingLoaded;
+			this.serverWorld = serverWorld;
+			this.chunkGenerator = chunkGenerator;
+			this.biomeProvider  = biomeProvider;
+			this.otgChunkGenerator = otgChunkGenerator;
+			this.dimensionStructuresSettings = dimensionStructuresSettings;
+			this.worldHeightCap = worldHeightCap;
+		}
+	
+		public void start(Random worldRandom)
+		{
+			this.runner = new Thread(this);
+			this.runner.start();
+			this.worldRandom = worldRandom;
+		}
+		
+		public void stop()
+		{
+			this.stop = true;
+		}
+		
+		@Override
+		public void run()
+		{
+			// Process chunks if any are in the queue,
+			// otherwise wait for the queue to be filled.
+			while(true)
+			{
+				if(this.stop)
+				{
+					this.stop = false;
+					return;
+				}
+				
+				ChunkCoordinate coords = null;
+				int sizeLeft;
+				synchronized(workerLock)
+				{
+					sizeLeft = this.chunksToLoad.size();
+					if(sizeLeft > 0)
+					{
+						coords = this.chunksToLoad.remove(sizeLeft - 1);
+						this.chunksBeingLoaded[this.index] = coords;
+					}
+				}
+				if(coords != null)
+				{
+					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords))
+					{
+						// Generate a chunk without loading/populating it.						
+						IChunk cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
 						synchronized(workerLock)
 						{
 							this.unloadedChunksCache.put(coords, cachedChunk);
 							this.chunksBeingLoaded[this.index] = null;
 						}
-	    			} else {
+					} else {
 						synchronized(workerLock)
 						{
 							// This chunk should not be shadowgenned, add it
@@ -558,16 +558,16 @@ public class ShadowChunkGenerator
 							this.unloadedChunksCache.put(coords, null);
 							this.chunksBeingLoaded[this.index] = null;
 						}
-	    			}
-	    		} else {
-	    			try {
-	    				//OTG.log(LogMarker.INFO, "Thread " + this.index + " idle");
+					}
+				} else {
+					try {
+						//OTG.log(LogMarker.INFO, "Thread " + this.index + " idle");
 						Thread.sleep(50);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-	    		}
-	    	}
-	    }
+				}
+			}
+		}
 	}
 }
