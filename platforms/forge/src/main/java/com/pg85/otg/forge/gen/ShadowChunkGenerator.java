@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.gen.OTGChunkGenerator;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -23,7 +21,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
@@ -33,9 +30,7 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.structure.VillageStructure;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
@@ -49,7 +44,7 @@ import net.minecraft.world.server.ServerWorld;
  * thread-safe way. Shadowgenned chunks are stored in a fixed size
  * FIFO cache, data is reused when base terraingen is requested
  * for those chunks via normal worldgen. Shadowgen is used for BO4's,
- * worker threads to speed up world generaration, and /otg mapterrain.
+ * worker threads to speed up world generation and /otg mapterrain.
  * 
  * Shadowgen can only be done for chunks that don't contain vanilla strucutures, 
  * since those structures may use density based smoothing applied during noisegen, 
@@ -58,10 +53,9 @@ import net.minecraft.world.server.ServerWorld;
  */
 public class ShadowChunkGenerator
 {
-	// TODO: Add a setting to the worldconfig for the size of these caches.
-	// Worlds with lots of BO4's and large smoothing areas may want to increase this.
+	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
-	private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);;
+	private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);
 	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);	
 
 	private final Object workerLock = new Object();
@@ -139,6 +133,9 @@ public class ShadowChunkGenerator
 									!this.chunksToLoad.contains(wgrChunkCoord)
 								)
 								{
+									// TODO: Queue order shouldn't really matter bc
+									// of the way maxQueueSize is enforced here. 
+									// Might affect cache hits/misses and waits tho, test?
 									this.chunksToLoad.addFirst(wgrChunkCoord);
 									if(this.chunksToLoad.size() == this.maxQueueSize)
 									{
@@ -160,7 +157,7 @@ public class ShadowChunkGenerator
 		
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
 		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
-		// BO4's/Shadowgen avoids villages, so this method should never be called to fetch unloaded chunks that contain villages, 
+		// BO4's/shadowgen avoid villages, so this method should never be called to fetch unloaded chunks that contain villages, 
 		// so we can skip noisegen affecting structures here.
 		// *TODO: Do we need to avoid any noisegen affecting structures other than villages?
 
@@ -173,12 +170,6 @@ public class ShadowChunkGenerator
 	
 	public IChunk getChunkWithWait(ChunkCoordinate chunkCoord)
 	{
-		// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.
-		return getChunkWithWait(chunkCoord, this.maxConcurrent);
-	}
-	
-	private IChunk getChunkWithWait(ChunkCoordinate chunkCoord, int threadIndex)
-	{
 		// Fetch the chunk if it is cached, otherwise check if no other thread
 		// is generating the chunk. If not, claim the chunk and generate it.
 		// If so, wait for the other thread to finish.
@@ -189,47 +180,65 @@ public class ShadowChunkGenerator
 			{
 				return cachedChunk;
 			} else {
-				boolean bFound = false;
-				for(int i = 0; i < this.chunksBeingLoaded.length; i++)
+				// If a chunk is in unloadedChunksCache but is null, it's in a chunk that
+				// shouldn't be generated async due to a vanilla structure start nearby.
+				if(this.unloadedChunksCache.containsKey(chunkCoord))
 				{
-					if(this.chunksBeingLoaded[i] == chunkCoord)
-					{
-						bFound = true;
-						break;
-					}
-				}
-				if(!bFound)
-				{
+					this.unloadedChunksCache.remove(chunkCoord);
 					this.chunksToLoad.remove(chunkCoord);
-					this.chunksBeingLoaded[threadIndex] = chunkCoord;
+					// MaxConcurrent means worldgen thread, not a worker thread.
+					this.chunksBeingLoaded[this.maxConcurrent] = chunkCoord;
 					return null;
+				} else {
+					boolean bFound = false;
+					for(int i = 0; i < this.chunksBeingLoaded.length; i++)
+					{
+						if(this.chunksBeingLoaded[i] == chunkCoord)
+						{
+							bFound = true;
+							break;
+						}
+					}
+					if(!bFound)
+					{
+						this.chunksToLoad.remove(chunkCoord);
+						// MaxConcurrent means worldgen thread, not a worker thread.
+						this.chunksBeingLoaded[this.maxConcurrent] = chunkCoord;
+						return null;
+					}
 				}
 			}
 		}
+		
+		// A worker thread is generating the chunk, wait.
+		
 		while(true)
 		{
+			try {
+				//OTG.log(LogMarker.INFO, "Waiting for chunk");
+				// TODO: If a worker thread is stuck or crashed, this may wait indefinitely.
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}			
 			synchronized(this.workerLock)
 			{
 				IChunk cachedChunk = this.unloadedChunksCache.get(chunkCoord);
 				if(cachedChunk != null)
 				{
 					return cachedChunk;
+				} else {
+					// If a chunk is in unloadedChunksCache but is null, it's in a chunk that
+					// shouldn't be generated async due to a vanilla structure start nearby.
+					if(this.unloadedChunksCache.containsKey(chunkCoord))
+					{
+						this.unloadedChunksCache.remove(chunkCoord);
+						this.chunksToLoad.remove(chunkCoord);
+						// MaxConcurrent means worldgen thread, not a worker thread.
+						this.chunksBeingLoaded[this.maxConcurrent] = chunkCoord;
+						return null;
+					}
 				}
-				// If a chunk is in unloadedChunksCache but is null, it's in a chunk that
-				// shouldn't be generated async due to a vanilla structure start nearby.
-				if(cachedChunk == null && this.unloadedChunksCache.containsKey(chunkCoord))
-				{
-					this.unloadedChunksCache.remove(chunkCoord);
-					this.chunksToLoad.remove(chunkCoord);
-					this.chunksBeingLoaded[threadIndex] = chunkCoord;
-					return null;
-				}
-			}
-			try {
-				//OTG.log(LogMarker.INFO, "Waiting for chunk");
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -241,7 +250,6 @@ public class ShadowChunkGenerator
 		((ChunkPrimer)chunk).sections = ((ChunkPrimer)cachedChunk).sections;
 		((ChunkPrimer)chunk).heightmaps = ((ChunkPrimer)cachedChunk).heightmaps;			
 		((ChunkPrimer)chunk).lights = ((ChunkPrimer)cachedChunk).lights;
-		//((ChunkPrimer)chunk).lightengine = ((ChunkPrimer)cachedChunk).lightengine;
 		cacheHits++;
 		//OTG.log(LogMarker.INFO, "Cache hit " + cacheHits);
 		synchronized(this.workerLock)
@@ -256,7 +264,7 @@ public class ShadowChunkGenerator
 		//OTG.log(LogMarker.INFO, "Cache miss " + + cacheMisses);
 		synchronized(workerLock)
 		{
-			// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.			
+			// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.
 			this.chunksBeingLoaded[maxConcurrent] = null;
 			this.chunksToLoad.remove(chunkCoord);
 		}
@@ -392,8 +400,7 @@ public class ShadowChunkGenerator
 			return cachedColumn;
 		}
 
-		// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.
-		IChunk chunk = this.getChunkWithWait(chunkCoord, this.maxConcurrent);
+		IChunk chunk = this.getChunkWithWait(chunkCoord);
 		if (chunk == null)
 		{
 			// Generate a chunk without loading/populating it
@@ -401,7 +408,7 @@ public class ShadowChunkGenerator
 			synchronized(this.workerLock)
 			{
 				this.unloadedChunksCache.put(chunkCoord, chunk);
-				this.chunksBeingLoaded[maxConcurrent] = null;
+				this.chunksBeingLoaded[this.maxConcurrent] = null;
 			}
 		}
 		
@@ -544,6 +551,10 @@ public class ShadowChunkGenerator
 	    			} else {
 						synchronized(workerLock)
 						{
+							// This chunk should not be shadowgenned, add it
+							// to the unloadedChunksCache as null so workers
+							// avoid it and the worldgen thread takes care
+							// of it in getChunkWithWait().
 							this.unloadedChunksCache.put(coords, null);
 							this.chunksBeingLoaded[this.index] = null;
 						}
