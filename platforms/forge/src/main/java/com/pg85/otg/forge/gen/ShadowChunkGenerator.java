@@ -65,7 +65,8 @@ public class ShadowChunkGenerator
 	private final LinkedList<ChunkCoordinate> chunksToLoad = new LinkedList<ChunkCoordinate>();
 	private final int maxQueueSize = 512;
 	private final ChunkCoordinate[] chunksBeingLoaded;
-
+	private final int waitTimeInMS = 25;
+	private final int idleTimeInMS = 50;
 	private int cacheHits = 0;
 	private int cacheMisses = 0;
 
@@ -84,8 +85,7 @@ public class ShadowChunkGenerator
 		{
 			for(int i = 0; i < this.maxConcurrent; i++)
 			{
-				Worker thread = this.threads[i];
-				thread.stop();
+				this.threads[i].stop();
 			}
 		}
 	}
@@ -129,7 +129,7 @@ public class ShadowChunkGenerator
 										break;
 									}
 								}
-								if(!bFound && !this.chunksToLoad.contains(wgrChunkCoord))
+								if(!bFound)
 								{
 									// TODO: Queue order shouldn't really matter bc
 									// of the way maxQueueSize is enforced here. 
@@ -215,10 +215,10 @@ public class ShadowChunkGenerator
 			try {
 				//OTG.log(LogMarker.INFO, "Waiting for chunk");
 				// TODO: If a worker thread is stuck or crashed, this may wait indefinitely.
-				Thread.sleep(50);
+				Thread.sleep(this.waitTimeInMS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}			
+			}
 			synchronized(this.workerLock)
 			{
 				IChunk cachedChunk = this.unloadedChunksCache.get(chunkCoord);
@@ -563,7 +563,7 @@ public class ShadowChunkGenerator
 				} else {
 					try {
 						//OTG.log(LogMarker.INFO, "Worker " + this.index + " idle");
-						Thread.sleep(50);
+						Thread.sleep(idleTimeInMS);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
