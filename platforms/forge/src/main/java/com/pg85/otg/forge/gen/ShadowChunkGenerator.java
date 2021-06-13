@@ -41,9 +41,9 @@ import net.minecraft.world.server.ServerWorld;
  * Shadow chunk generation means generating base terrain for chunks
  * without using mc's world generation flow. OTG's chunkgenerator is 
  * called internally to generate base terrain for dummy chunks in a 
- * thread-safe way. Shadowgenned chunks are stored in a fixed size
- * FIFO cache, data is reused when base terraingen is requested
- * for those chunks via normal worldgen. Shadowgen is used for BO4's,
+ * thread-safe/non-blocking way. Shadowgenned chunks are stored in a
+ * fixed size FIFO cache, data is reused when base terraingen is requested 
+ * for those chunks via normal worldgen. Shadowgen is used for BO4's, 
  * worker threads to speed up world generation and /otg mapterrain.
  * 
  * Shadowgen can only be done for chunks that don't contain vanilla strucutures, 
@@ -66,8 +66,8 @@ public class ShadowChunkGenerator
 	private final int maxQueueSize = 512;
 	private final ChunkCoordinate[] chunksBeingLoaded;
 
-	private static int cacheHits = 0;
-	private static int cacheMisses = 0;
+	private int cacheHits = 0;
+	private int cacheMisses = 0;
 
 	public ShadowChunkGenerator(int maxConcurrentThreads)
 	{
@@ -81,9 +81,9 @@ public class ShadowChunkGenerator
 	{
 		if(this.maxConcurrent > 0)
 		{
-			for(int i = 0; i < maxConcurrent; i++)
+			for(int i = 0; i < this.maxConcurrent; i++)
 			{
-				Worker thread = threads[i];
+				Worker thread = this.threads[i];
 				thread.stop();
 			}
 		}
@@ -128,10 +128,7 @@ public class ShadowChunkGenerator
 										break;
 									}
 								}
-								if(
-									!bFound && 
-									!this.chunksToLoad.contains(wgrChunkCoord)
-								)
+								if(!bFound && !this.chunksToLoad.contains(wgrChunkCoord))
 								{
 									// TODO: Queue order shouldn't really matter bc
 									// of the way maxQueueSize is enforced here. 
@@ -148,7 +145,7 @@ public class ShadowChunkGenerator
 				}
 			}
 		}
-	}	
+	}
 	
 	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
@@ -250,8 +247,8 @@ public class ShadowChunkGenerator
 		((ChunkPrimer)chunk).sections = ((ChunkPrimer)cachedChunk).sections;
 		((ChunkPrimer)chunk).heightmaps = ((ChunkPrimer)cachedChunk).heightmaps;			
 		((ChunkPrimer)chunk).lights = ((ChunkPrimer)cachedChunk).lights;
-		cacheHits++;
-		//OTG.log(LogMarker.INFO, "Cache hit " + cacheHits);
+		this.cacheHits++;
+		//OTG.log(LogMarker.INFO, "Cache hit " + this.cacheHits);
 		synchronized(this.workerLock)
 		{
 			this.unloadedChunksCache.remove(chunkCoord);
@@ -260,12 +257,12 @@ public class ShadowChunkGenerator
 	
 	public void setChunkGenerated(ChunkCoordinate chunkCoord)
 	{
-		cacheMisses++;
-		//OTG.log(LogMarker.INFO, "Cache miss " + + cacheMisses);
+		this.cacheMisses++;
+		//OTG.log(LogMarker.INFO, "Cache miss " + + this.cacheMisses);
 		synchronized(workerLock)
 		{
 			// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.
-			this.chunksBeingLoaded[maxConcurrent] = null;
+			this.chunksBeingLoaded[this.maxConcurrent] = null;
 			this.chunksToLoad.remove(chunkCoord);
 		}
 	}
@@ -408,6 +405,7 @@ public class ShadowChunkGenerator
 			synchronized(this.workerLock)
 			{
 				this.unloadedChunksCache.put(chunkCoord, chunk);
+				// Zero index, so MaxConcurrent means worldgen thread, not a worker thread.
 				this.chunksBeingLoaded[this.maxConcurrent] = null;
 			}
 		}
@@ -473,10 +471,11 @@ public class ShadowChunkGenerator
 	
 	public class Worker implements Runnable
 	{
-		private boolean stop = false;
 		private Thread runner;
-		private final int index;
+		private boolean stop = false;
 		private Random worldRandom;
+		
+		private final int index;
 		private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache;
 		private final List<ChunkCoordinate> chunksToLoad;
 		private final ChunkCoordinate[] chunksBeingLoaded;
@@ -486,7 +485,7 @@ public class ShadowChunkGenerator
 		private final OTGChunkGenerator otgChunkGenerator;
 		private final DimensionStructuresSettings dimensionStructuresSettings;
 		private final int worldHeightCap;
-		
+
 		public Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
 		{
 			this.index = index;
@@ -561,7 +560,7 @@ public class ShadowChunkGenerator
 					}
 				} else {
 					try {
-						//OTG.log(LogMarker.INFO, "Thread " + this.index + " idle");
+						//OTG.log(LogMarker.INFO, "Worker " + this.index + " idle");
 						Thread.sleep(50);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
