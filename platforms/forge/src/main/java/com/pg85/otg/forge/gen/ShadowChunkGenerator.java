@@ -46,7 +46,7 @@ import net.minecraft.world.server.ServerWorld;
  * for those chunks via normal worldgen. Shadowgen is used for BO4's, 
  * worker threads to speed up world generation and /otg mapterrain.
  * 
- * Shadowgen can only be done for chunks that don't contain vanilla strucutures, 
+ * Shadowgen can only be done for chunks that don't contain vanilla structures, 
  * since those structures may use density based smoothing applied during noisegen, 
  * which unfortunately is done in a non-thread-safe/blocking manner, necessitating
  * the use of a WorldGenRegion.
@@ -77,6 +77,7 @@ public class ShadowChunkGenerator
 		this.chunksBeingLoaded = new ChunkCoordinate[this.maxConcurrent + 1];
 	}
 
+	// Called on world unload to stop threads and release resources.
 	public void stopWorkerThreads()
 	{
 		if(this.maxConcurrent > 0)
@@ -368,6 +369,7 @@ public class ShadowChunkGenerator
 	
 	// /otg mapterrain fetches chunks in order to create a map of base terrain, without touching any of the caches or 
 	// resources used for worldgen or bo4 shadowgen, since the chunks aren't actually supposed to generate in the world.
+	// We won't get any density based smoothing applied to noisegen for vanilla structures, but that's ok for /otg mapterrain.
 	
 	public ForgeChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
