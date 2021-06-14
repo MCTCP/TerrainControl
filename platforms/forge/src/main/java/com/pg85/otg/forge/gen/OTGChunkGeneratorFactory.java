@@ -1,7 +1,9 @@
 package com.pg85.otg.forge.gen;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
@@ -28,6 +30,14 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 		
+		// Find the preset defined in generatorSettings, if none use the default preset.
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(generatorSettings);
+		String presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+		if(preset != null)
+		{
+			presetFolderName = preset.getFolderName();
+		}
+		
 		return new DimensionGeneratorSettings(
 			seed,
 			generateStructures,
@@ -36,9 +46,9 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 				dimensionTypesRegistry,
 				DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed),
 				new OTGNoiseChunkGenerator(
-					new DimensionConfig(generatorSettings),
+					new DimensionConfig(presetFolderName),
 					new OTGBiomeProvider(
-						generatorSettings,
+						presetFolderName,
 						seed,
 						false,
 						false,

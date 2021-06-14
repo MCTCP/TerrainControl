@@ -88,7 +88,7 @@ public abstract class LocalPresetLoader
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{						
-							Preset preset = new Preset(presetDir.toPath());
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
 							presets.put(preset.getFolderName(), preset);
 							aliasMap.put(preset.getShortPresetName(), preset.getFolderName());
 							break;
@@ -114,13 +114,13 @@ public abstract class LocalPresetLoader
 		FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
 		// use shortPresetName to register the biomes, instead of presetName
-		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(shortPresetName, presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
+		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(worldConfig.getShortPresetName(), worldConfig.getVersion(), presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
 
 		// We have to wait for the loading in order to get things like temperature
 		// TODO: Re-implement this for 1.16
 		//worldConfig.biomeGroupManager.processBiomeData();
 
-		return new Preset(presetDir, presetName, shortPresetName, worldConfig, biomeConfigs);
+		return new Preset(presetDir, presetName, worldConfig, biomeConfigs);
 	}	
 	
 	private ArrayList<String> addBiomesFromDirRecursive(File biomesDirectory)

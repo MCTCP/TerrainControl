@@ -4,19 +4,16 @@ import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
-import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.gen.biome.NewBiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -45,11 +42,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	}
 
 	@Override
-	public void registerBiomes (IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public void registerBiomes ()
 	{
 		for (Preset preset : this.presets.values())
 		{
-			preset.init(this, biomeResourcesManager, spawnLog, logger, materialReader);
 			// Index BiomeColors for FromImageMode and /otg map
 			HashMap<Integer, Integer> biomeColorMap = new HashMap<>();
 
