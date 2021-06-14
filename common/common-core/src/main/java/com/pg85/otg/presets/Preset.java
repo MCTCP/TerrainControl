@@ -21,7 +21,7 @@ public class Preset
 	// BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
 	private WorldConfig worldConfig;
 	private HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
-	private int version;
+	private int majorVersion;
 	private String author;
 	private String description;
 	
@@ -33,21 +33,21 @@ public class Preset
 		this.worldConfig = worldConfig;
 		this.author = worldConfig.getAuthor();
 		this.description = worldConfig.getDescription();
-		this.version = worldConfig.getVersion();
+		this.majorVersion = worldConfig.getMajorVersion();
 
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
 		}		
 	}
-		
+
 	public void update(Preset preset)
 	{
 		this.worldConfig = preset.worldConfig;
 		this.biomeConfigs = preset.biomeConfigs;
 		this.author = preset.author;
 		this.description = preset.description; 
-		this.version = preset.version;
+		this.majorVersion = preset.majorVersion;
 	}
 
 	public Path getPresetFolder()
@@ -80,9 +80,9 @@ public class Preset
 		return new ArrayList<BiomeConfig>(this.biomeConfigs.values());
 	}
 	
-	public int getVersion()
+	public int getMajorVersion()
 	{
-		return this.version;
+		return this.majorVersion;
 	}
 
 	public String getAuthor()

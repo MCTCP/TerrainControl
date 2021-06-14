@@ -118,9 +118,9 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetDir, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetVersion, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetDir, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		super(biomeName, new BiomeResourceLocation(presetDir, presetShortName, presetVersion, biomeName));
+		super(biomeName, new BiomeResourceLocation(presetDir, presetShortName, presetMajorVersion, biomeName));
 
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly

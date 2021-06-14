@@ -27,7 +27,7 @@ public interface IWorldConfig
 
 	public ConfigMode getSettingsMode();
 	String getShortPresetName();
-	public int getVersion();
+	public int getMajorVersion();
 	public String getAuthor();
 	public String getDescription();
 

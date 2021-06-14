@@ -18,7 +18,7 @@ public class PresetCommand
 		source.sendSuccess(new StringTextComponent
 			("Preset: " + preset.getFolderName()
 			 + "\nDescription: " + preset.getDescription()
-			 + "\nVersion: " + preset.getVersion()
+			 + "\nMajor version: " + preset.getMajorVersion()
 			), false);
 		return 0;
 	}

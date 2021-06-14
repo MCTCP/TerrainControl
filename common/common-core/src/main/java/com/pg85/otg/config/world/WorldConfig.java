@@ -151,7 +151,8 @@ public class WorldConfig extends WorldConfigBase
 		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger);
 		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger);
 		this.shortPresetName = reader.getSetting(WorldStandardValues.SHORT_PRESET_NAME, logger);
-		this.version = reader.getSetting(WorldStandardValues.VERSION, logger);
+		this.majorVersion = reader.getSetting(WorldStandardValues.MAJOR_VERSION, logger);
+		this.minorVersion = reader.getSetting(WorldStandardValues.MINOR_VERSION, logger);
 
 		// Visual settings
 
@@ -329,8 +330,13 @@ public class WorldConfig extends WorldConfigBase
 			"A short description of this world"
 		);
 
-		writer.putSetting(WorldStandardValues.VERSION, this.version,
-				"The preset version. Increasing the minor version makes the PresetPacker overwrite,",
+		writer.putSetting(WorldStandardValues.MAJOR_VERSION, this.majorVersion,
+				"The preset major version. Increasing the minor version makes the PresetPacker overwrite,",
+				"while increasing the major version will make the PresetPacker save a new copy"
+		);
+		
+		writer.putSetting(WorldStandardValues.MINOR_VERSION, this.minorVersion,
+				"The preset minor version. Increasing the minor version makes the PresetPacker overwrite,",
 				"while increasing the major version will make the PresetPacker save a new copy"
 		);
 

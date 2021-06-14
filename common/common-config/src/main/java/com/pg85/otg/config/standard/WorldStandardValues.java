@@ -51,7 +51,8 @@ public class WorldStandardValues extends Settings
 	;
 
     public static final Setting<Integer>
-		VERSION = intSetting("Version", 0 , 0, Integer.MAX_VALUE),
+		MAJOR_VERSION = intSetting("MajorVersion", 0 , 0, Integer.MAX_VALUE),
+		MINOR_VERSION = intSetting("MinorVersion", 0 , 0, Integer.MAX_VALUE),
 		WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),
 		WORLD_HEIGHT_CAP_BITS = intSetting("WorldHeightCapBits", 8, 5, 8),
 		GENERATION_DEPTH = intSetting("GenerationDepth", 10, 1, 20),
