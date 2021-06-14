@@ -1,5 +1,7 @@
 package com.pg85.otg.util.biome;
 
+import java.nio.file.Path;
+
 import com.pg85.otg.constants.Constants;
 
 public class BiomeResourceLocation
@@ -13,19 +15,29 @@ public class BiomeResourceLocation
 	private final String biomeName;
 	private final String resourceName;
 
-	public BiomeResourceLocation(String presetShortName, int presetVersion, String presetFolder, String biomeName, String resourceName)
+	public BiomeResourceLocation(Path presetFolder, String presetShortName, int presetVersion, String biomeName, String resourceName)
 	{
-		this.presetShortName = presetShortName;
 		this.presetVersion = presetVersion;
-		this.presetFolder = presetFolder;
-		this.presetRegistryName = presetShortName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_") + BIOME_RESOURCE_LOCATION_SEPARATOR + (presetVersion == 0 ? "" : presetVersion);
+		this.presetFolder = presetFolder.toFile().getName();
+		this.presetShortName = presetShortName != null && presetShortName.trim().length() > 0 ? presetShortName : this.presetFolder;		
+		this.presetRegistryName = this.presetShortName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_") + (presetVersion == 0 ? "" : BIOME_RESOURCE_LOCATION_SEPARATOR + presetVersion);
 		this.biomeName = biomeName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_");
 		this.resourceName = resourceName;
 	}
 
-	public BiomeResourceLocation(String presetShortName, int presetVersion, String presetFolder, String biomeName)
+	public BiomeResourceLocation(Path presetFolder, String presetShortName, int presetVersion, String biomeName)
 	{
-		this(presetShortName, presetVersion, presetFolder, biomeName, null);
+		this(presetFolder, presetShortName, presetVersion, biomeName, null);
+	}
+	
+	private BiomeResourceLocation(String presetFolderName, String presetShortName, int presetVersion, String presetRegistryName, String biomeName, String resourceName)
+	{
+		this.presetVersion = presetVersion;
+		this.presetFolder = presetFolderName;
+		this.presetShortName = presetShortName;		
+		this.presetRegistryName = presetRegistryName;
+		this.biomeName = biomeName;
+		this.resourceName = resourceName;
 	}
 	
 	public String getPresetFolderName()
@@ -55,6 +67,6 @@ public class BiomeResourceLocation
 
 	public BiomeResourceLocation withBiomeResource(String resourceName)
 	{
-		return new BiomeResourceLocation(this.presetShortName, this.presetVersion, this.presetFolder, this.biomeName, resourceName);
+		return new BiomeResourceLocation(this.presetFolder, this.presetShortName, this.presetVersion, this.presetRegistryName, this.biomeName, resourceName);
 	}
 }

@@ -287,7 +287,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
-					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getShortPresetName(), preset.getVersion(), preset.getPresetFolder().toFile().getName(), biome).toResourceLocationString());
+					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getVersion(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data

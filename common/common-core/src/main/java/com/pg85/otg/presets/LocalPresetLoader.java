@@ -154,7 +154,7 @@ public abstract class LocalPresetLoader
 		Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig.getWorldBiomes(), worldConfig.getWorldHeightScale(), biomeDirs, logger, materialReader);
 
 		// Read all settings
-		ArrayList<BiomeConfig> biomeConfigs = readAndWriteSettings(worldConfig, biomeConfigStubs, presetDir, presetShortName, presetVersion, presetDir.toFile().getName(), true, biomeResourcesManager, spawnLog, logger, materialReader);
+		ArrayList<BiomeConfig> biomeConfigs = readAndWriteSettings(worldConfig, biomeConfigStubs, presetDir, presetShortName, presetVersion, true, biomeResourcesManager, spawnLog, logger, materialReader);
 
 		// Update settings dynamically, these changes don't get written back to the file
 		processSettings(worldConfig, biomeConfigs);
@@ -165,7 +165,7 @@ public abstract class LocalPresetLoader
 		return biomeConfigs;
 	}
 
-	private static ArrayList<BiomeConfig> readAndWriteSettings(IWorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, Path settingsDir, String presetShortName, int presetVersion, String presetFolderName, boolean write, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private static ArrayList<BiomeConfig> readAndWriteSettings(IWorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, Path presetDir, String presetShortName, int presetVersion, boolean write, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		ArrayList<BiomeConfig> biomeConfigs = new ArrayList<BiomeConfig>();
 
@@ -176,7 +176,7 @@ public abstract class LocalPresetLoader
 			processMobInheritance(biomeConfigStubs, biomeConfigStub, 0, logger);
 
 			// Settings reading
-			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getBiomeName(), biomeConfigStub, settingsDir, biomeConfigStub.getSettings(), worldConfig, presetShortName, presetVersion, presetFolderName, biomeResourcesManager, spawnLog, logger, materialReader);
+			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getBiomeName(), biomeConfigStub, presetDir, biomeConfigStub.getSettings(), worldConfig, presetShortName, presetVersion, biomeResourcesManager, spawnLog, logger, materialReader);
 			biomeConfigs.add(biomeConfig);
 
 			// Settings writing
