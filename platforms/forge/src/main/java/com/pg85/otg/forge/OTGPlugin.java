@@ -17,6 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -40,12 +41,9 @@ public class OTGPlugin
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
-		// Start OpenTerrainGenerator engine, loads all presets.
-		// moved to the registerBiomes method over mod load order concerns with presetpacker
-		//OTG.startEngine(new ForgeEngine());
 	}
 	
-	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetname
+	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
 	@OnlyIn(Dist.DEDICATED_SERVER)
 	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)
@@ -79,7 +77,13 @@ public class OTGPlugin
 	
 	@SubscribeEvent
 	public void onSave(Save event)
-	{		
+	{
 		((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());
+	}
+	
+	@SubscribeEvent
+	public void onUnload(WorldEvent.Unload event)
+	{
+		((ForgeEngine)OTG.getEngine()).onUnload(event.getWorld());
 	}
 }

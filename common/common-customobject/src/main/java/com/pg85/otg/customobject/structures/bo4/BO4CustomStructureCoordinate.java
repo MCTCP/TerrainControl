@@ -26,9 +26,9 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 	boolean isWeightedBranch;
 	String branchGroup;
 	   
-    public BO4CustomStructureCoordinate(String presetName, IStructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
+    public BO4CustomStructureCoordinate(String presetFolderName, IStructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
-    	this.presetName = presetName;
+    	this.presetFolderName = presetFolderName;
     	this.bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
         this.object = object;
         this.rotation = rotation != null ? rotation : Rotation.NORTH;
@@ -50,7 +50,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     {
     	if(this.object == null)
     	{
-    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
     		if(object == null || !(object instanceof StructuredCustomObject))
     		{

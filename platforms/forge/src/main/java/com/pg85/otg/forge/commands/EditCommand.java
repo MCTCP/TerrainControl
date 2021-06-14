@@ -51,24 +51,29 @@ public class EditCommand
 				doFixing = !flags.contains("-nofix");
 			}
 			catch (IllegalArgumentException ignored) {}
-
+			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
+			boolean isGlobal = presetName == null;
+				
 			if (objectName.equals("")) { source.sendSuccess(new StringTextComponent("Please supply an object name"), false); return 0; }
 
 			if (source.getEntity() == null) { source.sendSuccess(new StringTextComponent("Only players can run this command"), false); return 0; }
 
 			CustomObject objectToSpawn = SpawnCommand.getObject(objectName, presetName);
 
-			if (!(objectToSpawn instanceof BO3)) { source.sendSuccess(new StringTextComponent("Could not find BO3 "+objectName), false); return 0; }
+			if (!(objectToSpawn instanceof BO3)) { source.sendSuccess(new StringTextComponent("Could not find BO3 " + objectName), false); return 0; }
 
-			Preset preset = ExportCommand.getPreset(presetName);
-			if (preset == null) { source.sendSuccess(new StringTextComponent("Could not find preset "+presetName), false); return 0; }
+			Preset preset = ExportCommand.getPresetOrDefault(presetName);
+			if (preset == null)
+			{
+				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false); return 0;
+			}
 
-			Path objectPath = ExportCommand.getObjectPath(preset, presetName);
+			Path objectPath = ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
 			BO3 bo3 = (BO3) objectToSpawn;
 
 			// Use ForgeWorldGenRegion as a wrapper for the world that BO3Creator can interact with
-			ForgeWorldGenRegion genRegion = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(),
+			ForgeWorldGenRegion genRegion = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(),
 				source.getLevel(), source.getLevel().getChunkSource().getGenerator());
 
 			BlockPos pos = source.getEntity().blockPosition();
@@ -93,7 +98,7 @@ public class EditCommand
 			if (immediate)
 			{
 				BO3 fixedBO3 = BO3Creator.create(region.getLow(), region.getHigh(), center, null, "fixed_" + bo3.getName(), false, objectPath,
-					genRegion, new ForgeNBTHelper(), extraBlocks, bo3.getSettings(), presetName,
+					genRegion, new ForgeNBTHelper(), extraBlocks, bo3.getSettings(), preset.getFolderName(),
 					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -101,7 +106,7 @@ public class EditCommand
 				if (fixedBO3 != null)
 				{
 					source.sendSuccess(new StringTextComponent("Successfully updated BO3 " + bo3.getName()), false);
-					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getSettings().getFile(), bo3);
+					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getSettings().getFile(), bo3);
 				}
 				else
 				{
@@ -110,7 +115,7 @@ public class EditCommand
 				cleanArea(genRegion, region.getLow(), region.getHigh());
 			} else {
 				// Store the info, wait for /otg finishedit
-				sessionsMap.put(source.getEntity(), new EditSession(genRegion, bo3, extraBlocks, objectPath, presetName, center));
+				sessionsMap.put(source.getEntity(), new EditSession(genRegion, bo3, extraBlocks, objectPath, preset.getFolderName(), center));
 				source.sendSuccess(new StringTextComponent("You can now edit the bo3"), false);
 				source.sendSuccess(new StringTextComponent("To change the area of the bo3, use /otg region"), false);
 				source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
@@ -142,7 +147,7 @@ public class EditCommand
 			ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
 
 			BO3 bo3 = BO3Creator.create(region.getLow(), region.getHigh(), session.center, null, session.bo3.getName(), false, session.objectPath,
-				session.genRegion, new ForgeNBTHelper(), session.extraBlocks, session.bo3.getSettings(), session.presetName,
+				session.genRegion, new ForgeNBTHelper(), session.extraBlocks, session.bo3.getSettings(), session.presetFolderName,
 				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -150,7 +155,7 @@ public class EditCommand
 			if (bo3 != null)
 			{
 				source.sendSuccess(new StringTextComponent("Successfully edited BO3 " + bo3.getName()), false);
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
 			} else {
 				source.sendSuccess(new StringTextComponent("Failed to edit BO3 " + session.bo3.getName()), false);
 			}
@@ -175,16 +180,16 @@ public class EditCommand
 		private final BO3 bo3;
 		private final ArrayList<BO3BlockFunction> extraBlocks;
 		private final Path objectPath;
-		private final String presetName;
+		private final String presetFolderName;
 		private final BOCreator.Corner center;
 
-		public EditSession(ForgeWorldGenRegion genRegion, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, Path objectPath, String presetName, BOCreator.Corner center)
+		public EditSession(ForgeWorldGenRegion genRegion, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, Path objectPath, String presetFolderName, BOCreator.Corner center)
 		{
 			this.genRegion = genRegion;
 			this.bo3 = bo3;
 			this.extraBlocks = extraBlocks;
 			this.objectPath = objectPath;
-			this.presetName = presetName;
+			this.presetFolderName = presetFolderName;
 			this.center = center;
 		}
 	}

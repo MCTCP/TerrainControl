@@ -294,7 +294,7 @@ public class CustomStructurePlotter
 	        		for(ICustomStructureGen structureGen : customStructureGens)
 	        		{
 	        			int i = 0;
-	        			for(IStructuredCustomObject structure : structureGen.getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+	        			for(IStructuredCustomObject structure : structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 	        			{
 	        				if(structure != null) // Structure was in resource list but file could not be found. TODO: Make this prettier!
 	        				{
@@ -327,7 +327,7 @@ public class CustomStructurePlotter
 		            		if(!((BO4)bo4AndRarity.getKey()).isInvalidConfig && ((BO4)bo4AndRarity.getKey()).getConfig().isSpawnPoint)
 		            		{
 			            		structuresToSpawn1.add(bo4AndRarity.getKey().getName());
-			                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
+			                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetFolderName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
 			                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			                	// Get minimum size (size if spawned with branchDepth 0)
 			                	try {
@@ -360,7 +360,7 @@ public class CustomStructurePlotter
 		            			if(isBO4AllowedToSpawnAtByFrequency(chunkCoord, ((BO4)bo4AndRarity.getKey())))
 		            			{
 				            		structuresToSpawn1.add(bo4AndRarity.getKey().getName());
-				                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
+				                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetFolderName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
 				                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 				                	try {
@@ -899,7 +899,7 @@ public class CustomStructurePlotter
 					                							                	
 				                		if(isBO4AllowedToSpawnAtByFrequency(spawnChunk, (BO4)currentStructureSpawning[0]))
 				                		{
-						                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
+						                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetFolderName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
 						                	structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 				            	        	if(structureStart2.isSpawned())

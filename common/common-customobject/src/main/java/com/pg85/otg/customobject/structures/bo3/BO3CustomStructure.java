@@ -82,7 +82,7 @@ public class BO3CustomStructure extends CustomStructure
 	        for (Branch branch : getBranches(object, coordObject.getRotation()))
 	        {
 	        	// TODO: Does passing null as startbo3name work?
-	        	BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetName(), random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+	        	BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 	            // Don't add null objects
 	            if (childCoordObject == null)

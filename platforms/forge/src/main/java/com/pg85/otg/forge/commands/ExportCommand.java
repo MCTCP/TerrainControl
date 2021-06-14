@@ -31,7 +31,6 @@ import java.util.Locale;
 
 public class ExportCommand
 {
-
 	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
 
 	public static int execute(CommandContext<CommandSource> context)
@@ -48,7 +47,7 @@ public class ExportCommand
 			// Extract here; this is kinda complex, would be messy in OTGCommand
 			String objectName = "";
 			BlockState centerBlockState = null;
-			String presetName = "global";
+			String presetName = null;		
 			String templateName = "default";
 			boolean overwrite = false, branching = false, includeAir = false;
 
@@ -68,6 +67,9 @@ public class ExportCommand
 			{
 			} // We can deal with any of these not being there
 
+			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
+			boolean isGlobal = presetName == null;
+			
 			if (objectName.equalsIgnoreCase(""))
 			{
 				source.sendSuccess(new StringTextComponent("Please specify a name for the object"), false);
@@ -80,14 +82,14 @@ public class ExportCommand
 				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
 				return 0;
 			}
-			Preset preset = getPreset(presetName);
+			Preset preset = getPresetOrDefault(presetName);
 			if (preset == null)
 			{
-				source.sendSuccess(new StringTextComponent("Could not find preset "+presetName), false);
+				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false);
 				return 0;
 			}
 
-			Path objectPath = getObjectPath(preset, presetName);
+			Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
 			if (!overwrite)
 			{
@@ -99,7 +101,7 @@ public class ExportCommand
 			}
 
 			LocalWorldGenRegion otgRegion = new ForgeWorldGenRegion(
-				preset.getName(), preset.getWorldConfig(), source.getLevel(),
+				preset.getFolderName(), preset.getWorldConfig(), source.getLevel(),
 				source.getLevel().getChunkSource().getGenerator()
 			);
 			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
@@ -112,7 +114,7 @@ public class ExportCommand
 				.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
 
 			// Initialize the settings
-			template.onEnable(presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+			template.onEnable(preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 			BO3 bo3;
@@ -122,7 +124,7 @@ public class ExportCommand
 				try
 				{
 					bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
-						nbtHelper, null, template.getSettings(), presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+						nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 						OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 						OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 				}
@@ -135,13 +137,11 @@ public class ExportCommand
 					}
 					return 0;
 				}
-			}
-			else
-			{
+			} else {
 				// Create a new BO3 from our settings
 				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
 				bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-					objectPath, otgRegion, nbtHelper, null, template.getSettings(), presetName,
+					objectPath, otgRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
 					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -151,19 +151,16 @@ public class ExportCommand
 			if (bo3 != null)
 			{
 				source.sendSuccess(new StringTextComponent("Successfully created BO3 " + objectName), false);
-				if (presetName.equalsIgnoreCase("global"))
+				if (isGlobal)
 				{
 					OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
 				} else {
-					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
+					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
 				}
-			}
-			else
-			{
+			} else {
 				source.sendSuccess(new StringTextComponent("Failed to create BO3 " + objectName), false);
 			}
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s : e.getStackTrace())
@@ -175,15 +172,14 @@ public class ExportCommand
 		return 0;
 	}
 
-	protected static Path getObjectPath(Preset preset, String presetName)
+	protected static Path getObjectPath(Path presetFolder)
 	{
 		Path objectPath;
-		if (presetName.equalsIgnoreCase("global"))
+		if (presetFolder == null)
 		{
 			objectPath = OTG.getEngine().getGlobalObjectsFolder();
-		}
-		else {
-			objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
+		} else {
+			objectPath = presetFolder.resolve(Constants.WORLD_OBJECTS_FOLDER);
 
 		}
 
@@ -197,12 +193,14 @@ public class ExportCommand
 		return objectPath;
 	}
 
-	protected static Preset getPreset(String presetName)
+	protected static Preset getPresetOrDefault(String presetFolderName)
 	{
-		if (presetName.equalsIgnoreCase("global"))
-			return OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
-		else
-			return OTG.getEngine().getPresetLoader().getPresetByName(presetName);
+		if (presetFolderName == null)
+		{
+			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
+		} else {
+			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(presetFolderName);
+		}
 	}
 
 	public static int mark(CommandSource source)

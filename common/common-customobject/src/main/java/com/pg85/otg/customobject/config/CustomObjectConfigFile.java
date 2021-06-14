@@ -90,7 +90,7 @@ public abstract class CustomObjectConfigFile
 
     protected abstract void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
 
-    protected abstract void readConfigSettings(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
+    protected abstract void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
     
     protected abstract void correctSettings();
 

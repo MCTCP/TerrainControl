@@ -66,7 +66,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
 	}
     
     @Override
-    public List<IStructuredCustomObject> getObjects(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public List<IStructuredCustomObject> getObjects(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	List<IStructuredCustomObject> objects = new ArrayList<>();
     	if(!objectNames.isEmpty())
@@ -75,7 +75,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
             {
             	// TODO: Re-wire this so we don't have to cast CustomObjectManager/CustomObjectResourcesManager :(
             	// TODO: Remove any dependency on common-customobjects, interfaces only?
-            	CustomObject object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), presetName, otgRootFolder, spawnLog, logger, (CustomObjectManager)customObjectManager, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
+            	CustomObject object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), presetFolderName, otgRootFolder, spawnLog, logger, (CustomObjectManager)customObjectManager, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
             	objects.add((StructuredCustomObject) object);
             }
     	}
@@ -126,14 +126,14 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
         {
             return null;
         }
-        for (int objectNumber = 0; objectNumber < getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
+        for (int objectNumber = 0; objectNumber < getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
         {
             if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
-            	IStructuredCustomObject object = getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
+            	IStructuredCustomObject object = getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetName(), random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), random, chunkX, chunkZ);
             	} else {
             		if(spawnLog)
             		{

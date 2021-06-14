@@ -21,9 +21,9 @@ import com.pg85.otg.logging.LogMarker;
  */
 public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 {
-    public BO3CustomStructureCoordinate(String presetName, IStructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z)
+    public BO3CustomStructureCoordinate(String presetFolderName, IStructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z)
     {
-    	this.presetName = presetName;
+    	this.presetFolderName = presetFolderName;
         this.object = object;
 
         bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;

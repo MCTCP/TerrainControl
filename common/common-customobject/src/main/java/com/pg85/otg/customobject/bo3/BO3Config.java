@@ -103,10 +103,10 @@ public class BO3Config extends CustomObjectConfigFile
 	/*
 	 * Creates a BO3Config from a file.
 	 */
-	protected BO3Config(SettingsReaderBO4 reader, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	protected BO3Config(SettingsReaderBO4 reader, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		super(reader);
-		init(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		init(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	private BO3Config(SettingsReaderBO4 reader)
@@ -156,16 +156,16 @@ public class BO3Config extends CustomObjectConfigFile
 		return clone;
 	}
 
-	private void init(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	private void init(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		this.isOTGPlus = false;
 		// Init settings
-		readConfigSettings(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		readConfigSettings(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		// Read the resources
 		readResources(spawnLog, logger, materialReader, manager);
 
 		this.reader.flushCache();
-		rotateBlocksAndChecks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		rotateBlocksAndChecks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	private void readResources(boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws InvalidConfigException
@@ -460,7 +460,7 @@ public class BO3Config extends CustomObjectConfigFile
 	}
 
 	@Override	
-	protected void readConfigSettings(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		this.isOTGPlus = readSettings(BO3Settings.IS_OTG_PLUS, spawnLog, logger, materialReader, manager);
 
@@ -750,7 +750,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/**
 	 * Rotates all the blocks and all the checks
 	 */
-	protected void rotateBlocksAndChecks(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	protected void rotateBlocksAndChecks(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (int i = 1; i < 4; i++)
 		{
@@ -793,7 +793,7 @@ public class BO3Config extends CustomObjectConfigFile
 			this.branches[i] = new BO3BranchFunction[this.branches[i - 1].length];
 			for (int j = 0; j < this.branches[i].length; j++)
 			{
-				this.branches[i][j] = this.branches[i - 1][j].rotate(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				this.branches[i][j] = this.branches[i - 1][j].rotate(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			}
 			// Bounding box
 			this.boundingBoxes[i] = this.boundingBoxes[i - 1].rotate();

@@ -37,7 +37,6 @@ public class WorldStandardValues extends Settings
     public static final Setting<CustomStructureType> CUSTOM_STRUCTURE_TYPE = enumSetting("CustomStructureType", CustomStructureType.BO3);
     
     public static final Setting<String>
-		VERSION = stringSetting("Version", "0.0"),
 		AUTHOR = stringSetting("Author", "Unknown"),
 		SHORT_PRESET_NAME = stringSetting("ShortPresetName", ""),
 		DESCRIPTION = stringSetting("Description", "No description given"),
@@ -52,6 +51,8 @@ public class WorldStandardValues extends Settings
 	;
 
     public static final Setting<Integer>
+		MAJOR_VERSION = intSetting("MajorVersion", 0 , 0, Integer.MAX_VALUE),
+		MINOR_VERSION = intSetting("MinorVersion", 0 , 0, Integer.MAX_VALUE),
 		WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),
 		WORLD_HEIGHT_CAP_BITS = intSetting("WorldHeightCapBits", 8, 5, 8),
 		GENERATION_DEPTH = intSetting("GenerationDepth", 10, 1, 20),
@@ -92,7 +93,7 @@ public class WorldStandardValues extends Settings
 		FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
 		BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
 		FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),
-		EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistrubution", false),
+		EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistribution", false),
 		DISABLE_BEDROCK = booleanSetting("DisableBedrock", false),
 		CEILING_BEDROCK = booleanSetting("CeilingBedrock", false),
 		FLAT_BEDROCK = booleanSetting("FlatBedrock", false),

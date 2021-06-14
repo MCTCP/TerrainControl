@@ -85,7 +85,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		if (biome != null)
 		{
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
-			BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(presetName, id);
+			BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
 			if (biomeConfig != null)
 			{
 				return new SpigotBiome(biome, biomeConfig);
@@ -108,7 +108,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		if (biome != null)
 		{
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
-			return OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetName, id);
+			return OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
 		}
 		return null;
 	}

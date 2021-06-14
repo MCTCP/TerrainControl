@@ -40,6 +40,7 @@ public final class PluginConfig extends PluginConfigBase
 		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger);
 		this.spawnLog = reader.getSetting(PluginConfigStandardValues.SPAWN_LOG, logger);
 		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
+		this.workerThreads = reader.getSetting(PluginConfigStandardValues.WORKER_THREADS, logger);
 	}
 
 	@Override
@@ -56,6 +57,12 @@ public final class PluginConfig extends PluginConfigBase
 			"Writing updates your configs to the currently installed version of OTG."
 		);
 
+		writer.putSetting(PluginConfigStandardValues.WORKER_THREADS, this.workerThreads,
+			"Forge only, experimental: The amount of OTG worker threads used to speed up ",
+			"base terrain and BO4 generation. Higher values may not result in better ",
+			"performance, experiment to see what works best for your cpu."
+		);
+		
 		writer.header2("Logging");
 
 		writer.putSetting(PluginConfigStandardValues.LOG_LEVEL, this.logLevel,

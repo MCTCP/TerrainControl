@@ -43,7 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private Map<String, List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();	
+	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();	
 	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
 	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
@@ -55,9 +55,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	@Override
-	public BiomeConfig getBiomeConfig(String presetName, int biomeId)
+	public BiomeConfig getBiomeConfig(String presetFolderName, int biomeId)
 	{
-		BiomeConfig[] biomes = this.globalIdMapping.get(presetName);
+		BiomeConfig[] biomes = this.globalIdMapping.get(presetFolderName);
 		return biomes.length > biomeId ? biomes[biomeId] : null;
 	}
 	
@@ -67,14 +67,14 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return this.biomeConfigsByRegistryKey.get(new ResourceLocation(resourceLocationString));
 	}
 	
-	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetName)
+	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetFolderName)
 	{
-		return this.biomesByPresetName.get(presetName);
+		return this.biomesByPresetFolderName.get(presetFolderName);
 	}
 
-	public BiomeConfig[] getGlobalIdMapping(String presetName)
+	public BiomeConfig[] getGlobalIdMapping(String presetFolderName)
 	{
-		return globalIdMapping.get(presetName);
+		return globalIdMapping.get(presetFolderName);
 	}
 
 	public Map<String, BiomeLayerData> getPresetGenerationData()
@@ -88,20 +88,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader, MutableRegistry<Biome> biomeRegistry)
+	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader, MutableRegistry<Biome> biomeRegistry)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
 			for(File presetDir : this.presetsDir.listFiles())
 			{
-				if(presetDir.isDirectory() && presetDir.getName().equals(presetName))
+				if(presetDir.isDirectory() && presetDir.getName().equals(presetFolderName))
 				{
 					for(File file : presetDir.listFiles())
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{						
 							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
-							Preset existingPreset = this.presets.get(preset.getName());
+							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
 							break;
 						}
@@ -111,24 +111,24 @@ public class ForgePresetLoader extends LocalPresetLoader
 		}
 		refreshConfigs(biomeRegistry);
 	}
-	
+
 	protected void refreshConfigs(MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping = new HashMap<>();
 		this.reverseIdMapping = new HashMap<>();
 		this.biomeConfigsByRegistryKey = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
-		this.biomesByPresetName = new LinkedHashMap<>();
+		this.biomesByPresetFolderName = new LinkedHashMap<>();
 		registerBiomes(true, biomeRegistry);
 	}
-
+	
 	@Override
 	public void registerBiomes()
 	{
 		registerBiomes(false, null);
 	}
 
-	public void registerBiomes(boolean refresh, MutableRegistry<Biome> biomeRegistry)
+	private void registerBiomes(boolean refresh, MutableRegistry<Biome> biomeRegistry)
 	{
 		for(Preset preset : this.presets.values())
 		{
@@ -139,7 +139,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			int currentId = 1;
 			
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
-			this.biomesByPresetName.put(preset.getName(), presetBiomes);
+			this.biomesByPresetFolderName.put(preset.getFolderName(), presetBiomes);
 
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
@@ -259,11 +259,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 				System.arraycopy(presetIdMapping, 1, presetIdMapping, 0, presetIdMapping.length - 1);
 			}
 			
-			this.globalIdMapping.put(preset.getName(), presetIdMapping);
-			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
+			this.globalIdMapping.put(preset.getFolderName(), presetIdMapping);
+			this.reverseIdMapping.put(preset.getFolderName(), presetReverseIdMapping);
 
 			// Set the base data
-			BiomeLayerData data = new BiomeLayerData(preset.getPresetDir(), worldConfig, oceanBiomeConfig, oceanTemperatures);
+			BiomeLayerData data = new BiomeLayerData(preset.getPresetFolder(), worldConfig, oceanBiomeConfig, oceanTemperatures);
 			
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
@@ -287,7 +287,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
-					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getShortPresetName(), biome).toResourceLocationString());
+					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
@@ -341,7 +341,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap, presetIdMapping);
 			
 			// Set data for this preset
-			this.presetGenerationData.put(preset.getName(), data);
+			this.presetGenerationData.put(preset.getFolderName(), data);
 		}
 	}
 }

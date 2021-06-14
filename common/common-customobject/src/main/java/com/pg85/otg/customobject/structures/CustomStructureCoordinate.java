@@ -20,7 +20,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 public abstract class CustomStructureCoordinate
 {
 	public String bo3Name;
-	public String presetName;
+	public String presetFolderName;
 	
     protected transient IStructuredCustomObject object;
     public Rotation rotation;
@@ -69,7 +69,7 @@ public abstract class CustomStructureCoordinate
     {
     	if(object == null)
     	{
-    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
     		if(object == null || !(object instanceof StructuredCustomObject))
     		{

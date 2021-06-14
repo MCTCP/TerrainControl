@@ -11,7 +11,7 @@ import com.pg85.otg.util.minecraft.TreeType;
 public interface IWorldGenRegion
 {
 	public IWorldConfig getWorldConfig();
-	public String getPresetName();
+	public String getPresetFolderName();
 	public long getSeed();	
 	public Random getWorldRandom();
 	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord);

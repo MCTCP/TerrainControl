@@ -40,10 +40,9 @@ public class ForgeEngine extends OTGEngine
 		);
 	}
 
-	public void reloadPreset(String presetName, MutableRegistry<Biome> biomeRegistry)
+	public void reloadPreset(String presetFolderName, MutableRegistry<Biome> biomeRegistry)
 	{
-		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
-		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetName, this.biomeResourcesManager, spawnLog, this.logger, this.materialReader, biomeRegistry);
+		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, pluginConfig.getSpawnLogEnabled(), this.logger, this.materialReader, biomeRegistry);
 	}
 	
 	public void onSave(IWorld world)
@@ -56,6 +55,19 @@ public class ForgeEngine extends OTGEngine
 		)
 		{
 			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).saveStructureCache();
+		}
+	}
+
+	public void onUnload(IWorld world)
+	{
+		// For server worlds, stop any worker threads.
+		if(
+			!world.isClientSide() && 
+			world.getChunkSource() instanceof ServerChunkProvider && 
+			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+		)
+		{
+			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).stopWorkerThreads();
 		}
 	}
 	

@@ -38,23 +38,34 @@ public class ExportCommand
 
 	public static boolean execute(CommandSender sender, String[] args)
 	{
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("Only players can execute this command"); return true;}
+		if (!(sender instanceof Player))
+		{
+			sender.sendMessage("Only players can execute this command"); 
+			return true;
+		}
 		Player player = (Player) sender;
 
-		if (args.length == 0) {help(player); return true;}
+		if (args.length == 0)
+		{
+			help(player); 
+			return true;
+		}
 		String objectName =  args[0];
 		IBlockData centerBlockState = null;
 		try
 		{
-			 if (args.length >= 2) centerBlockState = ArgumentTile.a().parse(new StringReader(args[1])).a();
+			if (args.length >= 2)
+			{
+				centerBlockState = ArgumentTile.a().parse(new StringReader(args[1])).a();
+			}
 		}
 		catch (CommandSyntaxException e)
 		{
 			sender.sendMessage("Could not find material "+args[1]);
 			return true;
 		}
-		String presetName = args.length >= 3 ? args[2] : "global";
+		String presetName = args.length > 2 && !args[2].equalsIgnoreCase("global") ? args[2] : null;
+		boolean isGlobal = presetName == null;
 		String templateName = args.length >= 4 ? args[3] : "default";
 		String flags = args.length >= 5 ? String.join(" ", Arrays.copyOfRange(args, 4, args.length)) : "";
 		boolean overwrite = flags.contains("-o");
@@ -63,25 +74,35 @@ public class ExportCommand
 
 		// Get region
 		Region region = playerSelectionMap.get(player);
-		if (region == null || region.getLow() == null) {
-			sender.sendMessage("Please mark two corners with /otg region mark"); return true;}
-
+		if (region == null || region.getLow() == null)
+		{
+			sender.sendMessage("Please mark two corners with /otg region mark"); 
+			return true;
+		}
 		// Get preset
-		Preset preset = getPreset(presetName);
-		if (preset == null) {
-			sender.sendMessage("Could not find preset "+presetName); return true; }
+		Preset preset = getPresetOrDefault(presetName);
+		if (preset == null)
+		{
+			sender.sendMessage("Could not find preset " + (presetName == null ? "" : presetName)); 
+			return true;
+		}
 
 		// Get object path
-		Path objectPath = getObjectPath(preset, presetName);
+		Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
 		// Check for existing file
 		if (!overwrite)
-			if (new File(objectPath.toFile(), objectName + ".bo3").exists()) {
-				sender.sendMessage("File already exists, run command with flag '-o' to overwrite"); return true; }
-
+		{
+			if (new File(objectPath.toFile(), objectName + ".bo3").exists())
+			{
+				sender.sendMessage("File already exists, run command with flag '-o' to overwrite"); 
+				return true;
+			}
+		}
+		
 		// Get required pieces
 		LocalWorldGenRegion otgRegion = new SpigotWorldGenRegion(
-			preset.getName(), preset.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
+			preset.getFolderName(), preset.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
 			((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()
 		);
 
@@ -95,7 +116,7 @@ public class ExportCommand
 			.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
 
 		// Initialize the settings
-		template.onEnable(presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+		template.onEnable(preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 			OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 			OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
@@ -106,7 +127,7 @@ public class ExportCommand
 			try
 			{
 				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
-					nbtHelper, null, template.getSettings(), presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+					nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 			}
@@ -119,13 +140,11 @@ public class ExportCommand
 				}
 				return true;
 			}
-		}
-		else
-		{
+		} else {
 			// Create a new BO3 from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : SpigotMaterialData.ofBlockData(centerBlockState);
 			bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-				objectPath, otgRegion, nbtHelper, null, template.getSettings(), presetName,
+				objectPath, otgRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
 				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -135,15 +154,13 @@ public class ExportCommand
 		if (bo3 != null)
 		{
 			sender.sendMessage("Successfully created BO3 " + objectName);
-			if (presetName.equalsIgnoreCase("global"))
+			if (isGlobal)
 			{
 				OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
 			} else {
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
 			}
-		}
-		else
-		{
+		} else {
 			sender.sendMessage("Failed to create BO3 " + objectName);
 		}
 
@@ -161,24 +178,24 @@ public class ExportCommand
 		player.sendMessage(" * -a flag is to include air blocks, -b is to export branching, and -o is overwrite file");
 	}
 
-	protected static Preset getPreset(String presetName)
+	protected static Preset getPresetOrDefault(String presetFolderName)
 	{
-		if (presetName.equalsIgnoreCase("global"))
-			return OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
-		else
-			return OTG.getEngine().getPresetLoader().getPresetByName(presetName);
+		if (presetFolderName == null)
+		{
+			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
+		} else {
+			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(presetFolderName);
+		}
 	}
 
-	protected static Path getObjectPath(Preset preset, String presetName)
+	protected static Path getObjectPath(Path presetFolder)
 	{
 		Path objectPath;
-		if (presetName.equalsIgnoreCase("global"))
+		if (presetFolder == null)
 		{
 			objectPath = OTG.getEngine().getGlobalObjectsFolder();
-		}
-		else {
-			objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
-
+		} else {
+			objectPath = presetFolder.resolve(Constants.WORLD_OBJECTS_FOLDER);
 		}
 
 		if (!objectPath.toFile().exists())
@@ -325,7 +342,7 @@ public class ExportCommand
 	// if a name includes a space, we wrap it in quotes
 	protected static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
 
-	protected static Set<String> presetNames = OTG.getEngine().getPresetLoader().getAllPresetNames().stream()
+	protected static Set<String> presetNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream()
 		.map(filterNamesWithSpaces).collect(Collectors.toSet());
 
 	static {

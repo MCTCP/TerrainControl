@@ -17,19 +17,19 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class DimensionConfig
 {
 	// Use capitals since we're serialising to yaml and want to make it look nice.
-	public String PresetName;
+	public String PresetFolderName;
 	
 	// Parameterless constructor for deserialisation
 	public DimensionConfig() {}
 	
-	public DimensionConfig(String presetName)
+	public DimensionConfig(String presetFolderName)
 	{
-		this.PresetName = presetName;
+		this.PresetFolderName = presetFolderName;
 	}
 	
 	public DimensionConfig clone()
 	{
-		DimensionConfig clone = new DimensionConfig(this.PresetName);
+		DimensionConfig clone = new DimensionConfig(this.PresetFolderName);
 		return clone;
 	}
 

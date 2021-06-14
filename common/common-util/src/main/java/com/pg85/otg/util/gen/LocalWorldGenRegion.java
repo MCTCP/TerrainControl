@@ -5,12 +5,12 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public abstract class LocalWorldGenRegion implements IWorldGenRegion
 {
-	protected final String presetName;
+	protected final String presetFolderName;
 	private final IWorldConfig worldConfig;
 	
-	protected LocalWorldGenRegion(String presetName, IWorldConfig worldConfig)
+	protected LocalWorldGenRegion(String presetFolderName, IWorldConfig worldConfig)
 	{
-		this.presetName = presetName;
+		this.presetFolderName = presetFolderName;
 		this.worldConfig = worldConfig;
 	}
 	
@@ -19,8 +19,8 @@ public abstract class LocalWorldGenRegion implements IWorldGenRegion
 		return this.worldConfig;
 	}
 	
-	public String getPresetName()
+	public String getPresetFolderName()
 	{
-		return this.presetName;
+		return this.presetFolderName;
 	}
 }

@@ -40,7 +40,7 @@ public class ForgeMaterialTag extends LocalMaterialTag
 	@Override
 	public String toString()
 	{
-		// TODO: Fetch the registry name from the tag object.
+		// TODO: Fetch the registry name from the tag object for writing back to config.
 		return this.name;
 	}
 }

@@ -42,7 +42,7 @@ public class CustomStructureCache
 	private final Path worldSaveDir;
 	private final boolean isBO4Enabled;
 	private final int dimensionId;
-	private final String presetName;
+	private final String presetFolderName;
 	private final long worldSeed;
 	
 	// BO3
@@ -63,7 +63,7 @@ public class CustomStructureCache
     // WorldInfoChunks is used as little as possible, due to its size and slowness.
     private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
 
-    public CustomStructureCache(String presetName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomStructureCache(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
         this.plotter = new CustomStructurePlotter();
@@ -71,7 +71,7 @@ public class CustomStructureCache
         this.worldSaveDir = worldSaveDir;
         this.isBO4Enabled = isBO4Enabled;
         this.dimensionId = dimensionId;
-        this.presetName = presetName;
+        this.presetFolderName = presetFolderName;
         this.worldSeed = worldSeed;
         loadStructureCache(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     }
@@ -199,14 +199,14 @@ public class CustomStructureCache
         {
             return null;
         }
-        for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
+        for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
         {
             if (random.nextDouble() * 100.0 < structureGen.getObjectChance(objectNumber))
             {
-            	IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
+            	IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetName(), random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), random, chunkX, chunkZ);
             	} else {
             		if(spawnLog)
             		{
@@ -325,7 +325,7 @@ public class CustomStructureCache
 
         this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
-    	Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    	Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetFolderName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(loadedStructures != null)
 		{
 	        if(this.isBO4Enabled)

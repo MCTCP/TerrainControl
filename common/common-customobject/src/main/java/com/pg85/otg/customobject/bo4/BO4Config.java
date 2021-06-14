@@ -153,7 +153,7 @@ public class BO4Config extends CustomObjectConfigFile
     public boolean spawnUnderWater;
     public boolean spawnAtWaterLevel;
 
-    private String presetName;
+    private String presetFolderName;
 
     // Store blocks in arrays instead of as BO4BlockFunctions,
     // since that gives way too much overhead memory wise.
@@ -184,19 +184,19 @@ public class BO4Config extends CustomObjectConfigFile
      *
      * @param reader       The settings of the BO3.
      */
-    BO4Config(SettingsReaderBO4 reader, boolean init, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    BO4Config(SettingsReaderBO4 reader, boolean init, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
         super(reader);
         if(init)
         {
-        	init(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+        	init(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
         }
     }
 
     static int BO4BlocksLoadedFromBO4Data = 0;
     static int accumulatedTime = 0;
     static int accumulatedTime2 = 0;
-    private void init(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    private void init(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
         this.minX = Integer.MAX_VALUE;
         this.maxX = Integer.MIN_VALUE;
@@ -207,7 +207,7 @@ public class BO4Config extends CustomObjectConfigFile
         if(!this.reader.getFile().getAbsolutePath().toLowerCase().endsWith(".bo4data"))
         {
         	//long startTime = System.currentTimeMillis();
-        	readConfigSettings(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+        	readConfigSettings(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
         	//BO4BlocksLoaded++;
         	//long timeTaken = (System.currentTimeMillis() - startTime);
         	//accumulatedTime += timeTaken;
@@ -276,12 +276,12 @@ public class BO4Config extends CustomObjectConfigFile
 		return this.inheritedBO3s;
     }
 
-    public BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-    	return getSmoothingHeightMap(start, true, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    	return getSmoothingHeightMap(start, true, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     }
     
-    private BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, boolean fromFile, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, boolean fromFile, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	// TODO: Caching the heightmap will mean this BO4 can only be used with 1 master BO4,
     	// it won't pick up smoothing area settings if it is also used in another structure.
@@ -292,7 +292,7 @@ public class BO4Config extends CustomObjectConfigFile
     			BO4Config bo4Config = null;
 				try
 				{
-					bo4Config = new BO4Config(this.reader, false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					bo4Config = new BO4Config(this.reader, false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				}
 				catch (InvalidConfigException e)
 				{
@@ -307,7 +307,7 @@ public class BO4Config extends CustomObjectConfigFile
 						this.heightMap = new BO4BlockFunction[16][16];
 						return this.heightMap;
 					}
-					this.heightMap = bo4Config.getSmoothingHeightMap(start, false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					this.heightMap = bo4Config.getSmoothingHeightMap(start, false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					return this.heightMap;
     			}
     		}
@@ -395,19 +395,19 @@ public class BO4Config extends CustomObjectConfigFile
     	return this.heightMap;
     }
 
-    BO4BlockFunction[] getBlocks(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    BO4BlockFunction[] getBlocks(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-    	return getBlocks(true, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    	return getBlocks(true, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     }
     
-    private BO4BlockFunction[] getBlocks(boolean fromFile, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private BO4BlockFunction[] getBlocks(boolean fromFile, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(fromFile && this.isBO4Data)
     	{
 			BO4Config bo4Config = null;
 			try
 			{
-				bo4Config = new BO4Config(this.reader, false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				bo4Config = new BO4Config(this.reader, false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			}
 			catch (InvalidConfigException e)
 			{
@@ -421,7 +421,7 @@ public class BO4Config extends CustomObjectConfigFile
 					logger.log(LogMarker.INFO, e.getMessage());
 					return null;
 				}
-				return bo4Config.getBlocks(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				return bo4Config.getBlocks(false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			}
     	}
     	
@@ -491,29 +491,29 @@ public class BO4Config extends CustomObjectConfigFile
     	return entityDataBO4;
     }
     
-    private void loadInheritedBO3(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private void loadInheritedBO3(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(this.inheritBO3 != null && this.inheritBO3.trim().length() > 0 && !inheritedBO3Loaded)
     	{
     		File currentFile = this.getFile().getParentFile();
-    		this.presetName = currentFile.getName();
+    		this.presetFolderName = currentFile.getName();
     		while(currentFile.getParentFile() != null && !currentFile.getName().equals(Constants.PRESETS_FOLDER))
     		{
-    			this.presetName = currentFile.getName();
+    			this.presetFolderName = currentFile.getName();
     			currentFile = currentFile.getParentFile();
-    			if(this.presetName.equals(Constants.GLOBAL_OBJECTS_FOLDER))
+    			if(this.presetFolderName.equals(Constants.GLOBAL_OBJECTS_FOLDER))
     			{
-    				this.presetName = null;
+    				this.presetFolderName = null;
     				break;
     			}
     		}
     		
         	// TODO: Re-wire this so we don't have to cast CustomObjectManager :(
     		CustomObjectManager customObjectManager2 = (CustomObjectManager)customObjectManager;    		
-    		CustomObject parentBO3 = customObjectManager2.getGlobalObjects().getObjectByName(this.inheritBO3, this.presetName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);
+    		CustomObject parentBO3 = customObjectManager2.getGlobalObjects().getObjectByName(this.inheritBO3, this.presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);
 			if(parentBO3 != null)
 			{
-				BO4BlockFunction[] blocks = getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);
+				BO4BlockFunction[] blocks = getBlocks(this.presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);
 				
 				this.inheritedBO3Loaded = true;
 
@@ -560,7 +560,7 @@ public class BO4Config extends CustomObjectConfigFile
 					this.minZ = parentMinZ;
 				}
 
-				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getConfig().getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);				
+				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getConfig().getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker);				
 				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(parentBlocks)));
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(blocks)));
@@ -585,7 +585,7 @@ public class BO4Config extends CustomObjectConfigFile
 				}
 				for(BO4BranchFunction branch : ((BO4)parentBO3).getConfig().branchesBO4)
 				{
-					newBranches.add(branch.rotate(this.inheritBO3Rotation, presetName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker));
+					newBranches.add(branch.rotate(this.inheritBO3Rotation, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker));
 				}
 				this.branchesBO4 = newBranches.toArray(new BO4BranchFunction[newBranches.size()]);
 
@@ -1196,7 +1196,7 @@ public class BO4Config extends CustomObjectConfigFile
     }
 
     @Override
-    protected void readConfigSettings(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    protected void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
     	this.branchFrequency = readSettings(BO4Settings.BRANCH_FREQUENCY, spawnLog, logger, materialReader, manager);
         
@@ -1351,7 +1351,7 @@ public class BO4Config extends CustomObjectConfigFile
         readResources(spawnLog, logger, materialReader, manager);
 
     	// Merge inherited resources
-       	loadInheritedBO3(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+       	loadInheritedBO3(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     }
    
     private void writeResources(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
@@ -1558,7 +1558,7 @@ public class BO4Config extends CustomObjectConfigFile
     }
 
     private int bo4DataVersion = 2;
-    void writeToStream(DataOutput stream, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
+    void writeToStream(DataOutput stream, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
     {
     	stream.writeInt(this.bo4DataVersion);    	
     	stream.writeInt(this.minimumSizeTop);
@@ -1658,7 +1658,7 @@ public class BO4Config extends CustomObjectConfigFile
         ArrayList<String> metaDataNames = new ArrayList<String>();
         int randomBlockCount = 0;
         int nonRandomBlockCount = 0;
-        BO4BlockFunction[] blocks = getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+        BO4BlockFunction[] blocks = getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
         for(BO4BlockFunction block : blocks)
         {    	
         	if(block instanceof BO4RandomBlockFunction)

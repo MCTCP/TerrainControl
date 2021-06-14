@@ -54,22 +54,17 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being populated, in order to plot large structures.
-	// It may query the same chunk multiple times, so use a fixed size cache.	
+	// It may query the same chunk multiple times, so use a fixed size cache.
 	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 	private boolean cacheIsValid;
 
 	/** Creates a LocalWorldGenRegion
 	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
-	 * 	It may crash if you try to do replaceblocks or
-	 *
-	 * @param presetName
-	 * @param worldConfig
-	 * @param worldGenRegion The world access
-	 * @param chunkGenerator The chunkgenerator
+	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
 	 */
-	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
 	{
-		super(presetName, worldConfig);
+		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -94,7 +89,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
 			if(biomeConfig != null)
 			{
 				// TODO: cache this
@@ -112,7 +107,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
 			return biomeConfig;
 		}
 		return null;
