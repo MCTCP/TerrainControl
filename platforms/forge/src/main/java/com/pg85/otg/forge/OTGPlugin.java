@@ -11,7 +11,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,12 +41,9 @@ public class OTGPlugin
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
-		// Start OpenTerrainGenerator engine, loads all presets.
-		// moved to the registerBiomes method over mod load order concerns with presetpacker
-		//OTG.startEngine(new ForgeEngine());
 	}
 	
-	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetname
+	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
 	@OnlyIn(Dist.DEDICATED_SERVER)
 	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)

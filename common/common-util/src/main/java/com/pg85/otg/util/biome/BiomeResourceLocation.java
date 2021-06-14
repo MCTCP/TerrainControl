@@ -6,39 +6,45 @@ public class BiomeResourceLocation
 {
 	private static final String BIOME_RESOURCE_LOCATION_SEPARATOR = ".";
 
-	private final String presetName;
+	private final String presetFolder;
+	private final String presetShortName;
+	private final int presetVersion;
+	private final String presetRegistryName;
 	private final String biomeName;
 	private final String resourceName;
 
-	public BiomeResourceLocation(String presetName, String biomeName, String resourceName)
+	public BiomeResourceLocation(String presetShortName, int presetVersion, String presetFolder, String biomeName, String resourceName)
 	{
-		this.presetName = presetName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_");
+		this.presetShortName = presetShortName;
+		this.presetVersion = presetVersion;
+		this.presetFolder = presetFolder;
+		this.presetRegistryName = presetShortName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_") + BIOME_RESOURCE_LOCATION_SEPARATOR + (presetVersion == 0 ? "" : presetVersion);
 		this.biomeName = biomeName.toLowerCase().trim().replaceAll("[^a-z0-9/_-]", "_");
 		this.resourceName = resourceName;
 	}
 
-	public BiomeResourceLocation(String presetName, String biomeName)
+	public BiomeResourceLocation(String presetShortName, int presetVersion, String presetFolder, String biomeName)
 	{
-		this(presetName, biomeName, null);
+		this(presetShortName, presetVersion, presetFolder, biomeName, null);
 	}
-
-	public String getPresetName()
+	
+	public String getPresetFolderName()
 	{
-		return this.presetName;
-	}
+		return this.presetFolder;
+	}	
 
-	public String getResourceDomain()
+	private String getResourceDomain()
 	{
 		return Constants.MOD_ID_SHORT;
 	}
 
-	public String getResourcePath()
+	private String getResourcePath()
 	{
 		if(this.resourceName != null)
 		{
-			return String.format("%s%s%s%s%s", this.presetName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.resourceName);
+			return String.format("%s%s%s%s%s", this.presetRegistryName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.resourceName);
 		} else {			
-			return String.format("%s%s%s", this.presetName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName);
+			return String.format("%s%s%s", this.presetRegistryName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName);
 		}
 	}
 
@@ -49,6 +55,6 @@ public class BiomeResourceLocation
 
 	public BiomeResourceLocation withBiomeResource(String resourceName)
 	{
-		return new BiomeResourceLocation(this.presetName, this.biomeName, resourceName);
+		return new BiomeResourceLocation(this.presetShortName, this.presetVersion, this.presetFolder, this.biomeName, resourceName);
 	}
 }

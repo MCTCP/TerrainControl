@@ -34,7 +34,7 @@ public class BO3Creator extends BOCreator
 	public static BO3 create(
 		Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
-		String presetName, Path rootPath, boolean spawnLog, ILogger logger, CustomObjectManager boManager,
+		String presetFolderName, Path rootPath, boolean spawnLog, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 
@@ -62,7 +62,7 @@ public class BO3Creator extends BOCreator
 		if (extraBlocks != null) blocks.addAll(extraBlocks);
 
 		// Make new BO3 with the given blocks
-		BO3Config config = makeBO3Config(template, objectName, new File(objectFolder, objectName + ".bo3"), logger, max, min, blocks, null, presetName, rootPath, spawnLog, boManager, mr, manager, mlc);
+		BO3Config config = makeBO3Config(template, objectName, new File(objectFolder, objectName + ".bo3"), logger, max, min, blocks, null, presetFolderName, rootPath, spawnLog, boManager, mr, manager, mlc);
 
 		FileSettingsWriterBO4.writeToFile(config, config.getFile(), config.settingsMode, spawnLog, logger, mr, manager);
 
@@ -72,7 +72,7 @@ public class BO3Creator extends BOCreator
 
 	// Use this to make the BO3 config
 	private static BO3Config makeBO3Config(BO3Config template, String objectName, File bo3File, ILogger logger, Corner max, Corner min,
-										   List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetName, Path rootPath, boolean spawnLog,
+										   List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetFolderName, Path rootPath, boolean spawnLog,
 										   CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 		BO3Config config = template.cloneConfigValues(new FileSettingsReaderBO4(objectName, bo3File, logger));
@@ -85,7 +85,7 @@ public class BO3Creator extends BOCreator
 		box.expandToFit(max.x - min.x + 1, max.y - min.x + 1, max.z - min.x + 1);
 		config.boundingBoxes[0] = box;
 		config.extractBlocks(blocks);
-		config.rotateBlocksAndChecks(presetName, rootPath, spawnLog, logger, boManager, mr, manager, mlc);
+		config.rotateBlocksAndChecks(presetFolderName, rootPath, spawnLog, logger, boManager, mr, manager, mlc);
 		return config;
 	}
 
@@ -151,7 +151,7 @@ public class BO3Creator extends BOCreator
 	public static BO3 createStructure(
 		Corner min, Corner max, Corner center, String objectName, boolean includeAir, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
-		String presetName, Path rootPath, boolean spawnLog, ILogger logger, CustomObjectManager boManager,
+		String presetFolderName, Path rootPath, boolean spawnLog, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 		File objectFolder = objectPath.toFile();
@@ -245,7 +245,7 @@ public class BO3Creator extends BOCreator
 				BO3Config branchConfig = makeBO3Config(template, branchName, new File(branchFolder, branchName + ".bo3"), logger,
 					new Corner(min.x + (16 * x), min.y, min.z + (16 * z)),
 					new Corner(x == chunksOnXAxis - 1 ? max.x : min.x + (16 * x) + 15, max.y, z == chunksOnZAxis - 1 ? max.z : min.z + (16 * z) + 15),
-					branchGrid[x][z], branches, presetName, rootPath, spawnLog, boManager, mr, manager, mlc);
+					branchGrid[x][z], branches, presetFolderName, rootPath, spawnLog, boManager, mr, manager, mlc);
 
 				FileSettingsWriterBO4.writeToFile(branchConfig, branchConfig.getFile(), branchConfig.settingsMode, spawnLog, logger, mr, manager);
 			}
@@ -261,7 +261,7 @@ public class BO3Creator extends BOCreator
 				(coord.getChunkX() * 16), 0, (coord.getChunkZ() * 16), (objectName + "_C" + coord.getChunkX() + "_R" + coord.getChunkZ()), "NORTH", 100));
 		}
 
-		BO3Config mainConfig = makeBO3Config(template, objectName, mainFile, logger, min, max, new ArrayList<>(), branches, presetName,
+		BO3Config mainConfig = makeBO3Config(template, objectName, mainFile, logger, min, max, new ArrayList<>(), branches, presetFolderName,
 			rootPath, spawnLog, boManager, mr, manager, mlc);
 
 		FileSettingsWriterBO4.writeToFile(mainConfig, mainConfig.getFile(), mainConfig.settingsMode, spawnLog, logger, mr, manager);

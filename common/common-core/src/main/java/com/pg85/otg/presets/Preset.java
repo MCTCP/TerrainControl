@@ -12,23 +12,23 @@ import com.pg85.otg.config.world.WorldConfig;
  */
 public class Preset
 {
-	private final Path presetDir;
-	private final String name;
-	private final String shortPresetName;
+	private final Path presetFolder;
+	private String presetFolderName;
+	private String shortPresetName;
 	
 	// Note: Since we're not using Supplier<>, we need to be careful about any classes fetching 
 	// and caching our worldconfig/biomeconfigs etc, or they won't update when reloaded from disk.
 	// BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
 	private WorldConfig worldConfig;
 	private HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
-	private String version;
+	private int version;
 	private String author;
 	private String description;
-
-	Preset(Path presetDir, String name, String shortPresetName, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
+	
+	public Preset(Path presetFolder, String shortPresetName, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
-		this.presetDir = presetDir;
-		this.name = name;
+		this.presetFolder = presetFolder;
+		this.presetFolderName = presetFolder.toFile().getName();
 		this.shortPresetName = shortPresetName;
 		this.worldConfig = worldConfig;
 		this.author = worldConfig.getAuthor();
@@ -38,9 +38,9 @@ public class Preset
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
-		}
+		}		
 	}
-	
+		
 	public void update(Preset preset)
 	{
 		this.worldConfig = preset.worldConfig;
@@ -50,14 +50,14 @@ public class Preset
 		this.version = preset.version;
 	}
 
-	public Path getPresetDir()
+	public Path getPresetFolder()
 	{
-		return this.presetDir;
+		return this.presetFolder;
 	}
 
-	public String getName()
+	public String getFolderName()
 	{
-		return this.name;
+		return this.presetFolderName;
 	}
 
 	public String getShortPresetName()
@@ -80,7 +80,7 @@ public class Preset
 		return new ArrayList<BiomeConfig>(this.biomeConfigs.values());
 	}
 	
-	public String getVersion()
+	public int getVersion()
 	{
 		return this.version;
 	}

@@ -73,17 +73,6 @@ public class WorldConfig extends WorldConfigBase
 	{
 		return this.biomeGroupManager;
 	}	
-	
-	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
-	{
-		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();
-		if(!worldConfigFile.exists())
-		{
-			return null;
-		}
-		SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
-		return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
-	}
 
 	@Override
 	protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader)
@@ -118,6 +107,7 @@ public class WorldConfig extends WorldConfigBase
 
 		// Rename old settings
 
+		reader.renameOldSetting("EvenCaveDistrubution", WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 		reader.renameOldSetting("WorldFog", WorldStandardValues.WORLD_FOG_COLOR);
 		reader.renameOldSetting("BedrockobBlock", WorldStandardValues.BEDROCK_BLOCK);
 	}

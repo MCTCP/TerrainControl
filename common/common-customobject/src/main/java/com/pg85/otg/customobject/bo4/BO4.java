@@ -69,7 +69,7 @@ public class BO4 implements StructuredCustomObject
     }
     
     @Override
-    public boolean onEnable(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public boolean onEnable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(isInvalidConfig)
     	{
@@ -82,7 +82,7 @@ public class BO4 implements StructuredCustomObject
     	
     	try
     	{
-    		this.config = new BO4Config(new FileSettingsReaderBO4(name, file, logger), true, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    		this.config = new BO4Config(new FileSettingsReaderBO4(name, file, logger), true, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     		if(this.config.settingsMode != ConfigMode.WriteDisable && !this.config.isBO4Data)
     		{
     			FileSettingsWriterBO4.writeToFile(this.config, this.config.settingsMode, spawnLog, logger, materialReader, manager);
@@ -152,7 +152,7 @@ public class BO4 implements StructuredCustomObject
     }
     
     // BO4's should always spawn within population bounds, so there is no SpawnForced, only TrySpawnAt
-    public boolean trySpawnAt(String presetName, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated, boolean doBiomeConfigReplaceBlocks)
+    public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated, boolean doBiomeConfigReplaceBlocks)
     {
    		//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
 
@@ -256,10 +256,10 @@ public class BO4 implements StructuredCustomObject
     	
         // Spawn
     	long startTime = System.currentTimeMillis();
-    	BO4BlockFunction[] blocks = config.getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    	BO4BlockFunction[] blocks = config.getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	if(blocks != null)
     	{
-	        for (BO4BlockFunction block : config.getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+	        for (BO4BlockFunction block : config.getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 	        {
 	        	if(block instanceof BO4RandomBlockFunction)
 	        	{
@@ -470,7 +470,7 @@ public class BO4 implements StructuredCustomObject
 	
 						destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
 						if(chunkCoord.equals(destChunk))
-						{
+						{							
 		    				if(replaceWithBiomeBlocks)
 		    				{
 		    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
@@ -660,9 +660,9 @@ public class BO4 implements StructuredCustomObject
 	
 						destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
 						if(chunkCoord.equals(destChunk))
-						{						
+						{
 		    				if(replaceWithBiomeBlocks)
-		    				{
+		    				{		    					
 		    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
 		    					{
 		                			blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);

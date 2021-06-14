@@ -4,16 +4,20 @@ import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
+import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.gen.biome.NewBiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
+import com.pg85.otg.util.interfaces.IMaterialReader;
+
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
@@ -31,7 +35,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
 	private final Map<MinecraftKey, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
-	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetName = new LinkedHashMap<>();
+	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetFolderName = new LinkedHashMap<>();
 
 	private final ResourceKey<IRegistry<BiomeBase>> BIOME_KEY = IRegistry.ay;
 
@@ -41,10 +45,11 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	}
 
 	@Override
-	public void registerBiomes ()
+	public void registerBiomes (IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		for (Preset preset : this.presets.values())
 		{
+			preset.init(this, biomeResourcesManager, spawnLog, logger, materialReader);
 			// Index BiomeColors for FromImageMode and /otg map
 			HashMap<Integer, Integer> biomeColorMap = new HashMap<>();
 
@@ -52,7 +57,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			int currentId = 1;
 
 			List<ResourceKey<BiomeBase>> presetBiomes = new ArrayList<>();
-			this.biomesByPresetName.put(preset.getName(), presetBiomes);
+			this.biomesByPresetFolderName.put(preset.getFolderName(), presetBiomes);
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
 			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
@@ -169,11 +174,11 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				System.arraycopy(presetIdMapping, 1, presetIdMapping, 0, presetIdMapping.length - 1);
 			}
 
-			this.globalIdMapping.put(preset.getName(), presetIdMapping);
-			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
+			this.globalIdMapping.put(preset.getFolderName(), presetIdMapping);
+			this.reverseIdMapping.put(preset.getFolderName(), presetReverseIdMapping);
 
 			// Set the base data
-			BiomeLayerData data = new BiomeLayerData(preset.getPresetDir(), worldConfig, oceanBiomeConfig, oceanTemperatures);
+			BiomeLayerData data = new BiomeLayerData(preset.getPresetFolder(), worldConfig, oceanBiomeConfig, oceanTemperatures);
 
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
@@ -197,7 +202,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
-					MinecraftKey location = new MinecraftKey(new BiomeResourceLocation(preset.getShortPresetName(), biome).toResourceLocationString());
+					MinecraftKey location = new MinecraftKey(new BiomeResourceLocation(preset.getShortPresetName(), preset.getVersion(), preset.getPresetFolder().toFile().getName(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 					if (config == null)
 					{
@@ -255,7 +260,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap, presetIdMapping);
 
 			// Set data for this preset
-			this.presetGenerationData.put(preset.getName(), data);
+			this.presetGenerationData.put(preset.getFolderName(), data);
 		}
 	}
 
@@ -266,20 +271,20 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	}
 
 	@Override
-	public BiomeConfig getBiomeConfig (String presetName, int biomeId)
+	public BiomeConfig getBiomeConfig (String presetFolderName, int biomeId)
 	{
-		BiomeConfig[] biomes = this.globalIdMapping.get(presetName);
+		BiomeConfig[] biomes = this.globalIdMapping.get(presetFolderName);
 		return biomes.length > biomeId ? biomes[biomeId] : null;
 	}
 
-	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys (String presetName)
+	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys (String presetFolderName)
 	{
-		return this.biomesByPresetName.get(presetName);
+		return this.biomesByPresetFolderName.get(presetFolderName);
 	}
 
-	public BiomeConfig[] getGlobalIdMapping (String presetName)
+	public BiomeConfig[] getGlobalIdMapping (String presetFolderName)
 	{
-		return globalIdMapping.get(presetName);
+		return globalIdMapping.get(presetFolderName);
 	}
 
 	public Map<String, BiomeLayerData> getPresetGenerationData ()

@@ -34,7 +34,7 @@ public class CustomObjectCollection
     private HashMap<String, HashMap<String, File>> customObjectFilesPerPreset = new HashMap<String, HashMap<String, File>>();
     private HashMap<String, HashMap<String, File>> boTemplateFilesPerPreset = new HashMap<>();
 
-    private CustomObject loadObject(File file, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private CustomObject loadObject(File file, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
@@ -59,46 +59,46 @@ public class CustomObjectCollection
 	                {
 	                    object = loader.loadFromFile(objectName, file, logger);
 	
-	                    if (presetName != null)
+	                    if (presetFolderName != null)
 	                    {
-	                        ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetName);
+	                        ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetFolderName);
 	                        if (presetObjects == null)
 	                        {
 	                            presetObjects = new ArrayList<CustomObject>();
-	                            objectsPerPreset.put(presetName, presetObjects);
+	                            objectsPerPreset.put(presetFolderName, presetObjects);
 	                        }
 	                        presetObjects.add(object);
 	                    } else {
 	                        objectsGlobalObjects.add(object);
 	                    }
 	
-	                    if (!object.onEnable(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
+	                    if (!object.onEnable(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
 	                    {
 	                        // Remove the object
-	                        removeLoadedObject(presetName, object);
+	                        removeLoadedObject(presetFolderName, object);
 							
 							// Try bo4
 							loader = customObjectManager.getObjectLoaders().get("bo4");
 							if (loader != null)
 							{
 								object = loader.loadFromFile(objectName, file, logger);
-								if (presetName != null)
+								if (presetFolderName != null)
 								{
-									ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetName);
+									ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetFolderName);
 									if (presetObjects == null)
 									{
 										presetObjects = new ArrayList<CustomObject>();
-										objectsPerPreset.put(presetName, presetObjects);
+										objectsPerPreset.put(presetFolderName, presetObjects);
 									}
 									presetObjects.add(object);
 								} else {
 									objectsGlobalObjects.add(object);
 								}
 
-								if (!object.onEnable(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
+								if (!object.onEnable(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
 								{
 									// Remove the object
-									removeLoadedObject(presetName, object);
+									removeLoadedObject(presetFolderName, object);
 									return null;
 								}
 							}
@@ -113,25 +113,25 @@ public class CustomObjectCollection
     	}
     }
           
-    private void removeLoadedObject(String presetName, CustomObject object)
+    private void removeLoadedObject(String presetFolderName, CustomObject object)
     {
-        if (presetName != null)
+        if (presetFolderName != null)
         {
-            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetFolderName);
             if(presetObjectsByName != null)
             {
 	            presetObjectsByName.remove(object.getName().toLowerCase());
 	            if (presetObjectsByName.size() == 0)
 	            {
-	            	objectsByNamePerPreset.remove(presetName, presetObjectsByName);
+	            	objectsByNamePerPreset.remove(presetFolderName, presetObjectsByName);
 	            }
             }
             
-            ArrayList<CustomObject> worldObjects = objectsPerPreset.get(presetName);
+            ArrayList<CustomObject> worldObjects = objectsPerPreset.get(presetFolderName);
             worldObjects.remove(object);
             if (worldObjects.size() == 0)
             {
-                objectsPerPreset.remove(presetName, worldObjects);
+                objectsPerPreset.remove(presetFolderName, worldObjects);
             }
         } else {
             objectsGlobalObjects.remove(object);
@@ -201,15 +201,15 @@ public class CustomObjectCollection
     	}
     }
 
-    public ArrayList<String> getAllBONamesForPreset(String presetName)
+    public ArrayList<String> getAllBONamesForPreset(String presetFolderName)
     {
-    	HashMap<String, File> files = customObjectFilesPerPreset.get(presetName);
+    	HashMap<String, File> files = customObjectFilesPerPreset.get(presetFolderName);
     	return files == null ? null : new ArrayList<>(files.keySet());
     }
 
-    public ArrayList<String> getTemplatesForPreset(String presetName)
+    public ArrayList<String> getTemplatesForPreset(String presetFolderName)
 	{
-    	HashMap<String, File> files = boTemplateFilesPerPreset.get(presetName);
+    	HashMap<String, File> files = boTemplateFilesPerPreset.get(presetFolderName);
     	return files == null ? null : new ArrayList<>(files.keySet());
 	}
 
@@ -227,17 +227,17 @@ public class CustomObjectCollection
 			   : new ArrayList<>(globalTemplates.keySet());
 	}
 
-	public void addObjectToPreset(String presetName, String objectName, File boFile, CustomObject object)
+	public void addObjectToPreset(String presetFolderName, String objectName, File boFile, CustomObject object)
 	{
-		objectsByNamePerPreset.get(presetName).put(objectName, object);
-		customObjectFilesPerPreset.get(presetName).put(objectName, boFile);
+		objectsByNamePerPreset.get(presetFolderName).put(objectName, object);
+		customObjectFilesPerPreset.get(presetFolderName).put(objectName, boFile);
 	}
     
-    public CustomObject getObjectByName(String name, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomObject getObjectByName(String name, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
-    		return getObjectByName(name, presetName, true, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+    		return getObjectByName(name, presetFolderName, true, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	}
     }
     
@@ -265,32 +265,32 @@ public class CustomObjectCollection
     	}
     }
     
-    void indexPresetObjectsFolder(String presetName, boolean spawnLog, ILogger logger, Path otgRootFolder)
+    void indexPresetObjectsFolder(String presetFolderName, boolean spawnLog, ILogger logger, Path otgRootFolder)
     {
     	synchronized(indexingFilesLock)
     	{
-	        if (presetName != null && !customObjectFilesPerPreset.containsKey(presetName))
+	        if (presetFolderName != null && !customObjectFilesPerPreset.containsKey(presetFolderName))
 	        {
-	        	logger.log(LogMarker.INFO, "Indexing Objects folder for preset " + presetName);
+	        	logger.log(LogMarker.INFO, "Indexing Objects folder for preset " + presetFolderName);
 	            HashMap<String, File> presetCustomObjectFiles = new HashMap<String, File>();
-	            customObjectFilesPerPreset.put(presetName, presetCustomObjectFiles);
+	            customObjectFilesPerPreset.put(presetFolderName, presetCustomObjectFiles);
 	            HashMap<String, File> templateFiles = new HashMap<String, File>();
-	            boTemplateFilesPerPreset.put(presetName, templateFiles);
-	            if (presetName != null)
+	            boTemplateFilesPerPreset.put(presetFolderName, templateFiles);
+	            if (presetFolderName != null)
 	            {
 	            	// TODO: Rename folders
 	            	String objectsFolderName = 
-            			new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists() ? Constants.WORLD_OBJECTS_FOLDER :
-        				new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + Constants.LEGACY_WORLD_OBJECTS_FOLDER).exists() ? Constants.LEGACY_WORLD_OBJECTS_FOLDER : null
+            			new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetFolderName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists() ? Constants.WORLD_OBJECTS_FOLDER :
+        				new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetFolderName + File.separator + Constants.LEGACY_WORLD_OBJECTS_FOLDER).exists() ? Constants.LEGACY_WORLD_OBJECTS_FOLDER : null
 					;	            	
 	            	if(objectsFolderName != null)
 	            	{
 	            		indexAllCustomObjectFilesInDir(
-                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + objectsFolderName),
+                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetFolderName + File.separator + objectsFolderName),
                         presetCustomObjectFiles, templateFiles, spawnLog, logger);
 	            	}
 	            }
-	            logger.log(LogMarker.INFO, "Objects folder for preset " + presetName + " indexed.");
+	            logger.log(LogMarker.INFO, "Objects folder for preset " + presetFolderName + " indexed.");
 	        }
     	}
     }
@@ -301,19 +301,19 @@ public class CustomObjectCollection
      * @param name Name of the object.
      * @return The object, or null if not found.
      */
-    private CustomObject getObjectByName(String name, String presetName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private CustomObject getObjectByName(String name, String presetFolderName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
-	        // OTG.log(LogMarker.INFO, "getObjectByName " + presetName != null ? presetName : "");
+	        // OTG.log(LogMarker.INFO, "getObjectByName " + presetFolderName != null ? presetFolderName : "");
 	
 	        CustomObject object = null;
 	
 	        // Check if the object has been cached
 	
-	        if (presetName != null)
+	        if (presetFolderName != null)
 	        {
-	            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+	            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetFolderName);
 	            if (presetObjectsByName != null)
 	            {
 	                object = presetObjectsByName.get(name.toLowerCase());
@@ -322,9 +322,9 @@ public class CustomObjectCollection
 	
 	        boolean bSearchedPresetObjects = false;
 	
-	        if (object == null && presetName != null)
+	        if (object == null && presetFolderName != null)
 	        {
-	            ArrayList<String> presetObjectsNotFoundByName = objectsNotFoundPerPreset.get(presetName);
+	            ArrayList<String> presetObjectsNotFoundByName = objectsNotFoundPerPreset.get(presetFolderName);
 	            if (presetObjectsNotFoundByName != null && presetObjectsNotFoundByName.contains(name.toLowerCase()))
 	            {
 	            	// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
@@ -333,7 +333,7 @@ public class CustomObjectCollection
 	        }
 	
 	        // Only check the GlobalObjects if the preset's Objects directory has already been searched
-	        if (object == null && searchGlobalObjects && (presetName == null || bSearchedPresetObjects))
+	        if (object == null && searchGlobalObjects && (presetFolderName == null || bSearchedPresetObjects))
 	        {
 	            object = objectsByNameGlobalObjects.get(name.toLowerCase());
 	        }
@@ -363,7 +363,7 @@ public class CustomObjectCollection
 	            bSearchedGlobalObjects = true;
 	        }
 	
-	        if ((!searchGlobalObjects || bSearchedGlobalObjects) && (presetName == null || bSearchedPresetObjects))
+	        if ((!searchGlobalObjects || bSearchedGlobalObjects) && (presetFolderName == null || bSearchedPresetObjects))
 	        {
 	            return null;
 	        }
@@ -371,26 +371,26 @@ public class CustomObjectCollection
 	        // Index GlobalObjects and preset's Objects directories
 	
 	        indexGlobalObjectsFolder(spawnLog, logger, otgRootFolder);
-	        indexPresetObjectsFolder(presetName, spawnLog, logger, otgRootFolder);
+	        indexPresetObjectsFolder(presetFolderName, spawnLog, logger, otgRootFolder);
 	
 	        // Search preset Objects
 	
-	        if (presetName != null && !bSearchedPresetObjects)
+	        if (presetFolderName != null && !bSearchedPresetObjects)
 	        {
-	            HashMap<String, File> presetCustomObjectFiles = customObjectFilesPerPreset.get(presetName);
+	            HashMap<String, File> presetCustomObjectFiles = customObjectFilesPerPreset.get(presetFolderName);
 	            if (presetCustomObjectFiles != null)
 	            {
 	                File searchForFile = presetCustomObjectFiles.get(name.toLowerCase());
 	                if (searchForFile != null)
 	                {
-	                    object = loadObject(searchForFile, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+	                    object = loadObject(searchForFile, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	                    if (object != null)
 	                    {
-	                        HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+	                        HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetFolderName);
 	                        if (presetObjectsByName == null)
 	                        {
 	                            presetObjectsByName = new HashMap<String, CustomObject>();
-	                            objectsByNamePerPreset.put(presetName, presetObjectsByName);
+	                            objectsByNamePerPreset.put(presetFolderName, presetObjectsByName);
 	                        }
 	                        presetObjectsByName.put(name.toLowerCase(), object);
 	                        return object;
@@ -406,11 +406,11 @@ public class CustomObjectCollection
 	            }
 	
 	            // Not found
-	            ArrayList<String> presetObjectsNotFound = objectsNotFoundPerPreset.get(presetName);
+	            ArrayList<String> presetObjectsNotFound = objectsNotFoundPerPreset.get(presetFolderName);
 	            if (presetObjectsNotFound == null)
 	            {
 	                presetObjectsNotFound = new ArrayList<String>();
-	                objectsNotFoundPerPreset.put(presetName, presetObjectsNotFound);
+	                objectsNotFoundPerPreset.put(presetFolderName, presetObjectsNotFound);
 	            }
 	            presetObjectsNotFound.add(name.toLowerCase());
 	        }
@@ -430,7 +430,7 @@ public class CustomObjectCollection
 	
 	            if (searchForFile != null)
 	            {
-	                object = loadObject(searchForFile, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+	                object = loadObject(searchForFile, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	
 	                if (object != null)
 	                {
@@ -453,7 +453,7 @@ public class CustomObjectCollection
 	        if (spawnLog)
 	        {
 	            logger.log(LogMarker.WARN,
-	                    "Could not find BO2/BO3 " + name + " in GlobalObjects " + (presetName != null ? "and Objects" : "") + " directory " + (presetName != null ? "for preset " + presetName : "") + ".");
+	                    "Could not find BO2/BO3 " + name + " in GlobalObjects " + (presetFolderName != null ? "and Objects" : "") + " directory " + (presetFolderName != null ? "for preset " + presetFolderName : "") + ".");
 	        }
 	
 	        return null;

@@ -21,6 +21,7 @@ public class SpawnCommand
 	{
 		try
 		{
+			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
 			CustomObject objectToSpawn = getObject(objectName, presetName);
 
 			if (objectToSpawn == null)
@@ -29,9 +30,9 @@ public class SpawnCommand
 				return 0;
 			}
 
-			Preset preset = ExportCommand.getPreset(presetName);
+			Preset preset = ExportCommand.getPresetOrDefault(presetName);
 
-			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getLevel(),
+			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), source.getLevel(),
 				source.getLevel().getChunkSource().getGenerator());
 
 			CustomStructureCache cache =  source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator ?
@@ -56,9 +57,7 @@ public class SpawnCommand
 			))
 			{
 				source.sendSuccess(new StringTextComponent("Spawned object " + objectName + " at " + blockPos.toString()), false);
-			}
-			else
-			{
+			} else {
 				source.sendSuccess(new StringTextComponent("Failed to spawn object " + objectName + ". Is it a BO4?"), false);
 			}
 		}
@@ -77,9 +76,9 @@ public class SpawnCommand
 
 	public static CustomObject getObject(String objectName, String presetName)
 	{
-		if (presetName.equalsIgnoreCase("global"))
+		if (presetName == null)
 		{
-			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetName();
+			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
 		}
 		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
 			objectName,

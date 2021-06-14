@@ -28,7 +28,7 @@ public class BO3WeightedBranchFunction extends BO3BranchFunction
     }
 
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(String presetName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String presetFolderName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         double randomChance = random.nextDouble() * (totalChanceSet
                 ? totalChance
@@ -40,7 +40,7 @@ public class BO3WeightedBranchFunction extends BO3BranchFunction
 		{
 			if (branch.getChance() >= randomChance)
 			{
-				return new BO3CustomStructureCoordinate(presetName, branch.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
+				return new BO3CustomStructureCoordinate(presetFolderName, branch.getCustomObject(false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
 			}
 		}
         return null;

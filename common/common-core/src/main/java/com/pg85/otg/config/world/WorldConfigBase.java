@@ -28,7 +28,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	protected ConfigMode settingsMode;
 
-	protected String version;
+	protected int version;
 	protected String author;
 	protected String description;
 	protected String shortPresetName;
@@ -498,7 +498,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	}
 
 	@Override
-	public String getVersion()
+	public int getVersion()
 	{
 		return this.version;
 	}

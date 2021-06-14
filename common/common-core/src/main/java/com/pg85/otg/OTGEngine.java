@@ -50,7 +50,7 @@ public abstract class OTGEngine
 	
 	private final Path otgRootFolder;
 	private final Path globalObjectsFolder;
-	private PluginConfig pluginConfig;
+	protected PluginConfig pluginConfig;
 
 	protected BiomeResourcesManager biomeResourcesManager;
 	private CustomObjectResourcesManager customObjectResourcesManager;
@@ -228,6 +228,7 @@ public abstract class OTGEngine
 			}
 		}
 	}
+	
 	private int[] parseVersion(BufferedReader reader) throws IOException
 	{
 		int[] version = new int[] {0,0};
@@ -322,9 +323,9 @@ public abstract class OTGEngine
 		
 	// Builders/Factories
 	
-	public CustomStructureCache createCustomStructureCache(String presetName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
+	public CustomStructureCache createCustomStructureCache(String presetFolderName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(presetName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(presetFolderName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
 	}
 }

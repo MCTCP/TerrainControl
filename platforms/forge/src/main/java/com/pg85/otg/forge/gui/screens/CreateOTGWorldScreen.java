@@ -41,7 +41,7 @@ public class CreateOTGWorldScreen extends Screen
 		this.parent = p_i242054_1_;
 		this.dimensionConfig = dimensionConfig;
 		this.presetList = OTG.getEngine().getPresetLoader().getAllPresets();
-		this.selectedPreset = new DimensionConfig(this.presetList.get(0).getName());
+		this.selectedPreset = new DimensionConfig(this.presetList.get(0).getFolderName());
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class CreateOTGWorldScreen extends Screen
 			)
 		);
 		
-		this.guiPresetList.setSelected(this.guiPresetList.children().stream().filter(entry -> Objects.equals(entry.field_238599_b_.getName(), this.selectedPreset.PresetName))
+		this.guiPresetList.setSelected(this.guiPresetList.children().stream().filter(entry -> Objects.equals(entry.field_238599_b_.getFolderName(), this.selectedPreset.PresetFolderName))
 				.findFirst().orElse(null));
 	}
 
@@ -128,8 +128,8 @@ public class CreateOTGWorldScreen extends Screen
 			super.setSelected(p_241215_1_);
 			if (p_241215_1_ != null)
 			{
-				CreateOTGWorldScreen.this.selectedPreset = new DimensionConfig(p_241215_1_.field_238599_b_.getName());
-				NarratorChatListener.INSTANCE.sayNow(p_241215_1_.field_238599_b_.getName());
+				CreateOTGWorldScreen.this.selectedPreset = new DimensionConfig(p_241215_1_.field_238599_b_.getFolderName());
+				NarratorChatListener.INSTANCE.sayNow(p_241215_1_.field_238599_b_.getFolderName());
 			}
 			CreateOTGWorldScreen.this.func_205306_h();
 		}
@@ -143,7 +143,7 @@ public class CreateOTGWorldScreen extends Screen
 			public PresetEntry(Preset p_i232272_2_)
 			{
 				this.field_238599_b_ = p_i232272_2_;
-				this.field_243282_c = new StringTextComponent(p_i232272_2_.getName());		
+				this.field_243282_c = new StringTextComponent(p_i232272_2_.getFolderName());		
 			}
 
 			@Override

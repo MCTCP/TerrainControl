@@ -61,15 +61,10 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion
 	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
 	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
-	 *
-	 * @param presetName
-	 * @param worldConfig
-	 * @param worldGenRegion The world access
-	 * @param chunkGenerator The chunkgenerator
 	 */
-	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
 	{
-		super(presetName, worldConfig);
+		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -94,7 +89,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
 			if(biomeConfig != null)
 			{
 				// TODO: cache this
@@ -112,7 +107,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
 			return biomeConfig;
 		}
 		return null;

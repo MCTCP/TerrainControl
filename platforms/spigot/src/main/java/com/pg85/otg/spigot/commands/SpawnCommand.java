@@ -24,13 +24,14 @@ public class SpawnCommand
 		Player player = (Player) sender;
 
 		String presetName = strings.get("1");
-		String objectName = strings.get("2");
-
+		String objectName = strings.get("2");		
+		
 		if (presetName == null || objectName == null)
 		{
 			sender.sendMessage("Please specify a preset and an object");
 			return true;
 		}
+		presetName = presetName.equalsIgnoreCase("global") ? null : presetName;
 
 		CustomObject objectToSpawn = getObject(objectName, presetName);
 
@@ -41,11 +42,11 @@ public class SpawnCommand
 		}
 
 		Block block = getWatchedBlock(player, false);
-		Preset p = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
-
+		Preset preset = ExportCommand.getPresetOrDefault(presetName);
+		
 		if (objectToSpawn.spawnForced(
 			null,
-			new SpigotWorldGenRegion(p.getName(), p.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
+			new SpigotWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
 				((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()),
 			new Random(),
 			Rotation.NORTH,
@@ -89,9 +90,9 @@ public class SpawnCommand
 	}
 	public static CustomObject getObject(String objectName, String presetName)
 	{
-		if (presetName.equalsIgnoreCase("global"))
+		if (presetName == null)
 		{
-			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetName();
+			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
 		}
 		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
 			objectName,

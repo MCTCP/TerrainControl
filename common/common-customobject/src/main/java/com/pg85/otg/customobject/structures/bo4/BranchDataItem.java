@@ -66,7 +66,7 @@ class BranchDataItem
 	        Branch[] branches = ((BO4)this.branch.getStructuredObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getBranches();
 	        for (Branch branch1 : branches)
 	        {
-		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(worldGenRegion.getPresetName(), this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		    	// Can be null if spawn roll fails TODO: dont roll for spawn in branch.toCustomObjectCoordinate?
 		    	if(childCoordObject != null)
 		    	{

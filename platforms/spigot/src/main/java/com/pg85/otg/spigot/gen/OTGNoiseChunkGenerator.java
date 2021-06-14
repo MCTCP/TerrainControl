@@ -91,7 +91,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	public OTGNoiseChunkGenerator (WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
-		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	private OTGNoiseChunkGenerator (String dimensionConfigYaml, WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
@@ -139,7 +139,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.unloadedChunksCache = new FifoMap<>(128);
 		//
 
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
 
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkPopulator = new OTGChunkDecorator();
@@ -158,7 +158,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), Paths.get("./saves/" + worldSaveFolderName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), Paths.get("./saves/" + worldSaveFolderName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
 		}
 	}
 
@@ -415,7 +415,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		init(((IWorldDataServer) world.getWorldData()).getName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
 		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
 		

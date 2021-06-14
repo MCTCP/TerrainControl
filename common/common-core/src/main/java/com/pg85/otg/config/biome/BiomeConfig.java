@@ -18,6 +18,7 @@ import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -117,9 +118,9 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path settingsDir, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path settingsDir, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetVersion, String presetFolderName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		super(biomeName, new BiomeResourceLocation(presetName, biomeName));
+		super(biomeName, new BiomeResourceLocation(presetShortName, presetVersion, presetFolderName, biomeName));
 
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly

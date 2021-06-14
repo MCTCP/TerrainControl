@@ -34,7 +34,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 {
  	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
-			Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetName),
+			Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetFolderName),
 			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
 			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
 			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
@@ -49,26 +49,26 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	private final ThreadLocal<CachingLayerSampler> layer;
 	public final BiomeConfig[] configLookup;
 	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
-	private final String presetName;
+	private final String presetFolderName;
 	
-	public OTGBiomeProvider(String presetName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
+	public OTGBiomeProvider(String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
-		super(getAllBiomesByPreset(presetName, (MutableRegistry<Biome>)registry));
-		this.presetName = presetName;
+		super(getAllBiomesByPreset(presetFolderName, (MutableRegistry<Biome>)registry));
+		this.presetFolderName = presetFolderName;
 		this.seed = seed;
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
 		this.largeBiomes = largeBiomes;
 		this.registry = registry;
-		this.layer = ThreadLocal.withInitial(() -> BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName), OTG.getEngine().getLogger()));
+		this.layer = ThreadLocal.withInitial(() -> BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetFolderName), OTG.getEngine().getLogger()));
 		this.keyLookup = new Int2ObjectOpenHashMap<>();
 
 		// Default to let us know if we did anything wrong
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
-		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetName);
+		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
 		if(this.configLookup == null)
 		{
-			throw new RuntimeException("No OTG preset found with name \"" + presetName + "\". Install the correct preset or update your server.properties.");
+			throw new RuntimeException("No OTG preset found with name \"" + presetFolderName + "\". Install the correct preset or update your server.properties.");
 		}
 		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
 		{
@@ -79,17 +79,17 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		}
 	}
 	
-	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetName, MutableRegistry<Biome> registry)
+	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetFolderName, MutableRegistry<Biome> registry)
 	{
 		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 		{
-			((ForgeEngine)OTG.getEngine()).reloadPreset(presetName, registry);
+			((ForgeEngine)OTG.getEngine()).reloadPreset(presetFolderName, registry);
 		}
 		
-		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
+		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
 		if(biomesForPreset == null)
 		{
-			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetName());
+			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
 		}
 		if(biomesForPreset == null)
 		{
@@ -108,7 +108,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@OnlyIn(Dist.CLIENT)
 	public BiomeProvider withSeed(long seed)
 	{
-		return new OTGBiomeProvider(this.presetName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
+		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
 
 	public RegistryKey<Biome> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)

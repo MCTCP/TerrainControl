@@ -104,7 +104,7 @@ class ForgeLegacyMaterials
 				return Blocks.LIGHT_GRAY_SHULKER_BOX.defaultBlockState();
 			case "minecraft:silver_glazed_terracotta":
 				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
-			*/				
+			*/
 			case "stationary_water":
 				return Blocks.WATER.defaultBlockState();
 			case "stationary_lava":

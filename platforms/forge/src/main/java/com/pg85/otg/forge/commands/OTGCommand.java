@@ -176,7 +176,8 @@ public class OTGCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			Set<String> set = OTG.getEngine().getPresetLoader().getAllPresetNames().stream()
+			// TODO: Should this include shortnames?
+			Set<String> set = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream()
 				.map(filterNamesWithSpaces).collect(Collectors.toSet());
 			set.add("global");
 			return ISuggestionProvider.suggest(set, builder);

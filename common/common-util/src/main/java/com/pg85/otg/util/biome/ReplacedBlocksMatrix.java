@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class ReplacedBlocksMatrix
 {
@@ -192,7 +193,6 @@ public class ReplacedBlocksMatrix
         		// TODO: Can't use this atm, tags can't be used when loading configs at app start.
         		// Will have to move some config loading / registry logic to world creation,
         		// as things like tags can also be added via datapacks. When that's done, reenable this code.
-        		/*
         		for(ReplacedBlocksInstruction entry : targetsAtHeight.targetsWithBlockTags)
         		{
         			if(
@@ -217,7 +217,6 @@ public class ReplacedBlocksMatrix
         				entry.setValue(instruction.to);
         			}
         		}
-        		*/
         		if(instruction.from.isTag())
         		{
         			targetsAtHeight.targetsWithBlockTags.add(instruction);        			

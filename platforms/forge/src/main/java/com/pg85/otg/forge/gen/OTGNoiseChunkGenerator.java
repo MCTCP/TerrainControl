@@ -122,7 +122,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	public OTGNoiseChunkGenerator(DimensionConfig dimensionConfig, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
@@ -157,7 +157,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
 		this.noiseHeight = noisesettings.height();
 
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
 
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
@@ -189,7 +189,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
 		}
 	}
 
@@ -323,7 +323,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		

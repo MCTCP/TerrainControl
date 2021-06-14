@@ -431,13 +431,13 @@ public class ShadowChunkGenerator
 		return blocksInColumn;
 	}
 
-	LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z)
+	public LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z)
 	{
 		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z);
 		return blockColumn[y];
 	}
 
-	int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	public int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
 	{
 		int height = -1;
 
@@ -471,7 +471,7 @@ public class ShadowChunkGenerator
 	// smoothing for vanilla structures, since that cannot be done 
 	// in a thread-safe/non-blocking manner.
 	
-	public class Worker implements Runnable
+	private class Worker implements Runnable
 	{
 		private Thread runner;
 		private boolean stop = false;
@@ -488,7 +488,7 @@ public class ShadowChunkGenerator
 		private final DimensionStructuresSettings dimensionStructuresSettings;
 		private final int worldHeightCap;
 
-		public Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
+		Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
 		{
 			this.index = index;
 			this.unloadedChunksCache = unloadedChunksCache;
