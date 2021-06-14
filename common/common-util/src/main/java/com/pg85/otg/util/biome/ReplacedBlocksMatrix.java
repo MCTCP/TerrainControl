@@ -165,8 +165,11 @@ public class ReplacedBlocksMatrix
         }
 
         // Set
-        setInstructions(instructions);
-        
+        setInstructions(instructions);        
+    }
+    
+	public void init(LocalMaterialData biomeCooledLavaBlock, LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock, LocalMaterialData biomeSandStoneBlock, LocalMaterialData biomeRedSandStoneBlock)
+	{
         // Fill maps for faster access
         for(ReplacedBlocksInstruction instruction : this.instructions)
         {
@@ -225,11 +228,7 @@ public class ReplacedBlocksMatrix
         		}
         	}
         }
-    }
-    
-	public void init(LocalMaterialData biomeCooledLavaBlock, LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock, LocalMaterialData biomeSandStoneBlock, LocalMaterialData biomeRedSandStoneBlock)
-	{
-        // Fill maps for faster access
+		
         for(ReplacedBlocksInstruction instruction : this.instructions)
         {
         	boolean isBlockTag = instruction.from.isTag();
