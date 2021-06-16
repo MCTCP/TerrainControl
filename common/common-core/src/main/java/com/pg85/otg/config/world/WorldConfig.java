@@ -329,17 +329,17 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.putSetting(WorldStandardValues.MAJOR_VERSION, this.majorVersion,
-				"The preset major version. Increasing the minor version makes the PresetPacker overwrite,",
-				"while increasing the major version will make the PresetPacker save a new copy"
+			"The preset major version. Increasing the minor version makes the PresetPacker overwrite,",
+			"while increasing the major version will make the PresetPacker save a new copy"
 		);
 		
 		writer.putSetting(WorldStandardValues.MINOR_VERSION, this.minorVersion,
-				"The preset minor version. Increasing the minor version makes the PresetPacker overwrite,",
-				"while increasing the major version will make the PresetPacker save a new copy"
+			"The preset minor version. Increasing the minor version makes the PresetPacker overwrite,",
+			"while increasing the major version will make the PresetPacker save a new copy"
 		);
 
 		writer.putSetting(WorldStandardValues.SHORT_PRESET_NAME, this.shortPresetName,
-				"The shortened name for the preset, used in biome resource locations and similar"
+			"The shortened name for the preset, used in biome resource locations and similar"
 		);
 
 		writer.header2("Visual Settings",
@@ -422,7 +422,7 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.putSetting(WorldStandardValues.OCEAN_BIOME_SIZE, this.landSize,
-				"Ocean biome size 0 to GenerationDepth. Higher OceanBiomeSize numbers will make the size of the ocean biomes smaller."
+			"Ocean biome size 0 to GenerationDepth. Higher OceanBiomeSize numbers will make the size of the ocean biomes smaller."
 		);
 
 		writer.putSetting(WorldStandardValues.LAND_FUZZY, this.landFuzzy,
@@ -434,19 +434,19 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_WARM_OCEAN_BIOME, this.defaultWarmOceanBiome,
-				"Set the default Warm Ocean biome for this world."
+			"Set the default Warm Ocean biome for this world."
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_LUKEWARM_OCEAN_BIOME, this.defaultLukewarmOceanBiome,
-				"Set the default Lukewarm Ocean biome for this world."
+			"Set the default Lukewarm Ocean biome for this world."
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_COLD_OCEAN_BIOME, this.defaultColdOceanBiome,
-				"Set the default Cold Ocean biome for this world."
+			"Set the default Cold Ocean biome for this world."
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
-				"The default Frozen Ocean biome for this world."
+			"The default Frozen Ocean biome for this world."
 		);
 
 		writer.header2("Ice Area Settings");

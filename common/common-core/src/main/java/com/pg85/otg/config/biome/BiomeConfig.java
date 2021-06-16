@@ -358,9 +358,9 @@ public class BiomeConfig extends BiomeConfigBase
 		);
 
 		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.biomeCategory,
-				"Set a category for this biome, used by vanilla for... something",
-				"Accepts one of the following values:",
-				"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether"
+			"Set a category for this biome, used by vanilla for... something",
+			"Accepts one of the following values:",
+			"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether"
 		);
 
 		writer.header1("Biome placement");
@@ -622,51 +622,51 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.putSetting(BiomeStandardValues.MUSIC, this.music,
 			"Music for the biome, takes a resource location. Leave empty to disable. Examples: ",
-				"Music: minecraft:music_disc.cat",
-				"Music: minecraft:music.nether.basalt_deltas"
+			"	Music: minecraft:music_disc.cat",
+			"	Music: minecraft:music.nether.basalt_deltas"
 		);
 
 		writer.putSetting(BiomeStandardValues.MUSIC_MIN_DELAY, this.musicMinDelay,
-				"Minimum delay for music to start, in ticks"
+			"Minimum delay for music to start, in ticks"
 		);
 
 		writer.putSetting(BiomeStandardValues.MUSIC_MAX_DELAY, this.musicMaxDelay,
-				"Maximum delay for music to start, in ticks"
+			"Maximum delay for music to start, in ticks"
 		);
 
 		writer.putSetting(BiomeStandardValues.REPLACE_CURRENT_MUSIC, this.replaceCurrentMusic,
-				"Whether music replaces the current playing music in the client or not"
+			"Whether music replaces the current playing music in the client or not"
 		);
 
 		writer.putSetting(BiomeStandardValues.AMBIENT_SOUND, this.ambientSound,
-				"Ambient sound for the biome. Leave empty to disable. Example:",
-				"AmbientSound: minecraft:ambient.cave"
+			"Ambient sound for the biome. Leave empty to disable. Example:",
+			"	AmbientSound: minecraft:ambient.cave"
 		);
 
 		writer.putSetting(BiomeStandardValues.MOOD_SOUND, this.moodSound,
-				"Mood sound for the biome. Leave empty to disable. Example:",
-				"MoodSound: minecraft:ambient.crimson_forest.mood"
+			"Mood sound for the biome. Leave empty to disable. Example:",
+			"	MoodSound: minecraft:ambient.crimson_forest.mood"
 		);
 
 		writer.putSetting(BiomeStandardValues.MOOD_SOUND_DELAY, this.moodSoundDelay,
-				"The delay in ticks between triggering mood sound"
+			"The delay in ticks between triggering mood sound"
 		);
 
 		writer.putSetting(BiomeStandardValues.MOOD_SEARCH_RANGE, this.moodSearchRange,
-				"How far from the player a mood sound can play"
+			"How far from the player a mood sound can play"
 		);
 
 		writer.putSetting(BiomeStandardValues.MOOD_OFFSET, this.moodOffset,
-				"The offset of the sound event"
+			"The offset of the sound event"
 		);
 
 		writer.putSetting(BiomeStandardValues.ADDITIONS_SOUND, this.additionsSound,
-				"Additions sound for the biome. Leave empty to disable. Example:",
-				"AdditionsSound: minecraft:ambient.soul_sand_valley.additions"
+			"Additions sound for the biome. Leave empty to disable. Example:",
+			"	AdditionsSound: minecraft:ambient.soul_sand_valley.additions"
 		);
 
 		writer.putSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, this.additionsTickChance,
-				"The tick chance that the additions sound plays"
+			"The tick chance that the additions sound plays"
 		);
 
 		writer.header1("Resource queue",
