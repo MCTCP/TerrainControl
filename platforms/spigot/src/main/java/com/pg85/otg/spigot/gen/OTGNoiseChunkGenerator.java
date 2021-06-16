@@ -363,7 +363,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Population / decoration
 
-	// Does population for a given pos/chunk
+	// Does decoration for a given pos/chunk
 	@Override
 	public void addDecorations (RegionLimitedWorldAccess worldGenRegion, StructureManager structureManager)
 	{
@@ -387,7 +387,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		long decorationSeed = sharedseedrandom.a(worldGenRegion.getSeed(), blockX, blockZ);
 		try
 		{
-			// Override normal population (Biome.func_242427_a()) with OTG's.
+			// Override normal decoration (Biome.func_242427_a()) with OTG's.
 			biomeDecorate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		}
 		catch (Exception exception)
@@ -413,9 +413,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
 		init(((IWorldDataServer) world.getWorldData()).getName());
-		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingDecorated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
 		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
 		
@@ -707,7 +707,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		IChunkAccess chunk = this.unloadedChunksCache.get(chunkCoord);
 		if (chunk == null)
 		{
-			// Generate a chunk without populating it
+			// Generate a chunk without loading/decorating it
 			chunk = getUnloadedChunk(((SpigotWorldGenRegion)worldGenRegion).getInternal().getMinecraftWorld(),worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}

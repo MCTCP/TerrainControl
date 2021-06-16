@@ -29,7 +29,7 @@ public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
 	 * @param z	 The z position
 	 * @return Whether this check prevents the BO3 from spawning.
 	 */
-	public abstract boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+	public abstract boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated);
 
 	/**
 	 * This implementation of

@@ -24,19 +24,19 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Takes care of resource population/decoration. Spawns all OTG resources. Some of the population/decoration steps 
- * (like vanilla structures and mob spawning) use mc logic and are spawned by mc itself. For those population steps, 
- * OTG only fills in the required configurations when registering the biomes in the platform-specific layer (see OTGBiome/ForgeBiome).
+ * Takes care of resource decoration. Spawns all OTG resources. Some of the decoration steps (like vanilla 
+ * structures and mob spawning) use mc logic and are spawned by mc itself. For those decoration steps, OTG 
+ * only fills in the required configurations when registering the biomes in the platform-specific layer (see OTGBiome/ForgeBiome).
  */
 public class OTGChunkDecorator implements IChunkDecorator
 {
 	private final Random rand;
 
-	// Locking objects / checks to prevent populate running on multiple threads,
+	// Locking objects / checks to prevent decorate running on multiple threads,
 	// or when the world is waiting for an opportunity to save.
 	// TODO: Make this prettier, may need to move this to chunk save as well.
 	private final Object lockingObject = new Object();
-	private boolean populating;
+	private boolean decorating;
 	private boolean processing = false;
 	private boolean saving;
 	private boolean saveRequired;
@@ -53,9 +53,9 @@ public class OTGChunkDecorator implements IChunkDecorator
 	}
 
 	@Override
-	public boolean isPopulating()
+	public boolean isDecorating()
 	{
-		return this.populating;
+		return this.decorating;
 	}
 
 	@Override
@@ -88,19 +88,19 @@ public class OTGChunkDecorator implements IChunkDecorator
 			{
 				if(!this.saving)
 				{
-					// If populating then this method is being called recursively (indicating cascading chunk-gen).
+					// If decorating then this method is being called recursively (indicating cascading chunk-gen).
 					// This method can be called recursively, but should never be called by two threads at once.
 					// TODO: Make sure that's the case.
-					if(!this.populating)
+					if(!this.decorating)
 					{
-						this.populating = true;
+						this.decorating = true;
 						unlockWhenDone = true;
 					}
 					break;
 				} else {
 					if(firstLog)
 					{
-						OTG.log(LogMarker.WARN, "Populate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+						OTG.log(LogMarker.WARN, "Decorate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
 						firstLog = false;
 					}
 				}
@@ -124,14 +124,14 @@ public class OTGChunkDecorator implements IChunkDecorator
 		if (!this.processing)
 		{
 			this.processing = true;
-			// Cache all biomes in the are being populated (2x2 chunks)
+			// Cache all biomes in the are being decorated (2x2 chunks)
 			worldGenRegion.cacheBiomesForDecoration(chunkCoord);			
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
 			this.processing = false;
 		} else {			
 			logger.log(LogMarker.INFO, "Cascading chunk generation detected.");
 			
-			// Don't use the population chunk biome cache during cascading chunk generation
+			// Don't use the decoration chunk biome cache during cascading chunk generation
 			worldGenRegion.invalidateDecorationBiomeCache();
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 
@@ -150,17 +150,17 @@ public class OTGChunkDecorator implements IChunkDecorator
 			// TODO: Make sure that's the case.
 			if(unlockWhenDone)
 			{
-				this.populating = false;
+				this.decorating = false;
 			}
 		}
 	}
 
-	// TODO: Fire population events.
+	// TODO: Fire decoration events.
 	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled, boolean developerMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{		
 		if (biomeConfig == null)
 		{
-			logger.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not populate chunk.", chunkCoord.getChunkX(), chunkCoord.getChunkZ(), chunkCoord);
+			logger.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not decorate chunk.", chunkCoord.getChunkX(), chunkCoord.getChunkZ(), chunkCoord);
 			return;
 		}
 
@@ -194,14 +194,14 @@ public class OTGChunkDecorator implements IChunkDecorator
 		
 		// Snow and ice
 		// TODO: Snow is appearing below structures, indicating it spawned before 
-		// it should. Check and align population bounds for resources and make sure
-		// freezing is done during the correct population step.
+		// it should. Check and align decoration bounds for resources and make sure
+		// freezing is done during the correct decoration step.
 		FrozenSurfaceHelper.freezeChunk(worldGenRegion, chunkCoord);
 	}
 
-	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{
-		// Plot and spawn BO4's for all chunks that may have blocks spawned on them while populating this chunk, 
+		// Plot and spawn BO4's for all chunks that may have blocks spawned on them while decorating this chunk, 
 		// so we can be sure those chunks have had a chance to plot+spawn bo4's before other resources.
 
 		structureCache.plotBo4Structures(worldGenRegion, this.rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);		
@@ -215,8 +215,8 @@ public class OTGChunkDecorator implements IChunkDecorator
 		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), chunkCoord, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);		
 	}
 
-	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 }

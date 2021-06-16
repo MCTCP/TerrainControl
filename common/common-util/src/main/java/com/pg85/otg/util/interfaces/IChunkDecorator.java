@@ -4,7 +4,7 @@ public interface IChunkDecorator
 {
 	Object getLockingObject();
 
-	boolean isPopulating();
+	boolean isDecorating();
 
 	public void beginSave();
 

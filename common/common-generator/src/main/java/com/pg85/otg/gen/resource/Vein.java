@@ -45,7 +45,7 @@ class Vein
 		return true;
 	}
 
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkBeingPopulated, VeinResource gen)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkBeingDecorated, VeinResource gen)
 	{
 		int sizeSquared = size * size;
 
@@ -53,19 +53,19 @@ class Vein
 		{
 			if (random.nextInt(100) < gen.oreRarity)
 			{
-				int oreX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+				int oreX = chunkBeingDecorated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 				int oreY = RandomHelper.numberInRange(random, gen.minAltitude, gen.maxAltitude);
-				int oreZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+				int oreZ = chunkBeingDecorated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
 				if ((oreX - x) * (oreX - x) + (oreY - y) * (oreY - y) + (oreZ - z) * (oreZ - z) < sizeSquared)
 				{
-					spawnOre(worldGenRegion, random, oreX, oreY, oreZ, gen, chunkBeingPopulated);
+					spawnOre(worldGenRegion, random, oreX, oreY, oreZ, gen, chunkBeingDecorated);
 				}
 			}
 		}
 	}
 
-	private void spawnOre(IWorldGenRegion worldGenRegion, Random rand, int x, int y, int z, VeinResource gen, ChunkCoordinate chunkBeingPopulated)
+	private void spawnOre(IWorldGenRegion worldGenRegion, Random rand, int x, int y, int z, VeinResource gen, ChunkCoordinate chunkBeingDecorated)
 	{
 		int maxSize = gen.oreAvgSize;
 		LocalMaterialData material = gen.material;
@@ -113,9 +113,9 @@ class Vein
 							for (int i5 = m; i5 <= i2; i5++)
 							{
 								double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-								if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(worldGenRegion.getMaterial(i3, i4, i5, chunkBeingPopulated)))
+								if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(worldGenRegion.getMaterial(i3, i4, i5, chunkBeingDecorated)))
 								{
-									worldGenRegion.setBlock(i3, i4, i5, material, null, chunkBeingPopulated, true);
+									worldGenRegion.setBlock(i3, i4, i5, material, null, chunkBeingDecorated, true);
 								}
 							}
 						}

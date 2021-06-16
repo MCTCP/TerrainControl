@@ -35,12 +35,12 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	}	
 		
 	/**
-	 * Gets the chunk that should populate for this object.
+	 * Gets the chunk that should decorate for this object.
 	 * @return The chunk.
 	 */
 	ChunkCoordinate getPopulatingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		// In the past we simply returned the chunk populating for the origin
+		// In the past we simply returned the chunk decorating for the origin
 		// of the object. However, the origin is not guaranteed to be at the
 		// center of the object. We need to know the exact center to choose
 		// the appropriate spawning chunk.

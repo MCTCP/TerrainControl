@@ -29,9 +29,9 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 	 }
 
 	 @Override
-	 public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+	 public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
 	 {  	
-	 	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, true, false);
+	 	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingDecorated, true, false);
 	 }
 	 
 	 public BO4BlockFunction rotate(Rotation rotation)

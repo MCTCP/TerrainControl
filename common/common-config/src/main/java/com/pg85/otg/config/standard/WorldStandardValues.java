@@ -98,7 +98,7 @@ public class WorldStandardValues extends Settings
 		CEILING_BEDROCK = booleanSetting("CeilingBedrock", false),
 		FLAT_BEDROCK = booleanSetting("FlatBedrock", false),
 		REMOVE_SURFACE_STONE = booleanSetting("RemoveSurfaceStone", false),
-		POPULATION_BOUNDS_CHECK = booleanSetting("PopulationBoundsCheck", true),
+		DECORATION_BOUNDS_CHECK = booleanSetting("DecorationBoundsCheck", true),
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 
 		OLD_GROUP_RARITY = booleanSetting("OldGroupRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin

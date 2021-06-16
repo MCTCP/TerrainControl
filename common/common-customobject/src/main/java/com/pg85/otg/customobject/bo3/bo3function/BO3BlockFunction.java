@@ -33,9 +33,9 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
 	{
-		worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, replaceBlock);
+		worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingDecorated, replaceBlock);
 	}
 	
 	@Override

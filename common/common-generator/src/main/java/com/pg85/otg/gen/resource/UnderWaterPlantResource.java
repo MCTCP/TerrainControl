@@ -16,9 +16,6 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Places underwater plants.
- */
 public class UnderWaterPlantResource extends FrequencyResourceBase
 {
 	private final int maxAltitude;
@@ -40,7 +37,7 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
@@ -55,8 +52,8 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 			j = x + rand.nextInt(8) - rand.nextInt(8);
 			k = y + rand.nextInt(4) - rand.nextInt(4);
 			m = z + rand.nextInt(8) - rand.nextInt(8);
-			worldMaterial = worldGenregion.getMaterial(j, k , m, chunkBeingPopulated);
-			worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(j, k , m, chunkBeingDecorated);
+			worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m, chunkBeingDecorated);
 			if (
 				(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.WATER)) ||
 				(worldMaterialBelow == null || !this.sourceBlocks.contains(worldMaterialBelow))
@@ -65,7 +62,7 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 				continue;
 			}
 
-			this.plant.spawn(worldGenregion, j, k, m, chunkBeingPopulated);
+			this.plant.spawn(worldGenregion, j, k, m, chunkBeingDecorated);
 		}
 	}
 	

@@ -42,13 +42,13 @@ public class CustomObjectResource extends ResourceBase implements ICustomObjectR
 	}
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (CustomObject object : getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 		{
 			if(object != null) // if null then BO2/BO3 file could not be found
 			{
-				object.process(structureCache, worldGenRegion, random, chunkBeingPopulated);
+				object.process(structureCache, worldGenRegion, random, chunkBeingDecorated);
 			}
 		}		
 	}	

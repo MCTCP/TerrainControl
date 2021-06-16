@@ -26,9 +26,9 @@ public class AboveWaterResource extends FrequencyResourceBase
 	}
 	
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = worldGenregion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated);
+		int y = worldGenregion.getBlockAboveLiquidHeight(x, z, chunkBeingDecorated);
 		if (y == -1)
 		{
 			return;
@@ -45,19 +45,19 @@ public class AboveWaterResource extends FrequencyResourceBase
 			localY = y + rand.nextInt(4) - rand.nextInt(4);
 			localZ = z + rand.nextInt(8) - rand.nextInt(8);
 			
-			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingDecorated);
 			if (worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
 			}
 
-			worldMaterialBeneath = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingPopulated);
+			worldMaterialBeneath = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingDecorated);
 			if (worldMaterialBeneath != null && !worldMaterialBeneath.isLiquid())
 			{
 				continue;
 			}
 			
-			worldGenregion.setBlock(localX, localY, localZ, this.material, null, chunkBeingPopulated, false);
+			worldGenregion.setBlock(localX, localY, localZ, this.material, null, chunkBeingDecorated, false);
 		}
 	}
 

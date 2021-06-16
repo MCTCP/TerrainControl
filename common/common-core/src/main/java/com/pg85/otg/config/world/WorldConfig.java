@@ -105,6 +105,7 @@ public class WorldConfig extends WorldConfigBase
 
 		// Rename old settings
 
+		reader.renameOldSetting("PopulationBoundsCheck", WorldStandardValues.DECORATION_BOUNDS_CHECK);
 		reader.renameOldSetting("EvenCaveDistrubution", WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 		reader.renameOldSetting("WorldFog", WorldStandardValues.WORLD_FOG_COLOR);
 		reader.renameOldSetting("BedrockobBlock", WorldStandardValues.BEDROCK_BLOCK);
@@ -254,7 +255,7 @@ public class WorldConfig extends WorldConfigBase
 		} else {
 			this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger);	
 		}
-		this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, logger);
+		this.decorationBoundsCheck = reader.getSetting(WorldStandardValues.DECORATION_BOUNDS_CHECK, logger);
 		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger);		
 
 		// Caves & Ravines
@@ -657,8 +658,8 @@ public class WorldConfig extends WorldConfigBase
 			"the CustomStructure resource in the biome configuration files. Not used for BO4's."
 		);
 		
-		writer.putSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck,
-			"Set this to false to disable the bounds check during chunk population.",
+		writer.putSetting(WorldStandardValues.DECORATION_BOUNDS_CHECK, this.decorationBoundsCheck,
+			"Set this to false to disable the bounds check during chunk decoration.",
 			"While this allows you to spawn objects larger than 32x32, it also makes terrain generation dependent on the direction you explored the world in."
 		);
 

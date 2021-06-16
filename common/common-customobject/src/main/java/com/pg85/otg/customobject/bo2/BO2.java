@@ -137,7 +137,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 		return true;
 	}
 	
-	private boolean canSpawnAt(IWorldGenRegion worldGenRegion, Rotation rotation, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	private boolean canSpawnAt(IWorldGenRegion worldGenRegion, Rotation rotation, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		// Basic checks
 		
@@ -151,21 +151,21 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			return false;
 		}
 
-		if (!spawnOnBlockType.contains(worldGenRegion.getMaterial(x, y - 1, z, chunkBeingPopulated)))
+		if (!spawnOnBlockType.contains(worldGenRegion.getMaterial(x, y - 1, z, chunkBeingDecorated)))
 		{
 			return false;
 		}
 
-		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 5, z, chunkBeingPopulated);
+		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 5, z, chunkBeingDecorated);
 		if (needsFoundation && worldMaterial == null || worldMaterial.isAir())
 		{
 			return false;
 		}
 
-		LocalMaterialData checkBlock = !spawnWater || !spawnLava ? worldGenRegion.getMaterial(x, y + 2, z, chunkBeingPopulated) : null;
+		LocalMaterialData checkBlock = !spawnWater || !spawnLava ? worldGenRegion.getMaterial(x, y + 2, z, chunkBeingDecorated) : null;
 		if(checkBlock == null)
 		{
-			// Tried to spawn in unloaded chunks when populationBoundsCheck:false.
+			// Tried to spawn in unloaded chunks when decorationBoundsCheck:false.
 			return false;
 		}
 		if (!spawnWater)
@@ -183,7 +183,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			}
 		}
 
-		int checkLight = !spawnSunlight || !spawnDarkness ? worldGenRegion.getLightLevel(x, y + 2, z, chunkBeingPopulated) : 0;
+		int checkLight = !spawnSunlight || !spawnDarkness ? worldGenRegion.getLightLevel(x, y + 2, z, chunkBeingDecorated) : 0;
 		if(checkLight == -1)
 		{
 			// Tried to spawn in unloaded chunk.
@@ -221,7 +221,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			
 			if(!loadedChunks.contains(chunkCoord))
 			{	 
-				if(chunkBeingPopulated != null && !ChunkCoordinate.IsInAreaBeingPopulated(x + point.x, z + point.z, chunkBeingPopulated))
+				if(chunkBeingDecorated != null && !ChunkCoordinate.isInAreaBeingDecorated(x + point.x, z + point.z, chunkBeingDecorated))
 				//if (!world.chunkExists((x + point.x), (y + point.y), (z + point.z)))
 				{
 					// Cannot spawn BO2, part of world is not loaded
@@ -240,7 +240,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			for (ObjectCoordinate point : objData)
 			{
 				if (
-					(material = worldGenRegion.getMaterial((x + point.x), (y + point.y), (z + point.z), chunkBeingPopulated)) == null || 
+					(material = worldGenRegion.getMaterial((x + point.x), (y + point.y), (z + point.z), chunkBeingDecorated)) == null || 
 					collisionBlockType.contains(material)
 				)
 				{
@@ -265,21 +265,21 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	}
 
 	@Override
-	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated)
 	{
-			return spawn(worldGenRegion, random, x, z, minY == -1 ? this.spawnElevationMin : minY, maxY == -1 ? this.spawnElevationMax : maxY, chunkBeingPopulated, false);
+			return spawn(worldGenRegion, random, x, z, minY == -1 ? this.spawnElevationMin : minY, maxY == -1 ? this.spawnElevationMax : maxY, chunkBeingDecorated, false);
 	} 
 	
-	private boolean spawn(IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+	private boolean spawn(IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
 		int y;
 		if (spawnAboveGround)
 		{
-			y = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+			y = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
 		}
 		else if (spawnUnderGround)
 		{
-			int solidHeight = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+			int solidHeight = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
 			if (solidHeight < 1 || solidHeight <= minY)
 			{
 				return false;
@@ -290,7 +290,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			}
 			y = random.nextInt(solidHeight - minY) + minY;
 		} else {
-			y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+			y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
 		}
 
 		if (y < 0)
@@ -300,7 +300,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 
 		Rotation rotation = randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 
-		if (!canSpawnAt(worldGenRegion, rotation, x, y, z, chunkBeingPopulated))
+		if (!canSpawnAt(worldGenRegion, rotation, x, y, z, chunkBeingDecorated))
 		{
 			return false;
 		}
@@ -311,22 +311,22 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 		// Spawn
 		for (ObjectCoordinate point : data)
 		{
-			if ((worldMaterial = worldGenRegion.getMaterial(x + point.x, y + point.y, z + point.z, chunkBeingPopulated)) != null)
+			if ((worldMaterial = worldGenRegion.getMaterial(x + point.x, y + point.y, z + point.z, chunkBeingDecorated)) != null)
 			{
 				if(worldMaterial.isAir())
 				{
-					setBlock(worldGenRegion, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated, replaceBlocks);
+					setBlock(worldGenRegion, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingDecorated, replaceBlocks);
 				}
 				else if (dig)
 				{
-					setBlock(worldGenRegion, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated, replaceBlocks);
+					setBlock(worldGenRegion, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingDecorated, replaceBlocks);
 				}
 			}
 		}
 		return true;
 	}
 
-	// Called during population.
+	// Called during decoration.
 	@Override
 	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord)
 	{
@@ -441,7 +441,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 
 	}
 
-	private void setBlock(IWorldGenRegion worldGenRegion, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+	private void setBlock(IWorldGenRegion worldGenRegion, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
 		/* TODO: Don't think anyone actually uses this? Remove if noone complains about missing it..
 		HashMap<LocalMaterialData, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
@@ -454,7 +454,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			}
 		}
 		*/
-		worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlocks);
+		worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingDecorated, replaceBlocks);
 	}
 
 	private boolean isEnabled = false;

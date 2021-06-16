@@ -36,7 +36,7 @@ public class PlantResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
@@ -51,8 +51,8 @@ public class PlantResource extends FrequencyResourceBase
 			localX = x + rand.nextInt(8) - rand.nextInt(8);
 			localY = y + rand.nextInt(4) - rand.nextInt(4);
 			localZ = z + rand.nextInt(8) - rand.nextInt(8);
-			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingPopulated);
-			worldMaterialBelow = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingDecorated);
+			worldMaterialBelow = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingDecorated);
 			if (
 				(worldMaterial == null || !worldMaterial.isAir()) ||
 				(worldMaterialBelow == null || !this.sourceBlocks.contains(worldMaterialBelow))
@@ -61,7 +61,7 @@ public class PlantResource extends FrequencyResourceBase
 				continue;
 			}
 
-			this.plant.spawn(worldGenregion, localX, localY, localZ, chunkBeingPopulated);
+			this.plant.spawn(worldGenregion, localX, localY, localZ, chunkBeingDecorated);
 		}
 	}
 	

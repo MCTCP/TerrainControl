@@ -22,9 +22,9 @@ public class CoralMushroomResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		int xRadius = random.nextInt(3) + 3;
@@ -46,7 +46,7 @@ public class CoralMushroomResource extends FrequencyResourceBase
 						(x1 != 0 && x1 != yRadius || z1 != 0 && z1 != zRadius) &&
 						(x1 == 0 || x1 == yRadius || y1 == 0 || y1 == xRadius || z1 == 0 || z1 == zRadius) &&
 						!(random.nextFloat() < 0.1F) &&
-						!CoralHelper.placeCoralBlock(world, random, chunkBeingPopulated, x + x1, y + y1 - yOffset, z + z1, coral)
+						!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, x + x1, y + y1 - yOffset, z + z1, coral)
 					)
 					{
 						// Lol

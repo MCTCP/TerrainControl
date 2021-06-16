@@ -34,9 +34,9 @@ public class BoulderResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+		int y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
 		if (y < this.minAltitude || y > this.maxAltitude)
 		{
 			return;
@@ -45,7 +45,7 @@ public class BoulderResource extends FrequencyResourceBase
 		LocalMaterialData material;
 		while (y > 3)
 		{
-			material = worldGenregion.getMaterial(x, y - 1, z, chunkBeingPopulated);
+			material = worldGenregion.getMaterial(x, y - 1, z, chunkBeingDecorated);
 			if (this.sourceBlocks.contains(material))
 			{
 				break;
@@ -83,7 +83,7 @@ public class BoulderResource extends FrequencyResourceBase
 						f4 = i3 - y;
 						if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
 						{
-							worldGenregion.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated, true);
+							worldGenregion.setBlock(i1, i3, i2, this.material, null, chunkBeingDecorated, true);
 						}
 					}
 				}

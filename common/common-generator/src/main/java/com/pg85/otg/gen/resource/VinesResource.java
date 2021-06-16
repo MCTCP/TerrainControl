@@ -37,7 +37,7 @@ public class VinesResource extends FrequencyResourceBase
 		this.maxAltitude = readInt(args.get(3), this.minAltitude, Constants.WORLD_HEIGHT - 1);
 	}
 	
-	private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int direction, ChunkCoordinate chunkBeingPopulated)
+	private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int direction, ChunkCoordinate chunkBeingDecorated)
 	{
 		LocalMaterialData sourceBlock;
 		switch (direction)
@@ -45,26 +45,26 @@ public class VinesResource extends FrequencyResourceBase
 			default:
 				return false;
 			case 1:
-				sourceBlock = worldGenRegion.getMaterial(x, y + 1, z, chunkBeingPopulated);
+				sourceBlock = worldGenRegion.getMaterial(x, y + 1, z, chunkBeingDecorated);
 				break;
 			case 2:
-				sourceBlock = worldGenRegion.getMaterial(x, y, z + 1, chunkBeingPopulated);
+				sourceBlock = worldGenRegion.getMaterial(x, y, z + 1, chunkBeingDecorated);
 				break;
 			case 3:
-				sourceBlock = worldGenRegion.getMaterial(x, y, z - 1, chunkBeingPopulated);
+				sourceBlock = worldGenRegion.getMaterial(x, y, z - 1, chunkBeingDecorated);
 				break;
 			case 5:
-				sourceBlock = worldGenRegion.getMaterial(x - 1, y, z, chunkBeingPopulated);
+				sourceBlock = worldGenRegion.getMaterial(x - 1, y, z, chunkBeingDecorated);
 				break;
 			case 4:
-				sourceBlock = worldGenRegion.getMaterial(x + 1, y, z, chunkBeingPopulated);
+				sourceBlock = worldGenRegion.getMaterial(x + 1, y, z, chunkBeingDecorated);
 				break;
 		}
 		return sourceBlock != null && sourceBlock.isSolid();
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int _x = x;
 		int _z = z;
@@ -74,15 +74,15 @@ public class VinesResource extends FrequencyResourceBase
 		
 		while (y <= this.maxAltitude)
 		{
-			worldMaterial = worldGenRegion.getMaterial(_x, y, _z, chunkBeingPopulated);
+			worldMaterial = worldGenRegion.getMaterial(_x, y, _z, chunkBeingDecorated);
 			if (worldMaterial != null && worldMaterial.isAir())
 			{
 				// TODO: Refactor to enum
 				for (int direction = 2; direction <= 5; direction++)
 				{
-					if (canPlace(worldGenRegion, _x, y, _z, direction, chunkBeingPopulated))
+					if (canPlace(worldGenRegion, _x, y, _z, direction, chunkBeingDecorated))
 					{
-						worldGenRegion.setBlock(_x, y, _z, FROM_DIRECTION[direction - 2], null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(_x, y, _z, FROM_DIRECTION[direction - 2], null, chunkBeingDecorated, false);
 						break;
 					}
 				}

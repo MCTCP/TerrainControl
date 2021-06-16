@@ -21,9 +21,9 @@ public class LightCheck extends BO3Check
 	private int maxLightLevel;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int lightLevel = worldGenRegion.getLightLevel(x, y, z, chunkBeingPopulated);
+		int lightLevel = worldGenRegion.getLightLevel(x, y, z, chunkBeingDecorated);
 		if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
 		{
 			// Out of bounds

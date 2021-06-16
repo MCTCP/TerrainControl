@@ -15,7 +15,7 @@ public class ModCheck extends BO3Check
 	private String[] mods;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		return false;
 	}

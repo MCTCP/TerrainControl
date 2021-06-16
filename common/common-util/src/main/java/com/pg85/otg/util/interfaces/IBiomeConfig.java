@@ -86,7 +86,7 @@ public interface IBiomeConfig
 
 	// Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
 	// call getXXXBlockReplaced to get the replaced blocks.
-	// Any blocks spawned during population will have their materials parsed before spawning
+	// Any blocks spawned during decoration will have their materials parsed before spawning
 	// them via world.setBlock(), so they use the default biomeconfig materials.	
 	
 	LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);

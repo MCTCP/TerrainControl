@@ -929,7 +929,7 @@ public class SmoothingAreaGenerator
 	
 	// Merges all the smoothing lines that were plotted earlier into one smoothing area per chunk and then spawns the smoothing area.
 	// Returns false if a smoothing area could not be finalised and spawning has to be delayed until other chunks have spawned.
-	public void spawnSmoothAreas(BO4Config startBO4Config, ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public void spawnSmoothAreas(BO4Config startBO4Config, ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		// Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
 		ArrayList<SmoothingAreaLine> smoothingAreaInChunk = smoothingAreasToSpawn.get(chunkCoordinate);

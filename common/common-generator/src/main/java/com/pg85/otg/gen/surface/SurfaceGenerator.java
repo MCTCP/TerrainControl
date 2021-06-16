@@ -6,16 +6,16 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+// TODO: Lol, ye olde comment. Refactor this? 
 /**
  * Minecraft 1.7 added block data support to the initial terrain generation.
  * CraftBukkit doesn't support this (yet), so all things with block data have
- * to be moved to the terrain population step.
+ * to be moved to the terrain decoration step.
  * <p />
  * The purpose of classes implementing this interface is to add the block data
  * to the surface blocks and the blocks just below that. At the moment, these
  * are the only blocks that require block data during the initial terrain
  * generation.
- * 
  */
 public interface SurfaceGenerator
 {

@@ -288,7 +288,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Population / decoration
 
-	// Does population for a given pos/chunk
+	// Does decoration for a given pos/chunk
 	@Override
 	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
@@ -315,17 +315,17 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}	
 	}
 
-	// Chunk population method taken from Biome class
+	// Chunk decoration method taken from Biome class
 	@SuppressWarnings("deprecation")
 	private void biomeDecorate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = world.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
 		init(worldSaveFolder);
-		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingDecorated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		

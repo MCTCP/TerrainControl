@@ -82,11 +82,11 @@ public class ChunkCoordinate
 	}
 
 	/**
-	 * Gets the coordinates of the chunk that is responsible for populating
+	 * Gets the coordinates of the chunk that is responsible for decorating
 	 * the given block.
 	 *
-	 * <p>During terrain population, these four chunks are
-	 * guaranteed to be loaded when the top-left chunk is being populated:
+	 * <p>During terrain decoration, these four chunks are
+	 * guaranteed to be loaded when the top-left chunk is being decorated:
 	 * <pre>
 	 * +--------+--------+ . = no changes in blocks for now
 	 * |........|........| # = blocks are replaced
@@ -112,7 +112,7 @@ public class ChunkCoordinate
 	 */
 	public static ChunkCoordinate getPopulatingChunk(int blockX, int blockZ)
 	{
-		// Because of the way Minecraft population works, objects should never
+		// Because of the way Minecraft decoration works, objects should never
 		// be placed in the bottom left corner of a chunk. That's why this
 		// formula looks a bit overly complicated. <-- TODO: Why should objects never be placed in the bottom-left corner of a chunk?
 		return new ChunkCoordinate(
@@ -209,15 +209,15 @@ public class ChunkCoordinate
 		return this.chunkX == chunkX && this.chunkZ == chunkZ;
 	}
 	
-	public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
+	public static boolean isInAreaBeingDecorated(int blockX, int blockZ, ChunkCoordinate chunkBeingDecorated)
 	{
 		return
 			(
-				blockX >= chunkBeingPopulated.getBlockX() &&
-				blockX < chunkBeingPopulated.getBlockX() + (CHUNK_SIZE * 2)
+				blockX >= chunkBeingDecorated.getBlockX() &&
+				blockX < chunkBeingDecorated.getBlockX() + (CHUNK_SIZE * 2)
 			) && (
-				blockZ >= chunkBeingPopulated.getBlockZ() &&
-				blockZ < chunkBeingPopulated.getBlockZ() + (CHUNK_SIZE * 2)
+				blockZ >= chunkBeingDecorated.getBlockZ() &&
+				blockZ < chunkBeingDecorated.getBlockZ() + (CHUNK_SIZE * 2)
 			)
 		;		
 	}

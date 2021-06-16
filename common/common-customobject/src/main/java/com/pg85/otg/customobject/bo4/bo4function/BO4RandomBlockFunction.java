@@ -164,13 +164,13 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
 	{
 		for (int i = 0; i < blockCount; i++)
 		{
 			if (random.nextInt(100) < blockChances[i])
 			{
-				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true, false);
+				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingDecorated, true, false);
 				break;
 			}
 		}

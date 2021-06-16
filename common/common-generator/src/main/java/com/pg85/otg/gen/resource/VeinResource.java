@@ -66,7 +66,7 @@ public class VeinResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
 		// Find all veins that reach this chunk, and spawn them
 		int searchRadius = (this.maxSizeInBlocks + 15) / 16;
@@ -79,8 +79,8 @@ public class VeinResource extends ResourceBase implements IBasicResource
 			}
 		}
 		
-		int currentChunkX = chunkBeingPopulated.getChunkX();
-		int currentChunkZ = chunkBeingPopulated.getChunkZ();
+		int currentChunkX = chunkBeingDecorated.getChunkX();
+		int currentChunkZ = chunkBeingDecorated.getChunkZ();
 		Vein vein;
 		for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
 		{
@@ -89,7 +89,7 @@ public class VeinResource extends ResourceBase implements IBasicResource
 				vein = getVeinStartInChunk(worldGenRegion, searchChunkX, searchChunkZ);
 				if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
 				{
-					vein.spawn(worldGenRegion, random, chunkBeingPopulated, this);
+					vein.spawn(worldGenRegion, random, chunkBeingDecorated, this);
 				}
 			}
 		}

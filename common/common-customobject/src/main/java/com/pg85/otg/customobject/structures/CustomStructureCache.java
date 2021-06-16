@@ -50,7 +50,7 @@ public class CustomStructureCache
 	
 	// BO4
 	
-	// Contains bo4StructureCache of plotted but not yet populated branches
+	// Contains bo4StructureCache of plotted but not yet decorated branches
 	private CustomStructurePlotter plotter; 
 
 	// Common
@@ -59,7 +59,7 @@ public class CustomStructureCache
 	// Used for /otg structure and spawners/particles/moddata for BO structures and objects.
 	// For BO4's this is also used used to avoid resources like lakes spawning on structures.
 	// WorldInfoChunks is persisted to disk, the bo4 plotter's structurecache (of plotted but
-	// not yet populated branches) is assembled from WorldInfoChunks when loaded from disk.
+	// not yet decorated branches) is assembled from WorldInfoChunks when loaded from disk.
 	// WorldInfoChunks is used as little as possible, due to its size and slowness.
 	private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
 
@@ -250,16 +250,16 @@ public class CustomStructureCache
 		return false;
 	}
 	
-	// Only used by ObjectSpawner during population
+	// Only used by ObjectSpawner during decoration
 	public void plotBo4Structures(IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		plotter.plotStructures(this, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
-	// Only used by ObjectSpawner during population
-	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	// Only used by ObjectSpawner during decoration
+	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Only used by /spawn command	
@@ -281,7 +281,7 @@ public class CustomStructureCache
 			// TODO: Make this prettier
 			synchronized(chunkPopulator.getLockingObject())
 			{
-				if(!chunkPopulator.isPopulating())
+				if(!chunkPopulator.isDecorating())
 				{
 					chunkPopulator.beginSave();
 					break;

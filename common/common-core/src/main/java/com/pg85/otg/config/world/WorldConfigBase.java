@@ -124,7 +124,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	// OTG Custom structures
 	
 	protected CustomStructureType customStructureType;
-	protected boolean populationBoundsCheck;
+	protected boolean decorationBoundsCheck;
 	protected int maximumCustomStructureRadius;
 	
 	// Caves & Ravines
@@ -189,7 +189,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	@Override
 	public boolean doPopulationBoundsCheck()
 	{
-		return this.populationBoundsCheck;
+		return this.decorationBoundsCheck;
 	}
 	
 	@Override

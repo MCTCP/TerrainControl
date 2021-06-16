@@ -24,7 +24,7 @@ public final class FossilResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
 		if (random.nextDouble() * 100.0 > this.rarity)
 		{
@@ -37,7 +37,7 @@ public final class FossilResource extends ResourceBase implements IBasicResource
 		// spawn exactly the same object at exactly the same location. In
 		// other words: don't bother adding a frequency parameter, unless
 		// you are going to rewrite the fossil code.
-		worldGenRegion.placeFossil(random, chunkBeingPopulated);
+		worldGenRegion.placeFossil(random, chunkBeingDecorated);
 	}
 
 	@Override

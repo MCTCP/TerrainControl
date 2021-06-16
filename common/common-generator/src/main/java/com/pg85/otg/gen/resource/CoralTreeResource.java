@@ -30,16 +30,16 @@ public class CoralTreeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		int height = random.nextInt(3) + 1;
 		for (int i = 0; i < height; i++)
 		{
 			// Return if we don't have enough space to place the rest of the tree
-			if (!CoralHelper.placeCoralBlock(world, random, chunkBeingPopulated, x, y + i, z, coral))
+			if (!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, x, y + i, z, coral))
 			{
 				return;
 			}
@@ -69,7 +69,7 @@ public class CoralTreeResource extends FrequencyResourceBase
 			count = random.nextInt(5) + 2;
 			placedIndex = 0;
 
-			for (int i = 0; i < count && CoralHelper.placeCoralBlock(world, random, chunkBeingPopulated, dx, dy, dz, coral); i++)
+			for (int i = 0; i < count && CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, dx, dy, dz, coral); i++)
 			{
 				placedIndex++;
 				dy++;

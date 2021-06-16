@@ -6,10 +6,10 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 public final class BlockCheckNot extends BlockCheck
 {
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		// We want the exact opposite as BlockCheck
-		return !super.preventsSpawn(worldGenRegion, x, y, z, chunkBeingPopulated);
+		return !super.preventsSpawn(worldGenRegion, x, y, z, chunkBeingDecorated);
 	}
 
 	@Override

@@ -86,25 +86,25 @@ class ObjectExtrusionHelper
 	 * @param y	  The BO3 base Y spawn location
 	 * @param z	  The BO3 base Z spawn location
 	 */
-	void extrude(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+	void extrude(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
 	{
 		for (BO3BlockFunction block : blocksToExtrude)
 		{
 			if (extrudeMode == ExtrudeMode.BottomDown)
 			{
 				for (int yi = y + block.y - 1;
-					 yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
+					 yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingDecorated));
 					 --yi)
 				{
-					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingPopulated, replaceBlock);
+					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingDecorated, replaceBlock);
 				}
 			} else if (extrudeMode == ExtrudeMode.TopUp)
 			{
 				for (int yi = y + block.y + 1;
-					 yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
+					 yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingDecorated));
 					 ++yi)
 				{
-					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingPopulated, replaceBlock);
+					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingDecorated, replaceBlock);
 				}
 			}
 		}

@@ -379,7 +379,7 @@ public class ShadowChunkGenerator
 
 	// BO4's / Smoothing Areas
 
-	// BO4's and smoothing areas may do material and height checks in unloaded chunks during population/decoration.
+	// BO4's and smoothing areas may do material and height checks in unloaded chunks during decoration.
 	// Shadowgen is used to do this without causing cascades. Shadowgenned chunks are requested on-demand for the worldgen thread (BO4's).
 	// Async worker threads may also pre-emptively shadowgen and cache unloaded chunks, which speeds up base terrain generation but also BO4's.
 	// Note: BO4's are always processed on the worldgen thread, never on a worker thread, since they are not a part of base terrain generation.
@@ -403,7 +403,7 @@ public class ShadowChunkGenerator
 		IChunk chunk = this.getChunkWithWait(chunkCoord);
 		if (chunk == null)
 		{
-			// Generate a chunk without loading/populating it
+			// Generate a chunk without loading/decorating it
 			chunk = getUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, chunkCoord).getChunk();
 			synchronized(this.workerLock)
 			{
@@ -543,7 +543,7 @@ public class ShadowChunkGenerator
 				{
 					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords))
 					{
-						// Generate a chunk without loading/populating it.
+						// Generate a chunk without loading/decorating it.
 						IChunk cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
 						synchronized(workerLock)
 						{

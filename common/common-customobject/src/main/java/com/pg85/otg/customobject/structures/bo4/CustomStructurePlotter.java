@@ -32,14 +32,14 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public class CustomStructurePlotter
 {
-	// Structurecache holds plotted structures/branches/smoothing areas in unpopulated chunks.
+	// Structurecache holds plotted structures/branches/smoothing areas in undecorated chunks.
 	private final Map<ChunkCoordinate, BO4CustomStructure[][]> bo4StructureCache; // Per region
 	
 	// plottedChunks holds a chunkcoord for every chunk outside the 
-	// pregenerated region that has had its populate method called.
+	// pregenerated region that has had its decorate method called.
 	// We unfortunately need this because MC can't tell use whether a chunk
-	// has been populated, only whether is has had terraingen done, or if it
-	// is completely done being populated and lit (its neighbours have all spawned).
+	// has been decorated, only whether is has had terraingen done, or if it
+	// is completely done being decorated and lit (its neighbours have all spawned).
 	private final Map<ChunkCoordinate, PlottedChunksRegion> plottedChunks; // Per region
 
 	// Used to find distance between structures and structure groups, only stores 1 chunk per structure in the 
@@ -54,7 +54,7 @@ public class CustomStructurePlotter
 	private boolean processing = false;
 	//
 	
-	private boolean structurePlottedAtSpawn; // Used by ObjectSpawner to make sure the structureatspawn is plotted first.
+	private boolean structurePlottedAtSpawn; // Used by ChunkDecorator to make sure the structureatspawn is plotted first.
 	
 	// Non-persistent caches (optimisations)
 	private final FifoMap<ChunkCoordinate, ArrayList<String>> structureNamesPerChunk;
@@ -163,20 +163,20 @@ public class CustomStructurePlotter
 		// Add to structure cache so we can spawn parts later
 		addToStructureCache(chunkCoordinate, structure);
 
-		// Add to populated chunks so we won't override
+		// Add to decorated chunks so we won't override
 		addToPlottedChunks(chunkCoordinate);
 		
 		// Let plotter know the chunk is taken (fast cache, optimisation)
 		setChunkOccupied(chunkCoordinate);
 	}
 
-	// Only used by ObjectSpawner
-	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	// Only used by ChunkDecorator
+	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BO4CustomStructure structureStart = getFromStructureCache(chunkCoordinate);
 		if (structureStart != null && structureStart.start != null)
 		{
-			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		} else {
 			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
 			if(structureStart != null && structureStart.start == null)
@@ -187,21 +187,21 @@ public class CustomStructurePlotter
 		}
 
 		// Safe to remove chunk from bo4StructureCache now, 
-		// it has been populated by ObjectSpawner (not just 
-		// plotted/spawned while populating a neighbouring chunk).
+		// it has been decorated by ChunkDecorator (not just 
+		// plotted/spawned while decorating a neighbouring chunk).
 		removeFromStructureCache(chunkCoordinate);
 		
 		// Let plotter know the chunk is taken (fast cache, optimisation)
 		setChunkOccupied(chunkCoordinate);
 	}
 
-	// Only used by ObjectSpawner during population
+	// Only used by ChunkDecorator during decoration
 	public BO4CustomStructure plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
-	// Used by ObjectSpawner during population and /otg spawn. targetStructure and targetBiomes only used for /spawn (make that prettier?)
+	// Used by ChunkDecorator during decoration and /otg spawn. targetStructure and targetBiomes only used for /spawn (make that prettier?)
 	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -965,7 +965,7 @@ public class CustomStructurePlotter
 												// Even though we made sure the structure's bounding box contained the current chunk,
 												// the structure may not have spawned a branch on the current chunk. If so, try to 
 												// spawn more structures.
-												// If we're plotting a target structure via /otg spawn, then the chunk isn't being populated
+												// If we're plotting a target structure via /otg spawn, then the chunk isn't being decorated
 												// so it's okay if the structure didn't get plotted on this chunk.
 												if(structureCacheContainsKey(chunkCoord) || targetStructure != null)
 												{
@@ -1102,11 +1102,11 @@ public class CustomStructurePlotter
 					}
 				
 					// loadedStructures contains chunkcoords for every chunk ever plotted.
-					// We only need chunks plotted but not yet populated that contain structure parts.
+					// We only need chunks plotted but not yet decorated that contain structure parts.
 					// objectsToSpawn and smoothingAreasToSpawn contain all unspawned branches and 
-					// smoothing areas. Any chunks that have had their bo4's spawned while populating a neighbouring 
-					// chunk, but have not yet been fully populated themselves are kept in populatedChunks, along with all
-					// fully populated chunks (they are considered fully populated for the purposes of bo4 plotting).
+					// smoothing areas. Any chunks that have had their bo4's spawned while decorating a neighbouring 
+					// chunk, but have not yet been fully decorated themselves are kept in decoratedChunks, along with all
+					// fully decorated chunks (they are considered fully decorated for the purposes of bo4 plotting).
 					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).getObjectsToSpawn().keySet())
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has blocks that need to be spawned
