@@ -24,9 +24,9 @@ public class RegistryResource  extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
-		worldGenRegion.placeFromRegistry(random, chunkBeingPopulated, this.id);
+		worldGenRegion.placeFromRegistry(random, chunkBeingDecorated, this.id);
 	}
 	
 	@Override

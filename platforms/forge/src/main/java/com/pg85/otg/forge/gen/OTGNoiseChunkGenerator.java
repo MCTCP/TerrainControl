@@ -322,10 +322,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = world.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
 		init(worldSaveFolder);
-		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingDecorated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		

@@ -34,13 +34,13 @@ public class ReedResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
-		LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z, chunkBeingPopulated);
-		LocalMaterialData materialB = worldGenRegion.getMaterial(x + 1, y - 1, z, chunkBeingPopulated);
-		LocalMaterialData materialC = worldGenRegion.getMaterial(x, y - 1, z - 1, chunkBeingPopulated);
-		LocalMaterialData materialD = worldGenRegion.getMaterial(x, y - 1, z + 1, chunkBeingPopulated);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
+		LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z, chunkBeingDecorated);
+		LocalMaterialData materialB = worldGenRegion.getMaterial(x + 1, y - 1, z, chunkBeingDecorated);
+		LocalMaterialData materialC = worldGenRegion.getMaterial(x, y - 1, z - 1, chunkBeingDecorated);
+		LocalMaterialData materialD = worldGenRegion.getMaterial(x, y - 1, z + 1, chunkBeingDecorated);
 		if (
 			y > this.maxAltitude || 
 			y < this.minAltitude || 
@@ -55,7 +55,7 @@ public class ReedResource extends FrequencyResourceBase
 			return;
 		}
 		
-		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 1, z, chunkBeingPopulated);		
+		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 1, z, chunkBeingDecorated);		
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
@@ -64,7 +64,7 @@ public class ReedResource extends FrequencyResourceBase
 		int height = 1 + rand.nextInt(2);
 		for (int y1 = 0; y1 < height; y1++)
 		{
-			worldGenRegion.setBlock(x, y + y1, z, this.material, null, chunkBeingPopulated, false);
+			worldGenRegion.setBlock(x, y + y1, z, this.material, null, chunkBeingDecorated, false);
 		}
 	}
 	

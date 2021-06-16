@@ -26,7 +26,7 @@ public class SeaPickleResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int dx;
 		int dz;
@@ -37,10 +37,10 @@ public class SeaPickleResource extends FrequencyResourceBase
 		{
 			dx = x + random.nextInt(8) - random.nextInt(8);
 			dz = z + random.nextInt(8) - random.nextInt(8);
-			y = world.getBlockAboveSolidHeight(dx, dz, chunkBeingPopulated);
+			y = world.getBlockAboveSolidHeight(dx, dz, chunkBeingDecorated);
 
-			bottom = world.getMaterial(dx, y - 1, dz, chunkBeingPopulated);
-			here = world.getMaterial(dx, y, dz, chunkBeingPopulated);
+			bottom = world.getMaterial(dx, y - 1, dz, chunkBeingDecorated);
+			here = world.getMaterial(dx, y, dz, chunkBeingDecorated);
 			if (bottom == null || here == null)
 			{
 				continue;
@@ -48,7 +48,7 @@ public class SeaPickleResource extends FrequencyResourceBase
 
 			if (bottom.isSolid() && here.isLiquid())
 			{
-				world.setBlock(dx, y, dz, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, chunkBeingPopulated, false);
+				world.setBlock(dx, y, dz, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, chunkBeingDecorated, false);
 			}
 		}
 	}

@@ -34,10 +34,10 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
-		if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
+		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingDecorated) - 1;
+		if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingDecorated) < firstSolidBlock || firstSolidBlock == -1)
 		{
 			return;
 		}
@@ -64,10 +64,10 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 				{
 					for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
 					{
-						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
+						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingDecorated);
 						if (this.sourceBlocks.contains(sourceBlock))
 						{
-							worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
+							worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingDecorated, true);
 						}
 					}
 				}

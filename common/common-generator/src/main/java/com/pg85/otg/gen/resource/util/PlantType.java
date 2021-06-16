@@ -147,12 +147,12 @@ public class PlantType
 	 * @param y Y position of the lowest block of the plant.
 	 * @param z Z position of the plant.
 	 */
-	public void spawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{		
-		worldGenregion.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated, false);
+		worldGenregion.setBlock(x, y, z, bottomBlock, null, chunkBeingDecorated, false);
 		if (topBlock != null)
 		{
-			worldGenregion.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated, false);
+			worldGenregion.setBlock(x, y + 1, z, topBlock, null, chunkBeingDecorated, false);
 		}
 	}
 

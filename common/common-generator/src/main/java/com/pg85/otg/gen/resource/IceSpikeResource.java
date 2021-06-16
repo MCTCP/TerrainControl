@@ -56,30 +56,30 @@ public class IceSpikeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		switch(this.type)
 		{
 			case Basement:
-				spawnBasement(worldGenregion, random, x, z, chunkBeingPopulated);
+				spawnBasement(worldGenregion, random, x, z, chunkBeingDecorated);
 				break;
 			case HugeSpike:
-				spawnSpike(worldGenregion, random, x, z, true, chunkBeingPopulated);
+				spawnSpike(worldGenregion, random, x, z, true, chunkBeingDecorated);
 				break;
 			case SmallSpike:
-				spawnSpike(worldGenregion, random, x, z, false, chunkBeingPopulated);
+				spawnSpike(worldGenregion, random, x, z, false, chunkBeingDecorated);
 				break;
 		}
 	}
 
-	private void spawnBasement(IWorldGenRegion worldGenregion, Random random,int x, int z, ChunkCoordinate chunkBeingPopulated)
+	private void spawnBasement(IWorldGenRegion worldGenregion, Random random,int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
 		LocalMaterialData worldMaterial;
 		while (
 			y > 2 && 
-			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) != null && 
 			worldMaterial.isAir()
 		)
 		{
@@ -87,7 +87,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 		}
 		
 		if (
-			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) == null || 
+			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) == null || 
 			!this.sourceBlocks.contains(worldMaterial)
 		)
 		{
@@ -108,10 +108,10 @@ public class IceSpikeResource extends FrequencyResourceBase
 				{
 					for (int deltaY = y - one; deltaY <= y + one; deltaY++)
 					{
-						worldMaterial = worldGenregion.getMaterial(actualX, deltaY, actualZ, chunkBeingPopulated);
+						worldMaterial = worldGenregion.getMaterial(actualX, deltaY, actualZ, chunkBeingDecorated);
 						if (worldMaterial != null && this.sourceBlocks.contains(worldMaterial))
 						{
-							worldGenregion.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated, true);
+							worldGenregion.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingDecorated, true);
 						}
 					}
 				}
@@ -119,13 +119,13 @@ public class IceSpikeResource extends FrequencyResourceBase
 		}
 	}
 
-	private void spawnSpike(IWorldGenRegion worldGenregion, Random random, int x, int z, boolean hugeSpike, ChunkCoordinate chunkBeingPopulated)
+	private void spawnSpike(IWorldGenRegion worldGenregion, Random random, int x, int z, boolean hugeSpike, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 		LocalMaterialData worldMaterial;
 		while (
 			y > 2 && 
-			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) != null && 
 			worldMaterial.isAir()
 		)
 		{
@@ -133,7 +133,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 		}
 		
 		if (
-			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) == null || 
+			(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) == null || 
 			!this.sourceBlocks.contains(worldMaterial)
 		)
 		{
@@ -172,21 +172,21 @@ public class IceSpikeResource extends FrequencyResourceBase
 					if ((var11 == 0 && var13 == 0 || var12 * var12 + var14 * var14 <= var9 * var9) && (var11 != -var10 && var11 != var10 && var13 != -var10 && var13 != var10 || random.nextFloat() <= 0.75F))
 					{
 						if (
-							(worldMaterial = worldGenregion.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
+							(worldMaterial = worldGenregion.getMaterial(x + var11, y + var8, z + var13, chunkBeingDecorated)) != null && 
 							(worldMaterial.isAir() || this.sourceBlocks.contains(worldMaterial))
 						)
 						{
-							worldGenregion.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated, true);
+							worldGenregion.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingDecorated, true);
 						}
 
 						if (var8 != 0 && var10 > 1)
 						{
 							if (
-								(worldMaterial = worldGenregion.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
+								(worldMaterial = worldGenregion.getMaterial(x + var11, y - var8, z + var13, chunkBeingDecorated)) != null && 
 								(worldMaterial.isAir() || this.sourceBlocks.contains(worldMaterial))
 							)
 							{
-								worldGenregion.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated, true);
+								worldGenregion.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingDecorated, true);
 							}							
 						}
 					}
@@ -225,7 +225,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 					if (var11 > 50)
 					{
 						if(
-							(worldMaterial = worldGenregion.getMaterial(x + var16, var11, z + var10, chunkBeingPopulated)) != null &&
+							(worldMaterial = worldGenregion.getMaterial(x + var16, var11, z + var10, chunkBeingDecorated)) != null &&
 							(
 								worldMaterial.isAir() || 
 								this.sourceBlocks.contains(worldMaterial) || 
@@ -233,7 +233,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 							)
 						)
 						{
-							worldGenregion.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated, true);
+							worldGenregion.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingDecorated, true);
 							--var11;
 							--var17;
 

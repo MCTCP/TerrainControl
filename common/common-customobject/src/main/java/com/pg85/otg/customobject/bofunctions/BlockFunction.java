@@ -75,7 +75,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 	 * @param z	  The absolute z to spawn. The z-position in this object is
 	 *				ignored.
 	 */
-	public abstract void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock);
+	public abstract void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock);
 	
 	@Override
 	public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)

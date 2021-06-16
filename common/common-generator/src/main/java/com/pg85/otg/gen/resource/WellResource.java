@@ -38,21 +38,21 @@ public class WellResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = random.nextInt(this.maxAltitude - this.minAltitude) + this.minAltitude;
 
 		LocalMaterialData worldMaterial;
 		while (
 			y > this.minAltitude && 
-			(worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+			(worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingDecorated)) != null && 
 			worldMaterial.isAir()
 		)
 		{
 			--y;
 		}
 
-		worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated);
+		worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingDecorated);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
@@ -66,9 +66,9 @@ public class WellResource extends FrequencyResourceBase
 			for (j = -2; j <= 2; ++j)
 			{
 				if (
-					(worldMaterial = worldGenRegion.getMaterial(x + i, y - 1, z + j, chunkBeingPopulated)) == null ||
+					(worldMaterial = worldGenRegion.getMaterial(x + i, y - 1, z + j, chunkBeingDecorated)) == null ||
 					worldMaterial.isAir() ||
-					(worldMaterial = worldGenRegion.getMaterial(x + i, y - 2, z + j, chunkBeingPopulated)) == null ||
+					(worldMaterial = worldGenRegion.getMaterial(x + i, y - 2, z + j, chunkBeingDecorated)) == null ||
 					worldMaterial.isAir()
 				)
 				{
@@ -83,16 +83,16 @@ public class WellResource extends FrequencyResourceBase
 			{
 				for (int var9 = -2; var9 <= 2; ++var9)
 				{
-					worldGenRegion.setBlock(x + j, y + i, z + var9, this.material, null, chunkBeingPopulated, false);
+					worldGenRegion.setBlock(x + j, y + i, z + var9, this.material, null, chunkBeingDecorated, false);
 				}
 			}
 		}
 
-		worldGenRegion.setBlock(x, y, z, this.water, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x - 1, y, z, this.water, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x + 1, y, z, this.water, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x, y, z - 1, this.water, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x, y, z + 1, this.water, null, chunkBeingPopulated, false);
+		worldGenRegion.setBlock(x, y, z, this.water, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x - 1, y, z, this.water, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x + 1, y, z, this.water, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x, y, z - 1, this.water, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x, y, z + 1, this.water, null, chunkBeingDecorated, false);
 
 		for (i = -2; i <= 2; ++i)
 		{
@@ -100,15 +100,15 @@ public class WellResource extends FrequencyResourceBase
 			{
 				if (i == -2 || i == 2 || j == -2 || j == 2)
 				{
-					worldGenRegion.setBlock(x + i, y + 1, z + j, this.material, null, chunkBeingPopulated, false);
+					worldGenRegion.setBlock(x + i, y + 1, z + j, this.material, null, chunkBeingDecorated, false);
 				}
 			}
 		}
 
-		worldGenRegion.setBlock(x + 2, y + 1, z, this.slab, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x - 2, y + 1, z, this.slab, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x, y + 1, z + 2, this.slab, null, chunkBeingPopulated, false);
-		worldGenRegion.setBlock(x, y + 1, z - 2, this.slab, null, chunkBeingPopulated, false);
+		worldGenRegion.setBlock(x + 2, y + 1, z, this.slab, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x - 2, y + 1, z, this.slab, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x, y + 1, z + 2, this.slab, null, chunkBeingDecorated, false);
+		worldGenRegion.setBlock(x, y + 1, z - 2, this.slab, null, chunkBeingDecorated, false);
 
 		for (i = -1; i <= 1; ++i)
 		{
@@ -116,19 +116,19 @@ public class WellResource extends FrequencyResourceBase
 			{
 				if (i == 0 && j == 0)
 				{
-					worldGenRegion.setBlock(x + i, y + 4, z + j, this.material, null, chunkBeingPopulated, false);
+					worldGenRegion.setBlock(x + i, y + 4, z + j, this.material, null, chunkBeingDecorated, false);
 				} else {
-					worldGenRegion.setBlock(x + i, y + 4, z + j, this.slab, null, chunkBeingPopulated, false);
+					worldGenRegion.setBlock(x + i, y + 4, z + j, this.slab, null, chunkBeingDecorated, false);
 				}
 			}
 		}
 
 		for (i = 1; i <= 3; ++i)
 		{
-			worldGenRegion.setBlock(x - 1, y + i, z - 1, this.material, null, chunkBeingPopulated, false);
-			worldGenRegion.setBlock(x - 1, y + i, z + 1, this.material, null, chunkBeingPopulated, false);
-			worldGenRegion.setBlock(x + 1, y + i, z - 1, this.material, null, chunkBeingPopulated, false);
-			worldGenRegion.setBlock(x + 1, y + i, z + 1, this.material, null, chunkBeingPopulated, false);
+			worldGenRegion.setBlock(x - 1, y + i, z - 1, this.material, null, chunkBeingDecorated, false);
+			worldGenRegion.setBlock(x - 1, y + i, z + 1, this.material, null, chunkBeingDecorated, false);
+			worldGenRegion.setBlock(x + 1, y + i, z - 1, this.material, null, chunkBeingDecorated, false);
+			worldGenRegion.setBlock(x + 1, y + i, z + 1, this.material, null, chunkBeingDecorated, false);
 		}
 	}
 	

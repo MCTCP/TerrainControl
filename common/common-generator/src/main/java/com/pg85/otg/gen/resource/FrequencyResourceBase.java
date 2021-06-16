@@ -21,10 +21,10 @@ public abstract class FrequencyResourceBase extends ResourceBase implements IBas
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
-		int blockX = chunkBeingPopulated.getBlockXCenter();
-		int blockZ = chunkBeingPopulated.getBlockZCenter();		
+		int blockX = chunkBeingDecorated.getBlockXCenter();
+		int blockZ = chunkBeingDecorated.getBlockZCenter();		
 
 		for (int t = 0; t < this.frequency; t++)
 		{
@@ -34,9 +34,9 @@ public abstract class FrequencyResourceBase extends ResourceBase implements IBas
 			}
 			int x = blockX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 			int z = blockZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			spawn(worldGenRegion, random, false, x, z, chunkBeingPopulated);
+			spawn(worldGenRegion, random, false, x, z, chunkBeingDecorated);
 		}
 	}
 
-	public abstract void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);	
+	public abstract void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated);	
 }

@@ -28,15 +28,14 @@ public abstract class LocalWorldGenRegion implements IWorldGenRegion
 	}
 	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
-		setBlock(x, y, z, material, nbt, chunkBeingPopulated, null, replaceBlocks, true);
+		setBlock(x, y, z, material, nbt, chunkBeingDecorated, null, replaceBlocks, true);
 	}
 	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks, boolean useResourceBounds)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks, boolean useResourceBounds)
 	{
-		setBlock(x, y, z, material, nbt, chunkBeingPopulated, null, replaceBlocks, useResourceBounds);
+		setBlock(x, y, z, material, nbt, chunkBeingDecorated, null, replaceBlocks, useResourceBounds);
 	}
-
 }

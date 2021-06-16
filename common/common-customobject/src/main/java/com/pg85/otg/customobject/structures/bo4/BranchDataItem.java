@@ -54,7 +54,7 @@ class BranchDataItem
 		branchNumber = BranchDataItem.BranchDataItemCounter;
 	}	
 	
-	Stack<BranchDataItem> getChildren(boolean dontSpawn, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	Stack<BranchDataItem> getChildren(boolean dontSpawn, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(worldGenRegion == null)
 		{

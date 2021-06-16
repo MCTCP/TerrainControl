@@ -25,19 +25,19 @@ public class SeaGrassResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		// Find lowest point
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
 
 		// TODO: sourceblocks
-		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
+		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingDecorated);
 		if (below == null || !below.isSolid())
 		{
 			return;
 		}
 
-		LocalMaterialData material = world.getMaterial(x, y, z, chunkBeingPopulated);
+		LocalMaterialData material = world.getMaterial(x, y, z, chunkBeingDecorated);
 
 		if (material == null)
 		{
@@ -47,12 +47,12 @@ public class SeaGrassResource extends FrequencyResourceBase
 		if (material.isLiquid())
 		{
 			// If the tall chance check succeeds and the above material is also water, place tall seagrass
-			if (random.nextDouble() <= this.tallChance && world.getMaterial(x, y + 1, z, chunkBeingPopulated).isLiquid())
+			if (random.nextDouble() <= this.tallChance && world.getMaterial(x, y + 1, z, chunkBeingDecorated).isLiquid())
 			{
-				world.setBlock(x, y, z, LocalMaterials.TALL_SEAGRASS_LOWER, null, chunkBeingPopulated, false);
-				world.setBlock(x, y + 1, z, LocalMaterials.TALL_SEAGRASS_UPPER, null, chunkBeingPopulated, false);
+				world.setBlock(x, y, z, LocalMaterials.TALL_SEAGRASS_LOWER, null, chunkBeingDecorated, false);
+				world.setBlock(x, y + 1, z, LocalMaterials.TALL_SEAGRASS_UPPER, null, chunkBeingDecorated, false);
 			} else {
-				world.setBlock(x, y, z, LocalMaterials.SEAGRASS, null, chunkBeingPopulated, false);
+				world.setBlock(x, y, z, LocalMaterials.SEAGRASS, null, chunkBeingDecorated, false);
 			}
 		}
 	}

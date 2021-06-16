@@ -29,7 +29,7 @@ public class DungeonResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 		worldGenRegion.placeDungeon(random, x, y, z);

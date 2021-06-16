@@ -35,7 +35,7 @@ public class CactusResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);		
 		LocalMaterialData worldMaterial;
@@ -49,39 +49,39 @@ public class CactusResource extends FrequencyResourceBase
 			cactusBaseY = y + rand.nextInt(4) - rand.nextInt(4);
 			cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
 
-			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingDecorated);
 			if(worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
 			}
 			
 			// Check foundation
-			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY - 1, cactusZ, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY - 1, cactusZ, chunkBeingDecorated);
 			if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 			{
 				continue;
 			}
 
 			// Check neighbors
-			worldMaterial = worldGenregion.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingDecorated);
 			if (worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
 			}
 			
-			worldMaterial = worldGenregion.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingDecorated);
 			if (worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
 			}
 			
-			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingDecorated);
 			if (worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
 			}
 			
-			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingPopulated);
+			worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingDecorated);
 			if (worldMaterial == null || !worldMaterial.isAir())
 			{
 				continue;
@@ -91,7 +91,7 @@ public class CactusResource extends FrequencyResourceBase
 			cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
 			for (int dY = 0; dY < cactusHeight; dY++)
 			{
-				worldGenregion.setBlock(cactusX, cactusBaseY + dY, cactusZ, this.material, null, chunkBeingPopulated, false);
+				worldGenregion.setBlock(cactusX, cactusBaseY + dY, cactusZ, this.material, null, chunkBeingDecorated, false);
 			}
 		}
 	}

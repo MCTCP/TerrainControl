@@ -209,15 +209,15 @@ public class ChunkCoordinate
 		return this.chunkX == chunkX && this.chunkZ == chunkZ;
 	}
 	
-	public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
+	public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingDecorated)
 	{
 		return
 			(
-				blockX >= chunkBeingPopulated.getBlockX() &&
-				blockX < chunkBeingPopulated.getBlockX() + (CHUNK_SIZE * 2)
+				blockX >= chunkBeingDecorated.getBlockX() &&
+				blockX < chunkBeingDecorated.getBlockX() + (CHUNK_SIZE * 2)
 			) && (
-				blockZ >= chunkBeingPopulated.getBlockZ() &&
-				blockZ < chunkBeingPopulated.getBlockZ() + (CHUNK_SIZE * 2)
+				blockZ >= chunkBeingDecorated.getBlockZ() &&
+				blockZ < chunkBeingDecorated.getBlockZ() + (CHUNK_SIZE * 2)
 			)
 		;		
 	}

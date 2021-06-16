@@ -77,7 +77,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 * @param z
 	 * @return Whether the attempt was successful.
 	 */
-	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated);
+	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated);
 	
 	/**
 	 * Spawns the object one or more times in a chunk. The object can search a good y position by

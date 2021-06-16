@@ -413,9 +413,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
 		init(((IWorldDataServer) world.getWorldData()).getName());
-		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingDecorated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
 		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
 		

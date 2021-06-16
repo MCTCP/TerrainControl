@@ -82,9 +82,9 @@ class TreeObject implements CustomObject
 	}
 	
 	@Override
-	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
 		Rotation rotation = Rotation.getRandomRotation(random);
 
 		if(!(minY == -1 && maxY == -1))

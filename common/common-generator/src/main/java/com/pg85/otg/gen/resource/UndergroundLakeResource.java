@@ -35,10 +35,10 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-		if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated))
+		if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated))
 		{
 			return;
 		}
@@ -84,7 +84,7 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 				{
 					for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
 					{
-						material = worldGenRegion.getMaterial(xLake, yLake, zLake, chunkBeingPopulated);
+						material = worldGenRegion.getMaterial(xLake, yLake, zLake, chunkBeingDecorated);
 						if (material == null || material.isEmptyOrAir() || material.isMaterial(LocalMaterials.BEDROCK))
 						{
 							// Don't replace air or bedrock
@@ -99,14 +99,14 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 							continue;
 						}
 
-						materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake, chunkBeingPopulated);
+						materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake, chunkBeingDecorated);
 						if (materialBelow != null && materialBelow.isAir())
 						{
 							// Air block, also set position above to air
-							worldGenRegion.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated, false);
+							worldGenRegion.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingDecorated, false);
 						} else {
 							// Not air, set position above to water
-							worldGenRegion.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated, false);
+							worldGenRegion.setBlock(xLake, yLake, zLake, material, null, chunkBeingDecorated, false);
 						}
 					}
 				}

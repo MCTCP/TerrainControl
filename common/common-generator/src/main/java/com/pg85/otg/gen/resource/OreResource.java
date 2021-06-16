@@ -44,15 +44,15 @@ public class OreResource  extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
 		// Override spawnInChunk so we can add a cache.
 		
 		// use a byte since y is always between 0-255
 		byte[][] highestBlocksCache = new byte[32][32];
 
-		int chunkX = chunkBeingPopulated.getBlockXCenter();
-		int chunkZ = chunkBeingPopulated.getBlockZCenter();		
+		int chunkX = chunkBeingDecorated.getBlockXCenter();
+		int chunkZ = chunkBeingDecorated.getBlockZCenter();		
 		
 		int x;
 		int z;
@@ -64,11 +64,11 @@ public class OreResource  extends ResourceBase implements IBasicResource
 			}
 			x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 			z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			spawn(worldGenRegion, random, false, x, z, chunkBeingPopulated, highestBlocksCache);
+			spawn(worldGenRegion, random, false, x, z, chunkBeingDecorated, highestBlocksCache);
 		}
 	}
 	
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated, byte[][] highestBlocksCache)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated, byte[][] highestBlocksCache)
 	{
 		if(worldGenregion.getWorldConfig().isDisableOreGen())
 		{
@@ -112,7 +112,7 @@ public class OreResource  extends ResourceBase implements IBasicResource
 		LocalMaterialData material;
 		int highestSolidBlock;			
 		
-		int areaBeingPoulatedSize = 32;
+		int areaBeingDecoratedSize = 32;
 				
 		// TODO: This seems to be really poorly optimised, re-design this.
 		for (int i = 0; i < this.maxSize; i++)
@@ -134,36 +134,36 @@ public class OreResource  extends ResourceBase implements IBasicResource
 			j1 = MathHelper.floor(d7 + d11 / 2.0D);
 			k1 = MathHelper.floor(d8 + d10 / 2.0D);			
 			
-			if(j < chunkBeingPopulated.getBlockX())
+			if(j < chunkBeingDecorated.getBlockX())
 			{
 				continue;
 			}
-			if(j > chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1)
+			if(j > chunkBeingDecorated.getBlockX() + areaBeingDecoratedSize - 1)
 			{
 				continue;
 			}
-			if(i1 < chunkBeingPopulated.getBlockX())
+			if(i1 < chunkBeingDecorated.getBlockX())
 			{
 				continue;
 			}
-			if(i1 > chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1)
+			if(i1 > chunkBeingDecorated.getBlockX() + areaBeingDecoratedSize - 1)
 			{
 				continue;
 			}
 			
-			if(l < chunkBeingPopulated.getBlockZ())
+			if(l < chunkBeingDecorated.getBlockZ())
 			{
 				continue;
 			}
-			if(l > chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1)
+			if(l > chunkBeingDecorated.getBlockZ() + areaBeingDecoratedSize - 1)
 			{
 				continue;
 			}
-			if(k1 < chunkBeingPopulated.getBlockZ())
+			if(k1 < chunkBeingDecorated.getBlockZ())
 			{
 				continue;
 			}
-			if(k1 > chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1)
+			if(k1 > chunkBeingDecorated.getBlockZ() + areaBeingDecoratedSize - 1)
 			{
 				continue;
 			}
@@ -186,10 +186,10 @@ public class OreResource  extends ResourceBase implements IBasicResource
 					{
 						if(j1 > 63) // Optimisation, don't look for highestblock if we're already looking below 63, default worlds have base terrain height at 63.
 						{
-							highestSolidBlock = highestBlocksCache[i3 - chunkBeingPopulated.getBlockX()][i5 - chunkBeingPopulated.getBlockZ()] & 0xFF; // byte to int conversion
+							highestSolidBlock = highestBlocksCache[i3 - chunkBeingDecorated.getBlockX()][i5 - chunkBeingDecorated.getBlockZ()] & 0xFF; // byte to int conversion
 							if(highestSolidBlock == 0)  // 0 is default / unset.
 							{
-								highestSolidBlock = worldGenregion.getHeightMapHeight(i3, i5, chunkBeingPopulated);
+								highestSolidBlock = worldGenregion.getHeightMapHeight(i3, i5, chunkBeingDecorated);
 								// TODO: This causes getHeightMapHeight to be called every time on a 0 height column, 
 								// can't use -1 tho since we're using byte arrays. At least we're aborting the column 
 								// immediately, since OreGen shouldn't be used to spawn things in empty columns. If
@@ -200,7 +200,7 @@ public class OreResource  extends ResourceBase implements IBasicResource
 									highestSolidBlock = (byte)0; // Reset
 									break;
 								}
-								highestBlocksCache[i3 - chunkBeingPopulated.getBlockX()][i5 - chunkBeingPopulated.getBlockZ()] = (byte)highestSolidBlock;
+								highestBlocksCache[i3 - chunkBeingDecorated.getBlockX()][i5 - chunkBeingDecorated.getBlockZ()] = (byte)highestSolidBlock;
 							}
 							if(j1 > highestSolidBlock)
 							{
@@ -215,10 +215,10 @@ public class OreResource  extends ResourceBase implements IBasicResource
 								d15 = ((double)i5 + 0.5D - d8) / (d10 / 2.0D);
 								if((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D))
 								{
-									material = worldGenregion.getMaterial(i3, i4, i5, chunkBeingPopulated);
+									material = worldGenregion.getMaterial(i3, i4, i5, chunkBeingDecorated);
 									if(this.sourceBlocks.contains(material))
 									{
-										worldGenregion.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated, true);
+										worldGenregion.setBlock(i3, i4, i5, this.material, null, chunkBeingDecorated, true);
 									}
 								}
 							}

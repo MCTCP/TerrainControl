@@ -43,7 +43,7 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
 		// TODO: May cause cascading chunkgen.
 		// TODO: Implement this?

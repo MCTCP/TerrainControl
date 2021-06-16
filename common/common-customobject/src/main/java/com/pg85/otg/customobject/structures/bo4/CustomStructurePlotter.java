@@ -171,12 +171,12 @@ public class CustomStructurePlotter
 	}
 
 	// Only used by ObjectSpawner
-	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BO4CustomStructure structureStart = getFromStructureCache(chunkCoordinate);
 		if (structureStart != null && structureStart.start != null)
 		{
-			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		} else {
 			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
 			if(structureStart != null && structureStart.start == null)

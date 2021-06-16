@@ -16,10 +16,10 @@ public class BlockCheck extends BO3Check
 	MaterialSet toCheck;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
 	{
 		//toCheck.parseForWorld(worldGenregion.getWorldConfig());
-		return y > Constants.WORLD_DEPTH && y < Constants.WORLD_HEIGHT && !toCheck.contains(worldGenregion.getMaterial(x, y, z, chunkBeingPopulated));
+		return y > Constants.WORLD_DEPTH && y < Constants.WORLD_HEIGHT && !toCheck.contains(worldGenregion.getMaterial(x, y, z, chunkBeingDecorated));
 	}
 
 	@Override

@@ -48,10 +48,10 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
-		int chunkX = chunkBeingPopulated.getBlockXCenter();
-		int chunkZ = chunkBeingPopulated.getBlockZCenter();
+		int chunkX = chunkBeingDecorated.getBlockXCenter();
+		int chunkZ = chunkBeingDecorated.getBlockZCenter();
 		int x;
 		int z;
 		for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_SIZE; z0++)
@@ -60,14 +60,14 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 			{
 				x = chunkX + x0;
 				z = chunkZ + z0;
-				spawn(worldGenRegion, random, false, x, z, chunkBeingPopulated);
+				spawn(worldGenRegion, random, false, x, z, chunkBeingDecorated);
 			}
 		}
 	}
 	
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated) - 1;
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated) - 1;
 		if (y < this.minAltitude || y > this.maxAltitude)
 		{
 			return;
@@ -76,13 +76,13 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 		double yNoise = this.noiseGen.getYNoise(x * 0.25D, z * 0.25D);
 		if (yNoise > 0.0D)
 		{
-			LocalMaterialData materialAtLocation = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated);
+			LocalMaterialData materialAtLocation = worldGenRegion.getMaterial(x, y, z, chunkBeingDecorated);
 			if (this.sourceBlocks.contains(materialAtLocation))
 			{
-				worldGenRegion.setBlock(x, y, z, this.material, null, chunkBeingPopulated, true);
+				worldGenRegion.setBlock(x, y, z, this.material, null, chunkBeingDecorated, true);
 				if (yNoise < 0.12D)
 				{
-					worldGenRegion.setBlock(x, y + 1, z, this.decorationAboveReplacements, null, chunkBeingPopulated, true);
+					worldGenRegion.setBlock(x, y + 1, z, this.decorationAboveReplacements, null, chunkBeingDecorated, true);
 				}
 			}
 		}

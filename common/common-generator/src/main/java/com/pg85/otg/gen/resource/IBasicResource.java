@@ -9,11 +9,11 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public interface IBasicResource
 {
-	default void processForChunkDecoration(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader)
+	default void processForChunkDecoration(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
 		// TODO: Fire Forge resource decoration events, when they're available.
-		spawnForChunkDecoration(worldGenregion, random, villageInChunk, chunkBeingPopulated, logger, materialReader);
+		spawnForChunkDecoration(worldGenregion, random, villageInChunk, chunkBeingDecorated, logger, materialReader);
 	}
 
-	void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, ILogger logger, IMaterialReader materialReader);
+	void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader);
 }
