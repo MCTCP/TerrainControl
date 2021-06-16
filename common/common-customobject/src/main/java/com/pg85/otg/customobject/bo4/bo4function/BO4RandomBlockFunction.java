@@ -170,7 +170,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 		{
 			if (random.nextInt(100) < blockChances[i])
 			{
-				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true);
+				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true, false);
 				break;
 			}
 		}

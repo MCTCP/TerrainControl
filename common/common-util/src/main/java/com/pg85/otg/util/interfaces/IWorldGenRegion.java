@@ -30,7 +30,8 @@ public interface IWorldGenRegion
 	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
 	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks);
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks);	
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks, boolean useResourceBounds);
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds);	
 	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate);
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
 	public void placeDungeon(Random random, int x, int y, int z);

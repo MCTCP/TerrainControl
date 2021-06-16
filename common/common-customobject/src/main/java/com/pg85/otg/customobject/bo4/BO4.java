@@ -770,12 +770,12 @@ public class BO4 implements StructuredCustomObject
 					material.isMaterial(LocalMaterials.EMERALD_BLOCK)
 				)
 				{
-					worldGenRegion.setBlock(x, y, z, LocalMaterials.GLOWSTONE, null, chunkBeingPopulated, replaceBlocks, false);
+					worldGenRegion.setBlock(x, y, z, LocalMaterials.GLOWSTONE, null, chunkBeingPopulated, replaceBlocks, false, false);
 					return;
 				}
 			}
 		}
-		worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlocks, needsReplaceBlock);
+		worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlocks, needsReplaceBlock, true);
 	}
 	
 	@Override

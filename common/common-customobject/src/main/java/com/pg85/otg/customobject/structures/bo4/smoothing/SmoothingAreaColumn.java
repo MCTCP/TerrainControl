@@ -123,7 +123,7 @@ class SmoothingAreaColumn
 				{
 					if(y > 0)
 					{
-						worldGenRegion.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false, false);
 					}
 				}
 				
@@ -160,7 +160,7 @@ class SmoothingAreaColumn
 					}
 					if(surfaceBlock != null)
 					{						
-						worldGenRegion.setBlock(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+						worldGenRegion.setBlock(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks, false);
 					}
 				}
 			}
@@ -180,7 +180,7 @@ class SmoothingAreaColumn
 				{
 					if(y > 0)
 					{
-						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false, false);
 					}
 				}
 			}
@@ -219,7 +219,7 @@ class SmoothingAreaColumn
 			{
 				if(this.highestFillingBlock.y > 0)
 				{
-					worldGenRegion.setBlock(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+					worldGenRegion.setBlock(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks, false);
 				}
 			}
 						
@@ -240,7 +240,7 @@ class SmoothingAreaColumn
 								needsReplaceBlocks = false;
 							}
 						}
-						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, needsReplaceBlocks, false);
 					}
 				}
 			} else {
@@ -256,7 +256,7 @@ class SmoothingAreaColumn
 								groundBlock = LocalMaterials.WATER;
 							}
 						}
-						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, false, false);
 					}
 				}
 			}

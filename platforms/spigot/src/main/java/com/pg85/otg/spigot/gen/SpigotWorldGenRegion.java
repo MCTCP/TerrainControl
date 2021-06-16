@@ -125,6 +125,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean placeTree (TreeType type, Random rand, int x, int y, int z)
 	{
@@ -452,13 +453,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
-	{
-		setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
-	}
-
-	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{

@@ -23,20 +23,20 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 {
 	public BO4BlockFunction() { }
 	
-	public BO4BlockFunction(BO4Config holder)
-	{
-		this.holder = holder;
-	}
-		
-	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
-	{  	
-		worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, true);
-	}
-	
-	public BO4BlockFunction rotate(Rotation rotation)
-	{
-		BO4BlockFunction rotatedBlock = new BO4BlockFunction(this.getHolder());
+	 public BO4BlockFunction(BO4Config holder)
+	 {
+	 	this.holder = holder;
+	 }
+
+	 @Override
+	 public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+	 {  	
+	 	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, true, false);
+	 }
+	 
+	 public BO4BlockFunction rotate(Rotation rotation)
+	 {
+		  BO4BlockFunction rotatedBlock = new BO4BlockFunction(this.getHolder());
 
 		rotatedBlock.material = material; // TODO: Make sure this won't cause problems
 

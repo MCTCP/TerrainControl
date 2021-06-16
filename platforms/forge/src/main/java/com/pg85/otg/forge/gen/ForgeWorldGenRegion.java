@@ -193,23 +193,25 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
+						@SuppressWarnings("unchecked")
 						ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
 						huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					} else {
+						@SuppressWarnings("unchecked")
 						ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
 						huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					}
 					return true;
 				case HugeRedMushroom:
-					ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
 					huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					return true;
 				case HugeBrownMushroom:
-					ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
 					huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					return true;
 				case SwampTree:
-					ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
+					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
 					swamp_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
 					return true;
 				case Taiga1:
@@ -229,7 +231,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
 					return true;
 				case GroundBush:
-					ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
+					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
 					jungle_bush.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
 					return true;
 				case Acacia:
@@ -495,15 +497,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		return -1;
 	}
-
+	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
-	{
-		setBlock(x, y, z, material, nbt, chunkBeingPopulated, null, replaceBlocks);
-	}
-
-	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
