@@ -236,7 +236,7 @@ public class BO3 implements StructuredCustomObject
 		return spawn(structureCache, worldGenRegion, random, x, z, minY, maxY, chunkBeingDecorated, false);
 	}
 
-	// Used for customobject and trees during population
+	// Used for customobject and trees during decoration
 	private boolean spawn(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
 		Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
@@ -260,7 +260,7 @@ public class BO3 implements StructuredCustomObject
 		return trySpawnAt(null, structureCache, worldGenRegion, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingDecorated, replaceBlocks);
 	}
 	
-	// Used for trees, customobjects and customstructures during population.
+	// Used for trees, customobjects and customstructures during decoration.
 	public boolean trySpawnAt(CustomStructure structure, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, int baseY, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT) // Isn't this already done before this method is called?

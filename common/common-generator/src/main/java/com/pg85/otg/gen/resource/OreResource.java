@@ -19,7 +19,7 @@ import java.util.Random;
 /**
  * Generates an ore structure by placing multiple spheres along a line.
  */
-public class OreResource  extends ResourceBase implements IBasicResource
+public class OreResource extends ResourceBase implements IBasicResource
 {
 	private final int frequency;
 	private final double rarity;
@@ -46,7 +46,7 @@ public class OreResource  extends ResourceBase implements IBasicResource
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
 	{
-		// Override spawnInChunk so we can add a cache.
+		// Override spawnForChunkDecoration so we can add a cache.
 		
 		// use a byte since y is always between 0-255
 		byte[][] highestBlocksCache = new byte[32][32];
@@ -78,8 +78,8 @@ public class OreResource  extends ResourceBase implements IBasicResource
 			}
 		}
 		
-		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-		
+		int areaBeingDecoratedSize = 32;
+		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);		
 		float f = rand.nextFloat() * (float)Math.PI;
 		double d0 = (double)((float)(x + 8) + MathHelper.sin(f) * (float)this.maxSize / 8.0F);
 		double d1 = (double)((float)(x + 8) - MathHelper.sin(f) * (float)this.maxSize / 8.0F);
@@ -92,27 +92,20 @@ public class OreResource  extends ResourceBase implements IBasicResource
 		double d6;
 		double d7;
 		double d8;
-
 		double d9;
 		double d10;
 		double d11;
-
 		int j;
 		int k;
 		int l;
-
 		int i1;
 		int j1;
-		int k1; 
-		
+		int k1; 	
 		double d13;
 		double d14;
-		double d15;
-		
+		double d15;		
 		LocalMaterialData material;
-		int highestSolidBlock;			
-		
-		int areaBeingDecoratedSize = 32;
+		int highestSolidBlock;	
 				
 		// TODO: This seems to be really poorly optimised, re-design this.
 		for (int i = 0; i < this.maxSize; i++)
