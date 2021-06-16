@@ -211,16 +211,14 @@ public class ChunkCoordinate
 	
 	public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
 	{
-		// We're still using 2x2 chunks / 32x32 blocks when spawning OTG resources, but have moved them -8 -8
-		// to align with 1.16's 3x3 chunk / 48x48 block bounds. 
 		return
 			(
-				blockX >= chunkBeingPopulated.getBlockXCenter() - CHUNK_SIZE &&
-				blockX < chunkBeingPopulated.getBlockXCenter() + CHUNK_SIZE
+				blockX >= chunkBeingPopulated.getBlockX() &&
+				blockX < chunkBeingPopulated.getBlockX() + (CHUNK_SIZE * 2)
 			) && (
-				blockZ >= chunkBeingPopulated.getBlockZCenter() - CHUNK_SIZE &&
-				blockZ < chunkBeingPopulated.getBlockZCenter() + CHUNK_SIZE
+				blockZ >= chunkBeingPopulated.getBlockZ() &&
+				blockZ < chunkBeingPopulated.getBlockZ() + (CHUNK_SIZE * 2)
 			)
-		;
+		;		
 	}
 }
