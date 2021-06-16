@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.config.biome.IBasicResource;
 import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -38,6 +37,6 @@ public abstract class FrequencyResourceBase extends ResourceBase implements IBas
 			spawn(worldGenRegion, random, false, x, z, chunkBeingPopulated);
 		}
 	}
-	
+
 	public abstract void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);	
 }

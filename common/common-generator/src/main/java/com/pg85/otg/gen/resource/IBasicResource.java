@@ -1,4 +1,4 @@
-package com.pg85.otg.config.biome;
+package com.pg85.otg.gen.resource;
 
 import java.util.Random;
 

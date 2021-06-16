@@ -1,9 +1,9 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.IBasicResource;
 import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;

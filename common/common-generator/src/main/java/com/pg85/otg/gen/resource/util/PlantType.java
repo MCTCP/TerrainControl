@@ -1,4 +1,4 @@
-package com.pg85.otg.gen.resource;
+package com.pg85.otg.gen.resource.util;
 
 import java.util.Collection;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class PlantType
 	 * @return The plant type.
 	 * @throws InvalidConfigException If the name is invalid.
 	 */
-	static PlantType getPlant(String name, IMaterialReader materialReader) throws InvalidConfigException
+	public static PlantType getPlant(String name, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		PlantType plantType = LOOKUP_MAP.get(name);
 		if (plantType == null)
@@ -147,7 +147,7 @@ public class PlantType
 	 * @param y Y position of the lowest block of the plant.
 	 * @param z Z position of the plant.
 	 */
-	void spawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+	public void spawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{		
 		worldGenregion.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated, false);
 		if (topBlock != null)

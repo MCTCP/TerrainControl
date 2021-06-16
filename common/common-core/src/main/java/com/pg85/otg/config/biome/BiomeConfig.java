@@ -9,11 +9,13 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
 import com.pg85.otg.customobject.resource.CustomObjectResource;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.customobject.resource.TreeResource;
 import com.pg85.otg.gen.resource.*;
+import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
@@ -713,7 +715,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"				if that fails, it attempts to place Taiga2 (100% chance).",
 			"PlantType:	  	One of the plant types: " + StringHelper.join(PlantType.values(), ", "),
 			"				or a block name",
-			"IceSpikeType:  One of the ice spike types: " + StringHelper.join(IceSpikeResource.SpikeType.values(), ","),
+			"IceSpikeType:  One of the ice spike types: " + StringHelper.join(IceSpikeType.values(), ","),
 			"Object:		Any custom object (bo2 or bo3) file but without the file extension. ",
 			"",
 			"Plant and Grass resource: Both a resource of one block. Plant can place blocks underground, Grass cannot.",

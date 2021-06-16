@@ -11,7 +11,6 @@ import java.util.Random;
 
 /**
  * Represents a single ore vein.
- *
  */
 class Vein
 {

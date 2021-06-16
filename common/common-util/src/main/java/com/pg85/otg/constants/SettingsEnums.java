@@ -97,4 +97,11 @@ public class SettingsEnums
 		Swamp,
 		DarkForest
 	}
+	
+	public enum IceSpikeType
+	{
+		Basement,
+		HugeSpike,
+		SmallSpike;
+	}	
 }

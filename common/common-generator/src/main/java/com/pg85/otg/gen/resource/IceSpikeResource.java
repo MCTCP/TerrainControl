@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -17,18 +18,11 @@ import java.util.Random;
 
 public class IceSpikeResource extends FrequencyResourceBase
 {
-	public enum SpikeType
-	{
-		Basement,
-		HugeSpike,
-		SmallSpike;
-	}
-
 	private final LocalMaterialData material;
 	private final int maxAltitude;
 	private final int minAltitude;
 	private final MaterialSet sourceBlocks;
-	private SpikeType type;
+	private IceSpikeType type;
 
 	public IceSpikeResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
@@ -40,7 +34,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 		// Read type
 		String typeString = args.get(1);
 		this.type = null;
-		for(SpikeType possibleType : SpikeType.values())
+		for(IceSpikeType possibleType : IceSpikeType.values())
 		{
 			if (possibleType.toString().equalsIgnoreCase(typeString))
 			{
