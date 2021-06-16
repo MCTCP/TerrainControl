@@ -1,6 +1,5 @@
 package com.pg85.otg.config;
 
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.StringHelper;
 
 import java.util.List;
@@ -24,13 +23,5 @@ public final class ErroredFunction<T> extends ConfigFunction<T>
         return "## INVALID " + name.toUpperCase() + " - " + error + " ##" + System.getProperty(
                 "line.separator") + name + "(" + StringHelper.join(args,
                         ",") + ")";
-    }
-
-    @Override
-    public boolean isAnalogousTo(ConfigFunction<T> other, ILogger logger)
-    {
-        // This function will never do anything, so won't matter how it is
-        // inherited
-        return this == other;
     }
 }

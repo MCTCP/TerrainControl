@@ -12,7 +12,7 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
-import com.pg85.otg.customobject.resource.CustomStructureGen;
+import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
@@ -53,7 +53,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	// Inheritance
 	
-	protected String biomeExtends;
+	protected List<String> biomeDictTags;	
 	
 	// Placement
 	
@@ -135,7 +135,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	// Custom structures
 	
-	protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
+	protected List<CustomStructureResource> customStructures = new ArrayList<CustomStructureResource>(); // Used as a cache for fast querying, not saved
 	private ICustomStructureGen structureGen;
 
 	// Vanilla structures
@@ -175,7 +175,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	// Resources
 	
-	protected List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
+	protected List<ConfigFunction<IBiomeConfig>> resourceQueue = new ArrayList<ConfigFunction<IBiomeConfig>>();
 	
 	protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
 	{
@@ -183,9 +183,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		this.registryKey = registryKey;
 	}
 	
-	public List<ConfigFunction<IBiomeConfig>> getResourceSequence()
+	public List<ConfigFunction<IBiomeConfig>> getResourceQueue()
 	{
-		return this.resourceSequence;
+		return this.resourceQueue;
 	}
 	
 	@Override
@@ -324,7 +324,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public List<List<String>> getCustomStructureNames()
 	{
 		List<List<String>> customStructureNamesByGen = new ArrayList<>();
-		for(CustomStructureGen structureGens : this.customStructures)
+		for(CustomStructureResource structureGens : this.customStructures)
 		{
 			List<String> customStructureNames = new ArrayList<>();
 			for(String objectName : structureGens.objectNames)
@@ -364,7 +364,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public String getBiomeCategory()
 	{
 		return this.biomeCategory;
-	}
+	}	
 			
 	@Override
 	public float getBiomeTemperature()
@@ -403,10 +403,10 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public String getBiomeExtends()
+	public List<String> getBiomeDictTags()
 	{
-		return this.biomeExtends;
-	}
+		return this.biomeDictTags;
+	}	
 	
 	@Override
 	public float getBiomeWetness()

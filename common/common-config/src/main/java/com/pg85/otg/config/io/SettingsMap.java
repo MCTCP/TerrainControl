@@ -42,7 +42,7 @@ public interface SettingsMap
      * fallback reader} must be used, false otherwise.
      * @return The config functions.
      */
-    <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader);
+    <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader);
 
     /**
      * Gets the name of this config file. For worlds, this is the world name,

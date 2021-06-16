@@ -206,17 +206,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
         return this.avgTemp < Constants.ICE_GROUP_MAX_TEMP;
     }
 
-    @Override
-    public boolean isAnalogousTo(ConfigFunction<IWorldConfig> other, ILogger logger)
-    {
-        if (other instanceof BiomeGroup)
-        {
-            BiomeGroup group = (BiomeGroup) other;
-            return group.name.equalsIgnoreCase(this.name);
-        }
-        return false;
-    }
-
 	private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, IBiome>>();
     public SortedMap<Integer, IBiome> getDepthMapOrHigher(int depth)
     {    	

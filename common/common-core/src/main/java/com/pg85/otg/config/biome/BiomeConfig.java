@@ -9,16 +9,15 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.customobject.resource.CustomObjectGen;
-import com.pg85.otg.customobject.resource.CustomStructureGen;
-import com.pg85.otg.customobject.resource.SaplingGen;
-import com.pg85.otg.customobject.resource.TreeGen;
+import com.pg85.otg.customobject.resource.CustomObjectResource;
+import com.pg85.otg.customobject.resource.CustomStructureResource;
+import com.pg85.otg.customobject.resource.SaplingResource;
+import com.pg85.otg.customobject.resource.TreeResource;
 import com.pg85.otg.gen.resource.*;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -45,40 +44,40 @@ import java.util.*;
  */
 public class BiomeConfig extends BiomeConfigBase
 {	
-	public static final HashMap<String, Class<? extends ConfigFunction<?>>> CONFIG_FUNCTIONS = new HashMap<>();
+	public static final HashMap<String, Class<? extends ConfigFunction<?>>> RESOURCE_QUEUE_RESOURCES = new HashMap<>();
 	static
 	{
-		CONFIG_FUNCTIONS.put("AboveWaterRes", AboveWaterGen.class);
-		CONFIG_FUNCTIONS.put("Boulder", BoulderGen.class);
-		CONFIG_FUNCTIONS.put("Cactus", CactusGen.class);
-		CONFIG_FUNCTIONS.put("Dungeon", DungeonGen.class);
-		CONFIG_FUNCTIONS.put("Grass", GrassGen.class);
-		CONFIG_FUNCTIONS.put("Fossil", FossilGen.class);
-		CONFIG_FUNCTIONS.put("IceSpike", IceSpikeGen.class);
-		CONFIG_FUNCTIONS.put("Liquid", LiquidGen.class);
-		CONFIG_FUNCTIONS.put("Ore", OreGen.class);
-		CONFIG_FUNCTIONS.put("Plant", PlantGen.class);
-		CONFIG_FUNCTIONS.put("UnderWaterPlant", UnderWaterPlantGen.class);
-		CONFIG_FUNCTIONS.put("Reed", ReedGen.class);
-		CONFIG_FUNCTIONS.put("SmallLake", SmallLakeGen.class);
-		CONFIG_FUNCTIONS.put("SurfacePatch", SurfacePatchGen.class);
-		CONFIG_FUNCTIONS.put("UndergroundLake", UndergroundLakeGen.class);
-		CONFIG_FUNCTIONS.put("UnderWaterOre", UnderWaterOreGen.class);
-		CONFIG_FUNCTIONS.put("Vein", VeinGen.class);
-		CONFIG_FUNCTIONS.put("Vines", VinesGen.class);
-		CONFIG_FUNCTIONS.put("Well", WellGen.class);
-		CONFIG_FUNCTIONS.put("CustomObject", CustomObjectGen.class);
-		CONFIG_FUNCTIONS.put("CustomStructure", CustomStructureGen.class);		
-		CONFIG_FUNCTIONS.put("Sapling", SaplingGen.class);		
-		CONFIG_FUNCTIONS.put("Tree", TreeGen.class);
-		CONFIG_FUNCTIONS.put("Bamboo", BambooGen.class);
-		CONFIG_FUNCTIONS.put("Seagrass", SeagrassGen.class);
-		CONFIG_FUNCTIONS.put("Kelp", KelpGen.class);
-		CONFIG_FUNCTIONS.put("SeaPickle", SeaPickleGen.class);
-		CONFIG_FUNCTIONS.put("Registry", RegistryGen.class);
-		CONFIG_FUNCTIONS.put("CoralMushroom", CoralMushroomGen.class);
-		CONFIG_FUNCTIONS.put("CoralTree", CoralTreeGen.class);
-		CONFIG_FUNCTIONS.put("CoralClaw", CoralClawGen.class);
+		RESOURCE_QUEUE_RESOURCES.put("AboveWaterRes", AboveWaterResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Boulder", BoulderResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Cactus", CactusResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Dungeon", DungeonResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Grass", GrassResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Fossil", FossilResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("IceSpike", IceSpikeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Liquid", LiquidResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Ore", OreResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Plant", PlantResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("UnderWaterPlant", UnderWaterPlantResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Reed", ReedResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("SmallLake", SmallLakeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("SurfacePatch", SurfacePatchResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("UndergroundLake", UndergroundLakeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("UnderWaterOre", UnderWaterOreResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Vein", VeinResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Vines", VinesResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Well", WellResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("CustomObject", CustomObjectResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("CustomStructure", CustomStructureResource.class);		
+		RESOURCE_QUEUE_RESOURCES.put("Sapling", SaplingResource.class);		
+		RESOURCE_QUEUE_RESOURCES.put("Tree", TreeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Bamboo", BambooResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("SeaGrass", SeaGrassResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Kelp", KelpResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("SeaPickle", SeaPickleResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Registry", RegistryResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("CoralMushroom", CoralMushroomResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("CoralTree", CoralTreeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("CoralClaw", CoralClawResource.class);
 	}
 
 	// This field is only used for reading/writing,
@@ -86,18 +85,13 @@ public class BiomeConfig extends BiomeConfigBase
 	// processing mob inheritance, rather than using this field.
 	private String inheritMobsBiomeName;
 
-	// TODO: Not used atm, implement these.
-	private String biomeDictId;
-	
 	// Fields used only in common-core or platform layers that aren't in IBiomeConfig	
 	// TODO: Refactor, expose via IBiomeConfig?	
-	private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
-	private Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
-	private Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();	
+	private Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(SaplingType.class);
+	private Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
+	private Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();	
 
 	// Private fields, only used when loading/saving
-
-	private boolean doResourceInheritance = true;
 	
 	private int configWaterLevelMax;
 	private int configWaterLevelMin;
@@ -167,9 +161,9 @@ public class BiomeConfig extends BiomeConfigBase
 		}
 	}
 	
-	public SaplingGen getSaplingGen(SaplingType type)
+	public SaplingResource getSaplingGen(SaplingType type)
 	{
-		SaplingGen gen = saplingGrowers.get(type);
+		SaplingResource gen = saplingGrowers.get(type);
 		if (gen == null && type.growsTree())
 		{
 			gen = saplingGrowers.get(SaplingType.All);
@@ -177,7 +171,7 @@ public class BiomeConfig extends BiomeConfigBase
 		return gen;
 	}
 
-	public SaplingGen getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
+	public SaplingResource getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
 	{
 		// TODO: Re-implement this when block data works
 		if (wideTrunk)
@@ -192,9 +186,7 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		this.biomeExtends = reader.getSetting(BiomeStandardValues.BIOME_EXTENDS, logger);
 		this.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
-		this.doResourceInheritance = reader.getSetting(BiomeStandardValues.RESOURCE_INHERITANCE, logger);
 		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
 		this.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, logger);
 		this.biomeRarityWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, logger);
@@ -275,7 +267,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.buriedTreasureProbability = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, logger);
 		this.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
 		this.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
-		this.biomeDictId = reader.getSetting(BiomeStandardValues.BIOME_DICT_ID, logger);
+		this.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
 		this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 
 		this.readResourceSettings(reader, biomeResourcesManager, spawnLog, logger, materialReader);
@@ -296,14 +288,14 @@ public class BiomeConfig extends BiomeConfigBase
 	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		// Disable resourceinheritance for saplings
-		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger, materialReader));
+		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, spawnLog, logger, materialReader));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)
 			{
-				if (res instanceof SaplingGen)
+				if (res instanceof SaplingResource)
 				{
-					SaplingGen sapling = (SaplingGen) res;
+					SaplingResource sapling = (SaplingResource) res;
 					if (sapling.saplingType == SaplingType.Custom)
 					{
 						try
@@ -327,18 +319,18 @@ public class BiomeConfig extends BiomeConfigBase
 			}
 		}
 
-		resources = new ArrayList<>(settings.getConfigFunctions(this, this.doResourceInheritance, biomeResourcesManager, spawnLog, logger, materialReader));
+		resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, spawnLog, logger, materialReader));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)
 			{
-				if (!(res instanceof SaplingGen))
+				if (!(res instanceof SaplingResource))
 				{
-					this.resourceSequence.add(res);
+					this.resourceQueue.add(res);
 				}
-				if(res instanceof CustomStructureGen)
+				if(res instanceof CustomStructureResource)
 				{
-					this.customStructures.add((CustomStructureGen)res);
+					this.customStructures.add((CustomStructureResource)res);
 				}
 			}
 		}
@@ -357,32 +349,16 @@ public class BiomeConfig extends BiomeConfigBase
 			"Example: minecraft:plains"
 		);
 		
-		writer.putSetting(BiomeStandardValues.BIOME_DICT_ID, this.biomeDictId,
-			"Forge Biome Dictionary ID used by other mods to identify a biome and",
-			"place modded blocks, items and mobs in it."
+		writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.biomeDictTags,
+			"Forge Biome Dictionary tags used by other mods to identify a biome and",
+			"place modded blocks, items and mobs in it.",
+			"Example: HOT, DRY, SANDY, OVERWORLD"
 		);
 
 		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.biomeCategory,
 				"Set a category for this biome, used by vanilla for... something",
 				"Accepts one of the following values:",
 				"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether"
-		);
-
-		writer.header1("Biome Inheritance");
-
-		writer.putSetting(BiomeStandardValues.BIOME_EXTENDS, this.biomeExtends,
-			"The name of the BiomeConfig you wish to extend (if any).",
-			"The extended config's settings are used as default values, and will",
-			"overwrite any settings that are left empty in this config (excluding",
-			"mob spawning, saplings and resources, which have their own inheritance",
-			"settings)."
-		);
-
-		writer.putSetting(BiomeStandardValues.RESOURCE_INHERITANCE, this.doResourceInheritance,
-			"When set to true, all resources of the extended biome (if any) will be copied",
-			"to the resources queue of this biome, except for saplings. If a resource in",
-			"the parent biome looks very similar to that of a child biome (for example,",
-			"two ores of the same type), it won't be copied."
 		);
 
 		writer.header1("Biome placement");
@@ -737,7 +713,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"				if that fails, it attempts to place Taiga2 (100% chance).",
 			"PlantType:	  	One of the plant types: " + StringHelper.join(PlantType.values(), ", "),
 			"				or a block name",
-			"IceSpikeType:  One of the ice spike types: " + StringHelper.join(IceSpikeGen.SpikeType.values(), ","),
+			"IceSpikeType:  One of the ice spike types: " + StringHelper.join(IceSpikeResource.SpikeType.values(), ","),
 			"Object:		Any custom object (bo2 or bo3) file but without the file extension. ",
 			"",
 			"Plant and Grass resource: Both a resource of one block. Plant can place blocks underground, Grass cannot.",
@@ -748,7 +724,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"CustomStructure resource: Starts a BO3 or BO4 structure in the chunk if spawn requirements are met.",
 			""
 		);
-		writer.addConfigFunctions(this.resourceSequence);
+		writer.addConfigFunctions(this.resourceQueue);
 
 		writer.header1("Sapling resource",
 			Constants.MOD_ID + " allows you to grow your custom objects from saplings, instead",
@@ -964,7 +940,6 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger)
 	{
-		this.biomeExtends = (this.biomeExtends == null || this.biomeExtends.equals("null")) ? "" : this.biomeExtends;
 		this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.getGenerationDepth());
 		this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.getGenerationDepth());
 		this.biomeSizeWhenBorder = lowerThanOrEqualTo(biomeSizeWhenBorder, worldConfig.getGenerationDepth());
@@ -985,5 +960,6 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		settings.renameOldSetting("ReplaceToBiomeName", BiomeStandardValues.VANILLA_BIOME);
 		settings.renameOldSetting("DisableNotchHeightControl", BiomeStandardValues.DISABLE_BIOME_HEIGHT);
+		settings.renameOldSetting("BiomeDictId", BiomeStandardValues.BIOME_DICT_TAGS);
 	}
 }

@@ -156,61 +156,6 @@ public class PlantType
         }
     }
 
-    @Override
-    public String toString()
-    {
-        return name;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((bottomBlock == null) ? 0 : bottomBlock.hashCode());
-        result = prime * result + ((topBlock == null) ? 0 : topBlock.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (!(obj instanceof PlantType))
-        {
-            return false;
-        }
-        PlantType other = (PlantType) obj;
-        if (bottomBlock == null)
-        {
-            if (other.bottomBlock != null)
-            {
-                return false;
-            }
-        } else if (!bottomBlock.equals(other.bottomBlock))
-        {
-            return false;
-        }
-        if (topBlock == null)
-        {
-            if (other.topBlock != null)
-            {
-                return false;
-            }
-        } else if (!topBlock.equals(other.topBlock))
-        {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Gets the bottom block of this plant.
      * 
@@ -230,4 +175,10 @@ public class PlantType
     {
         return topBlock;
     }
+    
+    @Override
+    public String toString()
+    {
+        return name;
+    }    
 }

@@ -46,7 +46,7 @@ class Vein
         return true;
     }
 
-    public void spawn(IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkBeingPopulated, VeinGen gen)
+    public void spawn(IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkBeingPopulated, VeinResource gen)
     {
         int sizeSquared = size * size;
 
@@ -66,10 +66,10 @@ class Vein
         }
     }
 
-    private void spawnOre(IWorldGenRegion worldGenRegion, Random rand, int x, int y, int z, VeinGen gen, ChunkCoordinate chunkBeingPopulated)
+    private void spawnOre(IWorldGenRegion worldGenRegion, Random rand, int x, int y, int z, VeinResource gen, ChunkCoordinate chunkBeingPopulated)
     {
-        int maxSize = gen.oreSize;
-        LocalMaterialData material = gen.getMaterial();
+        int maxSize = gen.oreAvgSize;
+        LocalMaterialData material = gen.material;
         MaterialSet sourceBlocks = gen.sourceBlocks;
 
         float f = rand.nextFloat() * 3.141593F;

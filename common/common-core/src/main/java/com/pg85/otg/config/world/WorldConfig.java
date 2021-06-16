@@ -2,7 +2,6 @@ package com.pg85.otg.config.world;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.biome.BiomeGroupManager;
-import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.standard.WorldStandardValues;
@@ -290,7 +288,7 @@ public class WorldConfig extends WorldConfigBase
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeGroupManager = new BiomeGroupManager();
-		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, false, biomeResourcesManager, spawnLog, logger, materialReader))
+		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, biomeResourcesManager, spawnLog, logger, materialReader))
 		{
 			if (res != null)
 			{

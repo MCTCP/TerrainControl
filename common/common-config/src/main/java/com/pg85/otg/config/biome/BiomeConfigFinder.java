@@ -169,7 +169,6 @@ public final class BiomeConfigFinder
         private final SettingsMap settings;
         private final Path file;
         private final String biomeName;
-        public boolean biomeExtendsProcessed = false;
         
         // Mob inheritance has to be done before the configs are actually loaded
         // Unfortunately can't handle this like BiomeExtends so have to put these

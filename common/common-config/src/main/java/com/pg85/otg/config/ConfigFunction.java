@@ -1,7 +1,6 @@
 package com.pg85.otg.config;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -41,16 +40,6 @@ public abstract class ConfigFunction<T>
             throw new InvalidConfigException("Too few arguments supplied");
         }
     }
-
-    /**
-     * Returns whether or not the two resources are similar to each other AND
-     * not equal. This should return true if two resources are of the same class
-     * and if critical element are the same. For example source blocks. This 
-     * will be used to test if a resource should be overridden via inheritance.
-     * @param other The resource to compare with.
-     * @return True if the resources are similar, false otherwise.
-     */
-    public abstract boolean isAnalogousTo(ConfigFunction<T> other, ILogger logger);
 
     /**
      * Formats the material list as a string list.

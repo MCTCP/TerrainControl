@@ -2,7 +2,6 @@ package com.pg85.otg.config.io;
 
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.ErroredFunction;
-import com.pg85.otg.config.helpers.InheritanceHelper;
 import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -15,7 +14,6 @@ import java.util.*;
 
 /**
  * The default implementation of {@link SettingsMap}.
- *
  */
 public final class SimpleSettingsMap implements SettingsMap
 {
@@ -71,7 +69,7 @@ public final class SimpleSettingsMap implements SettingsMap
     }
 
     @Override
-    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
         List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
         for (RawSettingValue configFunctionLine : configFunctions)
@@ -96,12 +94,6 @@ public final class SimpleSettingsMap implements SettingsMap
             		logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
             	}
             }
-        }
-
-        // Add inherited functions
-        if (useFallback && fallback != null)
-        {
-            return InheritanceHelper.mergeLists(result, fallback.getConfigFunctions(holder, true, biomeResourcesManager, spawnLog, logger, materialReader), logger);
         }
 
         return result;

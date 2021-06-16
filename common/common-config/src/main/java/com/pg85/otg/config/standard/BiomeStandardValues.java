@@ -31,7 +31,6 @@ public class BiomeStandardValues extends Settings
 	);
 
     public static final Setting<Boolean>
-    	RESOURCE_INHERITANCE = booleanSetting("ResourceInheritance", true),
     	USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),    	 
 		DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
 		STRONGHOLDS_ENABLED = booleanSetting("StrongholdsEnabled", true),
@@ -49,10 +48,8 @@ public class BiomeStandardValues extends Settings
 	;
 
     public static final Setting<String>
-    	BIOME_EXTENDS = stringSetting("BiomeExtends", ""),
     	RIVER_BIOME = stringSetting("RiverBiome", "River"),
     	VANILLA_BIOME = stringSetting("ReplaceToBiomeName", ""),
-    	BIOME_DICT_ID = stringSetting("BiomeDictId", ""),
     	INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", ""),
     	PARTICLE_TYPE = stringSetting("ParticleType", ""),
 		MUSIC = stringSetting("Music", ""),
@@ -92,6 +89,7 @@ public class BiomeStandardValues extends Settings
     ;
 
     public static final Setting<List<String>>
+		BIOME_DICT_TAGS = stringListSetting("BiomeDictTags", ""),
     	ISLE_IN_BIOME = stringListSetting("IsleInBiome", "Ocean"),
     	BIOME_IS_BORDER = stringListSetting("BiomeIsBorder"),
     	NOT_BORDER_NEAR = stringListSetting("NotBorderNear")

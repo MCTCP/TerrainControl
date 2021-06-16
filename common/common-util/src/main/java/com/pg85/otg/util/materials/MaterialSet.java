@@ -93,60 +93,6 @@ public class MaterialSet
         }       
     }
 
-    @Override
-    public int hashCode()
-    {
-    	// TODO: This method is never called, remove?
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (this.allMaterials ? 1231 : 1237);
-        result = prime * result + (this.allNonSolidMaterials ? 1231 : 1237);
-        result = prime * result + (this.allSolidMaterials ? 1231 : 1237);
-        result = prime * result + this.tags.hashCode();
-        result = prime * result + this.materials.hashCode();
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-    	// TODO: This method is never called, remove?
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (getClass() != obj.getClass())
-        {
-            return false;
-        }
-        MaterialSet other = (MaterialSet) obj;
-        if (this.allMaterials != other.allMaterials)
-        {
-            return false;
-        }
-        if (this.allNonSolidMaterials != other.allNonSolidMaterials)
-        {
-            return false;
-        }
-        if (this.allSolidMaterials != other.allSolidMaterials)
-        {
-            return false;
-        }
-        if (!this.tags.equals(other.tags))
-        {
-            return false;
-        }
-        if (!this.materials.equals(other.materials))
-        {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Adds the entry to this material set.
      *
