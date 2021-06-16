@@ -42,7 +42,7 @@ public class FrozenSurfaceHelper
 	 */
 	private static void freezeColumn(IWorldGenRegion worldGenRegion, int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		IBiome biome = worldGenRegion.getBiomeForPopulation(x, z, chunkBeingPopulated);
+		IBiome biome = worldGenRegion.getBiomeForDecoration(x, z, chunkBeingPopulated);
 		if (biome != null)
 		{
 			int blockToFreezeY = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);

@@ -14,10 +14,10 @@ public interface IWorldGenRegion
 	public String getPresetFolderName();
 	public long getSeed();	
 	public Random getWorldRandom();
-	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord);
-	public void invalidatePopulationBiomeCache();
+	public void cacheBiomesForDecoration(ChunkCoordinate chunkCoord);
+	public void invalidateDecorationBiomeCache();
 	public IBiome getBiome(int x, int z);
-	public IBiome getBiomeForPopulation(int x, int z, ChunkCoordinate chunkBeingPopulated);
+	public IBiome getBiomeForDecoration(int x, int z, ChunkCoordinate chunkBeingPopulated);
 	public IBiomeConfig getBiomeConfig(int x, int z);
 	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated);
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);

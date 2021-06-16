@@ -125,14 +125,14 @@ public class OTGChunkDecorator implements IChunkDecorator
 		{
 			this.processing = true;
 			// Cache all biomes in the are being populated (2x2 chunks)
-			worldGenRegion.cacheBiomesForPopulation(chunkCoord);			
+			worldGenRegion.cacheBiomesForDecoration(chunkCoord);			
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
 			this.processing = false;
 		} else {			
 			logger.log(LogMarker.INFO, "Cascading chunk generation detected.");
 			
 			// Don't use the population chunk biome cache during cascading chunk generation
-			worldGenRegion.invalidatePopulationBiomeCache();
+			worldGenRegion.invalidateDecorationBiomeCache();
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 
 			// If developer mode is enabled in OTG.ini, log the stack trace

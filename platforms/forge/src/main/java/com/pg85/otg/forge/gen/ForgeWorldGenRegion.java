@@ -55,7 +55,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private IBiome[][] cachedBiomeConfigs;
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being populated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
-	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
+	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 	private boolean cacheIsValid;
 
 	/** Creates a LocalWorldGenRegion
@@ -118,7 +118,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// for any operation that is intended to stay within population bounds.
 
 	@Override
-	public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+	public IBiome getBiomeForDecoration(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Cache is invalidated when cascading chunkgen happens.
 		return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
@@ -132,7 +132,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	public void cacheBiomesForDecoration(ChunkCoordinate chunkCoord)
 	{
 		this.cachedBiomeConfigs = new IBiome[32][32];
 		
@@ -147,9 +147,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		this.cacheIsValid = true;
 	}
 	
-	// Population biome cache is invalidated when cascading chunkgen happens
+	// Decoration biome cache is invalidated when cascading chunkgen happens
 	@Override
-	public void invalidatePopulationBiomeCache()
+	public void invalidateDecorationBiomeCache()
 	{
 		this.cacheIsValid = false;
 	}
@@ -162,6 +162,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
 	@Override
+	@SuppressWarnings("unchecked")	
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
@@ -193,25 +194,23 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
-						@SuppressWarnings("unchecked")
 						ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
 						huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					} else {
-						@SuppressWarnings("unchecked")
 						ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
 						huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					}
 					return true;
 				case HugeRedMushroom:
-					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+					ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
 					huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					return true;
 				case HugeBrownMushroom:
-					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+					ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
 					huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					return true;
 				case SwampTree:
-					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
+					ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
 					swamp_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
 					return true;
 				case Taiga1:
@@ -231,7 +230,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
 					return true;
 				case GroundBush:
-					@SuppressWarnings("unchecked") ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
+					ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
 					jungle_bush.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
 					return true;
 				case Acacia:
