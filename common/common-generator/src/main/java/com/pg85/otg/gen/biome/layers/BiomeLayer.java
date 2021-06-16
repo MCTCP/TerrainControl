@@ -66,8 +66,8 @@ class BiomeLayer extends BiomeLayerBase
 				{
 					NewBiomeData biomeData = getBiomeFromGroup(context, group.maxRarityPerDepth[depth], this.groupBiomes.get(group));
 					return sample | biomeData.id |
-                        // Set IceBit based on Biome Temperature
-                        (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
+						// Set IceBit based on Biome Temperature
+						(biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
 					;
 				}
 			}

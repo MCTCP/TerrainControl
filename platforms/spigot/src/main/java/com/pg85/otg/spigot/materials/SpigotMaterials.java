@@ -199,7 +199,6 @@ public class SpigotMaterials extends LocalMaterials
 		catch (InvalidConfigException ex)
 		{
 			// Happens when a non existing block name is used.
-			String breakpoint = "";
 			OTG.log(LogMarker.WARN, "Invalid config: " + ex.getMessage());
 			OTG.log(LogMarker.WARN, "Replacing with blank");
 		}

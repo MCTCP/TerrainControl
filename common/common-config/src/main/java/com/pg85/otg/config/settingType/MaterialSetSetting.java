@@ -15,41 +15,41 @@ import com.pg85.otg.util.materials.MaterialSet;
  */
 class MaterialSetSetting extends Setting<MaterialSet>
 {
-    private final String[] defaultValues;
+	private final String[] defaultValues;
 
-    public MaterialSetSetting(String name, String... defaultValues)
-    {
-        super(name);
-        this.defaultValues = defaultValues;
-    }
+	public MaterialSetSetting(String name, String... defaultValues)
+	{
+		super(name);
+		this.defaultValues = defaultValues;
+	}
 
-    @Override
-    public MaterialSet getDefaultValue(IMaterialReader materialReader)
-    {
-    	try
-    	{
-	        MaterialSet blocks = new MaterialSet();
-	        for (String blockName : defaultValues)
-	        {
-	            blocks.parseAndAdd(blockName, materialReader);
-	        }
-	        return blocks;
-        } catch (InvalidConfigException e)
-        {
-            throw new AssertionError(e);
-        }
-    }
+	@Override
+	public MaterialSet getDefaultValue(IMaterialReader materialReader)
+	{
+		try
+		{
+			MaterialSet blocks = new MaterialSet();
+			for (String blockName : defaultValues)
+			{
+				blocks.parseAndAdd(blockName, materialReader);
+			}
+			return blocks;
+		} catch (InvalidConfigException e)
+		{
+			throw new AssertionError(e);
+		}
+	}
 
-    @Override
-    public MaterialSet read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        MaterialSet blocks = new MaterialSet();
+	@Override
+	public MaterialSet read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		MaterialSet blocks = new MaterialSet();
 
-        for (String blockName : StringHelper.readCommaSeperatedString(string))
-        {
-            blocks.parseAndAdd(blockName, materialReader);
-        }
+		for (String blockName : StringHelper.readCommaSeperatedString(string))
+		{
+			blocks.parseAndAdd(blockName, materialReader);
+		}
 
-        return blocks;
-    }
+		return blocks;
+	}
 }

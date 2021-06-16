@@ -26,15 +26,15 @@ class FinalizeLayer implements ParentedLayer
 		// Remove all the metadata bits from the sample
 		sample = sample & BiomeLayers.BIOME_BITS;
 		
-        if (this.riversEnabled && (sample & BiomeLayers.RIVER_BITS) != 0)
+		if (this.riversEnabled && (sample & BiomeLayers.RIVER_BITS) != 0)
 		{
-    		int riverBiomeId = this.riverBiomes[sample];
-    		if(riverBiomeId >= 0)
-    		{
-    			sample = riverBiomeId;
-    		}
+			int riverBiomeId = this.riverBiomes[sample];
+			if(riverBiomeId >= 0)
+			{
+				sample = riverBiomeId;
+			}
 		}
-        
+		
 		return sample;
 	}
 }

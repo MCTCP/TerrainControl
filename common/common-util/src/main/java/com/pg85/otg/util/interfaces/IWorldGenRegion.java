@@ -14,10 +14,10 @@ public interface IWorldGenRegion
 	public String getPresetFolderName();
 	public long getSeed();	
 	public Random getWorldRandom();
-	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord);
-	public void invalidatePopulationBiomeCache();
+	public void cacheBiomesForDecoration(ChunkCoordinate chunkCoord);
+	public void invalidateDecorationBiomeCache();
 	public IBiome getBiome(int x, int z);
-	public IBiome getBiomeForPopulation(int x, int z, ChunkCoordinate chunkBeingPopulated);
+	public IBiome getBiomeForDecoration(int x, int z, ChunkCoordinate chunkBeingPopulated);
 	public IBiomeConfig getBiomeConfig(int x, int z);
 	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated);
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
@@ -30,7 +30,8 @@ public interface IWorldGenRegion
 	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
 	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks);
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks);	
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks, boolean useResourceBounds);
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds);	
 	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate);
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
 	public void placeDungeon(Random random, int x, int y, int z);

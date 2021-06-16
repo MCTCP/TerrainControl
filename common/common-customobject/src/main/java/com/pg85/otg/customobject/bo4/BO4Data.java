@@ -16,8 +16,8 @@ import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
 public class BO4Data
 {
-    public static boolean bo4DataExists(BO4Config config)
-    {
+	public static boolean bo4DataExists(BO4Config config)
+	{
 		String filePath = 
 			config.getFile().getAbsolutePath().endsWith(".BO4") ? config.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
 			config.getFile().getAbsolutePath().endsWith(".bo4") ? config.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
@@ -25,13 +25,13 @@ public class BO4Data
 			config.getFile().getAbsolutePath().endsWith(".bo3") ? config.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
 			config.getFile().getAbsolutePath();
 
-        File file = new File(filePath);
-        return file.exists();
-    }
-    
-    public static void generateBO4Data(BO4Config config, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
-    {
-        //write to disk
+		File file = new File(filePath);
+		return file.exists();
+	}
+	
+	public static void generateBO4Data(BO4Config config, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	{
+		//write to disk
 		String filePath = 
 			config.getFile().getAbsolutePath().endsWith(".BO4") ? config.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
 			config.getFile().getAbsolutePath().endsWith(".bo4") ? config.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
@@ -39,10 +39,10 @@ public class BO4Data
 			config.getFile().getAbsolutePath().endsWith(".bo3") ? config.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
 			config.getFile().getAbsolutePath();
 
-        File file = new File(filePath);
-        if(!file.exists())
-        {
-            try {
+		File file = new File(filePath);
+		if(!file.exists())
+		{
+			try {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				DataOutputStream dos = new DataOutputStream(bos);
 				config.writeToStream(dos, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -52,15 +52,15 @@ public class BO4Data
 				DataOutputStream dos2 = new DataOutputStream(fos);
 				dos2.write(compressedBytes, 0, compressedBytes.length);
 				dos2.close();
-            }
-            catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
+			}
+			catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }

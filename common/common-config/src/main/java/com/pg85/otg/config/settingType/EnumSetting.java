@@ -15,33 +15,33 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
  */
 class EnumSetting<T extends Enum<T>> extends Setting<T>
 {
-    private final T defaultValue;
-    private final T[] enumValues;
+	private final T defaultValue;
+	private final T[] enumValues;
 
-    public EnumSetting(String name, T defaultValue)
-    {
-        super(name);
-        this.defaultValue = defaultValue;
-        this.enumValues = defaultValue.getDeclaringClass().getEnumConstants();
-    }
+	public EnumSetting(String name, T defaultValue)
+	{
+		super(name);
+		this.defaultValue = defaultValue;
+		this.enumValues = defaultValue.getDeclaringClass().getEnumConstants();
+	}
 
-    @Override
-    public T getDefaultValue(IMaterialReader materialReader)
-    {
-        return defaultValue;
-    }
+	@Override
+	public T getDefaultValue(IMaterialReader materialReader)
+	{
+		return defaultValue;
+	}
 
-    @Override
-    public T read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        for (T enumValue : enumValues)
-        {
-            if (enumValue.name().equalsIgnoreCase(string))
-            {
-                return enumValue;
-            }
-        }
-        throw new InvalidConfigException(string + " is not an acceptable value");
-    }
+	@Override
+	public T read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		for (T enumValue : enumValues)
+		{
+			if (enumValue.name().equalsIgnoreCase(string))
+			{
+				return enumValue;
+			}
+		}
+		throw new InvalidConfigException(string + " is not an acceptable value");
+	}
 
 }

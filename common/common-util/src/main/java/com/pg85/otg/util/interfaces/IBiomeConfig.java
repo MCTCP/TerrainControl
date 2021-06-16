@@ -46,7 +46,7 @@ public interface IBiomeConfig
 	
 	// Inheritance
 	
-	String getBiomeExtends();
+	List<String> getBiomeDictTags();
 	String getBiomeCategory();
 	
 	// Placement
@@ -175,5 +175,5 @@ public interface IBiomeConfig
 	List<WeightedMobSpawnGroup> getWaterCreatures();
 	List<WeightedMobSpawnGroup> getAmbientCreatures();	
 	List<WeightedMobSpawnGroup> getWaterAmbientCreatures();
-	List<WeightedMobSpawnGroup> getMiscCreatures();	
+	List<WeightedMobSpawnGroup> getMiscCreatures();
 }

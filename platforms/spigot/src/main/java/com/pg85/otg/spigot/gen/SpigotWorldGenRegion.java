@@ -57,7 +57,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void cacheBiomesForPopulation (ChunkCoordinate chunkCoord)
+	public void cacheBiomesForDecoration (ChunkCoordinate chunkCoord)
 	{
 		this.cachedBiomeConfigs = new IBiome[32][32];
 
@@ -73,7 +73,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void invalidatePopulationBiomeCache ()
+	public void invalidateDecorationBiomeCache ()
 	{
 		this.cacheIsValid = false;
 	}
@@ -95,7 +95,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public IBiome getBiomeForPopulation (int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+	public IBiome getBiomeForDecoration (int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
 		return getBiome(worldX, worldZ);
 		//return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX-chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
@@ -116,7 +116,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfigForPopulation (int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
-		return getBiomeForPopulation(worldX, worldZ, chunkBeingPopulated).getBiomeConfig();
+		return getBiomeForDecoration(worldX, worldZ, chunkBeingPopulated).getBiomeConfig();
 	}
 
 	@Override
@@ -125,6 +125,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean placeTree (TreeType type, Random rand, int x, int y, int z)
 	{
@@ -452,13 +453,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
-	{
-		setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
-	}
-
-	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{

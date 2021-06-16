@@ -8,27 +8,27 @@ import com.pg85.otg.util.materials.LocalMaterialData;
  */
 public interface MojangSettings
 {
-    /**
-     * Gets the temperature of this biome, between 0 and 2 (inclusive).
-     * Higher is warmer.
-     *  
-     * @return The temperature of this biome,
-     */
-    float getTemperature();
+	/**
+	 * Gets the temperature of this biome, between 0 and 2 (inclusive).
+	 * Higher is warmer.
+	 *  
+	 * @return The temperature of this biome,
+	 */
+	float getTemperature();
 
-    /**
-     * Gets the wetness of this biome, between 0 and 1. 
-     * Lower is dryer.
-     * 
-     * @return The wetness of this biome.
-     */
-    float getWetness();
+	/**
+	 * Gets the wetness of this biome, between 0 and 1. 
+	 * Lower is dryer.
+	 * 
+	 * @return The wetness of this biome.
+	 */
+	float getWetness();
 
-    float getSurfaceHeight();
+	float getSurfaceHeight();
 
-    float getSurfaceVolatility();
+	float getSurfaceVolatility();
 
-    LocalMaterialData getSurfaceBlock();
+	LocalMaterialData getSurfaceBlock();
 
-    LocalMaterialData getGroundBlock();
+	LocalMaterialData getGroundBlock();
 }

@@ -36,7 +36,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * Converts a net.minecraft.server compound NBT tag to a
 	 * net.minecraftwiki.wiki.NBTClass NBT compound tag.
 	 *
-	 * @param name        Name of the Minecraft tag.
+	 * @param name		Name of the Minecraft tag.
 	 * @param compoundNBT The Minecraft tag.
 	 * @return The converted tag.
 	 */
@@ -104,7 +104,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * Converts a net.minecraft.server list NBT tag to a
 	 * net.minecraftwiki.wiki.NBTClass NBT list tag.
 	 *
-	 * @param name    Name of the Minecraft tag.
+	 * @param name	Name of the Minecraft tag.
 	 * @param listNBT The Minecraft tag.
 	 * @return The converted tag.
 	 */

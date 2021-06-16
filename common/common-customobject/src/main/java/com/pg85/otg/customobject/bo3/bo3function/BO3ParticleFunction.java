@@ -8,32 +8,32 @@ import com.pg85.otg.customobject.bofunctions.ParticleFunction;
  */
 public class BO3ParticleFunction extends ParticleFunction<BO3Config>
 {
-    public BO3ParticleFunction rotate()
-    {
-    	BO3ParticleFunction rotatedBlock = new BO3ParticleFunction();
-        rotatedBlock.x = z;
-        rotatedBlock.y = y;
-        rotatedBlock.z = -x;
-        rotatedBlock.particleName = particleName;
+	public BO3ParticleFunction rotate()
+	{
+		BO3ParticleFunction rotatedBlock = new BO3ParticleFunction();
+		rotatedBlock.x = z;
+		rotatedBlock.y = y;
+		rotatedBlock.z = -x;
+		rotatedBlock.particleName = particleName;
 
-        rotatedBlock.interval = interval;
+		rotatedBlock.interval = interval;
 
-        rotatedBlock.velocityX = velocityZ;
-        rotatedBlock.velocityY = velocityY;
-        rotatedBlock.velocityZ = -velocityX;
+		rotatedBlock.velocityX = velocityZ;
+		rotatedBlock.velocityY = velocityY;
+		rotatedBlock.velocityZ = -velocityX;
 
-        rotatedBlock.velocityXSet = velocityZSet;
-        rotatedBlock.velocityYSet = velocityYSet;
-        rotatedBlock.velocityZSet = velocityXSet;
+		rotatedBlock.velocityXSet = velocityZSet;
+		rotatedBlock.velocityYSet = velocityYSet;
+		rotatedBlock.velocityZSet = velocityXSet;
 
-        return rotatedBlock;
-    }
+		return rotatedBlock;
+	}
 
-    @Override
-    public Class<BO3Config> getHolderType()
-    {
-        return BO3Config.class;
-    }
+	@Override
+	public Class<BO3Config> getHolderType()
+	{
+		return BO3Config.class;
+	}
 
 	@Override
 	public ParticleFunction<BO3Config> getNewInstance()

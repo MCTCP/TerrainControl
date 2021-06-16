@@ -28,7 +28,7 @@ public class StructureCommand
 			return 0;
 		}
 		
-    	String structureInfo = "";
+		String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)source.getPosition().x, (int)source.getPosition().z);
 		// if the player is in range
 		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache().getChunkData(playerChunk);
@@ -44,14 +44,14 @@ public class StructureCommand
 			
 			if(worldInfoChunk instanceof BO4CustomStructure)
 			{				
-    			structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
-    			String branchesInChunk = ((BO4CustomStructure)worldInfoChunk).getObjectsToSpawnInfo().get(playerChunk);
-    			if(branchesInChunk != null && branchesInChunk.length() > 0)
-    			{
-    				structureInfo += "\r\n" + branchesInChunk;
-    			}
+				structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
+				String branchesInChunk = ((BO4CustomStructure)worldInfoChunk).getObjectsToSpawnInfo().get(playerChunk);
+				if(branchesInChunk != null && branchesInChunk.length() > 0)
+				{
+					structureInfo += "\r\n" + branchesInChunk;
+				}
 			} else {
-    			structureInfo += "-- BO3 Info -- \r\nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().author + "\r\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().description;
+				structureInfo += "-- BO3 Info -- \r\nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().author + "\r\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().description;
 			}
 		}
 		

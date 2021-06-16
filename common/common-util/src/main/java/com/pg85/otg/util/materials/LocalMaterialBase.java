@@ -10,5 +10,5 @@ public abstract class LocalMaterialBase
 	// TODO: Make this prettier, avoid requiring type checks altogether.
 	public abstract boolean isTag();
 	
-    public abstract String toString();
+	public abstract String toString();
 }

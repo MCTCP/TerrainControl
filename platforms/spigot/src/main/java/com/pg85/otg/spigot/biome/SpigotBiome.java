@@ -113,8 +113,8 @@ public class SpigotBiome implements IBiome
 		BiomeBase.a builder = new BiomeBase.a()
 				// Precipitation
 				.a(biomeConfig.getBiomeWetness() <= 0.0001 ? BiomeBase.Precipitation.NONE :
-				   biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
-				   BiomeBase.Precipitation.SNOW)
+					biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
+					BiomeBase.Precipitation.SNOW)
 				// depth
 				.a(biomeConfig.getBiomeHeight())
 				.b(biomeConfig.getBiomeVolatility())

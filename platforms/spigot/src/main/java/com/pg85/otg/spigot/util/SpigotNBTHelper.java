@@ -33,13 +33,13 @@ public class SpigotNBTHelper extends LocalNBTHelper
 	 * Converts a net.minecraft.server compound NBT tag to a
 	 * net.minecraftwiki.wiki.NBTClass NBT compound tag.
 	 *
-	 * @param name   Name of the Minecraft tag.
+	 * @param name	Name of the Minecraft tag.
 	 * @param nmsTag The Minecraft tag.
 	 * @return The converted tag.
 	 */
-	@SuppressWarnings("unchecked")
 	// ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
 	// So it is safe to suppress this warning
+	@SuppressWarnings("unchecked")
 	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, NBTTagCompound nmsTag)
 	{
 		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name,
@@ -106,7 +106,7 @@ public class SpigotNBTHelper extends LocalNBTHelper
 	 * Converts a net.minecraft.server list NBT tag to a
 	 * net.minecraftwiki.wiki.NBTClass NBT list tag.
 	 *
-	 * @param name       Name of the Minecraft tag.
+	 * @param name		Name of the Minecraft tag.
 	 * @param nmsListTag The Minecraft tag.
 	 * @return The converted tag.
 	 */

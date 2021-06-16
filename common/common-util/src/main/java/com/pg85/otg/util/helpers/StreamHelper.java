@@ -13,13 +13,13 @@ public class StreamHelper
 
 	public static void writeStringToStream(DataOutput stream, String value) throws IOException
 	{
-	    stream.writeBoolean(value == null);
-	    if(value != null)
-	    {
-		    byte[] bytes = (value == null ? "" : value).getBytes(StandardCharsets.UTF_8);
-		    stream.writeShort(bytes.length);
-		    stream.write(bytes);
-	    }
+		stream.writeBoolean(value == null);
+		if(value != null)
+		{
+			byte[] bytes = (value == null ? "" : value).getBytes(StandardCharsets.UTF_8);
+			stream.writeShort(bytes.length);
+			stream.write(bytes);
+		}
 	}
 
 	public static String readStringFromStream(DataInputStream stream) throws IOException
@@ -31,17 +31,17 @@ public class StreamHelper
 		}
 		
 		short length = stream.readShort();
-	    byte[] chars = new byte[length];
-	    if(length > 0)
-	    {
-		    if (stream.read(chars, 0, chars.length) != chars.length)
-		    {
-		        throw new EOFException();
-		    }
-		    return new String(chars);
-	    } else {
-    		return "";
-	    }
+		byte[] chars = new byte[length];
+		if(length > 0)
+		{
+			if (stream.read(chars, 0, chars.length) != chars.length)
+			{
+				throw new EOFException();
+			}
+			return new String(chars);
+		} else {
+			return "";
+		}
 	}
 	
 	public static String readStringFromBuffer(ByteBuffer buffer) throws IOException, BufferUnderflowException
@@ -53,13 +53,13 @@ public class StreamHelper
 		}
 		
 		short length = buffer.getShort();
-	    byte[] chars = new byte[length];
-	    if(length > 0)
-	    {
-    		buffer.get(chars, 0, chars.length);
-		    return new String(chars);
-	    } else {
-    		return "";
-	    }
+		byte[] chars = new byte[length];
+		if(length > 0)
+		{
+			buffer.get(chars, 0, chars.length);
+			return new String(chars);
+		} else {
+			return "";
+		}
 	}
 }

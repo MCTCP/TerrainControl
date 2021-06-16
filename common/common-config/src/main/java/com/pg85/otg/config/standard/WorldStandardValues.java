@@ -18,7 +18,7 @@ import java.util.List;
 public class WorldStandardValues extends Settings
 {
 	public static class BiomeGroupNames
-    {
+	{
 		public static final String NORMAL = "NormalBiomes";
 		public static final String ICE = "IceBiomes";
 		public static final String COLD = "ColdBiomes";
@@ -26,17 +26,17 @@ public class WorldStandardValues extends Settings
 		public static final String MESA = "MesaBiomes";
 		public static final String JUNGLE = "JungleBiomes";
 		public static final String MEGA_TAIGA = "Mega TaigaBiomes";
-    }
+	}
 
-    public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
-    public static final Setting<ConfigMode> SETTINGS_MODE_BO3 = enumSetting("SettingsMode", ConfigMode.WriteDisable);
-    public static final Setting<BiomeMode> BIOME_MODE = enumSetting("BiomeMode", BiomeMode.Normal);
-    public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
-    public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
-    public static final Setting<ImageOrientation> IMAGE_ORIENTATION = enumSetting("ImageOrientation", ImageOrientation.West);
-    public static final Setting<CustomStructureType> CUSTOM_STRUCTURE_TYPE = enumSetting("CustomStructureType", CustomStructureType.BO3);
-    
-    public static final Setting<String>
+	public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
+	public static final Setting<ConfigMode> SETTINGS_MODE_BO3 = enumSetting("SettingsMode", ConfigMode.WriteDisable);
+	public static final Setting<BiomeMode> BIOME_MODE = enumSetting("BiomeMode", BiomeMode.Normal);
+	public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
+	public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
+	public static final Setting<ImageOrientation> IMAGE_ORIENTATION = enumSetting("ImageOrientation", ImageOrientation.West);
+	public static final Setting<CustomStructureType> CUSTOM_STRUCTURE_TYPE = enumSetting("CustomStructureType", CustomStructureType.BO3);
+	
+	public static final Setting<String>
 		AUTHOR = stringSetting("Author", "Unknown"),
 		SHORT_PRESET_NAME = stringSetting("ShortPresetName", ""),
 		DESCRIPTION = stringSetting("Description", "No description given"),
@@ -50,7 +50,7 @@ public class WorldStandardValues extends Settings
 		DEFAULT_COLD_OCEAN_BIOME = stringSetting("DefaultColdOceanBiome", "Ocean")
 	;
 
-    public static final Setting<Integer>
+	public static final Setting<Integer>
 		MAJOR_VERSION = intSetting("MajorVersion", 0 , 0, Integer.MAX_VALUE),
 		MINOR_VERSION = intSetting("MinorVersion", 0 , 0, Integer.MAX_VALUE),
 		WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),
@@ -84,9 +84,9 @@ public class WorldStandardValues extends Settings
 		RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
 		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100)
-    ;
-    
-    public static final Setting<Boolean>
+	;
+	
+	public static final Setting<Boolean>
 		RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
 		GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),
 		RANDOM_RIVERS = booleanSetting("RandomRivers", false),
@@ -121,16 +121,16 @@ public class WorldStandardValues extends Settings
 		
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
 		ISOTGPLUS = booleanSetting("IsOTGPlus", false)
-    ;
+	;
 
-    public static final Setting<LocalMaterialData>
+	public static final Setting<LocalMaterialData>
 		WATER_BLOCK = new MaterialSetting("WaterBlock", LocalMaterials.WATER_NAME),
 		ICE_BLOCK = new MaterialSetting("IceBlock", LocalMaterials.ICE_NAME),
 		COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", LocalMaterials.LAVA_NAME),
 		BEDROCK_BLOCK = new MaterialSetting("BedrockBlock", LocalMaterials.BEDROCK_NAME)
-    ;
+	;
 
-    public static final Setting<List<String>>
+	public static final Setting<List<String>>
 		ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
 			"Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
 			"JungleHills", "Cold Taiga Hills", "Birch Forest Hills", "Extreme Hills+",
@@ -140,22 +140,22 @@ public class WorldStandardValues extends Settings
 			"JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga")
 	;
 
-    public static final Setting<Double>
+	public static final Setting<Double>
 		FROZEN_OCEAN_TEMPERATURE = doubleSetting("OceanFreezingTemperature", 0.15, 0, 2),
 		RAVINE_DEPTH = doubleSetting("RavineDepth", 3, 0.1, 15),
 		CANYON_DEPTH = doubleSetting("CanyonDepth", 3, 0.1, 15),
 		FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
 		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500)
-    ;
+	;
 
-    public static final Setting<Integer>
+	public static final Setting<Integer>
 		WORLD_FOG_COLOR = colorSetting("WorldFog", "0xC0D8FF")
-    ;
+	;
 
-    // Deprecated settings
-    public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
-    public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting(
+	// Deprecated settings
+	public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
+	public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting(
 		"NormalBiomes", "Desert", "Forest", "Extreme Hills", "Swampland", "Plains", "Taiga", "Jungle", "River"
-    );
-    public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
+	);
+	public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
 }

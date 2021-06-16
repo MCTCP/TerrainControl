@@ -2,9 +2,7 @@ package com.pg85.otg.spigot;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
@@ -18,8 +16,6 @@ import net.minecraft.server.v1_16_R3.IRegistryWritable;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
 
 import com.pg85.otg.spigot.util.UnsafeUtil;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;

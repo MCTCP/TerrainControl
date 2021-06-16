@@ -12,20 +12,20 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
 class ReplacedBlocksSetting extends Setting<ReplacedBlocksMatrix>
 {
 
-    ReplacedBlocksSetting(String name)
-    {
-        super(name);
-    }
+	ReplacedBlocksSetting(String name)
+	{
+		super(name);
+	}
 
-    @Override
-    public ReplacedBlocksMatrix getDefaultValue(IMaterialReader materialReader)
-    {
-        return ReplacedBlocksMatrix.createEmptyMatrix(Constants.WORLD_HEIGHT, materialReader);
-    }
+	@Override
+	public ReplacedBlocksMatrix getDefaultValue(IMaterialReader materialReader)
+	{
+		return ReplacedBlocksMatrix.createEmptyMatrix(Constants.WORLD_HEIGHT, materialReader);
+	}
 
-    @Override
-    public ReplacedBlocksMatrix read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        return new ReplacedBlocksMatrix(string, Constants.WORLD_HEIGHT, materialReader);
-    }
+	@Override
+	public ReplacedBlocksMatrix read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		return new ReplacedBlocksMatrix(string, Constants.WORLD_HEIGHT, materialReader);
+	}
 }

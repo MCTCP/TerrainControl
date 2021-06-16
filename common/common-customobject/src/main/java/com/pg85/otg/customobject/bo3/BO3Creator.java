@@ -29,8 +29,6 @@ import java.util.List;
 
 public class BO3Creator extends BOCreator
 {
-
-
 	public static BO3 create(
 		Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
@@ -72,8 +70,8 @@ public class BO3Creator extends BOCreator
 
 	// Use this to make the BO3 config
 	private static BO3Config makeBO3Config(BO3Config template, String objectName, File bo3File, ILogger logger, Corner max, Corner min,
-										   List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetFolderName, Path rootPath, boolean spawnLog,
-										   CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
+											List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetFolderName, Path rootPath, boolean spawnLog,
+											CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 		BO3Config config = template.cloneConfigValues(new FileSettingsReaderBO4(objectName, bo3File, logger));
 		if (branches != null)
@@ -168,10 +166,10 @@ public class BO3Creator extends BOCreator
 		if ((max.x - min.x) % 16 > 0) chunksOnXAxis++;
 		if ((max.z - min.z) % 16 > 0) chunksOnZAxis++;
 
-
 		// Get the blocks for each branch, put them in a grid
 		//  - Make sure empty branches are ignored
 
+		@SuppressWarnings("unchecked")
 		ArrayList<BO3BlockFunction>[][] branchGrid = (ArrayList<BO3BlockFunction>[][]) new ArrayList<?>[chunksOnXAxis][chunksOnZAxis];
 
 		// Array with booleans, saying if a given branch exists

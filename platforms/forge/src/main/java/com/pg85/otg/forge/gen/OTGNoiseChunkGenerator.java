@@ -137,6 +137,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
+	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -315,6 +316,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Chunk population method taken from Biome class
+	@SuppressWarnings("deprecation")
 	private void biomeDecorate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
 		// World save folder name may not be identical to level name, fetch it.
@@ -402,6 +404,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
+	@SuppressWarnings("deprecation")
 	@Override
 	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
 	{

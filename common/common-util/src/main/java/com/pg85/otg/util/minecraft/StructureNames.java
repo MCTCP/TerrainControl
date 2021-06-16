@@ -14,15 +14,15 @@ package com.pg85.otg.util.minecraft;
  */
 public class StructureNames
 {
-    public static final String MINESHAFT = "Mineshaft";
-    public static final String NETHER_FORTRESS = "Fortress";
-    public static final String VILLAGE = "OTGVillage";
-    public static final String STRONGHOLD = "Stronghold";
-    public static final String RARE_BUILDING = "OTGTemple";
-    public static final String OCEAN_MONUMENT = "Monument";
-    public static final String WOODLAND_MANSION = "Mansion";
+	public static final String MINESHAFT = "Mineshaft";
+	public static final String NETHER_FORTRESS = "Fortress";
+	public static final String VILLAGE = "OTGVillage";
+	public static final String STRONGHOLD = "Stronghold";
+	public static final String RARE_BUILDING = "OTGTemple";
+	public static final String OCEAN_MONUMENT = "Monument";
+	public static final String WOODLAND_MANSION = "Mansion";
 
-    private StructureNames()
-    {
-    }
+	private StructureNames()
+	{
+	}
 }

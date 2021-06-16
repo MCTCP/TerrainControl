@@ -22,58 +22,58 @@ public class BO4ParticleFunction extends ParticleFunction<BO4Config>
 		this.holder = holder;
 	}
 	
-    public BO4ParticleFunction rotate(Rotation rotation)
-    {
-    	BO4ParticleFunction rotatedBlock = new BO4ParticleFunction(this.getHolder());
+	public BO4ParticleFunction rotate(Rotation rotation)
+	{
+		BO4ParticleFunction rotatedBlock = new BO4ParticleFunction(this.getHolder());
 
-        BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+		BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
 
-        rotatedBlock.x = rotatedCoords.getX();
-        rotatedBlock.y = rotatedCoords.getY();
-        rotatedBlock.z = rotatedCoords.getZ();
+		rotatedBlock.x = rotatedCoords.getX();
+		rotatedBlock.y = rotatedCoords.getY();
+		rotatedBlock.z = rotatedCoords.getZ();
 
-        rotatedBlock.velocityX = velocityX;
-        rotatedBlock.velocityY = velocityY;
-        rotatedBlock.velocityZ = velocityZ;
+		rotatedBlock.velocityX = velocityX;
+		rotatedBlock.velocityY = velocityY;
+		rotatedBlock.velocityZ = velocityZ;
 
-        rotatedBlock.velocityXSet = velocityXSet;
-        rotatedBlock.velocityYSet = velocityYSet;
-        rotatedBlock.velocityZSet = velocityZSet;
+		rotatedBlock.velocityXSet = velocityXSet;
+		rotatedBlock.velocityYSet = velocityYSet;
+		rotatedBlock.velocityZSet = velocityZSet;
 
-        double newVelocityX = rotatedBlock.velocityX;
-        double newVelocityZ = rotatedBlock.velocityZ;
+		double newVelocityX = rotatedBlock.velocityX;
+		double newVelocityZ = rotatedBlock.velocityZ;
 
-        boolean newVelocityXSet = rotatedBlock.velocityXSet;
-        boolean newVelocityZSet = rotatedBlock.velocityZSet;
+		boolean newVelocityXSet = rotatedBlock.velocityXSet;
+		boolean newVelocityZSet = rotatedBlock.velocityZSet;
 
-    	for(int i = 0; i < rotation.getRotationId(); i++)
-    	{
-            newVelocityX = rotatedBlock.velocityZ;
-            newVelocityZ = -rotatedBlock.velocityX;
+		for(int i = 0; i < rotation.getRotationId(); i++)
+		{
+			newVelocityX = rotatedBlock.velocityZ;
+			newVelocityZ = -rotatedBlock.velocityX;
 
-            rotatedBlock.velocityX = newVelocityX;
-            rotatedBlock.velocityY = rotatedBlock.velocityY;
-            rotatedBlock.velocityZ = newVelocityZ;
+			rotatedBlock.velocityX = newVelocityX;
+			rotatedBlock.velocityY = rotatedBlock.velocityY;
+			rotatedBlock.velocityZ = newVelocityZ;
 
-            newVelocityXSet = rotatedBlock.velocityZSet;
-            newVelocityZSet = rotatedBlock.velocityXSet;
+			newVelocityXSet = rotatedBlock.velocityZSet;
+			newVelocityZSet = rotatedBlock.velocityXSet;
 
-            rotatedBlock.velocityXSet = newVelocityXSet;
-            rotatedBlock.velocityYSet = rotatedBlock.velocityYSet;
-            rotatedBlock.velocityZSet = newVelocityZSet;
-    	}
+			rotatedBlock.velocityXSet = newVelocityXSet;
+			rotatedBlock.velocityYSet = rotatedBlock.velocityYSet;
+			rotatedBlock.velocityZSet = newVelocityZSet;
+		}
 
-    	rotatedBlock.particleName = particleName;
-    	rotatedBlock.interval = interval;
+		rotatedBlock.particleName = particleName;
+		rotatedBlock.interval = interval;
 
-        return rotatedBlock;
-    }
-    
-    @Override
-    public Class<BO4Config> getHolderType()
-    {
-        return BO4Config.class;
-    }
+		return rotatedBlock;
+	}
+	
+	@Override
+	public Class<BO4Config> getHolderType()
+	{
+		return BO4Config.class;
+	}
 
 	@Override
 	public ParticleFunction<BO4Config> getNewInstance()
@@ -81,48 +81,48 @@ public class BO4ParticleFunction extends ParticleFunction<BO4Config>
 		return new BO4ParticleFunction(this.getHolder());
 	}
 	
-    public void writeToStream(DataOutput stream) throws IOException
-    {
-        stream.writeInt(this.x);
-        stream.writeInt(this.y);
-        stream.writeInt(this.z);       
+	public void writeToStream(DataOutput stream) throws IOException
+	{
+		stream.writeInt(this.x);
+		stream.writeInt(this.y);
+		stream.writeInt(this.z);		
 
-        stream.writeBoolean(this.firstSpawn);
+		stream.writeBoolean(this.firstSpawn);
 
-    	StreamHelper.writeStringToStream(stream, this.particleName);
+		StreamHelper.writeStringToStream(stream, this.particleName);
 
-        stream.writeDouble(this.interval);
-        stream.writeDouble(this.intervalOffset);
+		stream.writeDouble(this.interval);
+		stream.writeDouble(this.intervalOffset);
 
-        stream.writeDouble(this.velocityX);
-        stream.writeDouble(this.velocityY);
-        stream.writeDouble(this.velocityZ);
+		stream.writeDouble(this.velocityX);
+		stream.writeDouble(this.velocityY);
+		stream.writeDouble(this.velocityZ);
 
-        stream.writeBoolean(this.velocityXSet);
-        stream.writeBoolean(this.velocityYSet);
-        stream.writeBoolean(this.velocityZSet);
-    }
-    
-    public static BO4ParticleFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
-    {
-    	BO4ParticleFunction particleFunction = new BO4ParticleFunction(holder);
-    	
-    	particleFunction.x = buffer.getInt();
-    	particleFunction.y = buffer.getInt();
-    	particleFunction.z = buffer.getInt();
-    	
-    	particleFunction.firstSpawn = buffer.get() != 0;
-    	particleFunction.particleName = StreamHelper.readStringFromBuffer(buffer);
-    	particleFunction.interval = buffer.getDouble();
-    	particleFunction.intervalOffset = buffer.getDouble();
-    	particleFunction.velocityX = buffer.getDouble();
-    	particleFunction.velocityY = buffer.getDouble();
-    	particleFunction.velocityZ = buffer.getDouble();
-    	
-    	particleFunction.velocityXSet = buffer.get() != 0;
-    	particleFunction.velocityYSet = buffer.get() != 0;
-    	particleFunction.velocityZSet = buffer.get() != 0;
-    	
-    	return particleFunction;
-    }
+		stream.writeBoolean(this.velocityXSet);
+		stream.writeBoolean(this.velocityYSet);
+		stream.writeBoolean(this.velocityZSet);
+	}
+	
+	public static BO4ParticleFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
+	{
+		BO4ParticleFunction particleFunction = new BO4ParticleFunction(holder);
+		
+		particleFunction.x = buffer.getInt();
+		particleFunction.y = buffer.getInt();
+		particleFunction.z = buffer.getInt();
+		
+		particleFunction.firstSpawn = buffer.get() != 0;
+		particleFunction.particleName = StreamHelper.readStringFromBuffer(buffer);
+		particleFunction.interval = buffer.getDouble();
+		particleFunction.intervalOffset = buffer.getDouble();
+		particleFunction.velocityX = buffer.getDouble();
+		particleFunction.velocityY = buffer.getDouble();
+		particleFunction.velocityZ = buffer.getDouble();
+		
+		particleFunction.velocityXSet = buffer.get() != 0;
+		particleFunction.velocityYSet = buffer.get() != 0;
+		particleFunction.velocityZSet = buffer.get() != 0;
+		
+		return particleFunction;
+	}
 }

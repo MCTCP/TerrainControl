@@ -11,32 +11,32 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
  */
 class BooleanSetting extends Setting<Boolean>
 {
-    private final boolean defaultValue;
+	private final boolean defaultValue;
 
-    BooleanSetting(String name, boolean defaultValue)
-    {
-        super(name);
-        this.defaultValue = Boolean.valueOf(defaultValue);
-    }
+	BooleanSetting(String name, boolean defaultValue)
+	{
+		super(name);
+		this.defaultValue = Boolean.valueOf(defaultValue);
+	}
 
-    @Override
-    public Boolean getDefaultValue(IMaterialReader materialReader)
-    {
-        return defaultValue;
-    }
+	@Override
+	public Boolean getDefaultValue(IMaterialReader materialReader)
+	{
+		return defaultValue;
+	}
 
-    @Override
-    public Boolean read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        if (string.equalsIgnoreCase("true"))
-        {
-            return Boolean.TRUE;
-        }
-        if (string.equalsIgnoreCase("false"))
-        {
-            return Boolean.FALSE;
-        }
-        throw new InvalidConfigException(string + " is not a boolean");
-    }
+	@Override
+	public Boolean read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		if (string.equalsIgnoreCase("true"))
+		{
+			return Boolean.TRUE;
+		}
+		if (string.equalsIgnoreCase("false"))
+		{
+			return Boolean.FALSE;
+		}
+		throw new InvalidConfigException(string + " is not a boolean");
+	}
 
 }

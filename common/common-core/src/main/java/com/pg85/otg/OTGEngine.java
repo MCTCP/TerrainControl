@@ -127,7 +127,7 @@ public abstract class OTGEngine
 
 		HashMap<String, Class<? extends ConfigFunction<?>>> configFunctions = new HashMap<>();
 		configFunctions.putAll(WorldConfig.CONFIG_FUNCTIONS);
-		configFunctions.putAll(BiomeConfig.CONFIG_FUNCTIONS);
+		configFunctions.putAll(BiomeConfig.RESOURCE_QUEUE_RESOURCES);
 		this.biomeResourcesManager = new BiomeResourcesManager(configFunctions);
 
 		// Load presets

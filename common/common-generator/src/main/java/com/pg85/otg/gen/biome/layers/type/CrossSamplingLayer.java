@@ -9,14 +9,14 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
  * Unfortunately, this will cause some serious slowdown so it needs to be used with care.
  */
 public interface CrossSamplingLayer extends ParentedLayer {
-   int sample(LayerSampleContext<?> context, int x, int z, int n, int e, int s, int w, int center);
+	int sample(LayerSampleContext<?> context, int x, int z, int n, int e, int s, int w, int center);
 
-   default int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z) {
-      return this.sample(context, x, z,
-              parent.sample(x, z - 1), // North
-              parent.sample(x + 1, z), // East
-              parent.sample(x, z + 1), // South
-              parent.sample(x - 1, z), // West
-              parent.sample(x, z));    // Center
-   }
+	default int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z) {
+	  return this.sample(context, x, z,
+			  parent.sample(x, z - 1), // North
+			  parent.sample(x + 1, z), // East
+			  parent.sample(x, z + 1), // South
+			  parent.sample(x - 1, z), // West
+			  parent.sample(x, z));	// Center
+	}
 }

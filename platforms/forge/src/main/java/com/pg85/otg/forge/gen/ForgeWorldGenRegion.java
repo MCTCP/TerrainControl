@@ -55,7 +55,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private IBiome[][] cachedBiomeConfigs;
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being populated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
-	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
+	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 	private boolean cacheIsValid;
 
 	/** Creates a LocalWorldGenRegion
@@ -118,7 +118,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// for any operation that is intended to stay within population bounds.
 
 	@Override
-	public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+	public IBiome getBiomeForDecoration(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Cache is invalidated when cascading chunkgen happens.
 		return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
@@ -132,7 +132,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	public void cacheBiomesForDecoration(ChunkCoordinate chunkCoord)
 	{
 		this.cachedBiomeConfigs = new IBiome[32][32];
 		
@@ -147,9 +147,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		this.cacheIsValid = true;
 	}
 	
-	// Population biome cache is invalidated when cascading chunkgen happens
+	// Decoration biome cache is invalidated when cascading chunkgen happens
 	@Override
-	public void invalidatePopulationBiomeCache()
+	public void invalidateDecorationBiomeCache()
 	{
 		this.cacheIsValid = false;
 	}
@@ -162,6 +162,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
 	@Override
+	@SuppressWarnings("unchecked")	
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
@@ -495,15 +496,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		return -1;
 	}
-
+	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
-	{
-		setBlock(x, y, z, material, nbt, chunkBeingPopulated, null, replaceBlocks);
-	}
-
-	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{

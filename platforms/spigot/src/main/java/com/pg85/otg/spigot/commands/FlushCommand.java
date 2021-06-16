@@ -15,9 +15,9 @@ public class FlushCommand
 			return true;
 		}
 	
-        OTG.log(LogMarker.INFO, "Unloading BO2/BO3/BO4 files");
-        OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
-        sender.sendMessage("Objects unloaded.");
-        return true;
+		OTG.log(LogMarker.INFO, "Unloading BO2/BO3/BO4 files");
+		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
+		sender.sendMessage("Objects unloaded.");
+		return true;
 	}
 }

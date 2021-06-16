@@ -50,7 +50,7 @@ public class MapCommand
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish); // Note: This is probably the least helpful time duration helper class I've ever seen ...
 		
-		String fileName = source.getServer().getWorldData().getLevelName() + " biomes.png";        
+		String fileName = source.getServer().getWorldData().getLevelName() + " biomes.png";		
 		Path p = Paths.get(fileName);
 		try
 		{
@@ -87,7 +87,7 @@ public class MapCommand
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish);		
 		
-		String fileName = source.getServer().getWorldData().getLevelName() + " terrain.png";        
+		String fileName = source.getServer().getWorldData().getLevelName() + " terrain.png";		
 		Path p = Paths.get(fileName);
 		try
 		{
@@ -110,7 +110,7 @@ public class MapCommand
 	{
 		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
 		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
-        List<BlockPos2D> coordsToHandle = new ArrayList<BlockPos2D>(width * height);
+		List<BlockPos2D> coordsToHandle = new ArrayList<BlockPos2D>(width * height);
 		for (int chunkX = 0; chunkX < (int)Math.ceil(width / 16f); chunkX++)
 		{
 			for (int chunkZ = 0; chunkZ < (int)Math.ceil(height / 16f); chunkZ++)
@@ -119,18 +119,18 @@ public class MapCommand
 			}
 		}
 
-        CountDownLatch latch = new CountDownLatch(threads);
-        MapCommand outer = new MapCommand();
-        int totalSize = coordsToHandle.size();
+		CountDownLatch latch = new CountDownLatch(threads);
+		MapCommand outer = new MapCommand();
+		int totalSize = coordsToHandle.size();
 		for(int i = 0; i < threads; i++)
 		{
 			outer.new Worker(latch, source, generator, provider, img, coordsToHandle, totalSize, mapBiomes, width, height).start();
 		}
-		
-        try {
-        	latch.await();
-    	} catch (InterruptedException e) {
-        	e.printStackTrace();
+	
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class MapCommand
 		blue = blue * percent / 100;
 		blue = blue > 255 ? 255 : blue;
 
-	    return 65536 * red + 256 * green + blue;
+		return 65536 * red + 256 * green + blue;
 	}
 	
 	public class Worker implements Runnable
@@ -155,76 +155,76 @@ public class MapCommand
 		private Thread runner;		
 		private final int totalSize;
 		private final List<BlockPos2D> coordsToHandle;
-	    private final CountDownLatch latch;
-	    private final OTGNoiseChunkGenerator generator;
-	    private final OTGBiomeProvider provider;
-	    private final CommandSource source;
-	    private final BufferedImage img;
-	    private final int progressUpdate;
-	    private final boolean mapBiomes;
-	    private final int width;
-	    private final int height;
+		private final CountDownLatch latch;
+		private final OTGNoiseChunkGenerator generator;
+		private final OTGBiomeProvider provider;
+		private final CommandSource source;
+		private final BufferedImage img;
+		private final int progressUpdate;
+		private final boolean mapBiomes;
+		private final int width;
+		private final int height;
 
-	    public Worker(CountDownLatch latch, CommandSource source, OTGNoiseChunkGenerator generator, OTGBiomeProvider provider, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
-	    {
-	        this.latch = latch;
-	        this.generator = generator;
-	        this.provider = provider;
-	        this.source = source;
-	        this.img = img;
-	        this.progressUpdate = (int)Math.ceil(totalSize / 100f);
-	        this.coordsToHandle = coordsToHandle;
-	        this.totalSize = totalSize;
-	        this.mapBiomes = mapBiomes;
-	        this.width = width;
-	        this.height = height;
-	    }
+		public Worker(CountDownLatch latch, CommandSource source, OTGNoiseChunkGenerator generator, OTGBiomeProvider provider, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
+		{
+			this.latch = latch;
+			this.generator = generator;
+			this.provider = provider;
+			this.source = source;
+			this.img = img;
+			this.progressUpdate = (int)Math.ceil(totalSize / 100f);
+			this.coordsToHandle = coordsToHandle;
+			this.totalSize = totalSize;
+			this.mapBiomes = mapBiomes;
+			this.width = width;
+			this.height = height;
+		}
 
-	    public void start()
-	    {
-	        this.runner = new Thread(this);
-	        this.runner.start();
-	    }
-	    
-	    @Override
-	    public void run()
-	    {
+		public void start()
+		{
+			this.runner = new Thread(this);
+			this.runner.start();
+		}
+		
+		@Override
+		public void run()
+		{
 			//set the color
-	    	while(true)
-	    	{
-	    		BlockPos2D coords = null;
-	    		int sizeLeft;
-	    		synchronized(queueLock)
-	    		{
-	    			sizeLeft = this.coordsToHandle.size();
-	    			if(sizeLeft > 0)
-	    			{
-	    				coords = this.coordsToHandle.remove(sizeLeft - 1);
-	    			}
-	    		}
-    			// Send a progress update to let people know the server isn't dying
-    			if (sizeLeft % this.progressUpdate == 0)
-    			{
-    				this.source.sendSuccess(new StringTextComponent((int)Math.floor(100 - (((double)sizeLeft / this.totalSize) * 100)) + "% Done mapping"), true);
-    			}
-	    		
-	    		if(coords != null)
-	    		{
-	    			if(this.mapBiomes)
-	    			{
-	    				getBiomePixel(coords);
-	    			} else {
-	    				getTerrainPixel(coords);
-	    			}
-	    		} else {
-	    			this.latch.countDown();
-    				return;
-	    		}
-	    	}
-	    }
+			while(true)
+			{
+				BlockPos2D coords = null;
+				int sizeLeft;
+				synchronized(queueLock)
+				{
+					sizeLeft = this.coordsToHandle.size();
+					if(sizeLeft > 0)
+					{
+						coords = this.coordsToHandle.remove(sizeLeft - 1);
+					}
+				}
+				// Send a progress update to let people know the server isn't dying
+				if (sizeLeft % this.progressUpdate == 0)
+				{
+					this.source.sendSuccess(new StringTextComponent((int)Math.floor(100 - (((double)sizeLeft / this.totalSize) * 100)) + "% Done mapping"), true);
+				}
+				
+				if(coords != null)
+				{
+					if(this.mapBiomes)
+					{
+						getBiomePixel(coords);
+					} else {
+						getTerrainPixel(coords);
+					}
+				} else {
+					this.latch.countDown();
+					return;
+				}
+			}
+		}
 
-	    private void getBiomePixel(BlockPos2D chunkCoords)
-	    {		
+		private void getBiomePixel(BlockPos2D chunkCoords)
+		{		
 			for (int internalX = 0; internalX < 16; internalX++)
 			{
 				for (int internalZ = 0; internalZ < 16; internalZ++)
@@ -241,12 +241,12 @@ public class MapCommand
 					}
 				}
 			}
-	    }
-	    
-	    private void getTerrainPixel(BlockPos2D chunkCoords)
-	    {
-	    	ForgeChunkBuffer chunk = this.generator.getChunkWithoutLoadingOrCaching(this.source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
-	    	HighestBlockInfo highestBlockInfo;
+		}
+		
+		private void getTerrainPixel(BlockPos2D chunkCoords)
+		{
+			ForgeChunkBuffer chunk = this.generator.getChunkWithoutLoadingOrCaching(this.source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
+			HighestBlockInfo highestBlockInfo;
 			for (int internalX = 0; internalX < 16; internalX++)
 			{
 				for (int internalZ = 0; internalZ < 16; internalZ++)
@@ -276,8 +276,8 @@ public class MapCommand
 						}
 					}
 				}
-			}	    	
-	    }
+			}			
+		}
 
 		private HighestBlockInfo getHighestBlockInfoInUnloadedChunk(ForgeChunkBuffer chunk, int internalX, int internalZ)
 		{

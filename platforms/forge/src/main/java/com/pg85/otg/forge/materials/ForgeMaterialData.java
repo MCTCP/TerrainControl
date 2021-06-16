@@ -329,9 +329,11 @@ public class ForgeMaterialData extends LocalMaterialData
 		return this.rotated;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
 	{
+		@SuppressWarnings("rawtypes")
 		Property property = null;
 		T finalVal = value;
 
@@ -339,20 +341,22 @@ public class ForgeMaterialData extends LocalMaterialData
 		if (materialProperty == MaterialProperties.AGE_0_25)
 		{
 			property = BlockStateProperties.AGE_25;
-		} else if (materialProperty == MaterialProperties.PICKLES_1_4)
+		}
+		else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{
 			property = BlockStateProperties.PICKLES;
-		} else if (materialProperty == MaterialProperties.SNOWY)
+		}
+		else if (materialProperty == MaterialProperties.SNOWY)
 		{
 			property = BlockStateProperties.SNOWY;
-		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
+		}
+		else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
 		{
 			// Extremely ugly hack for directions
 			property = BlockStateProperties.HORIZONTAL_FACING;
 			Direction direction = Direction.values()[((OTGDirection)value).ordinal()];
 			return ForgeMaterialData.ofBlockState(this.blockData.setValue(property, direction));
-		} else
-		{
+		} else {
 			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}
 

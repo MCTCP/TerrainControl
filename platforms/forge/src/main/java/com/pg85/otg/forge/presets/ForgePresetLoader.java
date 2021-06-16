@@ -39,6 +39,7 @@ import net.minecraft.world.biome.Biome;
 import com.pg85.otg.gen.biome.NewBiomeData;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
@@ -199,7 +200,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 				} else {
 					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
 				}
- 				 				 				
+				
+				// Add biome dictionary tags for Forge
+				biomeConfig.getBiomeDictTags().forEach(biomeDictId -> {
+					if(biomeDictId != null && biomeDictId.trim().length() > 0)
+					{
+						BiomeDictionary.addTypes(registryKey, BiomeDictionary.Type.getType(biomeDictId.trim()));
+					}
+				});
+
 				presetIdMapping[otgBiomeId] = biomeConfig;
 				presetReverseIdMapping.put(biomeConfig, otgBiomeId);
 

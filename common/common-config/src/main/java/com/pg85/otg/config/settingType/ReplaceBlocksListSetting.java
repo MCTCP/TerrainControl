@@ -16,27 +16,27 @@ import java.util.List;
  */
 class ReplaceBlocksListSetting extends Setting<List<ReplaceBlocks>>
 {
-    ReplaceBlocksListSetting(String name)
-    {
-        super(name);
-    }
+	ReplaceBlocksListSetting(String name)
+	{
+		super(name);
+	}
 
-    @Override
-    public List<ReplaceBlocks> getDefaultValue(IMaterialReader materialReader)
-    {
-        return Collections.emptyList();
-    }
+	@Override
+	public List<ReplaceBlocks> getDefaultValue(IMaterialReader materialReader)
+	{
+		return Collections.emptyList();
+	}
 
-    @Override
-    public List<ReplaceBlocks> read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        return ReplaceBlocks.fromJson(string);
-    }
+	@Override
+	public List<ReplaceBlocks> read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		return ReplaceBlocks.fromJson(string);
+	}
 
-    @Override
-    public String write(List<ReplaceBlocks> groups)
-    {
-        return ReplaceBlocks.toJson(groups);
-    }
+	@Override
+	public String write(List<ReplaceBlocks> groups)
+	{
+		return ReplaceBlocks.toJson(groups);
+	}
 
 }

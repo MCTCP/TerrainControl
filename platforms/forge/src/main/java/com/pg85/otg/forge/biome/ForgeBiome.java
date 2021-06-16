@@ -103,6 +103,7 @@ public class ForgeBiome implements IBiome
 				.skyColor(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
 		;
 
+		@SuppressWarnings("deprecation")
 		Optional<ParticleType<?>> particleType = Registry.PARTICLE_TYPE.getOptional(new ResourceLocation(biomeConfig.getParticleType()));
 		if(particleType.isPresent() && particleType.get() instanceof IParticleData)
 		{
@@ -181,9 +182,9 @@ public class ForgeBiome implements IBiome
 		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
 		if (category == null)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+			OTG.log(LogMarker.INFO, "Could not parse biome category " + biomeConfig.getBiomeCategory());
 		}
-
+		
 		return biomeBuilder.build().setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()));
 	}
 

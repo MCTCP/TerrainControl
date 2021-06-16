@@ -172,7 +172,6 @@ public abstract class LocalPresetLoader
 		for (BiomeConfigStub biomeConfigStub : biomeConfigStubs.values())
 		{
 			// Inheritance
-			processInheritance(biomeConfigStubs, biomeConfigStub, 0, logger);
 			processMobInheritance(biomeConfigStubs, biomeConfigStub, 0, logger);
 
 			// Settings reading
@@ -183,10 +182,6 @@ public abstract class LocalPresetLoader
 			if(write)
 			{
 				Path writeFile = biomeConfigStub.getPath();
-				if (!biomeConfig.getBiomeExtends().isEmpty())
-				{
-					writeFile = Paths.get(writeFile + ".inherited");
-				}
 				FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile.toFile(), worldConfig.getSettingsMode(), logger);
 			}
 		}
@@ -214,53 +209,6 @@ public abstract class LocalPresetLoader
 				worldConfig.setMaxSmoothRadius(biomeConfig.getCHCSmoothRadius());
 			}
 		}
-	}
-
-	private static void processInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth, ILogger logger)
-	{
-		if (biomeConfigStub.biomeExtendsProcessed)
-		{
-			// Already processed
-			return;
-		}
-
-		String extendedBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.BIOME_EXTENDS, logger, null);
-		if (extendedBiomeName.isEmpty())
-		{
-			// Not extending anything
-			biomeConfigStub.biomeExtendsProcessed = true;
-			return;
-		}
-
-		// This biome extends another biome
-		BiomeConfigStub extendedBiomeConfig = biomeConfigStubs.get(extendedBiomeName);
-		if (extendedBiomeConfig == null)
-		{
-			OTG.log(LogMarker.WARN, 
-				"The biome {} tried to extend the biome {}, but that biome doesn't exist.", 
-				biomeConfigStub.getBiomeName(), extendedBiomeName);
-			return;
-		}
-
-		// Check for too much recursion
-		if (currentDepth > MAX_INHERITANCE_DEPTH)
-		{
-			OTG.log(LogMarker.FATAL,
-				"The biome {} cannot extend the biome {} - too much configs processed already! Cyclical inheritance?",
-				biomeConfigStub.getBiomeName(), extendedBiomeConfig.getBiomeName());
-		}
-
-		if (!extendedBiomeConfig.biomeExtendsProcessed)
-		{
-			// This biome has not been processed yet, do that first
-			processInheritance(biomeConfigStubs, extendedBiomeConfig, currentDepth + 1, logger);
-		}
-
-		// Merge the two
-		biomeConfigStub.getSettings().setFallback(extendedBiomeConfig.getSettings());
-
-		// Done
-		biomeConfigStub.biomeExtendsProcessed = true;
 	}
 
 	private static void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth, ILogger logger)

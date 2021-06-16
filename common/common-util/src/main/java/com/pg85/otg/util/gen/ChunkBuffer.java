@@ -11,41 +11,41 @@ public abstract class ChunkBuffer
 {
 
 	/**
-     * Gets the chunk coordinate of this buffer.
-     * 
-     * @return The chunk coordinate.
-     */
+	 * Gets the chunk coordinate of this buffer.
+	 * 
+	 * @return The chunk coordinate.
+	 */
 	public abstract ChunkCoordinate getChunkCoordinate();
 
-    /**
-     * Sets the block at the given location in the chunk. The implementation may
-     * ignore block data or may ignore blocks with ids larger than 255.
-     *
-     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
-     *               - 1), inclusive.
-     * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
-     *               - 1), inclusive.
-     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
-     *               - 1), inclusive.
-     * @param material The material to set the block to.
-     */
-    public abstract void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material);
+	/**
+	 * Sets the block at the given location in the chunk. The implementation may
+	 * ignore block data or may ignore blocks with ids larger than 255.
+	 *
+	 * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
+	 *				- 1), inclusive.
+	 * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
+	 *				- 1), inclusive.
+	 * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
+	 *				- 1), inclusive.
+	 * @param material The material to set the block to.
+	 */
+	public abstract void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material);
 
-    /**
-     * Gets the block material at the given position.
-     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
-     *               - 1), inclusive.
-     * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
-     *               - 1), inclusive.
-     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
-     *               - 1), inclusive.
-     * @return The block material.
-     */
-    public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
+	/**
+	 * Gets the block material at the given position.
+	 * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
+	 *				- 1), inclusive.
+	 * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
+	 *				- 1), inclusive.
+	 * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
+	 *				- 1), inclusive.
+	 * @return The block material.
+	 */
+	public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
 
-    // TODO: Are these really necessary, can use heightmaps?
-    
-    private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
+	// TODO: Are these really necessary, can use heightmaps?
+	
+	private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
 	public int getHighestBlockForColumn(int blockX, int blockZ)
 	{
 		return highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ];

@@ -15,15 +15,15 @@ import java.util.function.Predicate;
 @Mixin(ChunkManager.class)
 public class MixinChunkManager
 {
-    @ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 0))
-    private Predicate<ChunkHolder> alwaysAccessibleFlush(Predicate<ChunkHolder> chunk)
-    {
-        return c -> true;
-    }
+	@ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 0))
+	private Predicate<ChunkHolder> alwaysAccessibleFlush(Predicate<ChunkHolder> chunk)
+	{
+		return c -> true;
+	}
 	
-    @ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 1))
-    private Predicate<IChunk> allowChunkPrimerFlush(Predicate<IChunk> chunk)
-    {
-        return c -> c instanceof ChunkPrimer || c instanceof ChunkPrimerWrapper || c instanceof Chunk;
-    }   
+	@ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 1))
+	private Predicate<IChunk> allowChunkPrimerFlush(Predicate<IChunk> chunk)
+	{
+		return c -> c instanceof ChunkPrimer || c instanceof ChunkPrimerWrapper || c instanceof Chunk;
+	}	
 }

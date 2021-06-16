@@ -228,8 +228,8 @@ public class SpigotMaterialData extends LocalMaterialData
 	public boolean isLiquid()
 	{
 		return this.blockData != null
-			   && (this.blockData.getMaterial() == Material.WATER
-				   || this.blockData.getMaterial() == Material.LAVA);
+				&& (this.blockData.getMaterial() == Material.WATER
+					|| this.blockData.getMaterial() == Material.LAVA);
 	}
 
 	@Override
@@ -337,9 +337,11 @@ public class SpigotMaterialData extends LocalMaterialData
 		return this.rotated;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
 	{
+		@SuppressWarnings("rawtypes")
 		IBlockState property = null;
 		T finalVal = value;
 
