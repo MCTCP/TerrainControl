@@ -165,7 +165,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 		LocalMaterialData checkBlock = !spawnWater || !spawnLava ? worldGenRegion.getMaterial(x, y + 2, z, chunkBeingDecorated) : null;
 		if(checkBlock == null)
 		{
-			// Tried to spawn in unloaded chunks when populationBoundsCheck:false.
+			// Tried to spawn in unloaded chunks when decorationBoundsCheck:false.
 			return false;
 		}
 		if (!spawnWater)
@@ -221,7 +221,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			
 			if(!loadedChunks.contains(chunkCoord))
 			{	 
-				if(chunkBeingDecorated != null && !ChunkCoordinate.IsInAreaBeingPopulated(x + point.x, z + point.z, chunkBeingDecorated))
+				if(chunkBeingDecorated != null && !ChunkCoordinate.isInAreaBeingDecorated(x + point.x, z + point.z, chunkBeingDecorated))
 				//if (!world.chunkExists((x + point.x), (y + point.y), (z + point.z)))
 				{
 					// Cannot spawn BO2, part of world is not loaded
@@ -326,7 +326,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 		return true;
 	}
 
-	// Called during population.
+	// Called during decoration.
 	@Override
 	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord)
 	{

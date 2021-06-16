@@ -670,7 +670,7 @@ public class BiomeConfig extends BiomeConfigBase
 		);
 
 		writer.header1("Resource queue",
-			"This section controls all resources spawning during population.",
+			"This section controls all resources spawning during decoration.",
 			"The resources will be placed in this order.",
 			"",
 			"Keep in mind that a high size, frequency or rarity may slow down terrain generation.",

@@ -288,7 +288,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Population / decoration
 
-	// Does population for a given pos/chunk
+	// Does decoration for a given pos/chunk
 	@Override
 	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
@@ -315,7 +315,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}	
 	}
 
-	// Chunk population method taken from Biome class
+	// Chunk decoration method taken from Biome class
 	@SuppressWarnings("deprecation")
 	private void biomeDecorate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{

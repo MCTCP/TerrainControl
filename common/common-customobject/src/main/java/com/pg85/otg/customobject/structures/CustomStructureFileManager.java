@@ -49,12 +49,12 @@ public class CustomStructureFileManager
 {
 	// Plotted chunks
 	
-	public static void savePlottedChunksData(Path worldSaveDir, int dimensionId, Map<ChunkCoordinate, PlottedChunksRegion> populatedChunks, boolean spawnLog, ILogger logger)
+	public static void savePlottedChunksData(Path worldSaveDir, int dimensionId, Map<ChunkCoordinate, PlottedChunksRegion> decoratedChunks, boolean spawnLog, ILogger logger)
 	{
 		int regionsSaved = 0;
-		if(populatedChunks.size() > 0)
+		if(decoratedChunks.size() > 0)
 		{
-			for(Entry<ChunkCoordinate, PlottedChunksRegion> chunkPerRegionEntry : populatedChunks.entrySet())
+			for(Entry<ChunkCoordinate, PlottedChunksRegion> chunkPerRegionEntry : decoratedChunks.entrySet())
 			{
 				if(!chunkPerRegionEntry.getValue().requiresSave())
 				{

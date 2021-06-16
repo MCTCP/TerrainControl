@@ -307,7 +307,7 @@ public class BO4CustomStructure extends CustomStructure
 		{
 			startChunkBlockChecksDone = true;
 
-			// Requesting the Y position or material of a block in an unpopulated chunk causes some of that chunk's blocks to be calculated, this is expensive and should be kept at a minimum.
+			// Requesting the Y position or material of a block in an undecorated chunk causes some of that chunk's blocks to be calculated, this is expensive and should be kept at a minimum.
 
 			// Y checks:
 			// If BO3's have a minimum and maximum Y configured by the player then we don't really need
@@ -363,7 +363,7 @@ public class BO4CustomStructure extends CustomStructure
 				{
 					startY = (short) (worldGenRegion.getBiomeConfig(centerX, centerZ).getWaterLevelMax());
 				} else {
-					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
+					// Passing null for chunk being decorated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
 					int highestBlock = worldGenRegion.getHighestBlockYAt(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true, null);
 					if(highestBlock < 0)
 					{

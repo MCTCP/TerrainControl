@@ -121,7 +121,7 @@ public class BO4 implements StructuredCustomObject
 		return false;
 	}
 			
-	// BO4 CustomStructures cannot be force-spawned, only plotted in unloaded chunks and then spawned when the chunk is populated.
+	// BO4 CustomStructures cannot be force-spawned, only plotted in unloaded chunks and then spawned when the chunk is decorated.
 	@Override
 	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
 	{
@@ -151,7 +151,7 @@ public class BO4 implements StructuredCustomObject
 		return getConfig().isCollidable();
 	}
 	
-	// BO4's should always spawn within population bounds, so there is no SpawnForced, only TrySpawnAt
+	// BO4's should always spawn within decoration bounds, so there is no SpawnForced, only TrySpawnAt
 	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingDecorated, boolean doBiomeConfigReplaceBlocks)
 	{
 			//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
@@ -719,7 +719,7 @@ public class BO4 implements StructuredCustomObject
 			{
 				if(spawnLog)
 				{
-					logger.log(LogMarker.WARN, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
+					logger.log(LogMarker.WARN, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being decorated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
 				}
 			}
 	

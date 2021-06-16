@@ -51,12 +51,12 @@ class TreeObject implements CustomObject
 		return true;
 	}
 	
-	// Called during population.
+	// Called during decoration.
 	@Override
 	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord)
 	{
 		// A tree has no frequency or rarity, so spawn it once in the chunk
-		// Make sure we stay within population bounds.
+		// Make sure we stay within decoration bounds.
 		int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 		int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 				

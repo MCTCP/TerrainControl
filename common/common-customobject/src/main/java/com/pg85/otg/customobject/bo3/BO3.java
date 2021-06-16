@@ -195,7 +195,7 @@ public class BO3 implements StructuredCustomObject
 	}
 
 	// This method is only used to spawn CustomObject.
-	// Called during population.
+	// Called during decoration.
 	@Override
 	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord)
 	{
@@ -220,7 +220,7 @@ public class BO3 implements StructuredCustomObject
 		return atLeastOneObjectHasSpawned;
 	}
 
-	// Used for trees during population
+	// Used for trees during decoration
 	@Override
 	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated)
 	{
@@ -302,7 +302,7 @@ public class BO3 implements StructuredCustomObject
 				chunkCoord = ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z);
 			if(!loadedChunks.contains(chunkCoord))
 			{
-				if(chunkBeingDecorated != null && !ChunkCoordinate.IsInAreaBeingPopulated(x + block.x, z + block.z, chunkBeingDecorated))
+				if(chunkBeingDecorated != null && !ChunkCoordinate.isInAreaBeingDecorated(x + block.x, z + block.z, chunkBeingDecorated))
 				//if(!world.chunkExists(x + block.x, y + block.y, z + block.z)) 
 				{
 					// Cannot spawn BO3, part of world is not loaded
