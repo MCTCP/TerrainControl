@@ -39,15 +39,15 @@ import net.minecraft.world.server.ServerWorld;
 
 /**
  * Shadow chunk generation means generating base terrain for chunks
- * without using mc's world generation flow. OTG's chunkgenerator is 
- * called internally to generate base terrain for dummy chunks in a 
+ * without using mc's world generation flow. OTG's chunkgenerator is
+ * called internally to generate base terrain for dummy chunks in a
  * thread-safe/non-blocking way. Shadowgenned chunks are stored in a
- * fixed size FIFO cache, data is reused when base terraingen is requested 
- * for those chunks via normal worldgen. Shadowgen is used for BO4's, 
+ * fixed size FIFO cache, data is reused when base terraingen is requested
+ * for those chunks via normal worldgen. Shadowgen is used for BO4's,
  * worker threads to speed up world generation and /otg mapterrain.
- * 
- * Shadowgen can only be done for chunks that don't contain vanilla structures, 
- * since those structures may use density based smoothing applied during noisegen, 
+ *
+ * Shadowgen can only be done for chunks that don't contain vanilla structures,
+ * since those structures may use density based smoothing applied during noisegen,
  * which unfortunately is done in a non-thread-safe/blocking manner, necessitating
  * the use of a WorldGenRegion.
  */
@@ -56,7 +56,7 @@ public class ShadowChunkGenerator
 	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
 	private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);
-	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);	
+	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
 	private final Object workerLock = new Object();
 	private final int maxConcurrent;
@@ -89,9 +89,9 @@ public class ShadowChunkGenerator
 			}
 		}
 	}
-	
+
 	// Whenever MC requests noisegen/base terrain gen for a chunk, it also exposes a cache of chunks currently loaded/queued.
-	// These chunks are highly likely to be requested next, so we can filter out any that need noisegen/base terrain gen and 
+	// These chunks are highly likely to be requested next, so we can filter out any that need noisegen/base terrain gen and
 	// pre-emptively generate and cache them asynchronously. When MC requests those chunks a moment later as part of worldgen,
 	// we return the async generated chunk data.
 	public void queueChunksForWorkerThreads(WorldGenRegion worldGenRegion, StructureManager manager, IChunk chunk, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
@@ -133,7 +133,7 @@ public class ShadowChunkGenerator
 								if(!bFound)
 								{
 									// TODO: Queue order shouldn't really matter bc
-									// of the way maxQueueSize is enforced here. 
+									// of the way maxQueueSize is enforced here.
 									// Might affect cache hits/misses and waits tho, test?
 									this.chunksToLoad.addFirst(wgrChunkCoord);
 									if(this.chunksToLoad.size() == this.maxQueueSize)
@@ -148,15 +148,15 @@ public class ShadowChunkGenerator
 			}
 		}
 	}
-	
+
 	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
 		ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ForgeChunkBuffer buffer = new ForgeChunkBuffer(chunk);
-		
+
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
 		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
-		// BO4's/shadowgen avoid villages, so this method should never be called to fetch unloaded chunks that contain villages, 
+		// BO4's/shadowgen avoid villages, so this method should never be called to fetch unloaded chunks that contain villages,
 		// so we can skip noisegen affecting structures here.
 		// *TODO: Do we need to avoid any noisegen affecting structures other than villages?
 
@@ -166,7 +166,7 @@ public class ShadowChunkGenerator
 		otgChunkGenerator.populateNoise(worldHeightCap, random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return buffer;
 	}
-	
+
 	public IChunk getChunkWithWait(ChunkCoordinate chunkCoord)
 	{
 		// Fetch the chunk if it is cached, otherwise check if no other thread
@@ -208,9 +208,9 @@ public class ShadowChunkGenerator
 				}
 			}
 		}
-		
+
 		// A worker thread is generating the chunk, wait.
-		
+
 		while(true)
 		{
 			try {
@@ -247,7 +247,7 @@ public class ShadowChunkGenerator
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 		// Re-use base terrain generated via shadowgen for worldgen.
 		((ChunkPrimer)chunk).sections = ((ChunkPrimer)cachedChunk).sections;
-		((ChunkPrimer)chunk).heightmaps = ((ChunkPrimer)cachedChunk).heightmaps;			
+		((ChunkPrimer)chunk).heightmaps = ((ChunkPrimer)cachedChunk).heightmaps;
 		((ChunkPrimer)chunk).lights = ((ChunkPrimer)cachedChunk).lights;
 		this.cacheHits++;
 		//OTG.log(LogMarker.INFO, "Cache hit " + this.cacheHits);
@@ -256,7 +256,7 @@ public class ShadowChunkGenerator
 			this.unloadedChunksCache.remove(chunkCoord);
 		}
 	}
-	
+
 	public void setChunkGenerated(ChunkCoordinate chunkCoord)
 	{
 		this.cacheMisses++;
@@ -268,15 +268,15 @@ public class ShadowChunkGenerator
 			this.chunksToLoad.remove(chunkCoord);
 		}
 	}
-	
+
 	// Vanilla structure detection (avoidance)
 	// Some vanilla structures use density based smoothing of terrain underneath, which is factored into noisegen.
-	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async 
+	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
-	
+
 	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, DimensionStructuresSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate)
 	{
-		// Since we can't check for structure components/references, only structure starts,  
+		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 5;
 		ChunkPrimer chunk;
@@ -285,7 +285,7 @@ public class ShadowChunkGenerator
 		ChunkCoordinate searchChunk;
 		Boolean result;
 		if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
-		{		
+		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<ChunkCoordinate>();
 			synchronized(this.hasVanillaStructureChunkCache)
 			{
@@ -295,7 +295,7 @@ public class ShadowChunkGenerator
 					{
 						for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
 						{
-							int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));		 
+							int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));
 							if (distance == cycle)
 							{
 								searchChunk = ChunkCoordinate.fromChunkCoords(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset);
@@ -321,7 +321,7 @@ public class ShadowChunkGenerator
 
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 				// based on biome and resource settings (distance etc). Does not plot any structure components.
-				
+
 				biome = biomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
 				for(Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().structures())
 				{
@@ -346,7 +346,7 @@ public class ShadowChunkGenerator
 		}
 		return false;
 	}
-	
+
 	// Taken from PillagerOutpostStructure.isNearVillage
 	private static boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DimensionStructuresSettings dimensionStructuresSettings, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
@@ -356,7 +356,7 @@ public class ShadowChunkGenerator
 			SharedSeedRandom sharedSeedRandom = new SharedSeedRandom();
 			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
 			if (
-				chunkPos.x == chunkPosPotential.x && 
+				chunkPos.x == chunkPosPotential.x &&
 				chunkPos.z == chunkPosPotential.z
 			) {
 				return true;
@@ -365,25 +365,25 @@ public class ShadowChunkGenerator
 		}
 		return false;
 	}
-	
+
 	// /otg mapterrain
-	
-	// /otg mapterrain fetches chunks in order to create a map of base terrain, without touching any of the caches or 
+
+	// /otg mapterrain fetches chunks in order to create a map of base terrain, without touching any of the caches or
 	// resources used for worldgen or bo4 shadowgen, since the chunks aren't actually supposed to generate in the world.
 	// We won't get any density based smoothing applied to noisegen for vanilla structures, but that's ok for /otg mapterrain.
-	
+
 	public ForgeChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
 		return getUnloadedChunk(otgChunkGenerator, worldHeightCap, random, chunkCoordinate);
 	}
-	
+
 	// BO4's / Smoothing Areas
 
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks during population/decoration.
 	// Shadowgen is used to do this without causing cascades. Shadowgenned chunks are requested on-demand for the worldgen thread (BO4's).
-	// Async worker threads may also pre-emptively shadowgen and cache unloaded chunks, which speeds up base terrain generation but also BO4's. 
+	// Async worker threads may also pre-emptively shadowgen and cache unloaded chunks, which speeds up base terrain generation but also BO4's.
 	// Note: BO4's are always processed on the worldgen thread, never on a worker thread, since they are not a part of base terrain generation.
-	
+
 	private LocalMaterialData[] getBlockColumnInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z)
 	{
 		BlockPos2D blockPos = new BlockPos2D(x, z);
@@ -394,7 +394,7 @@ public class ShadowChunkGenerator
 		byte blockZ = (byte) (z &= 0xF);
 
 		LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
-	
+
 		if (cachedColumn != null)
 		{
 			return cachedColumn;
@@ -412,7 +412,7 @@ public class ShadowChunkGenerator
 				this.chunksBeingLoaded[this.maxConcurrent] = null;
 			}
 		}
-		
+
 		cachedColumn = new LocalMaterialData[256];
 
 		LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
@@ -466,18 +466,18 @@ public class ShadowChunkGenerator
 		}
 		return height;
 	}
-	
+
 	// Async Worker for generating chunks up to ChunkStatus.NOISE.
-	// This is only used for chunks that don't require density based 
-	// smoothing for vanilla structures, since that cannot be done 
+	// This is only used for chunks that don't require density based
+	// smoothing for vanilla structures, since that cannot be done
 	// in a thread-safe/non-blocking manner.
-	
+
 	private class Worker implements Runnable
 	{
 		private Thread runner;
 		private boolean stop = false;
 		private Random worldRandom;
-		
+
 		private final int index;
 		private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache;
 		private final List<ChunkCoordinate> chunksToLoad;
@@ -502,19 +502,19 @@ public class ShadowChunkGenerator
 			this.dimensionStructuresSettings = dimensionStructuresSettings;
 			this.worldHeightCap = worldHeightCap;
 		}
-	
+
 		public void start(Random worldRandom)
 		{
 			this.runner = new Thread(this);
 			this.runner.start();
 			this.worldRandom = worldRandom;
 		}
-		
+
 		public void stop()
 		{
 			this.stop = true;
 		}
-		
+
 		@Override
 		public void run()
 		{
@@ -527,7 +527,7 @@ public class ShadowChunkGenerator
 					this.stop = false;
 					return;
 				}
-				
+
 				ChunkCoordinate coords = null;
 				int sizeLeft;
 				synchronized(workerLock)
@@ -543,7 +543,7 @@ public class ShadowChunkGenerator
 				{
 					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords))
 					{
-						// Generate a chunk without loading/populating it.						
+						// Generate a chunk without loading/populating it.
 						IChunk cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
 						synchronized(workerLock)
 						{

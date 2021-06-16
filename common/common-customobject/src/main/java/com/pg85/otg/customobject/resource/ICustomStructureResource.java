@@ -16,13 +16,13 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public interface ICustomStructureResource
 {
-	// This code is only used for BO3 custom structures, they share the same biomeconfig 
+	// This code is only used for BO3 custom structures, they share the same biomeconfig
 	// resource with bo4's though, so this is probably as clean a separation as we'll get.
-	
+
 	default void processForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// TODO: Fire Forge resource decoration events, when they're available.
-			spawnForChunkDecoration(structureCache, worldGenRegion, random, villageInChunk, chunkBeingPopulated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);			
+			spawnForChunkDecoration(structureCache, worldGenRegion, random, villageInChunk, chunkBeingPopulated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	// Only used for BO3 CustomStructure
@@ -30,7 +30,7 @@ public interface ICustomStructureResource
 	{
 		// Don't process BO4's, they're plotted and spawned separately from other resources.
 		if(worldGenRegion.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
-		{	
+		{
 			// Find all structures that reach this chunk, and spawn them
 			int searchRadius = worldGenRegion.getWorldConfig().getMaximumCustomStructureRadius();
 			int currentChunkX = chunkBeingPopulated.getChunkX();
@@ -48,5 +48,5 @@ public interface ICustomStructureResource
 				}
 			}
 		}
-	}	
+	}
 }
