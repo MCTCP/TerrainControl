@@ -228,8 +228,8 @@ public class SpigotMaterialData extends LocalMaterialData
 	public boolean isLiquid()
 	{
 		return this.blockData != null
-			   && (this.blockData.getMaterial() == Material.WATER
-				   || this.blockData.getMaterial() == Material.LAVA);
+				&& (this.blockData.getMaterial() == Material.WATER
+					|| this.blockData.getMaterial() == Material.LAVA);
 	}
 
 	@Override

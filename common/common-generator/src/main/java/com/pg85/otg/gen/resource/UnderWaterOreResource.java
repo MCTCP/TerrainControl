@@ -19,65 +19,65 @@ import java.util.Random;
 public class UnderWaterOreResource extends FrequencyResourceBase
 {
 	private final LocalMaterialData material;
-    private final int size;
-    private final MaterialSet sourceBlocks;
+	private final int size;
+	private final MaterialSet sourceBlocks;
 
-    public UnderWaterOreResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
-    {
-    	super(biomeConfig, args, logger, materialReader);
-        assureSize(5, args);
-        this.material = materialReader.readMaterial(args.get(0));
-        this.size = readInt(args.get(1), 1, 8);
-        this.frequency = readInt(args.get(2), 1, 100);
-        this.rarity = readRarity(args.get(3));
-        this.sourceBlocks = readMaterials(args, 4, materialReader);
-    }
+	public UnderWaterOreResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		super(biomeConfig, args, logger, materialReader);
+		assureSize(5, args);
+		this.material = materialReader.readMaterial(args.get(0));
+		this.size = readInt(args.get(1), 1, 8);
+		this.frequency = readInt(args.get(2), 1, 100);
+		this.rarity = readRarity(args.get(3));
+		this.sourceBlocks = readMaterials(args, 4, materialReader);
+	}
 
-    @Override
-    public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
-    {
-        int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
-        if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
-        {
-            return;
-        }
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+	{
+		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
+		if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
+		{
+			return;
+		}
 
-        if(worldGenRegion.getWorldConfig().isDisableOreGen())
-        {
-    		if(this.material.isOre())
-        	{
-        		return;
-        	}
-        }
-        
-        int currentSize = rand.nextInt(this.size) + 2;
-        int deltaX;
-        int deltaZ;
-        LocalMaterialData sourceBlock;
-        for (int currentX = x - currentSize; currentX <= x + currentSize; currentX++)
-        {
-            for (int currentZ = z - currentSize; currentZ <= z + currentSize; currentZ++)
-            {
-                deltaX = currentX - x;
-                deltaZ = currentZ - z;
-                if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
-                {
-                    for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
-                    {
-                        sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
-                        if (this.sourceBlocks.contains(sourceBlock))
-                        {
-                        	worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    @Override
-    public String toString()
-    {
-        return "UnderWaterOre(" + this.material + "," + this.size + "," + this.frequency + "," + this.rarity + makeMaterials(this.sourceBlocks) + ")";
-    }    
+		if(worldGenRegion.getWorldConfig().isDisableOreGen())
+		{
+			if(this.material.isOre())
+			{
+				return;
+			}
+		}
+		
+		int currentSize = rand.nextInt(this.size) + 2;
+		int deltaX;
+		int deltaZ;
+		LocalMaterialData sourceBlock;
+		for (int currentX = x - currentSize; currentX <= x + currentSize; currentX++)
+		{
+			for (int currentZ = z - currentSize; currentZ <= z + currentSize; currentZ++)
+			{
+				deltaX = currentX - x;
+				deltaZ = currentZ - z;
+				if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
+				{
+					for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
+					{
+						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
+						if (this.sourceBlocks.contains(sourceBlock))
+						{
+							worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "UnderWaterOre(" + this.material + "," + this.size + "," + this.frequency + "," + this.rarity + makeMaterials(this.sourceBlocks) + ")";
+	}	
 }

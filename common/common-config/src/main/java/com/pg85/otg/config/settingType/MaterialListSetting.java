@@ -16,57 +16,57 @@ import com.pg85.otg.util.materials.LocalMaterialData;
  */
 public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 {
-    private final String[] defaultValue;
-    private boolean processedMaterials;
-    private LocalMaterialData[] defaultMaterials;
+	private final String[] defaultValue;
+	private boolean processedMaterials;
+	private LocalMaterialData[] defaultMaterials;
 
-    public MaterialListSetting(String name, String[] defaultValue)
-    {
-        super(name);
-        this.defaultValue = defaultValue;
-    }
+	public MaterialListSetting(String name, String[] defaultValue)
+	{
+		super(name);
+		this.defaultValue = defaultValue;
+	}
 
-    @Override
-    public ArrayList<LocalMaterialData> getDefaultValue(IMaterialReader materialReader)
-    {
-    	if(!processedMaterials)
-    	{
-    		processedMaterials = true;
-	    	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
-	    	for(String defaultMaterial : defaultValue)
-	    	{
-	    		LocalMaterialData material = null;
+	@Override
+	public ArrayList<LocalMaterialData> getDefaultValue(IMaterialReader materialReader)
+	{
+		if(!processedMaterials)
+		{
+			processedMaterials = true;
+			ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
+			for(String defaultMaterial : defaultValue)
+			{
+				LocalMaterialData material = null;
 				try {
 					material = materialReader.readMaterial(defaultMaterial);
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	    		if(material != null)
-	    		{
-	    			materials.add(material);
-	    		}
-	    	}
-    	}
-    	return this.defaultMaterials == null ? new ArrayList<LocalMaterialData>() : new ArrayList<LocalMaterialData>(Arrays.asList(this.defaultMaterials));
-    }
+				if(material != null)
+				{
+					materials.add(material);
+				}
+			}
+		}
+		return this.defaultMaterials == null ? new ArrayList<LocalMaterialData>() : new ArrayList<LocalMaterialData>(Arrays.asList(this.defaultMaterials));
+	}
 
-    @Override
-    public ArrayList<LocalMaterialData> read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-    	String[] materialNames = string.split(",");
-    	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
-    	for(String materialName : materialNames)
-    	{
-    		LocalMaterialData material = materialReader.readMaterial(materialName.trim());
+	@Override
+	public ArrayList<LocalMaterialData> read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		String[] materialNames = string.split(",");
+		ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
+		for(String materialName : materialNames)
+		{
+			LocalMaterialData material = materialReader.readMaterial(materialName.trim());
 			materials.add(material);
-    	}
-        return materials;
-    }
-    
-    @Override
-    public String write(ArrayList<LocalMaterialData> value)
-    {
-        return StringHelper.join(value, ", ");
-    }
+		}
+		return materials;
+	}
+	
+	@Override
+	public String write(ArrayList<LocalMaterialData> value)
+	{
+		return StringHelper.join(value, ", ");
+	}
 }

@@ -313,9 +313,9 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
 			"Each time " + Constants.MOD_ID + " reads the config files it can also write to them. With this setting you can change how this behaves. Possible modes:",
-			"   WriteAll - Auto-update settings from old versions, order them, add comments, reset invalid settings and remove custom comments. (Recommended)",
-			"   WriteWithoutComments - Same as WriteAll, but removes all comments, both the ones added by OTG and custom ones. Removing comments is a recommended optimization for release versions of presets.",
-			"   WriteDisable - Doesn't write to the config files. Errors are not corrected, old settings are read but are not corrected. Custom comments won't be removed with this mode."
+			"	WriteAll - Auto-update settings from old versions, order them, add comments, reset invalid settings and remove custom comments. (Recommended)",
+			"	WriteWithoutComments - Same as WriteAll, but removes all comments, both the ones added by OTG and custom ones. Removing comments is a recommended optimization for release versions of presets.",
+			"	WriteDisable - Doesn't write to the config files. Errors are not corrected, old settings are read but are not corrected. Custom comments won't be removed with this mode."
 		);
 		
 		writer.header2("World Identity");
@@ -354,16 +354,16 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.BIOME_MODE, this.biomeMode,
 			"Possible biome modes:",
-			"   Normal - standard random generation with biome groups, uses all features.",
-			"   FromImage - biome layout defined by an image file.",
-			"   NoGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes."
+			"	Normal - standard random generation with biome groups, uses all features.",
+			"	FromImage - biome layout defined by an image file.",
+			"	NoGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes."
 		);
 
 		writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.modeTerrain,
 			"Possible terrain modes:",
-			"   Normal - standard generation, uses all features",
-			"   TerrainTest - generate only terrain without any resources (useful for testing purposes)",
-			"   NotGenerate - generate empty chunks"
+			"	Normal - standard generation, uses all features",
+			"	TerrainTest - generate only terrain without any resources (useful for testing purposes)",
+			"	NotGenerate - generate empty chunks"
 		);
 		
 		writer.header1("Settings for BiomeMode: Normal/NoGroups");
@@ -494,10 +494,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.IMAGE_MODE, this.imageMode,
 			"Defines what to do when terrain is generated outside the boundaries of the image:",
-			"   Repeat - repeats the image",
-			"   Mirror - repeats and mirrors the image",
-			"   ContinueNormal - continues with random generation, using settings for BiomeMode: Normal",
-			"   FillEmpty - fills the space with one biome (defined below)"
+			"	Repeat - repeats the image",
+			"	Mirror - repeats and mirrors the image",
+			"	ContinueNormal - continues with random generation, using settings for BiomeMode: Normal",
+			"	FillEmpty - fills the space with one biome (defined below)"
 		);
 
 		writer.putSetting(WorldStandardValues.IMAGE_FILE, this.imageFile,

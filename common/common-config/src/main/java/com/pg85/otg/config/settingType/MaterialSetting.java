@@ -12,34 +12,34 @@ import com.pg85.otg.util.materials.LocalMaterialData;
  */
 public class MaterialSetting extends Setting<LocalMaterialData>
 {
-    private final String defaultValue;
-    private boolean processedMaterial = false;
-    private LocalMaterialData defaultMaterial;
+	private final String defaultValue;
+	private boolean processedMaterial = false;
+	private LocalMaterialData defaultMaterial;
 
-    public MaterialSetting(String name, String defaultValue)
-    {
-        super(name);
-        this.defaultValue = defaultValue;
-    }
+	public MaterialSetting(String name, String defaultValue)
+	{
+		super(name);
+		this.defaultValue = defaultValue;
+	}
 
-    @Override
-    public LocalMaterialData getDefaultValue(IMaterialReader materialReader)
-    {    	
-    	if(!processedMaterial)
-    	{
-    		processedMaterial = true;
-	        try {
+	@Override
+	public LocalMaterialData getDefaultValue(IMaterialReader materialReader)
+	{		
+		if(!processedMaterial)
+		{
+			processedMaterial = true;
+			try {
 				defaultMaterial = materialReader.readMaterial(defaultValue);
 			} catch (InvalidConfigException e) {
 				e.printStackTrace();
 			}
-    	}
-        return defaultMaterial;
-    }
+		}
+		return defaultMaterial;
+	}
 
-    @Override
-    public LocalMaterialData read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-    	return materialReader.readMaterial(string);
-    }
+	@Override
+	public LocalMaterialData read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		return materialReader.readMaterial(string);
+	}
 }

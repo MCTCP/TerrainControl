@@ -15,9 +15,9 @@ import com.pg85.otg.logging.Logger.LogLevels;
  */
 public interface IPluginConfig
 {
-    public LogLevels getLogLevel();
-    public int getMaxWorkerThreads();
-    public boolean getDeveloperModeEnabled();
-    public boolean getSpawnLogEnabled();
-    public ConfigMode getSettingsMode();
+	public LogLevels getLogLevel();
+	public int getMaxWorkerThreads();
+	public boolean getDeveloperModeEnabled();
+	public boolean getSpawnLogEnabled();
+	public ConfigMode getSettingsMode();
 }

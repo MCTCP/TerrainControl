@@ -70,8 +70,8 @@ public class BO3Creator extends BOCreator
 
 	// Use this to make the BO3 config
 	private static BO3Config makeBO3Config(BO3Config template, String objectName, File bo3File, ILogger logger, Corner max, Corner min,
-										   List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetFolderName, Path rootPath, boolean spawnLog,
-										   CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
+											List<BO3BlockFunction> blocks, List<BO3BranchFunction> branches, String presetFolderName, Path rootPath, boolean spawnLog,
+											CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 		BO3Config config = template.cloneConfigValues(new FileSettingsReaderBO4(objectName, bo3File, logger));
 		if (branches != null)

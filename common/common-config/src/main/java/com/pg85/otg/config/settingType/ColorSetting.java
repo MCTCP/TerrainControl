@@ -14,41 +14,41 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
  */
 class ColorSetting extends Setting<Integer>
 {
-    private int defaultValue;
+	private int defaultValue;
 
-    ColorSetting(String name, String defaultValue)
-    {
-        super(name);
-        this.defaultValue = Integer.decode(defaultValue);
-    }
+	ColorSetting(String name, String defaultValue)
+	{
+		super(name);
+		this.defaultValue = Integer.decode(defaultValue);
+	}
 
-    @Override
-    public Integer getDefaultValue(IMaterialReader materialReader)
-    {
-        return defaultValue;
-    }
+	@Override
+	public Integer getDefaultValue(IMaterialReader materialReader)
+	{
+		return defaultValue;
+	}
 
-    @Override
-    public Integer read(String string, IMaterialReader materialReader) throws InvalidConfigException
-    {
-        try
-        {
-            Integer integer = Integer.decode(string);
-            if (integer.intValue() > 0xffffff || integer.intValue() < 0)
-            {
-                throw new InvalidConfigException("Color must have 6 hexadecimal digits");
-            }
-            return integer;
-        } catch (NumberFormatException e)
-        {
-            throw new InvalidConfigException("Invalid color " + string);
-        }
-    }
+	@Override
+	public Integer read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	{
+		try
+		{
+			Integer integer = Integer.decode(string);
+			if (integer.intValue() > 0xffffff || integer.intValue() < 0)
+			{
+				throw new InvalidConfigException("Color must have 6 hexadecimal digits");
+			}
+			return integer;
+		} catch (NumberFormatException e)
+		{
+			throw new InvalidConfigException("Invalid color " + string);
+		}
+	}
 
-    @Override
-    public String write(Integer value)
-    {
-        return "#" + Integer.toHexString(value.intValue() | 0x1000000).substring(1).toUpperCase();
-    }
+	@Override
+	public String write(Integer value)
+	{
+		return "#" + Integer.toHexString(value.intValue() | 0x1000000).substring(1).toUpperCase();
+	}
 
 }

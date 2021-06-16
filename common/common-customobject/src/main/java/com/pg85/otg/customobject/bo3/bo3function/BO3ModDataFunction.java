@@ -8,23 +8,23 @@ import com.pg85.otg.customobject.bofunctions.ModDataFunction;
  */
 public class BO3ModDataFunction extends ModDataFunction<BO3Config>
 {
-    public BO3ModDataFunction rotate()
-    {
-        BO3ModDataFunction rotatedBlock = new BO3ModDataFunction();
-        rotatedBlock.x = z;
-        rotatedBlock.y = y;
-        rotatedBlock.z = -x;
-        rotatedBlock.modId = modId;
-        rotatedBlock.modData = modData;
+	public BO3ModDataFunction rotate()
+	{
+		BO3ModDataFunction rotatedBlock = new BO3ModDataFunction();
+		rotatedBlock.x = z;
+		rotatedBlock.y = y;
+		rotatedBlock.z = -x;
+		rotatedBlock.modId = modId;
+		rotatedBlock.modData = modData;
 
-        return rotatedBlock;
-    }
-    
-    @Override
-    public Class<BO3Config> getHolderType()
-    {
-        return BO3Config.class;
-    }
+		return rotatedBlock;
+	}
+	
+	@Override
+	public Class<BO3Config> getHolderType()
+	{
+		return BO3Config.class;
+	}
 
 	@Override
 	public ModDataFunction<BO3Config> getNewInstance()

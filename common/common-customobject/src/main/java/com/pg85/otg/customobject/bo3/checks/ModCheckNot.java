@@ -4,14 +4,14 @@ import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
 public class ModCheckNot extends ModCheck
 {
-    @Override
-    public String makeString()
-    {
-        return makeString("ModCheckNot");
-    }
+	@Override
+	public String makeString()
+	{
+		return makeString("ModCheckNot");
+	}
 	
-    public boolean evaluate(IModLoadedChecker modLoadedChecker)
-    {
-        return !super.evaluate(modLoadedChecker);
-    }
+	public boolean evaluate(IModLoadedChecker modLoadedChecker)
+	{
+		return !super.evaluate(modLoadedChecker);
+	}
 }

@@ -50,9 +50,9 @@ public final class PluginConfig extends PluginConfigBase
 
 		writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
 			"Possible Config Write Modes:",
-			"   WriteAll			 - Write config files with help comments.",
-			"   WriteWithoutComments - Write config files without help comments.",
-			"   WriteDisable		 - Don't write config files, read-only.",
+			"	WriteAll			 - Write config files with help comments.",
+			"	WriteWithoutComments - Write config files without help comments.",
+			"	WriteDisable		 - Don't write config files, read-only.",
 			"Defaults to: WriteAll",
 			"Writing updates your configs to the currently installed version of OTG."
 		);
@@ -67,11 +67,11 @@ public final class PluginConfig extends PluginConfigBase
 
 		writer.putSetting(PluginConfigStandardValues.LOG_LEVEL, this.logLevel,
 			"Possible Log Levels",
-			"   Off		   - Bare logging; This will only show FATAL and ERROR logs",
-			"   Quiet	   - Minimal logging; This will show FATAL, ERROR, and WARN logs",
-			"   Standard   - Default logging; Logging for normal users. Quiet + INFO logs",
-			"   Debug	   - Above Normal logging; Standard logs + DEBUG logs",
-			"   Trace	   - Verbose logging; This gets very messy, Debug logs + TRACE logs",
+			"	Off			- Bare logging; This will only show FATAL and ERROR logs",
+			"	Quiet		- Minimal logging; This will show FATAL, ERROR, and WARN logs",
+			"	Standard	- Default logging; Logging for normal users. Quiet + INFO logs",
+			"	Debug		- Above Normal logging; Standard logs + DEBUG logs",
+			"	Trace		- Verbose logging; This gets very messy, Debug logs + TRACE logs",
 			"",
 			"Defaults to: Standard"
 		);

@@ -19,23 +19,23 @@ import com.pg85.otg.util.materials.LocalMaterialData;
  */
 public interface SurfaceGenerator
 {
-    /**
-     * Spawns this surface layer in the world.
-     * @param generatingChunk Information about the chunk being generated.
-     * @param chunkBuffer     The chunk buffer.
-     * @param biomeConfig     The biome config to use for the settings.
-     * @param xInWorld        X position in the world.
-     * @param zInWorld        Z position in the world.
-     */
-    void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld);
+	/**
+	 * Spawns this surface layer in the world.
+	 * @param generatingChunk Information about the chunk being generated.
+	 * @param chunkBuffer	 The chunk buffer.
+	 * @param biomeConfig	 The biome config to use for the settings.
+	 * @param xInWorld		X position in the world.
+	 * @param zInWorld		Z position in the world.
+	 */
+	void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld);
 
-    /**
-     * Writes the settings used to a string. There must be a constructor to
-     * read this string again.
-     * 
-     * @return The settings as a string.
-     */
-    String toString();
+	/**
+	 * Writes the settings used to a string. There must be a constructor to
+	 * read this string again.
+	 * 
+	 * @return The settings as a string.
+	 */
+	String toString();
 
 	LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
 

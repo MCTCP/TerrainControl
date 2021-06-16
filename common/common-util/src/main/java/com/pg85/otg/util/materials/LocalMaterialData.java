@@ -19,36 +19,36 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
 	public abstract String getName();
 	
-    public abstract boolean canSnowFallOn();
-    
-    public abstract boolean canFall();
+	public abstract boolean canSnowFallOn();
 	
-    public abstract boolean isMaterial(LocalMaterialData material);
+	public abstract boolean canFall();
+	
+	public abstract boolean isMaterial(LocalMaterialData material);
 	
 	public abstract boolean isBlockTag(LocalMaterialTag tag);
-    
-    public abstract boolean isLiquid();
+	
+	public abstract boolean isLiquid();
 
-    public abstract boolean isSolid();
+	public abstract boolean isSolid();
 
-    public abstract boolean isEmptyOrAir();
-    
-    public abstract boolean isAir();
+	public abstract boolean isEmptyOrAir();
+	
+	public abstract boolean isAir();
 
-    public abstract boolean isEmpty();
-       
-    public boolean isLogOrLeaves()
-    {
+	public abstract boolean isEmpty();
+		
+	public boolean isLogOrLeaves()
+	{
 		return isLog() || isLeaves();
-    }
-           
-    /**
-     * Gets whether this material can be used as an anchor point for a smoothing area    
-     * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves.
-     */
-    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
-    {
-    	return
+	}
+			
+	/**
+	 * Gets whether this material can be used as an anchor point for a smoothing area	
+	 * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves.
+	 */
+	public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
+	{
+		return
 			(
 				(
 					// Any materials that are either solid or liquid
@@ -69,12 +69,12 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 				!isLeaves() &&
 				!isMaterial(LocalMaterials.WATER_LILY)
 			);
-    }
-    
+	}
+	
 	public boolean isOre()
 	{
-    	// TODO: Use BlockTags for these?		
-    	return
+		// TODO: Use BlockTags for these?		
+		return
 			isMaterial(LocalMaterials.COAL_ORE) ||
 			isMaterial(LocalMaterials.DIAMOND_ORE) ||
 			isMaterial(LocalMaterials.EMERALD_ORE) ||
@@ -87,9 +87,9 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 		;
 	}
 	
-    public boolean isLeaves()
-    {
-    	// TODO: Use BlockTags for these?    	
+	public boolean isLeaves()
+	{
+		// TODO: Use BlockTags for these?		
 		return
 			isMaterial(LocalMaterials.ACACIA_LEAVES) ||
 			isMaterial(LocalMaterials.BIRCH_LEAVES) ||
@@ -97,11 +97,11 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.JUNGLE_LEAVES) ||
 			isMaterial(LocalMaterials.OAK_LEAVES) ||
 			isMaterial(LocalMaterials.SPRUCE_LEAVES);
-    }
+	}
 
-    public boolean isLog()
-    {
-    	// TODO: Use BlockTags for these?
+	public boolean isLog()
+	{
+		// TODO: Use BlockTags for these?
 		return
 			isMaterial(LocalMaterials.ACACIA_LOG) ||
 			isMaterial(LocalMaterials.BIRCH_LOG) ||
@@ -120,36 +120,36 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.STRIPPED_OAK_LOG) ||
 			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG);
 	}
-    
-    /**
-     * Gets a new material that is rotated 90 degrees. North -> west -> south ->
-     * east. If this material cannot be rotated, the material itself is
-     * returned.
-     * 
-     * @return The rotated material.
-     */
-    public LocalMaterialData rotate()
-    {
-    	return rotate(1);
-    }
-    
-    /**
-     * Gets a new material that is rotated 90 degrees. North -> west -> south ->
-     * east. If this material cannot be rotated, the material itself is
-     * returned.
-     * 
-     * @return The rotated material.
-     */
-    public abstract LocalMaterialData rotate(int rotateTimes);
-      
+	
+	/**
+	 * Gets a new material that is rotated 90 degrees. North -> west -> south ->
+	 * east. If this material cannot be rotated, the material itself is
+	 * returned.
+	 * 
+	 * @return The rotated material.
+	 */
+	public LocalMaterialData rotate()
+	{
+		return rotate(1);
+	}
+	
+	/**
+	 * Gets a new material that is rotated 90 degrees. North -> west -> south ->
+	 * east. If this material cannot be rotated, the material itself is
+	 * returned.
+	 * 
+	 * @return The rotated material.
+	 */
+	public abstract LocalMaterialData rotate(int rotateTimes);
+	  
 	public LocalMaterialData parseWithBiomeAndHeight(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
 	{	
-        if (!biomeConfigsHaveReplacement)
-        {
-            // Don't waste time here, ReplacedBlocks is empty everywhere
-            return this;
-        }
-        return replaceBlocks.replaceBlock(y, this);
+		if (!biomeConfigsHaveReplacement)
+		{
+			// Don't waste time here, ReplacedBlocks is empty everywhere
+			return this;
+		}
+		return replaceBlocks.replaceBlock(y, this);
 	}
 
 	@Override
@@ -158,13 +158,13 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 		return false;
 	}
 	
-    @Override
-    public String toString()
-    {
-    	return getName();
-    }
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
 	
-    public abstract boolean equals(Object other);
-    
-    public abstract int hashCode();    
+	public abstract boolean equals(Object other);
+	
+	public abstract int hashCode();	
 }

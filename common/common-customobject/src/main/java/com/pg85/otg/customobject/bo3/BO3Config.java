@@ -549,11 +549,11 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("");
 		writer.comment("Examples:");
 		writer.comment("  BlockCheck(0,-1,0,GRASS,DIRT)  Require grass or dirt just below the object");
-		writer.comment("  BlockCheck(0,-1,0,Solid)       Require any solid block just below the object");
-		writer.comment("  BlockCheck(0,-1,0,WOOL)        Require any type of wool just below the object");
-		writer.comment("  BlockCheck(0,-1,0,WOOL:0)      Require white wool just below the object");
-		writer.comment("  BlockCheckNot(0,-1,0,WOOL:0)   Require that there is no white wool below the object");
-		writer.comment("  LightCheck(0,0,0,0,1)          Require almost complete darkness just below the object");
+		writer.comment("  BlockCheck(0,-1,0,Solid)		Require any solid block just below the object");
+		writer.comment("  BlockCheck(0,-1,0,WOOL)		Require any type of wool just below the object");
+		writer.comment("  BlockCheck(0,-1,0,WOOL:0)	  Require white wool just below the object");
+		writer.comment("  BlockCheckNot(0,-1,0,WOOL:0)	Require that there is no white wool below the object");
+		writer.comment("  LightCheck(0,0,0,0,1)		  Require almost complete darkness just below the object");
 
 		for (BO3Check func : Arrays.asList(this.bo3Checks[0]))
 		{

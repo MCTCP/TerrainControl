@@ -8,9 +8,9 @@ import com.pg85.otg.util.bo3.Rotation;
 
 class BO4Settings extends Settings
 {
-    static final Setting<Boolean>
+	static final Setting<Boolean>
 		ISOTGPLUS = booleanSetting("IsOTGPlus", true),
-        REMOVEAIR = booleanSetting("RemoveAir", true),
+		REMOVEAIR = booleanSetting("RemoveAir", true),
 		CANOVERRIDE = booleanSetting("CanOverride", false),
 		MUSTBEBELOWOTHER = booleanSetting("MustBeBelowOther", false),
 		MUSTBEINSIDEWORLDBORDERS = booleanSetting("MustBeInsideWorldBorders", false),
@@ -26,23 +26,23 @@ class BO4Settings extends Settings
 		SMOOTHSTARTWOOD = booleanSetting("SmoothStartWood", false),
 		DO_REPLACE_BLOCKS = booleanSetting("DoReplaceBlocks", true),
 		USE_CENTER_FOR_HIGHEST_BLOCK = booleanSetting("UseCenterForHighestBlock", true)		
-    ;
+	;
 
-    static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
+	static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
 
-    static final Setting<Integer>
-        FREQUENCY = intSetting("Frequency", 0, 0, 9999),
-        MIN_HEIGHT = intSetting("MinHeight", 0, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
-        MAX_HEIGHT = intSetting("MaxHeight", 256, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
+	static final Setting<Integer>
+		FREQUENCY = intSetting("Frequency", 0, 0, 9999),
+		MIN_HEIGHT = intSetting("MinHeight", 0, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
+		MAX_HEIGHT = intSetting("MaxHeight", 256, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		BRANCH_FREQUENCY = intSetting("BranchFrequency", 0, 0, 9999),
 		HEIGHT_OFFSET = intSetting("HeightOffset", 0, -255, 255),
 		SMOOTH_HEIGHT_OFFSET = intSetting("SmoothHeightOffset", 0, -255, 255),
 		SMOOTHRADIUS = intSetting("SmoothRadius", 0, -1, 9999)
-    ;
+	;
 
-    static final Setting<String>
-        AUTHOR = stringSetting("Author", "Unknown"),
-        DESCRIPTION = stringSetting("Description", "No description given"),
+	static final Setting<String>
+		AUTHOR = stringSetting("Author", "Unknown"),
+		DESCRIPTION = stringSetting("Description", "No description given"),
 		INHERITBO3 = stringSetting("InheritBO3", ""),
 		REPLACEABOVE = stringSetting("ReplaceAbove", ""),
 		REPLACEBELOW = stringSetting("ReplaceBelow", ""),
@@ -56,8 +56,8 @@ class BO4Settings extends Settings
 		MUSTBEINSIDE = stringSetting("MustBeInside", ""),
 		CANNOTBEINSIDE = stringSetting("CannotBeInside", ""),
 		REPLACESBO3 = stringSetting("ReplacesBO3", "")
-    ;
+	;
 
-    // Enum settings
-    static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+	// Enum settings
+	static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
 }

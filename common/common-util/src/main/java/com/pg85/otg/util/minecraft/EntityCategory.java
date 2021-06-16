@@ -5,10 +5,10 @@ package com.pg85.otg.util.minecraft;
  */
 public enum EntityCategory
 {
-    AMBIENT_CREATURE,
-    WATER_CREATURE,
-    CREATURE,
-    MONSTER,
-    WATER_AMBIENT,
-    MISC
+	AMBIENT_CREATURE,
+	WATER_CREATURE,
+	CREATURE,
+	MONSTER,
+	WATER_AMBIENT,
+	MISC
 }

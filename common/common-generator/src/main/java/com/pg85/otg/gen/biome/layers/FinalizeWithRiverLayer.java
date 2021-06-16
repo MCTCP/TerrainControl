@@ -26,18 +26,18 @@ class FinalizeWithRiverLayer implements MergingLayer
 		// Remove all the metadata bits from the sample
 		sample = sample & BiomeLayers.BIOME_BITS;
 
-        if (this.riversEnabled)
-        {
-        	int currentRiver = riverSampler.sample(x, z);
-        	if((currentRiver & BiomeLayers.RIVER_BITS) != 0)
+		if (this.riversEnabled)
+		{
+			int currentRiver = riverSampler.sample(x, z);
+			if((currentRiver & BiomeLayers.RIVER_BITS) != 0)
 			{
-        		int riverBiomeId = this.riverBiomes[sample];
-        		if(riverBiomeId >= 0)
-        		{
-        			sample = riverBiomeId;
-        		}
+				int riverBiomeId = this.riverBiomes[sample];
+				if(riverBiomeId >= 0)
+				{
+					sample = riverBiomeId;
+				}
 			}
-        }
+		}
 
 		return sample;
 	}

@@ -67,7 +67,7 @@ public class OTGChunkGenerator
 	// ThreadLocal may have some overhead for the gets/sets, even when used on a single thread.
 	// Some of these classes may not be thread-safe (tho testing seems ok), need to check all the internal state.
 	
-	private final OctavePerlinNoiseSampler interpolationNoise;     // Volatility noise
+	private final OctavePerlinNoiseSampler interpolationNoise;	 // Volatility noise
 	private final OctavePerlinNoiseSampler lowerInterpolatedNoise; // Volatility1 noise
 	private final OctavePerlinNoiseSampler upperInterpolatedNoise; // Volatility2 noise
 	private final OctavePerlinNoiseSampler depthNoise;

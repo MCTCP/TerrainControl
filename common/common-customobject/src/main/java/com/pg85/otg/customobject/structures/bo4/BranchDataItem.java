@@ -61,79 +61,79 @@ class BranchDataItem
 			throw new RuntimeException();
 		}
 
-    	if(!dontSpawn && this.children.size() == 0)
-    	{
-	        Branch[] branches = ((BO4)this.branch.getStructuredObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getBranches();
-	        for (Branch branch1 : branches)
-	        {
-		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
-		    	// Can be null if spawn roll fails TODO: dont roll for spawn in branch.toCustomObjectCoordinate?
-		    	if(childCoordObject != null)
-		    	{
-		    		BO4 childBO3 = ((BO4)childCoordObject.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
-		    		if(childBO3 == null)
-		    		{
-		    			continue;
-		    		}
+		if(!dontSpawn && this.children.size() == 0)
+		{
+			Branch[] branches = ((BO4)this.branch.getStructuredObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getBranches();
+			for (Branch branch1 : branches)
+			{
+				BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				// Can be null if spawn roll fails TODO: dont roll for spawn in branch.toCustomObjectCoordinate?
+				if(childCoordObject != null)
+				{
+					BO4 childBO3 = ((BO4)childCoordObject.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
+					if(childBO3 == null)
+					{
+						continue;
+					}
 
-		    		// canOverride optional branches spawn after all other branches have spawned (the "fundament" BO3's),
-		    		// they are most commonly spawned on top of those BO3's to add randomised parts.
-		    		// For instance interiors for rooms, doors, BO3's that knock out walls or ceilings between rooms etc.
-		    		// "interior" BO3's failing to spawn cannot cause the "fundament" BO3's to be rolled back.
-		    		// this is enforced by making sure that canOverride optional branches cannot be in a branch group with other branches.
-		    		if(
-	    				childCoordObject.branchGroup != null &&
-	    				childCoordObject.branchGroup.trim().length() > 0 &&
-	    				childBO3.getConfig().canOverride &&
-	    				!childCoordObject.isRequiredBranch
-    				)
-		    		{
-		    			if(spawnLog)
-		    			{
-		    				logger.log(LogMarker.WARN, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + this.branch.bo3Name);
-		    			}
-		    			continue;
-		    		}
+					// canOverride optional branches spawn after all other branches have spawned (the "fundament" BO3's),
+					// they are most commonly spawned on top of those BO3's to add randomised parts.
+					// For instance interiors for rooms, doors, BO3's that knock out walls or ceilings between rooms etc.
+					// "interior" BO3's failing to spawn cannot cause the "fundament" BO3's to be rolled back.
+					// this is enforced by making sure that canOverride optional branches cannot be in a branch group with other branches.
+					if(
+						childCoordObject.branchGroup != null &&
+						childCoordObject.branchGroup.trim().length() > 0 &&
+						childBO3.getConfig().canOverride &&
+						!childCoordObject.isRequiredBranch
+					)
+					{
+						if(spawnLog)
+						{
+							logger.log(LogMarker.WARN, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + this.branch.bo3Name);
+						}
+						continue;
+					}
 
-		    		if(childBO3.getConfig().overrideParentHeight)
-		    		{
-    		    		if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel)
-    		    		{
-    		    			childCoordObject.y = (short) worldGenRegion.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
-    		    		}
-    		    		else if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.randomY)
-    		    		{
-    		    			childCoordObject.y = (short) RandomHelper.numberInRange(this.random, childBO3.getConfig().minHeight, childBO3.getConfig().maxHeight);
-    		    		}
-		    		}
-		    		childCoordObject.y += childBO3.getConfig().heightOffset;
-		    		//if(childCoordObject.y < childBO3.settings.minHeight || childCoordObject.y > childBO3.settings.maxHeight)
-		    		{
-		    			//continue; // TODO: Don't do this for required branches? instead do rollback?
-		    		}
+					if(childBO3.getConfig().overrideParentHeight)
+					{
+						if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel)
+						{
+							childCoordObject.y = (short) worldGenRegion.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
+						}
+						else if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.randomY)
+						{
+							childCoordObject.y = (short) RandomHelper.numberInRange(this.random, childBO3.getConfig().minHeight, childBO3.getConfig().maxHeight);
+						}
+					}
+					childCoordObject.y += childBO3.getConfig().heightOffset;
+					//if(childCoordObject.y < childBO3.settings.minHeight || childCoordObject.y > childBO3.settings.maxHeight)
+					{
+						//continue; // TODO: Don't do this for required branches? instead do rollback?
+					}
 
-		    		int currentDepth1 = childCoordObject.isRequiredBranch ? currentDepth : currentDepth + 1;
-		    		int maxDepth1 = this.maxDepth;
+					int currentDepth1 = childCoordObject.isRequiredBranch ? currentDepth : currentDepth + 1;
+					int maxDepth1 = this.maxDepth;
 
-		    		// If this branch has a branch depth value other than 0 then override current branch depth with the value
-		    		if(childCoordObject.branchDepth > 0 && !this.minimumSize)
-		    		{
-		    			currentDepth1 = 0;
-			    		maxDepth1 = childCoordObject.branchDepth;
-		    		}
+					// If this branch has a branch depth value other than 0 then override current branch depth with the value
+					if(childCoordObject.branchDepth > 0 && !this.minimumSize)
+					{
+						currentDepth1 = 0;
+						maxDepth1 = childCoordObject.branchDepth;
+					}
 
-		    		if(this.minimumSize)
-		    		{
-		    			maxDepth1 = 0;
-		    		}
+					if(this.minimumSize)
+					{
+						maxDepth1 = 0;
+					}
 
-		    		if((maxDepth1 > 0 && currentDepth1 <= maxDepth1) || childCoordObject.isRequiredBranch)
-		    		{
-		    			this.children.add(new BranchDataItem(this.random, this, childCoordObject, this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, currentDepth1, maxDepth1, this.minimumSize));
-		    		}
-		    	}
-	        }
-    	}
-    	return this.children;
+					if((maxDepth1 > 0 && currentDepth1 <= maxDepth1) || childCoordObject.isRequiredBranch)
+					{
+						this.children.add(new BranchDataItem(this.random, this, childCoordObject, this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name, currentDepth1, maxDepth1, this.minimumSize));
+					}
+				}
+			}
+		}
+		return this.children;
 	}
 }

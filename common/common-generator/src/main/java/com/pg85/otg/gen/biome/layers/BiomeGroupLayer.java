@@ -58,9 +58,9 @@ class BiomeGroupLayer implements ParentedLayer
 			{
 				// Encode the biome group id into the sample for later use
 				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) |
-	                //>>	If the average temp of the group is cold
-	                ((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
-	            ;
+					//>>	If the average temp of the group is cold
+					((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
+				;
 			}
 		}
 

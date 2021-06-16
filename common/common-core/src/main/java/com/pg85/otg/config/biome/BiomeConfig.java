@@ -371,7 +371,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"- normal biomes, ice biomes, isle biomes and border biomes when BiomeMode is set to NoGroups",
 			"- biomes spawned as part of a BiomeGroup when BiomeMode is set to Normal.",
 			"  For biomes spawned as isles, borders or rivers other settings are available.",
-			"  Isle biomes:   " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " (see below)",
+			"  Isle biomes:	" + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " (see below)",
 			"  Border biomes: " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER + " (see below)",
 			"  River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)"
 		);
@@ -702,7 +702,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Frequency:	  	Number of attempts to place this resource in each chunk.",
 			"Rarity:		Chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass.",
 			"MinAltitude and MaxAltitude: Height limits.",
-			"TreeType:	   	Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree -",
+			"TreeType:			Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree -",
 			"				HugeMushroom (randomly red or brown) - HugeRedMushroom - HugeBrownMushroom -",
 			"				Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2 -",
 			"				JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)",

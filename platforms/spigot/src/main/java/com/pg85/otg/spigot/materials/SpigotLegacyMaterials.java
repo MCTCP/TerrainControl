@@ -1056,14 +1056,14 @@ public class SpigotLegacyMaterials
 				return null;
 		}
 		return half == 0 ?
-			   blockState
-					   .set(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.LOWER)
-					   .set(BlockDoor.FACING, getFacingEastSouthWestNorth(facing))
-					   .set(BlockDoor.OPEN, open == 1)
+				blockState
+						.set(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.LOWER)
+						.set(BlockDoor.FACING, getFacingEastSouthWestNorth(facing))
+						.set(BlockDoor.OPEN, open == 1)
 						 : blockState
-					   .set(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.UPPER)
-					   .set(BlockDoor.HINGE, hinge == 0 ? BlockPropertyDoorHinge.LEFT : BlockPropertyDoorHinge.RIGHT)
-					   .set(BlockDoor.POWERED, powered == 1)
+						.set(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.UPPER)
+						.set(BlockDoor.HINGE, hinge == 0 ? BlockPropertyDoorHinge.LEFT : BlockPropertyDoorHinge.RIGHT)
+						.set(BlockDoor.POWERED, powered == 1)
 				;
 	}
 

@@ -4,7 +4,7 @@ import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 
 public interface LayerRandomnessSource
 {
-   int nextInt(int bound);
+	int nextInt(int bound);
 
-   PerlinNoiseSampler getNoiseSampler();
+	PerlinNoiseSampler getNoiseSampler();
 }

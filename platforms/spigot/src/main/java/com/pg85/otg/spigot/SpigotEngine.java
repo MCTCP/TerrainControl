@@ -45,7 +45,7 @@ public class SpigotEngine extends OTGEngine
 	@Override
 	public void mergeVanillaBiomeMobSpawnSettings (BiomeConfigFinder.BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
-		String[] resourceLocationArr = biomeResourceLocation.split(":");		    
+		String[] resourceLocationArr = biomeResourceLocation.split(":");			
 		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
 		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];		
 		

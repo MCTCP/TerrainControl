@@ -791,20 +791,20 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Since we can't check for structure components/references, only structure starts,  
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 4;
-        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
-        {
-        	int cycleSquared = cycle *cycle;
-        	int nextSquared = (cycle+1)*(cycle+1);
-            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
-            {
-                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
-                {
+		for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+		{
+			int cycleSquared = cycle *cycle;
+			int nextSquared = (cycle+1)*(cycle+1);
+			for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+			{
+				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+				{
 					float distance = xOffset*xOffset+zOffset*zOffset;
 					// If this is the correct cycle - doing it this way to avoid calls to Math.sqrt
 					if (cycleSquared <= distance && distance < nextSquared)
-                    {
-                    	ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
-                    	ChunkCoordIntPair chunkpos = chunk.getPos();
+					{
+						ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
+						ChunkCoordIntPair chunkpos = chunk.getPos();
 						
 						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 						// based on biome and resource settings (distance etc). Does not plot any structure components.

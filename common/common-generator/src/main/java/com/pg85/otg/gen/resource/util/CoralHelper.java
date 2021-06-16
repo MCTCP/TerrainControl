@@ -11,73 +11,73 @@ import java.util.Random;
 
 public final class CoralHelper
 {
-    private static final OTGDirection[] HORIZONTAL = {
+	private static final OTGDirection[] HORIZONTAL = {
 		OTGDirection.NORTH, 
 		OTGDirection.EAST, 
 		OTGDirection.SOUTH, 
 		OTGDirection.WEST
 	};
 
-    private CoralHelper() {}
+	private CoralHelper() {}
 
-    public static boolean placeCoralBlock(IWorldGenRegion world, Random random, ChunkCoordinate pos, int x, int y, int z, LocalMaterialData data)
-    {
-        LocalMaterialData currentState = world.getMaterial(x, y, z, pos);
-        
-        // Check for water or coral here, and water above
-        if (
-    		(currentState.isMaterial(LocalMaterials.WATER) || isCoral(currentState)) && 
-    		world.getMaterial(x, y + 1, z, pos).isMaterial(LocalMaterials.WATER)
-        )
-        {
-            // Set the coral state
-            world.setBlock(x, y, z, data, null, pos, false);
+	public static boolean placeCoralBlock(IWorldGenRegion world, Random random, ChunkCoordinate pos, int x, int y, int z, LocalMaterialData data)
+	{
+		LocalMaterialData currentState = world.getMaterial(x, y, z, pos);
+		
+		// Check for water or coral here, and water above
+		if (
+			(currentState.isMaterial(LocalMaterials.WATER) || isCoral(currentState)) && 
+			world.getMaterial(x, y + 1, z, pos).isMaterial(LocalMaterials.WATER)
+		)
+		{
+			// Set the coral state
+			world.setBlock(x, y, z, data, null, pos, false);
 
-            if (random.nextFloat() < 0.25f)
-            {
-                // Set random coral on the top block
-                world.setBlock(x, y + 1, z, getRandomCoral(random), null, pos, false);
-            }
-            else if (random.nextFloat() < 0.05f)
-            {
-                // Place a pickle above, 1 in 20 coral placements
-                world.setBlock(x, y + 1, z, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, pos, false);
-            }
+			if (random.nextFloat() < 0.25f)
+			{
+				// Set random coral on the top block
+				world.setBlock(x, y + 1, z, getRandomCoral(random), null, pos, false);
+			}
+			else if (random.nextFloat() < 0.05f)
+			{
+				// Place a pickle above, 1 in 20 coral placements
+				world.setBlock(x, y + 1, z, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, pos, false);
+			}
 
-            LocalMaterialData wallMaterial;
-            for (OTGDirection direction : HORIZONTAL)
-            {
-                if (random.nextFloat() < 0.2f)
-                {
-                    if (world.getMaterial(x + direction.getX(), y + direction.getY(), z + direction.getZ(), pos).isMaterial(LocalMaterials.WATER))
-                    {
-                        wallMaterial = getRandomWallCoral(random).withProperty(MaterialProperties.HORIZONTAL_DIRECTION, direction);
-                        world.setBlock(x + direction.getX(), y + direction.getY(), z + direction.getZ(), wallMaterial, null, pos, false);
-                    }
-                }
-            }
-            return true;
-        }
-        return false;
-    }
+			LocalMaterialData wallMaterial;
+			for (OTGDirection direction : HORIZONTAL)
+			{
+				if (random.nextFloat() < 0.2f)
+				{
+					if (world.getMaterial(x + direction.getX(), y + direction.getY(), z + direction.getZ(), pos).isMaterial(LocalMaterials.WATER))
+					{
+						wallMaterial = getRandomWallCoral(random).withProperty(MaterialProperties.HORIZONTAL_DIRECTION, direction);
+						world.setBlock(x + direction.getX(), y + direction.getY(), z + direction.getZ(), wallMaterial, null, pos, false);
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
-    public static boolean isCoral(LocalMaterialData data)
-    {
-        return LocalMaterials.CORALS.contains(data);
-    }
+	public static boolean isCoral(LocalMaterialData data)
+	{
+		return LocalMaterials.CORALS.contains(data);
+	}
 
-    public static LocalMaterialData getRandomCoral(Random random)
-    {
-        return LocalMaterials.CORALS.get(random.nextInt(LocalMaterials.CORALS.size()));
-    }
+	public static LocalMaterialData getRandomCoral(Random random)
+	{
+		return LocalMaterials.CORALS.get(random.nextInt(LocalMaterials.CORALS.size()));
+	}
 
-    public static LocalMaterialData getRandomWallCoral(Random random)
-    {
-        return LocalMaterials.WALL_CORALS.get(random.nextInt(LocalMaterials.WALL_CORALS.size()));
-    }
+	public static LocalMaterialData getRandomWallCoral(Random random)
+	{
+		return LocalMaterials.WALL_CORALS.get(random.nextInt(LocalMaterials.WALL_CORALS.size()));
+	}
 
-    public static LocalMaterialData getRandomCoralBlock(Random random)
-    {
-        return LocalMaterials.CORAL_BLOCKS.get(random.nextInt(LocalMaterials.CORAL_BLOCKS.size()));
-    }
+	public static LocalMaterialData getRandomCoralBlock(Random random)
+	{
+		return LocalMaterials.CORAL_BLOCKS.get(random.nextInt(LocalMaterials.CORAL_BLOCKS.size()));
+	}
 }
