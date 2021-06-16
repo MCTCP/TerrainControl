@@ -29,8 +29,6 @@ import java.util.List;
 
 public class BO3Creator extends BOCreator
 {
-
-
 	public static BO3 create(
 		Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
@@ -168,10 +166,10 @@ public class BO3Creator extends BOCreator
 		if ((max.x - min.x) % 16 > 0) chunksOnXAxis++;
 		if ((max.z - min.z) % 16 > 0) chunksOnZAxis++;
 
-
 		// Get the blocks for each branch, put them in a grid
 		//  - Make sure empty branches are ignored
 
+		@SuppressWarnings("unchecked")
 		ArrayList<BO3BlockFunction>[][] branchGrid = (ArrayList<BO3BlockFunction>[][]) new ArrayList<?>[chunksOnXAxis][chunksOnZAxis];
 
 		// Array with booleans, saying if a given branch exists

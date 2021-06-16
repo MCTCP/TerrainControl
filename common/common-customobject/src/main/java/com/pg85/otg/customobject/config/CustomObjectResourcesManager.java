@@ -43,9 +43,9 @@ public class CustomObjectResourcesManager implements ICustomObjectResourcesManag
      * function requires another holder. For invalid or non-existing config
      * functions, it returns an instance of {@link ErroredFunction}.
      */
-    @SuppressWarnings("unchecked")
     // It's checked with clazz.getConstructor(holder.getClass(), ...))
-    public <T> CustomObjectConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+    @SuppressWarnings("unchecked")
+	public <T> CustomObjectConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
     	// If a Block() tag has the parameters of a RandomBlock tag then transform it into a RandomBlock
     	// This allows users to edit Bo3's and change Blocks to RandomBlocks with a simple find/replace.

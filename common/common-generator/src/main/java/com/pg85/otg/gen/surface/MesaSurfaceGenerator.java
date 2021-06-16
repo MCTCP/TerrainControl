@@ -13,6 +13,7 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+@SuppressWarnings("deprecation")
 class MesaSurfaceGenerator implements SurfaceGenerator
 {
     private LocalMaterialData[] clayBands;
@@ -92,7 +93,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
     private int lastX = Integer.MAX_VALUE;
     private int lastZ = Integer.MAX_VALUE;
     private int lastNoise = 0;
-    private LocalMaterialData getBand(IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	private LocalMaterialData getBand(IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
     	int noise = this.lastNoise;
     	if(this.lastX != xInWorld || this.lastZ != zInWorld)
@@ -155,7 +156,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
     }
     
     // net.minecraft.world.biome.BiomeMesa.generateBands
-    private void generateBands(long seed)
+	private void generateBands(long seed)
     {
         this.clayBands = new LocalMaterialData[64];
         Arrays.fill(this.clayBands, this.hardClay);
@@ -238,7 +239,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
 
     private boolean clayBandsGenerated = false;
     // net.minecraft.world.biome.BiomeMesa.genTerrainBlocks
-    @Override
+	@Override
     public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {    	    	
         if (this.clayBands == null || !this.clayBandsGenerated)

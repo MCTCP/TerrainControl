@@ -37,9 +37,9 @@ public class SpigotNBTHelper extends LocalNBTHelper
 	 * @param nmsTag The Minecraft tag.
 	 * @return The converted tag.
 	 */
-	@SuppressWarnings("unchecked")
 	// ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
 	// So it is safe to suppress this warning
+	@SuppressWarnings("unchecked")
 	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, NBTTagCompound nmsTag)
 	{
 		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name,

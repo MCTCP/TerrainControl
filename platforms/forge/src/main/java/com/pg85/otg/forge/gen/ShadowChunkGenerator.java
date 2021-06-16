@@ -102,6 +102,7 @@ public class ShadowChunkGenerator
 			{
 				for(int i = 0; i < this.maxConcurrent; i++)
 				{
+					@SuppressWarnings("deprecation")
 					Worker thread = this.new Worker(i, this.unloadedChunksCache, this.chunksToLoad, this.chunksBeingLoaded, worldGenRegion.getLevel(), chunkGenerator, biomeProvider, otgChunkGenerator, dimensionStructuresSettings, worldHeightCap);
 					this.threads[i] = thread;
 					thread.start(worldGenRegion.getRandom());

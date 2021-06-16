@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 /**
  * Generates the base terrain, sets stone/ground/surface blocks and does SurfaceAndGroundControl, generates caves and canyons.
  */
+@SuppressWarnings("deprecation")
 public class OTGChunkGenerator
 {
 	// "It's a number that made the worldgen look good!" - Dinnerbone 2020

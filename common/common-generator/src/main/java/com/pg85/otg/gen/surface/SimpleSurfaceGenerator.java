@@ -29,7 +29,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     }
 
     // net.minecraft.world.biome.Biome.generateBiomeTerrain
-    protected final void spawnColumn(LayerChoice layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
+    protected final void spawnColumn(MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
     {
         float currentTemperature = biomeConfig.getBiomeTemperature();
         // Used to create a variable depth ground layer per column

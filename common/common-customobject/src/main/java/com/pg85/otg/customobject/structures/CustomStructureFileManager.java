@@ -336,7 +336,7 @@ public class CustomStructureFileManager
 	
 	private static PlottedChunksRegion parsePlottedChunksFileFromStream(ByteBuffer buffer, ILogger logger) throws IOException
 	{
-		int version = buffer.getInt();		
+		buffer.getInt(); // Version, not used atm.		
 		int regionSize = buffer.getInt();
 		boolean[][] chunksMatrix = new boolean[Constants.REGION_SIZE][Constants.REGION_SIZE];
 		if(regionSize == Constants.REGION_SIZE)
@@ -946,7 +946,7 @@ public class CustomStructureFileManager
 	// TODO: Dev versions of v9 used region size 100, not 250, this may cause problems.
 	private static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> parseStructuresFileFromStream(ByteBuffer buffer, ChunkCoordinate regionCoord, String presetFolderName, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
 	{
-		int version = buffer.getInt();
+		buffer.getInt(); // Version, not used atm.
 		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> structuresFile = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
 		int structureNamesSize = buffer.getInt();
 		for(int i = 0; i < structureNamesSize; i++)
@@ -1336,7 +1336,7 @@ public class CustomStructureFileManager
 		HashMap<String, ArrayList<ChunkCoordinate>> chunksByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
 		HashMap<String, HashMap<ChunkCoordinate, Integer>> chunksByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();		
 
-		int version = buffer.getInt();
+		buffer.getInt(); // Version, not used atm.
 		
 		int spawnedStructuresByNameSize = buffer.getInt();
 		for(int i = 0; i < spawnedStructuresByNameSize; i++)

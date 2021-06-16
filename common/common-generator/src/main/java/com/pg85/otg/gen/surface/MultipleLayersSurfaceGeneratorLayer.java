@@ -3,7 +3,7 @@ package com.pg85.otg.gen.surface;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-class LayerChoice implements Comparable<LayerChoice>
+class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSurfaceGeneratorLayer>
 {
 	protected final LocalMaterialData surfaceBlock;
 	protected final LocalMaterialData groundBlock;
@@ -13,7 +13,7 @@ class LayerChoice implements Comparable<LayerChoice>
     private boolean surfaceBlockIsReplaced;
     private boolean groundBlockIsReplaced;
 
-    LayerChoice(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
+    MultipleLayersSurfaceGeneratorLayer(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
     {
         this.surfaceBlock = surfaceBlock;
         this.groundBlock = groundBlock;
@@ -55,7 +55,7 @@ class LayerChoice implements Comparable<LayerChoice>
     }
     
     @Override
-    public int compareTo(LayerChoice that)
+    public int compareTo(MultipleLayersSurfaceGeneratorLayer that)
     {
         float delta = this.maxNoise - that.maxNoise;
         // The number 65565 is just randomly chosen, any positive number

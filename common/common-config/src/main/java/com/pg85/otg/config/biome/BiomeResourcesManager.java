@@ -47,9 +47,9 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
      * function requires another holder. For invalid or non-existing config
      * functions, it returns an instance of {@link ErroredFunction}.
      */
-    @SuppressWarnings("unchecked")
     // It's checked with clazz.getConstructor(holder.getClass(), ...))
-    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, ILogger logger, IMaterialReader materialReader)
+    @SuppressWarnings("unchecked")
+	public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, ILogger logger, IMaterialReader materialReader)
     {
         // Get the class of the config function
         Class<? extends ConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());

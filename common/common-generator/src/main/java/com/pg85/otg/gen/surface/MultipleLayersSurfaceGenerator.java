@@ -16,7 +16,7 @@ import java.util.List;
 class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 {
     // Must be sorted based on the noise field
-    private List<LayerChoice> layerChoices;
+    private List<MultipleLayersSurfaceGeneratorLayer> layers;
 
     MultipleLayersSurfaceGenerator(String[] args, IMaterialReader materialReader) throws InvalidConfigException
     {
@@ -25,22 +25,22 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
             throw new InvalidConfigException("Needs at least two arguments");
         }
 
-        layerChoices = new ArrayList<LayerChoice>();
+        layers = new ArrayList<MultipleLayersSurfaceGeneratorLayer>();
         for (int i = 0; i < args.length - 2; i += 3)
         {
             LocalMaterialData surfaceBlock = materialReader.readMaterial(args[i]);
             LocalMaterialData groundBlock = materialReader.readMaterial(args[i+1]);
             float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
-            layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
+            layers.add(new MultipleLayersSurfaceGeneratorLayer(surfaceBlock, groundBlock, maxNoise));
         }
-        Collections.sort(layerChoices);
+        Collections.sort(layers);
     }
 
     @Override
     public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
     	double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);    	
-        for (LayerChoice layer : this.layerChoices)
+        for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
         {
             if (noise <= layer.maxNoise)
             {
@@ -54,7 +54,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
    		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
-        for (LayerChoice layer : this.layerChoices)
+        for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
         {
             if (noise <= layer.maxNoise)
             {
@@ -71,7 +71,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         int z = zInWorld & 0xf;
         double noise = generatingChunkInfo.getNoise(x, z);
 
-        for (LayerChoice layer : this.layerChoices)
+        for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
         {
             if (noise <= layer.maxNoise)
             {
@@ -88,7 +88,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     public String toString()
     {
         StringBuilder stringBuilder = new StringBuilder();
-        for (LayerChoice groundLayer : this.layerChoices)
+        for (MultipleLayersSurfaceGeneratorLayer groundLayer : this.layers)
         {
             stringBuilder.append(groundLayer.surfaceBlock);
             stringBuilder.append(',').append(' ');

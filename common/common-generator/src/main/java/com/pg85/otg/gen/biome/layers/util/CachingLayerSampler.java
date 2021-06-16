@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.HashCommon;
 
 public final class CachingLayerSampler implements LayerSampler
 {
-	private final LayerOperator operator;
 	private final ThreadLocal<BiomeCache> cache;
 	private final int cacheCapacity;
 
@@ -16,7 +15,6 @@ public final class CachingLayerSampler implements LayerSampler
 	{
 		this.cache = ThreadLocal.withInitial(() -> new BiomeCache(operator, cacheCapacity));
 		this.cacheCapacity = cacheCapacity;
-		this.operator = operator;
 	}
 
 	public int sample(int x, int z)
