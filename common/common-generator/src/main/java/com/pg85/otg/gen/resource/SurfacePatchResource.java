@@ -6,6 +6,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -48,10 +49,10 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
-		int chunkX = chunkBeingDecorated.getBlockXCenter();
-		int chunkZ = chunkBeingDecorated.getBlockZCenter();
+		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter();
+		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter();
 		int x;
 		int z;
 		for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_SIZE; z0++)
@@ -60,14 +61,14 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 			{
 				x = chunkX + x0;
 				z = chunkZ + z0;
-				spawn(worldGenRegion, random, false, x, z, chunkBeingDecorated);
+				spawn(worldGenRegion, random, false, x, z);
 			}
 		}
 	}
 	
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated) - 1;
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z) - 1;
 		if (y < this.minAltitude || y > this.maxAltitude)
 		{
 			return;
@@ -76,13 +77,14 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 		double yNoise = this.noiseGen.getYNoise(x * 0.25D, z * 0.25D);
 		if (yNoise > 0.0D)
 		{
-			LocalMaterialData materialAtLocation = worldGenRegion.getMaterial(x, y, z, chunkBeingDecorated);
+			LocalMaterialData materialAtLocation = worldGenRegion.getMaterial(x, y, z);
 			if (this.sourceBlocks.contains(materialAtLocation))
 			{
-				worldGenRegion.setBlock(x, y, z, this.material, null, chunkBeingDecorated, true);
+				ReplaceBlockMatrix replaceBlocks = worldGenRegion.getBiomeConfigForDecoration(x, z).getReplaceBlocks();
+				worldGenRegion.setBlock(x, y, z, this.material, replaceBlocks);
 				if (yNoise < 0.12D)
 				{
-					worldGenRegion.setBlock(x, y + 1, z, this.decorationAboveReplacements, null, chunkBeingDecorated, true);
+					worldGenRegion.setBlock(x, y + 1, z, this.decorationAboveReplacements, replaceBlocks);
 				}
 			}
 		}

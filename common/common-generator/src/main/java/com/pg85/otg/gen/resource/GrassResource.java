@@ -63,27 +63,27 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
 		switch (this.groupOption)
 		{
 			case Grouped:
-				spawnGrouped(worldGenRegion, random, chunkBeingDecorated);
+				spawnGrouped(worldGenRegion, random);
 				break;
 			case NotGrouped:
-				spawnNotGrouped(worldGenRegion, random, chunkBeingDecorated);
+				spawnNotGrouped(worldGenRegion, random);
 				break;
 		}
 	}
 	
-	private void spawnGrouped(IWorldGenRegion worldGenregion, Random random, ChunkCoordinate chunkBeingDecorated)
+	private void spawnGrouped(IWorldGenRegion worldGenregion, Random random)
 	{
 		if (random.nextDouble() * 100.0 <= this.rarity)
 		{
 			// Passed Rarity test, place about Frequency grass in this chunk
-			int centerX = chunkBeingDecorated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			int centerZ = chunkBeingDecorated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ, chunkBeingDecorated);
+			int centerX = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			int centerZ = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ);
 			
 			if(centerY < Constants.WORLD_DEPTH)
 			{
@@ -96,12 +96,12 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 			while (
 				(
 					(centerY >= Constants.WORLD_DEPTH && centerY < Constants.WORLD_HEIGHT) &&
-					(worldMaterial = worldGenregion.getMaterial(centerX, centerY, centerZ, chunkBeingDecorated)) != null &&
+					(worldMaterial = worldGenregion.getMaterial(centerX, centerY, centerZ)) != null &&
 					(
 						worldMaterial.isAir() || 
 						worldMaterial.isLeaves()
 					) &&
-					(worldMaterial = worldGenregion.getMaterial(centerX, centerY - 1, centerZ, chunkBeingDecorated)) != null
+					(worldMaterial = worldGenregion.getMaterial(centerX, centerY - 1, centerZ)) != null
 				) && (
 					centerY > 0
 				)
@@ -123,21 +123,21 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 				y = centerY + random.nextInt(4) - random.nextInt(4);
 				z = centerZ + random.nextInt(8) - random.nextInt(8);
 				if (
-					(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) != null && 
+					(worldMaterial = worldGenregion.getMaterial(x, y, z)) != null && 
 					worldMaterial.isAir() &&
 					(
-						(worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingDecorated)) != null && 
+						(worldMaterial = worldGenregion.getMaterial(x, y - 1, z)) != null && 
 						this.sourceBlocks.contains(worldMaterial)
 					)
 				)
 				{
-					this.plant.spawn(worldGenregion, x, y, z, chunkBeingDecorated);
+					this.plant.spawn(worldGenregion, x, y, z);
 				}
 			}
 		}
 	}
 
-	private void spawnNotGrouped(IWorldGenRegion worldGenregion, Random random, ChunkCoordinate chunkBeingDecorated)
+	private void spawnNotGrouped(IWorldGenRegion worldGenregion, Random random)
 	{
 		LocalMaterialData worldMaterial;
 		int x;
@@ -150,9 +150,9 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 				continue;
 			}
 			
-			x = chunkBeingDecorated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			z = chunkBeingDecorated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
+			x = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			z = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			y = worldGenregion.getHighestBlockAboveYAt(x, z);
 
 			if(y < Constants.WORLD_DEPTH)
 			{
@@ -161,12 +161,12 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 			
 			while (
 				(
-					(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) != null &&
+					(worldMaterial = worldGenregion.getMaterial(x, y, z)) != null &&
 					(
 						worldMaterial.isAir() || 
 						worldMaterial.isLeaves()
 					) &&
-					(worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingDecorated)) != null
+					(worldMaterial = worldGenregion.getMaterial(x, y - 1, z)) != null
 				) && 
 				y > 0
 			)
@@ -176,17 +176,17 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 
 			if (					
 				(
-					(worldMaterial = worldGenregion.getMaterial(x, y + 1, z, chunkBeingDecorated)) == null ||
+					(worldMaterial = worldGenregion.getMaterial(x, y + 1, z)) == null ||
 					!worldMaterial.isAir()
 				) || (
-					(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated)) == null ||
+					(worldMaterial = worldGenregion.getMaterial(x, y, z)) == null ||
 					!this.sourceBlocks.contains(worldMaterial)
 				)
 			)
 			{
 				continue;
 			}
-			this.plant.spawn(worldGenregion, x, y + 1, z, chunkBeingDecorated);
+			this.plant.spawn(worldGenregion, x, y + 1, z);
 		}
 	}
 	

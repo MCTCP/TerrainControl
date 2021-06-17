@@ -7,7 +7,7 @@ import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -150,13 +150,26 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 	}	
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z)
 	{
 		for (int i = 0; i < blockCount; i++)
 		{
 			if (random.nextInt(100) < blockChances[i])
 			{
-				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingDecorated, replaceBlock);
+				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i]);
+				break;
+			}
+		}
+	}	
+	
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks)
+	{
+		for (int i = 0; i < blockCount; i++)
+		{
+			if (random.nextInt(100) < blockChances[i])
+			{
+				worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], replaceBlocks);
 				break;
 			}
 		}

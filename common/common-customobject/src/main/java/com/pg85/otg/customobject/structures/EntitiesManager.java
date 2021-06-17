@@ -63,7 +63,7 @@ public class EntitiesManager
 				newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
 				newEntityData.rotation = rotations;
 
-				worldGenRegion.spawnEntity(newEntityData, chunkCoordinate);
+				worldGenRegion.spawnEntity(newEntityData);
 			} else {
 
 				newEntityData.y = coordObject.getY() + entityDataInObject[i].y;
@@ -78,7 +78,7 @@ public class EntitiesManager
 				newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
 				newEntityData.rotation = 0;
 
-				worldGenRegion.spawnEntity(newEntityData, chunkCoordinate);
+				worldGenRegion.spawnEntity(newEntityData);
 			}
 		}
 	}

@@ -1,41 +1,51 @@
 package com.pg85.otg.util.gen;
 
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
-import com.pg85.otg.util.materials.LocalMaterialData;
 
 public abstract class LocalWorldGenRegion implements IWorldGenRegion
 {
 	protected final String presetFolderName;
 	private final IWorldConfig worldConfig;
+	protected final DecorationBiomeCache decorationBiomeCache;
+	protected final DecorationArea decorationArea;
+
+	/** Creates a LocalWorldGenRegion to be used during chunk decoration */
+	protected LocalWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, int worldRegionCenterX, int worldRegionCenterZ)
+	{
+		this.presetFolderName = presetFolderName;
+		this.worldConfig = worldConfig;
+		this.decorationBiomeCache = new DecorationBiomeCache(ChunkCoordinate.CHUNK_SIZE * 2, ChunkCoordinate.CHUNK_SIZE * 2, worldRegionCenterX, worldRegionCenterZ);
+		//this.biomeCache = new DecorationBiomeCache(ChunkCoordinate.CHUNK_SIZE * 3, ChunkCoordinate.CHUNK_SIZE * 3, worldRegionCenterX - ChunkCoordinate.CHUNK_SIZE, worldRegionCenterZ - ChunkCoordinate.CHUNK_SIZE);
+		this.decorationArea = new DecorationArea(0, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, 0, ChunkCoordinate.fromChunkCoords(worldRegionCenterX, worldRegionCenterZ));
+		//this.decorationArea = new DecorationArea(ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.fromChunkCoords(worldRegionCenterX, worldRegionCenterZ));
+	}
 	
+	/** Creates a LocalWorldGenRegion to be used outside of world generation. */	
 	protected LocalWorldGenRegion(String presetFolderName, IWorldConfig worldConfig)
 	{
 		this.presetFolderName = presetFolderName;
 		this.worldConfig = worldConfig;
+		this.decorationBiomeCache = null;
+		this.decorationArea = null;
 	}
 	
+	@Override
 	public IWorldConfig getWorldConfig()
 	{
 		return this.worldConfig;
 	}
 	
+	@Override
 	public String getPresetFolderName()
 	{
 		return this.presetFolderName;
 	}
 	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
+	public DecorationArea getDecorationArea()
 	{
-		setBlock(x, y, z, material, nbt, chunkBeingDecorated, null, replaceBlocks, true);
-	}
-	
-	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks, boolean useResourceBounds)
-	{
-		setBlock(x, y, z, material, nbt, chunkBeingDecorated, null, replaceBlocks, useResourceBounds);
+		return this.decorationArea;
 	}
 }

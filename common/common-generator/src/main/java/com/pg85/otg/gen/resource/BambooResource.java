@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -29,15 +28,15 @@ public class BambooResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = world.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
+		int y = world.getHighestBlockAboveYAt(x, z);
 		int height = random.nextInt(12) + 5;
 
-		if (world.getMaterial(x, y, z, chunkBeingDecorated).isAir())
+		if (world.getMaterial(x, y, z).isAir())
 		{
 			// Don't continue if the material below us isn't in the source blocks or is null
-			LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingDecorated);
+			LocalMaterialData below = world.getMaterial(x, y - 1, z);
 			if (below == null || !this.sourceBlocks.contains(below))
 			{
 				return;
@@ -46,7 +45,7 @@ public class BambooResource extends FrequencyResourceBase
 			// Search upwards for the max height that it can place bamboo
 			for (int y1 = 0; y1 < height; y1++)
 			{
-				if (!world.getMaterial(x, y + y1, z, chunkBeingDecorated).isAir())
+				if (!world.getMaterial(x, y + y1, z).isAir())
 				{
 					height = y1;
 					break;
@@ -66,10 +65,10 @@ public class BambooResource extends FrequencyResourceBase
 						// Include only inside the circle
 						if (x1 * x1 + z1 * z1 <= radius * radius)
 						{
-							topY = world.getHighestBlockAboveYAt(x + x1, z + z1, chunkBeingDecorated);
-							if (this.sourceBlocks.contains(world.getMaterial(x + x1, topY - 1, z + z1, chunkBeingDecorated)))
+							topY = world.getHighestBlockAboveYAt(x + x1, z + z1);
+							if (this.sourceBlocks.contains(world.getMaterial(x + x1, topY - 1, z + z1)))
 							{
-								world.setBlock(x + x1, topY - 1, z + z1, LocalMaterials.PODZOL, null, chunkBeingDecorated, false);
+								world.setBlock(x + x1, topY - 1, z + z1, LocalMaterials.PODZOL);
 							}
 						}
 					}
@@ -94,7 +93,7 @@ public class BambooResource extends FrequencyResourceBase
 					bamboo = LocalMaterials.BAMBOO_SMALL;
 				}
 
-				world.setBlock(x, y + y1, z, bamboo, null, chunkBeingDecorated, false);
+				world.setBlock(x, y + y1, z, bamboo);
 			}
 		}
 	}

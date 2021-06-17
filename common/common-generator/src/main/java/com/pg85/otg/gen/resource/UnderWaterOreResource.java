@@ -2,7 +2,6 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -34,10 +33,10 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
-		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingDecorated) - 1;
-		if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingDecorated) < firstSolidBlock || firstSolidBlock == -1)
+		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z) - 1;
+		if (worldGenRegion.getBlockAboveLiquidHeight(x, z) < firstSolidBlock || firstSolidBlock == -1)
 		{
 			return;
 		}
@@ -64,10 +63,10 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 				{
 					for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
 					{
-						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingDecorated);
+						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ);
 						if (this.sourceBlocks.contains(sourceBlock))
 						{
-							worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingDecorated, true);
+							worldGenRegion.setBlock(currentX, y, currentZ, this.material);
 						}
 					}
 				}

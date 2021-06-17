@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -24,7 +23,7 @@ public final class FossilResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
 		if (random.nextDouble() * 100.0 > this.rarity)
 		{
@@ -37,7 +36,7 @@ public final class FossilResource extends ResourceBase implements IBasicResource
 		// spawn exactly the same object at exactly the same location. In
 		// other words: don't bother adding a frequency parameter, unless
 		// you are going to rewrite the fossil code.
-		worldGenRegion.placeFossil(random, chunkBeingDecorated);
+		worldGenRegion.placeFossil(random, worldGenRegion.getDecorationArea().getChunkBeingDecorated());
 	}
 
 	@Override

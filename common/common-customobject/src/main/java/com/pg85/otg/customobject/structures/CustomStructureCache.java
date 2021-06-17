@@ -175,8 +175,8 @@ public class CustomStructureCache
 
 		// No structure found, create one
 		Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, worldGenRegion.getSeed());
-			IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
-			ICustomStructureGen structureGen = biomeConfig.getStructureGen();
+		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
+		ICustomStructureGen structureGen = biomeConfig.getStructureGen();
 
 		if (structureGen != null)
 		{
@@ -257,9 +257,9 @@ public class CustomStructureCache
 	}
 
 	// Only used by ChunkDecorator during decoration
-	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Only used by /spawn command	

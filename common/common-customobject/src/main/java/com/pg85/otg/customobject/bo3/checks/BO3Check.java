@@ -3,7 +3,6 @@ package com.pg85.otg.customobject.bo3.checks;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 /**
@@ -29,7 +28,7 @@ public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
 	 * @param z	 The z position
 	 * @return Whether this check prevents the BO3 from spawning.
 	 */
-	public abstract boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated);
+	public abstract boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z);
 
 	/**
 	 * This implementation of

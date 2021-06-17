@@ -8,7 +8,7 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -165,7 +165,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	}
 
 	@Override
-	public LocalMaterialData getBedrockBlockReplaced(ReplacedBlocksMatrix replaceBlocks, int y)
+	public LocalMaterialData getBedrockBlockReplaced(ReplaceBlockMatrix replaceBlocks, int y)
 	{		
 		if(replaceBlocks.replacesBedrock)
 		{

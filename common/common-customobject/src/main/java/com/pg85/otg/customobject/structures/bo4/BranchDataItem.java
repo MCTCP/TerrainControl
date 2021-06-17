@@ -56,6 +56,8 @@ class BranchDataItem
 	
 	Stack<BranchDataItem> getChildren(boolean dontSpawn, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
+		// We may target unloaded/ungenerated chunks, so we'll use shadowgen when doing height/material checks.
+		
 		if(worldGenRegion == null)
 		{
 			throw new RuntimeException();
@@ -99,7 +101,7 @@ class BranchDataItem
 					{
 						if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel)
 						{
-							childCoordObject.y = (short) worldGenRegion.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
+							childCoordObject.y = (short) worldGenRegion.getHighestBlockYAtWithoutLoading(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true);
 						}
 						else if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.randomY)
 						{

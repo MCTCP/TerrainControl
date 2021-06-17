@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -34,9 +33,9 @@ public class BoulderResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		if (y < this.minAltitude || y > this.maxAltitude)
 		{
 			return;
@@ -45,7 +44,7 @@ public class BoulderResource extends FrequencyResourceBase
 		LocalMaterialData material;
 		while (y > 3)
 		{
-			material = worldGenregion.getMaterial(x, y - 1, z, chunkBeingDecorated);
+			material = worldGenRegion.getMaterial(x, y - 1, z);
 			if (this.sourceBlocks.contains(material))
 			{
 				break;
@@ -76,6 +75,7 @@ public class BoulderResource extends FrequencyResourceBase
 			{
 				for (int i2 = z - n; i2 <= z + n; i2++)
 				{
+					IBiomeConfig biome = worldGenRegion.getBiomeConfigForDecoration(i1, i2);
 					for (int i3 = y - m; i3 <= y + m; i3++)
 					{
 						f2 = i1 - x;
@@ -83,7 +83,7 @@ public class BoulderResource extends FrequencyResourceBase
 						f4 = i3 - y;
 						if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
 						{
-							worldGenregion.setBlock(i1, i3, i2, this.material, null, chunkBeingDecorated, true);
+							worldGenRegion.setBlock(i1, i3, i2, this.material, biome.getReplaceBlocks());
 						}
 					}
 				}

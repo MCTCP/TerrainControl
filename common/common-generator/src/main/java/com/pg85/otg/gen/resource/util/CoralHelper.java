@@ -1,6 +1,5 @@
 package com.pg85.otg.gen.resource.util;
 
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -20,28 +19,28 @@ public final class CoralHelper
 
 	private CoralHelper() {}
 
-	public static boolean placeCoralBlock(IWorldGenRegion world, Random random, ChunkCoordinate pos, int x, int y, int z, LocalMaterialData data)
+	public static boolean placeCoralBlock(IWorldGenRegion world, Random random, int x, int y, int z, LocalMaterialData data)
 	{
-		LocalMaterialData currentState = world.getMaterial(x, y, z, pos);
+		LocalMaterialData currentState = world.getMaterial(x, y, z);
 		
 		// Check for water or coral here, and water above
 		if (
 			(currentState.isMaterial(LocalMaterials.WATER) || isCoral(currentState)) && 
-			world.getMaterial(x, y + 1, z, pos).isMaterial(LocalMaterials.WATER)
+			world.getMaterial(x, y + 1, z).isMaterial(LocalMaterials.WATER)
 		)
 		{
 			// Set the coral state
-			world.setBlock(x, y, z, data, null, pos, false);
+			world.setBlock(x, y, z, data);
 
 			if (random.nextFloat() < 0.25f)
 			{
 				// Set random coral on the top block
-				world.setBlock(x, y + 1, z, getRandomCoral(random), null, pos, false);
+				world.setBlock(x, y + 1, z, getRandomCoral(random));
 			}
 			else if (random.nextFloat() < 0.05f)
 			{
 				// Place a pickle above, 1 in 20 coral placements
-				world.setBlock(x, y + 1, z, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, pos, false);
+				world.setBlock(x, y + 1, z, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1));
 			}
 
 			LocalMaterialData wallMaterial;
@@ -49,10 +48,10 @@ public final class CoralHelper
 			{
 				if (random.nextFloat() < 0.2f)
 				{
-					if (world.getMaterial(x + direction.getX(), y + direction.getY(), z + direction.getZ(), pos).isMaterial(LocalMaterials.WATER))
+					if (world.getMaterial(x + direction.getX(), y + direction.getY(), z + direction.getZ()).isMaterial(LocalMaterials.WATER))
 					{
 						wallMaterial = getRandomWallCoral(random).withProperty(MaterialProperties.HORIZONTAL_DIRECTION, direction);
-						world.setBlock(x + direction.getX(), y + direction.getY(), z + direction.getZ(), wallMaterial, null, pos, false);
+						world.setBlock(x + direction.getX(), y + direction.getY(), z + direction.getZ(), wallMaterial);
 					}
 				}
 			}

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -26,7 +25,7 @@ public class SeaPickleResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
 		int dx;
 		int dz;
@@ -37,10 +36,10 @@ public class SeaPickleResource extends FrequencyResourceBase
 		{
 			dx = x + random.nextInt(8) - random.nextInt(8);
 			dz = z + random.nextInt(8) - random.nextInt(8);
-			y = world.getBlockAboveSolidHeight(dx, dz, chunkBeingDecorated);
+			y = world.getBlockAboveSolidHeight(dx, dz);
 
-			bottom = world.getMaterial(dx, y - 1, dz, chunkBeingDecorated);
-			here = world.getMaterial(dx, y, dz, chunkBeingDecorated);
+			bottom = world.getMaterial(dx, y - 1, dz);
+			here = world.getMaterial(dx, y, dz);
 			if (bottom == null || here == null)
 			{
 				continue;
@@ -48,7 +47,7 @@ public class SeaPickleResource extends FrequencyResourceBase
 
 			if (bottom.isSolid() && here.isLiquid())
 			{
-				world.setBlock(dx, y, dz, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1), null, chunkBeingDecorated, false);
+				world.setBlock(dx, y, dz, LocalMaterials.SEA_PICKLE.withProperty(MaterialProperties.PICKLES_1_4, random.nextInt(4) + 1));
 			}
 		}
 	}

@@ -598,6 +598,7 @@ public class NamedBinaryTag
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void print(NamedBinaryTag t, int indent)
 	{
 		Type type = t.getType();

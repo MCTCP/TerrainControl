@@ -4,7 +4,7 @@ import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.minecraft.DefaultStructurePart;
@@ -43,12 +43,18 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlocks)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z)
 	{
 		// TODO: May cause cascading chunkgen.
 		// TODO: Implement this?
 		//SpawnableObject object = worldGenRegion.getMojangStructurePart(structurePart.getPath());
 		//object.spawnForced(null, worldGenRegion, random, rotation, x, y, z);
+	}
+	
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks)
+	{
+		// TODO: Implement this?	
 	}
 
 	@Override

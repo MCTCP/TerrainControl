@@ -5,7 +5,6 @@ import java.util.List;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -15,7 +14,7 @@ public class ModCheck extends BO3Check
 	private String[] mods;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		return false;
 	}

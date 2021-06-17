@@ -18,8 +18,7 @@ public class ChunkCoordinate
 {
 	public static final int CHUNK_SIZE = 16;
 	public static final int CHUNK_Y_SIZE = 256;
-	private static final int CHUNK_POPULATION_OFFSET_X = CHUNK_SIZE / 2 - 1;
-	private static final int CHUNK_POPULATION_OFFSET_Z = CHUNK_SIZE / 2 - 1;
+	public static final int CHUNK_CENTER = CHUNK_SIZE / 2 - 1;
 
 	private final int chunkX;
 	private final int chunkZ;
@@ -82,46 +81,6 @@ public class ChunkCoordinate
 	}
 
 	/**
-	 * Gets the coordinates of the chunk that is responsible for decorating
-	 * the given block.
-	 *
-	 * <p>During terrain decoration, these four chunks are
-	 * guaranteed to be loaded when the top-left chunk is being decorated:
-	 * <pre>
-	 * +--------+--------+ . = no changes in blocks for now
-	 * |........|........| # = blocks are replaced
-	 * |....####|####....|
-	 * |....####|####....|
-	 * +--------+--------+
-	 * |....####|####....|
-	 * |....####|####....|
-	 * |........|........|
-	 * +--------+--------+
-	 * </pre>
-	 * This offset makes it possible for objects like trees to extend a little
-	 * bit outside the area marked with <code>#</code> without hitting
-	 * unloaded chunks.
-	 *
-	 * <p>This method essentially returns the top left chunk for the whole
-	 * area marked with <code>#</code>, even though only 1/4 of that area is
-	 * actually in the top left chunk.
-	 *
-	 * @param blockX X coordinate of the block.
-	 * @param blockZ Z coordinate of the block.
-	 * @return The coordinates of the chunk.
-	 */
-	public static ChunkCoordinate getPopulatingChunk(int blockX, int blockZ)
-	{
-		// Because of the way Minecraft decoration works, objects should never
-		// be placed in the bottom left corner of a chunk. That's why this
-		// formula looks a bit overly complicated. <-- TODO: Why should objects never be placed in the bottom-left corner of a chunk?
-		return new ChunkCoordinate(
-			(blockX - CHUNK_POPULATION_OFFSET_X) >> 4,
-			(blockZ - CHUNK_POPULATION_OFFSET_Z) >> 4
-		);
-	}
-
-	/**
 	 * Gets the coordinates of the chunk that will contain the given block.
 	 * @param blockX The x position of the block.
 	 * @param blockZ The z position of the block.
@@ -166,7 +125,7 @@ public class ChunkCoordinate
 	 * @return The x position.
 	 */
 	public int getBlockXCenter() {
-		return chunkX * CHUNK_SIZE + CHUNK_POPULATION_OFFSET_X;
+		return chunkX * CHUNK_SIZE + CHUNK_CENTER;
 	}
 	
 	/**
@@ -174,7 +133,7 @@ public class ChunkCoordinate
 	 * @return The z position.
 	 */
 	public int getBlockZCenter() {
-		return chunkZ * CHUNK_SIZE + CHUNK_POPULATION_OFFSET_Z;
+		return chunkZ * CHUNK_SIZE + CHUNK_CENTER;
 	}
 
 	/**
@@ -207,18 +166,5 @@ public class ChunkCoordinate
 	public boolean coordsMatch(int chunkX, int chunkZ)
 	{
 		return this.chunkX == chunkX && this.chunkZ == chunkZ;
-	}
-	
-	public static boolean isInAreaBeingDecorated(int blockX, int blockZ, ChunkCoordinate chunkBeingDecorated)
-	{
-		return
-			(
-				blockX >= chunkBeingDecorated.getBlockX() &&
-				blockX < chunkBeingDecorated.getBlockX() + (CHUNK_SIZE * 2)
-			) && (
-				blockZ >= chunkBeingDecorated.getBlockZ() &&
-				blockZ < chunkBeingDecorated.getBlockZ() + (CHUNK_SIZE * 2)
-			)
-		;		
 	}
 }

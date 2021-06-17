@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -29,12 +28,12 @@ public class DungeonResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 		worldGenRegion.placeDungeon(random, x, y, z);
 	}
-	
+
 	@Override
 	public String toString()
 	{

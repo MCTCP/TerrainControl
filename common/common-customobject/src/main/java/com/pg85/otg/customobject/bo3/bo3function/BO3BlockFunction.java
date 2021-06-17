@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 /**
@@ -33,11 +33,17 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z)
 	{
-		worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingDecorated, replaceBlock);
-	}
+		worldGenRegion.setBlock(x, y, z, this.material, this.nbt);			
+	}	
 	
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks)
+	{
+		worldGenRegion.setBlock(x, y, z, this.material, this.nbt, replaceBlocks);
+	}
+
 	@Override
 	public Class<BO3Config> getHolderType()
 	{

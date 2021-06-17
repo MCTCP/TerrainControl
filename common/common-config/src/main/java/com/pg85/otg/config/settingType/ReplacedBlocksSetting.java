@@ -2,14 +2,14 @@ package com.pg85.otg.config.settingType;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 /**
- * Setting that handles {@link ReplacedBlocksMatrix}.
+ * Setting that handles {@link ReplaceBlockMatrix}.
  *
  */
-class ReplacedBlocksSetting extends Setting<ReplacedBlocksMatrix>
+class ReplacedBlocksSetting extends Setting<ReplaceBlockMatrix>
 {
 
 	ReplacedBlocksSetting(String name)
@@ -18,14 +18,14 @@ class ReplacedBlocksSetting extends Setting<ReplacedBlocksMatrix>
 	}
 
 	@Override
-	public ReplacedBlocksMatrix getDefaultValue(IMaterialReader materialReader)
+	public ReplaceBlockMatrix getDefaultValue(IMaterialReader materialReader)
 	{
-		return ReplacedBlocksMatrix.createEmptyMatrix(Constants.WORLD_HEIGHT, materialReader);
+		return ReplaceBlockMatrix.createEmptyMatrix(Constants.WORLD_HEIGHT, materialReader);
 	}
 
 	@Override
-	public ReplacedBlocksMatrix read(String string, IMaterialReader materialReader) throws InvalidConfigException
+	public ReplaceBlockMatrix read(String string, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		return new ReplacedBlocksMatrix(string, Constants.WORLD_HEIGHT, materialReader);
+		return new ReplaceBlockMatrix(string, Constants.WORLD_HEIGHT, materialReader);
 	}
 }

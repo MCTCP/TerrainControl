@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -30,16 +29,16 @@ public class CoralTreeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
+		int y = world.getBlockAboveSolidHeight(x, z);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		int height = random.nextInt(3) + 1;
 		for (int i = 0; i < height; i++)
 		{
 			// Return if we don't have enough space to place the rest of the tree
-			if (!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, x, y + i, z, coral))
+			if (!CoralHelper.placeCoralBlock(world, random, x, y + i, z, coral))
 			{
 				return;
 			}
@@ -69,7 +68,7 @@ public class CoralTreeResource extends FrequencyResourceBase
 			count = random.nextInt(5) + 2;
 			placedIndex = 0;
 
-			for (int i = 0; i < count && CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, dx, dy, dz, coral); i++)
+			for (int i = 0; i < count && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); i++)
 			{
 				placedIndex++;
 				dy++;

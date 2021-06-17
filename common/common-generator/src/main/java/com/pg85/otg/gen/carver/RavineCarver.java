@@ -24,7 +24,7 @@ public class RavineCarver extends Carver
 
 	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet)
 	{
-		int branchingFactor = (this.getBranchFactor() * 2 - 1) * 16;
+//		int branchingFactor = (this.getBranchFactor() * 2 - 1) * 16;
 
 		double x = chunkX * 16 + random.nextInt(16);
 		// Vanilla behavior: Bias ravines downwards, with a min of 20.

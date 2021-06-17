@@ -16,7 +16,7 @@ import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.interfaces.IBiome;
@@ -41,6 +41,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Features;
@@ -51,17 +52,21 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private final ISeedReader worldGenRegion;
 	private final ChunkGenerator chunkGenerator;
 	
-	// 32x32 biomes cache for fast lookups during decoration
-	private IBiome[][] cachedBiomeConfigs;
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
 	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
-	private boolean cacheIsValid;
 
-	/** Creates a LocalWorldGenRegion
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	{
+		super(presetFolderName, worldConfig, worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
+		this.worldGenRegion = worldGenRegion;
+		this.chunkGenerator = chunkGenerator;
+	}
+	
+	/** Creates a LocalWorldGenRegion to be used outside of world generation.
 	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
 	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
-	 */
+	 */	
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig);
@@ -112,53 +117,32 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		return null;
 	}
-	
-	// A 32x32 cache of biomes is filled when decoration starts for each chunk, any resource 
-	// spawning during decoration should use getBiomeForPopulation/getBiomeConfigForPopulation 
-	// for any operation that is intended to stay within decoration bounds.
 
 	@Override
-	public IBiome getBiomeForDecoration(int worldX, int worldZ, ChunkCoordinate chunkBeingDecorated)
+	public IBiome getBiomeForDecoration(int worldX, int worldZ)
 	{
-		// Cache is invalidated when cascading chunkgen happens.
-		return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX - chunkBeingDecorated.getBlockX()][worldZ - chunkBeingDecorated.getBlockZ()];
-	}
-	
-	@Override
-	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingDecorated)
-	{
-		// Cache is invalidated when cascading chunkgen happens.
-		return !cacheIsValid ? getBiome(worldX, worldZ).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingDecorated.getBlockX()][worldZ - chunkBeingDecorated.getBlockZ()].getBiomeConfig();
-	}
-
-	@Override
-	public void cacheBiomesForDecoration(ChunkCoordinate chunkCoord)
-	{
-		this.cachedBiomeConfigs = new IBiome[32][32];
-		
-		int areaSize = 32; 
-		for(int x = 0; x < areaSize; x++)
+		if(this.decorationBiomeCache != null)
 		{
-			for(int z = 0; z < areaSize; z++)
-			{
-				this.cachedBiomeConfigs[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
-			}
+			return this.decorationBiomeCache.getBiome(worldX, worldZ, this);
 		}
-		this.cacheIsValid = true;
+		return this.getBiome(worldX, worldZ);
 	}
 	
-	// Decoration biome cache is invalidated when cascading chunkgen happens
 	@Override
-	public void invalidateDecorationBiomeCache()
+	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ)
 	{
-		this.cacheIsValid = false;
+		if(this.decorationBiomeCache != null)
+		{
+			return this.decorationBiomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
+		}
+		return this.getBiome(worldX, worldZ).getBiomeConfig();
 	}
 
 	@Override
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(blockX, blockZ);
-	}	
+	}
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
 	@Override
@@ -263,46 +247,27 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	@Override
-	public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public LocalMaterialData getMaterial(int x, int y, int z)
 	{
 		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
 		{
 			return null;
 		}
-	 
+
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		
-		// If the chunk exists or is inside the area being decorated, fetch it normally.
+
 		IChunk chunk = null;
-		if(chunkBeingDecorated != null && ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
-		
-		// If the chunk doesn't exist so we're doing something outside the
-		// decoration sequence, return the material without loading the chunk.
-		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)) && chunkBeingDecorated == null)
-		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
-				!(
-					chunk == null && 
-					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
-			}
-		}
-		
+
 		// Tried to query an unloaded chunk outside the area being decorated
 		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return null;
 		}
-		
+
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
@@ -310,9 +275,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	@Override
-	public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getBlockAboveLiquidHeight(int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false);
 		if(highestY >= 0)
 		{
 			return highestY + 1;
@@ -322,9 +287,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getBlockAboveSolidHeight(int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false);
 		if(highestY >= 0)
 		{
 			return highestY + 1;
@@ -334,9 +299,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getHighestBlockAboveYAt(int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false);
 		if(highestY >= 0)
 		{
 			return highestY + 1;
@@ -344,43 +309,29 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return -1;
 		}
 	}
-
+	
 	@Override
-	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingDecorated)
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunk chunk = null;
-		if(chunkBeingDecorated != null && ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
-		
-		// If the chunk doesn't exist and we're doing something outside the
-		// decoration sequence, return the material without loading the chunk.
-		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)) && chunkBeingDecorated == null)
-		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
-				!(
-					chunk == null && 
-					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-			}
-		}
-		
+
 		// Tried to query an unloaded chunk outside the area being decorated
 		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return -1;
-		}
-		
+		}	
+		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
+	}	
+
+	private int getHighestBlockYAt(IChunk chunk, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
@@ -468,16 +419,16 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		
 		// Can happen if this is a chunk filled with air
 		return -1;
-	}
-
+	}	
+	
 	@Override
-	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getHeightMapHeight(int x, int z)
 	{
 		return this.worldGenRegion.getHeight(Type.WORLD_SURFACE_WG, x, z); 
 	}
 
 	@Override
-	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getLightLevel(int x, int y, int z)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
@@ -489,51 +440,61 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		IChunk chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		if(chunkBeingDecorated == null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
+		if(chunk != null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
 			return this.worldGenRegion.getMaxLocalRawBrightness(new BlockPos(x, y, z));
 		}
 		return -1;
 	}
+
+	@Override
+	public void setBlock(int x, int y, int z, LocalMaterialData material)
+	{
+		setBlock(x, y, z, material, null, null);
+	}
 	
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt)
+	{
+		setBlock(x, y, z, material, nbt, null);
+	}
+	
+	@Override
+	public void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix)
+	{
+		setBlock(x, y, z, material, null, replaceBlocksMatrix);
+	}
+	
+	@Override
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ReplaceBlockMatrix replaceBlocksMatrix)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
 			return;
 		}
-		
+
 		if(material.isEmpty())
 		{
 			// Happens when configs contain blocks that don't exist.
 			// TODO: Catch this earlier up the chain, avoid doing work?
 			return;
 		}
-		
+
 		// If no chunk was passed, we're doing something outside of the decoration cycle.
 		// If a chunk was passed, only spawn in the area being decorated.
-		if(chunkBeingDecorated == null || ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			if(replaceBlocks)
+			if(replaceBlocksMatrix != null)
 			{
-				if(replaceBlocksMatrix == null)
-				{
-					if(chunkBeingDecorated == null)
-					{
-						replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
-					} else {
-						replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingDecorated).getReplaceBlocks();
-					}
-				}
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
 
 			BlockPos pos = new BlockPos(x, y, z);
 			this.worldGenRegion.setBlock(pos, ((ForgeMaterialData)material).internalBlock(), 2 | 16);
 
-			if (material.isLiquid()) {
+			if (material.isLiquid())
+			{
 				this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
 			}
 
@@ -569,20 +530,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
-	{
-		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
-		if(hasDefaultStructure != null)
-		{
-			return hasDefaultStructure.booleanValue();
-		}
-		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
-		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
-		return hasDefaultStructure;
-	}
-
-	@Override
-	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
+	public void spawnEntity(IEntityFunction<?> newEntityData)
 	{
 		// TODO: Implement this.
 	}
@@ -640,5 +588,105 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public ISeedReader getInternal()
 	{
 		return worldGenRegion;
+	}
+	
+	// Shadowgen
+	
+	@Override
+	public LocalMaterialData getMaterialWithoutLoading(int x, int y, int z)
+	{
+		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
+		{
+			return null;
+		}
+	 
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+		
+		// If the chunk exists or is inside the area being decorated, fetch it normally.
+		IChunk chunk = null;
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		{
+			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+		
+		// If the chunk doesn't exist so we're doing something outside the
+		// decoration sequence, return the material without loading the chunk.
+		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if(
+				!(
+					chunk == null && 
+					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
+				)
+			)
+			{
+				// Calculate the material without loading the chunk.
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
+			}
+		}
+		
+		// Tried to query an unloaded chunk outside the area being decorated
+		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
+		{
+			return null;
+		}
+
+		// Get internal coordinates for block in chunk
+		int internalX = x & 0xF;
+		int internalZ = z & 0xF;
+		return ForgeMaterialData.ofBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
+	}	
+	
+	@Override
+	public int getHighestBlockYAtWithoutLoading(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+		
+		// If the chunk exists or is inside the area being decorated, fetch it normally.
+		IChunk chunk = null;
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		{
+			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+		
+		// If the chunk doesn't exist and we're doing something outside the
+		// decoration sequence, return the material without loading the chunk.
+		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if(
+				!(
+					chunk == null && 
+					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
+				)
+			)
+			{
+				// Calculate the material without loading the chunk.
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+			}
+		}
+		
+		// Tried to query an unloaded chunk outside the area being decorated
+		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
+		{
+			return -1;
+		}
+		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
+	}	
+	
+	@Override
+	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
+	{
+		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
+		if(hasDefaultStructure != null)
+		{
+			return hasDefaultStructure.booleanValue();
+		}
+		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
+		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
+		return hasDefaultStructure;
 	}
 }

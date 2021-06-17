@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -23,12 +22,12 @@ public class KelpResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
+		int y = world.getBlockAboveSolidHeight(x, z);
 
 		// TODO: sourceblocks
-		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingDecorated);
+		LocalMaterialData below = world.getMaterial(x, y - 1, z);
 		if (below == null || !below.isSolid())
 		{
 			return;
@@ -43,17 +42,17 @@ public class KelpResource extends FrequencyResourceBase
 			dy = y + y1;
 
 			// Stop if we hit non-water
-			if (!world.getMaterial(x, dy, + z, chunkBeingDecorated).isLiquid())
+			if (!world.getMaterial(x, dy, + z).isLiquid())
 			{
 				break;
 			}
 
 			// If we hit the surface of the water, place the top and return
-			if (!world.getMaterial(x, dy + 1, + z, chunkBeingDecorated).isLiquid())
+			if (!world.getMaterial(x, dy + 1, + z).isLiquid())
 			{
 				if (y1 > 0)
 				{
-					world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)), null, chunkBeingDecorated, false);
+					world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)));
 				}
 
 				break;
@@ -62,9 +61,9 @@ public class KelpResource extends FrequencyResourceBase
 			// Place the top if we're at the top of the column
 			if (y1 == height)
 			{
-				world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)), null, chunkBeingDecorated, false);
+				world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)));
 			} else {
-				world.setBlock(x, dy, z, LocalMaterials.KELP_PLANT, null, chunkBeingDecorated, false);
+				world.setBlock(x, dy, z, LocalMaterials.KELP_PLANT);
 			}
 		}
 	}

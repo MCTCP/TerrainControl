@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -43,13 +42,13 @@ public class CoralClawResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
+		int y = world.getBlockAboveSolidHeight(x, z);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		// Return if we don't have enough space to place the claw
-		if (!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, x, y, z, coral))
+		if (!CoralHelper.placeCoralBlock(world, random, x, y, z, coral))
 		{
 			return;
 		}
@@ -84,7 +83,7 @@ public class CoralClawResource extends FrequencyResourceBase
 				clawLength = random.nextInt(3) + 3;
 			}
 
-			for(int i = 0; i < branchLength && CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, dx, dy, dz, coral); ++i)
+			for(int i = 0; i < branchLength && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); ++i)
 			{
 				dx += finalDir.getX();
 				dy += finalDir.getY();
@@ -105,7 +104,7 @@ public class CoralClawResource extends FrequencyResourceBase
 				dy += initial.getY();
 				dz += initial.getZ();
 
-				if (!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, dx, dy, dz, coral))
+				if (!CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral))
 				{
 					break;
 				}

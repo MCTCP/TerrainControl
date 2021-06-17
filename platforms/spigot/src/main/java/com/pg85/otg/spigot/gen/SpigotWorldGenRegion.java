@@ -12,8 +12,9 @@ import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.gen.DecorationBiomeCache;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -22,6 +23,7 @@ import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
+
 import java.util.Optional;
 import java.util.Random;
 
@@ -29,57 +31,47 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	private final GeneratorAccessSeed worldGenRegion;
 	private final ChunkGenerator chunkGenerator;
+	private final DecorationBiomeCache biomeCache;
 
-	// 32x32 biomes cache for fast lookups during decoration
-	private IBiome[][] cachedBiomeConfigs;
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
 	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
-	private boolean cacheIsValid;
 
-	public SpigotWorldGenRegion (String name, IWorldConfig worldConfig, GeneratorAccessSeed world, ChunkGenerator otgNoiseChunkGenerator)
+	/** Creates a LocalWorldGenRegion to be used during chunk decoration */
+	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(name, worldConfig);
-		worldGenRegion = world;
-		this.chunkGenerator = otgNoiseChunkGenerator;
+		super(presetFolderName, worldConfig);
+		this.worldGenRegion = worldGenRegion;
+		this.chunkGenerator = chunkGenerator;
+		this.biomeCache = new DecorationBiomeCache(ChunkCoordinate.CHUNK_SIZE * 3, ChunkCoordinate.CHUNK_SIZE * 3, worldGenRegion.a() - ChunkCoordinate.CHUNK_SIZE, worldGenRegion.b() - ChunkCoordinate.CHUNK_SIZE);
 	}
-
+	
+	/** Creates a LocalWorldGenRegion to be used outside of world generation.
+	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
+	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
+	 */
+	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, ChunkGenerator chunkGenerator)
+	{
+		super(presetFolderName, worldConfig);
+		this.worldGenRegion = worldGenRegion;
+		this.chunkGenerator = chunkGenerator;
+		this.biomeCache = null;
+	}	
+	
 	@Override
-	public long getSeed ()
+	public long getSeed()
 	{
 		return this.worldGenRegion.getSeed();
 	}
 
 	@Override
-	public Random getWorldRandom ()
+	public Random getWorldRandom()
 	{
 		return this.worldGenRegion.getRandom();
 	}
 
 	@Override
-	public void cacheBiomesForDecoration (ChunkCoordinate chunkCoord)
-	{
-		this.cachedBiomeConfigs = new IBiome[32][32];
-
-		int areaSize = 32;
-		for (int x = 0; x < areaSize; x++)
-		{
-			for (int z = 0; z < areaSize; z++)
-			{
-				this.cachedBiomeConfigs[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
-			}
-		}
-		this.cacheIsValid = true;
-	}
-
-	@Override
-	public void invalidateDecorationBiomeCache ()
-	{
-		this.cacheIsValid = false;
-	}
-
-	@Override
-	public IBiome getBiome (int x, int z)
+	public IBiome getBiome(int x, int z)
 	{
 		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
 		if (biome != null)
@@ -95,14 +87,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public IBiome getBiomeForDecoration (int worldX, int worldZ, ChunkCoordinate chunkBeingDecorated)
-	{
-		return getBiome(worldX, worldZ);
-		//return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX-chunkBeingDecorated.getBlockX()][worldZ - chunkBeingDecorated.getBlockZ()];
-	}
-
-	@Override
-	public IBiomeConfig getBiomeConfig (int x, int z)
+	public IBiomeConfig getBiomeConfig(int x, int z)
 	{
 		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
 		if (biome != null)
@@ -114,23 +99,39 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public IBiomeConfig getBiomeConfigForPopulation (int worldX, int worldZ, ChunkCoordinate chunkBeingDecorated)
+	public IBiome getBiomeForDecoration(int worldX, int worldZ)
 	{
-		return getBiomeForDecoration(worldX, worldZ, chunkBeingDecorated).getBiomeConfig();
+		if(this.biomeCache != null)
+		{
+			return this.biomeCache.getBiome(worldX, worldZ, this);
+		}
+		return this.getBiome(worldX, worldZ);
+	}
+	
+	@Override
+	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ)
+	{
+		if(this.biomeCache != null)
+		{
+			return this.biomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
+		}
+		return this.getBiome(worldX, worldZ).getBiomeConfig();
 	}
 
 	@Override
-	public double getBiomeBlocksNoiseValue (int xInWorld, int zInWorld)
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld)
 	{
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean placeTree (TreeType type, Random rand, int x, int y, int z)
+	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		{
 			return false;
+		}
 		BlockPosition blockPos = new BlockPosition(x, y, z);
 		try
 		{
@@ -220,7 +221,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public LocalMaterialData getMaterial (int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public LocalMaterialData getMaterial(int x, int y, int z)
 	{
 		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
 		{
@@ -231,25 +232,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
-		if (chunkBeingDecorated != null && ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		}
-		// isAtLeast() -> b()
-		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingDecorated == null)
-		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if (
-					!(
-							chunk == null &&
-							this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
-							(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
-					)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x, y, z);
-			}
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
@@ -265,9 +250,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getBlockAboveLiquidHeight (int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getBlockAboveLiquidHeight (int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false);
 		if (highestY >= 0)
 		{
 			return highestY + 1;
@@ -277,9 +262,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getBlockAboveSolidHeight (int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getBlockAboveSolidHeight (int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false);
 		if (highestY >= 0)
 		{
 			return highestY + 1;
@@ -289,9 +274,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getHighestBlockAboveYAt (int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getHighestBlockAboveYAt (int x, int z)
 	{
-		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingDecorated);
+		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false);
 		if (highestY >= 0)
 		{
 			return highestY + 1;
@@ -301,33 +286,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public int getHighestBlockYAt (int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingDecorated)
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
-		if (chunkBeingDecorated != null && ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		}
-
-		// If the chunk doesn't exist and we're doing something outside the
-		// decoration sequence, return the material without loading the chunk.
-		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingDecorated == null)
-		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if (
-					!(
-							chunk == null &&
-							this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
-							(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
-					)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-			}
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
@@ -336,6 +303,11 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			return -1;
 		}
 
+		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
+	}	
+
+	private int getHighestBlockYAt(IChunkAccess chunk, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
@@ -371,43 +343,43 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			material = SpigotMaterialData.ofBlockData(blockState);
 			isLiquid = material.isLiquid();
 			isSolid =
+			(
+				(
+					material.isSolid() &&
 					(
-							(
-									material.isSolid() &&
-									(
-											!ignoreLeaves ||
-											(
-													block != Blocks.ACACIA_LOG &&
-													block != Blocks.BIRCH_LOG &&
-													block != Blocks.DARK_OAK_LOG &&
-													block != Blocks.JUNGLE_LOG &&
-													block != Blocks.OAK_LOG &&
-													block != Blocks.SPRUCE_LOG &&
-													block != Blocks.STRIPPED_ACACIA_LOG &&
-													block != Blocks.STRIPPED_BIRCH_LOG &&
-													block != Blocks.STRIPPED_DARK_OAK_LOG &&
-													block != Blocks.STRIPPED_JUNGLE_LOG &&
-													block != Blocks.STRIPPED_OAK_LOG &&
-													block != Blocks.STRIPPED_SPRUCE_LOG
-											)
-									)
-							)
-							||
-							(
-									!ignoreLeaves &&
-									(
-											block == Blocks.ACACIA_LEAVES ||
-											block == Blocks.BIRCH_LEAVES ||
-											block == Blocks.DARK_OAK_LEAVES ||
-											block == Blocks.JUNGLE_LEAVES ||
-											block == Blocks.OAK_LEAVES ||
-											block == Blocks.SPRUCE_LEAVES
-									)
-							) || (
-									!ignoreSnow &&
-									block == Blocks.SNOW
-							)
-					);
+						!ignoreLeaves ||
+						(
+							block != Blocks.ACACIA_LOG &&
+							block != Blocks.BIRCH_LOG &&
+							block != Blocks.DARK_OAK_LOG &&
+							block != Blocks.JUNGLE_LOG &&
+							block != Blocks.OAK_LOG &&
+							block != Blocks.SPRUCE_LOG &&
+							block != Blocks.STRIPPED_ACACIA_LOG &&
+							block != Blocks.STRIPPED_BIRCH_LOG &&
+							block != Blocks.STRIPPED_DARK_OAK_LOG &&
+							block != Blocks.STRIPPED_JUNGLE_LOG &&
+							block != Blocks.STRIPPED_OAK_LOG &&
+							block != Blocks.STRIPPED_SPRUCE_LOG
+						)
+					)
+				)
+				||
+				(
+					!ignoreLeaves &&
+					(
+						block == Blocks.ACACIA_LEAVES ||
+						block == Blocks.BIRCH_LEAVES ||
+						block == Blocks.DARK_OAK_LEAVES ||
+						block == Blocks.JUNGLE_LEAVES ||
+						block == Blocks.OAK_LEAVES ||
+						block == Blocks.SPRUCE_LEAVES
+					)
+				) || (
+					!ignoreSnow &&
+					block == Blocks.SNOW
+				)
+			);
 			if (!(ignoreLiquid && isLiquid))
 			{
 				if ((findSolid && isSolid) || (findLiquid && isLiquid))
@@ -423,16 +395,16 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// Can happen if this is a chunk filled with air
 		return -1;
-	}
+	}	
 
 	@Override
-	public int getHeightMapHeight (int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getHeightMapHeight (int x, int z)
 	{
 		return this.worldGenRegion.a(HeightMap.Type.WORLD_SURFACE_WG, x, z);
 	}
 
 	@Override
-	public int getLightLevel (int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public int getLightLevel (int x, int y, int z)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
@@ -444,7 +416,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		IChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		if (chunkBeingDecorated == null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
+		if (chunk != null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
 			return this.worldGenRegion.getLightLevel(new BlockPosition(x, y, z));
@@ -453,7 +425,25 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingDecorated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks, boolean useResourceBounds)
+	public void setBlock(int x, int y, int z, LocalMaterialData material)
+	{
+		setBlock(x, y, z, material, null, null);
+	}
+	
+	@Override
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt)
+	{
+		setBlock(x, y, z, material, nbt, null);
+	}
+	
+	@Override
+	public void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix)
+	{
+		setBlock(x, y, z, material, null, replaceBlocksMatrix);
+	}	
+	
+	@Override
+	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ReplaceBlockMatrix replaceBlocksMatrix)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
@@ -469,19 +459,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If no chunk was passed, we're doing something outside of the decoration cycle.
 		// If a chunk was passed, only spawn in the area being decorated.
-		if (chunkBeingDecorated == null || ChunkCoordinate.isInAreaBeingDecorated(x, z, chunkBeingDecorated))
+		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			if (replaceBlocks)
+			if(replaceBlocksMatrix != null)
 			{
-				if (replaceBlocksMatrix == null)
-				{
-					if (chunkBeingDecorated == null)
-					{
-						replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
-					} else {
-						replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingDecorated).getReplaceBlocks();
-					}
-				}
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
 
@@ -525,22 +506,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void spawnEntity (IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
+	public void spawnEntity (IEntityFunction<?> newEntityData)
 	{
 		// TODO: Implement this.
-	}
-
-	@Override
-	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
-	{
-		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
-		if(hasDefaultStructure != null)
-		{
-			return hasDefaultStructure;
-		}
-		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
-		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
-		return hasDefaultStructure;
 	}
 
 	@Override
@@ -596,4 +564,103 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	{
 		worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
+	
+	// Shadowgen
+	
+	@Override
+	public LocalMaterialData getMaterialWithoutLoading(int x, int y, int z)
+	{
+		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
+		{
+			return null;
+		}
+
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+
+		// If the chunk exists or is inside the area being decorated, fetch it normally.
+		IChunkAccess chunk = null;
+		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		{
+			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+		// isAtLeast() -> b()
+		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if (
+				!(
+					chunk == null &&
+					this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
+					(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
+				)
+			)
+			{
+				// Calculate the material without loading the chunk.
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x, y, z);
+			}
+		}
+
+		// Tried to query an unloaded chunk outside the area being decorated
+		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		{
+			return null;
+		}
+
+		// Get internal coordinates for block in chunk
+		int internalX = x & 0xF;
+		int internalZ = z & 0xF;
+		return SpigotMaterialData.ofBlockData(chunk.getType(new BlockPosition(internalX, y, internalZ)));
+	}	
+	
+	@Override
+	public int getHighestBlockYAtWithoutLoading(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+
+		// If the chunk exists or is inside the area being decorated, fetch it normally.
+		IChunkAccess chunk = null;
+		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		{
+			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+
+		// If the chunk doesn't exist and we're doing something outside the
+		// decoration sequence, return the material without loading the chunk.
+		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if (
+				!(
+					chunk == null &&
+					this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
+					(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
+				)
+			)
+			{
+				// Calculate the material without loading the chunk.
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+			}
+		}
+
+		// Tried to query an unloaded chunk outside the area being decorated
+		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		{
+			return -1;
+		}
+
+		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves); 
+	}	
+	
+	@Override
+	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
+	{
+		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
+		if(hasDefaultStructure != null)
+		{
+			return hasDefaultStructure;
+		}
+		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
+		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
+		return hasDefaultStructure;
+	}	
 }
