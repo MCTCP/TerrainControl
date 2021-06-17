@@ -24,12 +24,14 @@ public class FrozenSurfaceHelper
 	{
 		int x = chunkCoord.getBlockXCenter();
 		int z = chunkCoord.getBlockZCenter();
+		int blockToFreezeX;
+		int blockToFreezeZ;
 		for (int i = 0; i < ChunkCoordinate.CHUNK_SIZE; i++)
 		{
 			for (int j = 0; j < ChunkCoordinate.CHUNK_SIZE; j++)
 			{
-				int blockToFreezeX = x + i;
-				int blockToFreezeZ = z + j;
+				blockToFreezeX = x + i;
+				blockToFreezeZ = z + j;
 				freezeColumn(worldGenRegion, blockToFreezeX, blockToFreezeZ);
 			}
 		}

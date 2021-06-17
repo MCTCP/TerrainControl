@@ -14,7 +14,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.gen.DecorationBiomeCache;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -31,7 +30,6 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	private final GeneratorAccessSeed worldGenRegion;
 	private final ChunkGenerator chunkGenerator;
-	private final DecorationBiomeCache biomeCache;
 
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
@@ -40,10 +38,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during chunk decoration */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, worldConfig, worldGenRegion.a(), worldGenRegion.b());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
-		this.biomeCache = new DecorationBiomeCache(ChunkCoordinate.CHUNK_SIZE * 3, ChunkCoordinate.CHUNK_SIZE * 3, worldGenRegion.a() - ChunkCoordinate.CHUNK_SIZE, worldGenRegion.b() - ChunkCoordinate.CHUNK_SIZE);
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used outside of world generation.
@@ -55,7 +52,6 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
-		this.biomeCache = null;
 	}	
 	
 	@Override
@@ -101,9 +97,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiomeForDecoration(int worldX, int worldZ)
 	{
-		if(this.biomeCache != null)
+		if(this.decorationBiomeCache != null)
 		{
-			return this.biomeCache.getBiome(worldX, worldZ, this);
+			return this.decorationBiomeCache.getBiome(worldX, worldZ, this);
 		}
 		return this.getBiome(worldX, worldZ);
 	}
@@ -111,9 +107,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ)
 	{
-		if(this.biomeCache != null)
+		if(this.decorationBiomeCache != null)
 		{
-			return this.biomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
+			return this.decorationBiomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
 		}
 		return this.getBiome(worldX, worldZ).getBiomeConfig();
 	}
