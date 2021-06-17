@@ -8,7 +8,7 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 /**
@@ -44,7 +44,7 @@ public interface IWorldConfig
 
 	public boolean getRemoveSurfaceStone();
 	public LocalMaterialData getWaterBlock();
-	public LocalMaterialData getBedrockBlockReplaced(ReplacedBlocksMatrix replacedBlocks, int y);
+	public LocalMaterialData getBedrockBlockReplaced(ReplaceBlockMatrix replacedBlocks, int y);
 	public LocalMaterialData getDefaultBedrockBlock();
 	public LocalMaterialData getCooledLavaBlock();
 	public LocalMaterialData getIceBlock();
@@ -124,6 +124,7 @@ public interface IWorldConfig
 	// OTG Custom structures
 
 	public CustomStructureType getCustomStructureType();
+	// TODO: Reimplement this, or forbid any spawning outside of decoration for 1.16.
 	public boolean doPopulationBoundsCheck();
 	public int getMaximumCustomStructureRadius();
 

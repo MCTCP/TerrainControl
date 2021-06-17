@@ -6,11 +6,11 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 
 public class ApplyOceanLayer implements ParentedLayer
 {
-	private final BiomeLayerData data;
+	//private final BiomeLayerData data;
 
 	public ApplyOceanLayer(BiomeLayerData data)
 	{
-		this.data = data;
+		//this.data = data;
 	}
 
 	@Override

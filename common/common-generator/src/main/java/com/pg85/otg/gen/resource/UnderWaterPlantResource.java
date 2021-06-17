@@ -4,7 +4,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -37,7 +36,7 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
@@ -45,15 +44,14 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 		int k;
 		int m;
 		LocalMaterialData worldMaterial;
-		LocalMaterialData worldMaterialBelow;
-		
+		LocalMaterialData worldMaterialBelow;		
 		for (int i = 0; i < 64; i++)
 		{
 			j = x + rand.nextInt(8) - rand.nextInt(8);
 			k = y + rand.nextInt(4) - rand.nextInt(4);
 			m = z + rand.nextInt(8) - rand.nextInt(8);
-			worldMaterial = worldGenregion.getMaterial(j, k , m, chunkBeingDecorated);
-			worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m, chunkBeingDecorated);
+			worldMaterial = worldGenregion.getMaterial(j, k , m);
+			worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m);
 			if (
 				(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.WATER)) ||
 				(worldMaterialBelow == null || !this.sourceBlocks.contains(worldMaterialBelow))
@@ -61,8 +59,7 @@ public class UnderWaterPlantResource extends FrequencyResourceBase
 			{
 				continue;
 			}
-
-			this.plant.spawn(worldGenregion, j, k, m, chunkBeingDecorated);
+			this.plant.spawn(worldGenregion, j, k, m);
 		}
 	}
 	

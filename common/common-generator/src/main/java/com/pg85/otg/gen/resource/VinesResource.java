@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -37,7 +36,7 @@ public class VinesResource extends FrequencyResourceBase
 		this.maxAltitude = readInt(args.get(3), this.minAltitude, Constants.WORLD_HEIGHT - 1);
 	}
 	
-	private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int direction, ChunkCoordinate chunkBeingDecorated)
+	private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int direction)
 	{
 		LocalMaterialData sourceBlock;
 		switch (direction)
@@ -45,44 +44,43 @@ public class VinesResource extends FrequencyResourceBase
 			default:
 				return false;
 			case 1:
-				sourceBlock = worldGenRegion.getMaterial(x, y + 1, z, chunkBeingDecorated);
+				sourceBlock = worldGenRegion.getMaterial(x, y + 1, z);
 				break;
 			case 2:
-				sourceBlock = worldGenRegion.getMaterial(x, y, z + 1, chunkBeingDecorated);
+				sourceBlock = worldGenRegion.getMaterial(x, y, z + 1);
 				break;
 			case 3:
-				sourceBlock = worldGenRegion.getMaterial(x, y, z - 1, chunkBeingDecorated);
+				sourceBlock = worldGenRegion.getMaterial(x, y, z - 1);
 				break;
 			case 5:
-				sourceBlock = worldGenRegion.getMaterial(x - 1, y, z, chunkBeingDecorated);
+				sourceBlock = worldGenRegion.getMaterial(x - 1, y, z);
 				break;
 			case 4:
-				sourceBlock = worldGenRegion.getMaterial(x + 1, y, z, chunkBeingDecorated);
+				sourceBlock = worldGenRegion.getMaterial(x + 1, y, z);
 				break;
 		}
 		return sourceBlock != null && sourceBlock.isSolid();
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
 		int _x = x;
 		int _z = z;
 		int y = this.minAltitude;
 
-		LocalMaterialData worldMaterial;
-		
+		LocalMaterialData worldMaterial;		
 		while (y <= this.maxAltitude)
 		{
-			worldMaterial = worldGenRegion.getMaterial(_x, y, _z, chunkBeingDecorated);
+			worldMaterial = worldGenRegion.getMaterial(_x, y, _z);
 			if (worldMaterial != null && worldMaterial.isAir())
 			{
 				// TODO: Refactor to enum
 				for (int direction = 2; direction <= 5; direction++)
 				{
-					if (canPlace(worldGenRegion, _x, y, _z, direction, chunkBeingDecorated))
+					if (canPlace(worldGenRegion, _x, y, _z, direction))
 					{
-						worldGenRegion.setBlock(_x, y, _z, FROM_DIRECTION[direction - 2], null, chunkBeingDecorated, false);
+						worldGenRegion.setBlock(_x, y, _z, FROM_DIRECTION[direction - 2]);
 						break;
 					}
 				}

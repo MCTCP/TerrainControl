@@ -5,7 +5,7 @@ import java.util.Random;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -74,7 +74,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
 		return null;
 	}
 
-	private void Init(ReplacedBlocksMatrix replacedBlocks)
+	private void Init(ReplaceBlockMatrix replacedBlocks)
 	{
 		if(!this.initialized)
 		{

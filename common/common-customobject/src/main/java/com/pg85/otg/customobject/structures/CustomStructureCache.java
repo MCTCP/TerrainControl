@@ -175,8 +175,8 @@ public class CustomStructureCache
 
 		// No structure found, create one
 		Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, worldGenRegion.getSeed());
-			IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
-			ICustomStructureGen structureGen = biomeConfig.getStructureGen();
+		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
+		ICustomStructureGen structureGen = biomeConfig.getStructureGen();
 
 		if (structureGen != null)
 		{
@@ -250,16 +250,16 @@ public class CustomStructureCache
 		return false;
 	}
 	
-	// Only used by ObjectSpawner during decoration
+	// Only used by ChunkDecorator during decoration
 	public void plotBo4Structures(IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		plotter.plotStructures(this, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
-	// Only used by ObjectSpawner during decoration
-	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	// Only used by ChunkDecorator during decoration
+	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Only used by /spawn command	
@@ -295,8 +295,8 @@ public class CustomStructureCache
 			int interval = 300;
 			if(System.currentTimeMillis() - starTime > (interval * 1000))
 			{
-				logger.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
-				throw new RuntimeException("SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
+				logger.log(LogMarker.FATAL, "SaveToDisk waited on decorate longer than " + interval + " seconds, something went wrong!");
+				throw new RuntimeException("SaveToDisk waited on decorate longer than " + interval + " seconds, something went wrong!");
 			}
 		}		
 

@@ -46,7 +46,7 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 	}	
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		loadTrees(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
@@ -58,13 +58,14 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 			for (int treeNumber = 0; treeNumber < this.treeNames.size(); treeNumber++)
 			{							
 				if (random.nextInt(100) < this.treeChances.get(treeNumber))
-				{					
-					x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-					z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);					
+				{
+					// TODO: Remove this offset for 1.16?
+					x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+					z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);					
 					
 					tree = this.treeObjects[treeNumber];
 					// Min/Max == -1 means use bo2/bo3 internal min/max height, otherwise use the optional min/max height defined with Tree()
-					if(tree != null && tree.spawnAsTree(structureCache, worldGenRegion, random, x, z, this.treeObjectMinChances[treeNumber], this.treeObjectMaxChances[treeNumber], chunkCoord))
+					if(tree != null && tree.spawnAsTree(structureCache, worldGenRegion, random, x, z, this.treeObjectMinChances[treeNumber], this.treeObjectMaxChances[treeNumber]))
 					{
 						// Success!
 						break;

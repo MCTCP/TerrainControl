@@ -6,7 +6,6 @@ import java.util.Random;
 import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -24,9 +23,9 @@ public class RegistryResource  extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
-		worldGenRegion.placeFromRegistry(random, chunkBeingDecorated, this.id);
+		worldGenRegion.placeFromRegistry(random, worldGenRegion.getDecorationArea().getChunkBeingDecorated(), this.id);
 	}
 	
 	@Override

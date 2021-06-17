@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.surface;
 
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSurfaceGeneratorLayer>
@@ -20,7 +20,7 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		this.maxNoise = maxNoise;
 	}
 
-	LocalMaterialData getSurfaceBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
+	LocalMaterialData getSurfaceBlockReplaced(boolean biomeConfigsHaveReplacement, ReplaceBlockMatrix replaceBlocks, int y)
 	{		
 		// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
 		// Make this prettier?
@@ -32,7 +32,7 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		return this.surfaceBlock;
 	}
 	
-	LocalMaterialData getGroundBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
+	LocalMaterialData getGroundBlockReplaced(boolean biomeConfigsHaveReplacement, ReplaceBlockMatrix replaceBlocks, int y)
 	{
 		// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
 		// Make this prettier?
@@ -44,7 +44,7 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		return this.groundBlock;
 	}
 	
-	private void Init(ReplacedBlocksMatrix replacedBlocks)
+	private void Init(ReplaceBlockMatrix replacedBlocks)
 	{
 		if(!initialized)
 		{

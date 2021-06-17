@@ -8,7 +8,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -62,20 +62,9 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 		return start + ')';
 	}
 
-	/**
-	 * Spawns this block at the position. The saved x, y and z in this block are
-	 * ignored.
-	 * <p/>
-	 * @param worldGenRegion  The world to spawn in.
-	 * @param random The random number generator.
-	 * @param x	  The absolute x to spawn. The x-position in this object is
-	 *				ignored.
-	 * @param y	  The absolute y to spawn. The y-position in this object is
-	 *				ignored.
-	 * @param z	  The absolute z to spawn. The z-position in this object is
-	 *				ignored.
-	 */
-	public abstract void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock);
+	public abstract void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z);
+	
+	public abstract void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks);
 	
 	@Override
 	public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)

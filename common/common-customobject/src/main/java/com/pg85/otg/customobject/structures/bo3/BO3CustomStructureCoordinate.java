@@ -35,8 +35,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	}	
 		
 	/**
-	 * Gets the chunk that should decorate for this object.
-	 * @return The chunk.
+	 * Gets the chunk that should spawn this object during decoration.
 	 */
 	ChunkCoordinate getPopulatingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
@@ -59,10 +58,13 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 			return null;
 		}
 
-		BoundingBox box = ((BO3)object).getBoundingBox(rotation);
-		int centerX = x + box.getMinX() + (box.getWidth() / 2);
-		int centerZ = z + box.getMinZ() + (box.getDepth() / 2);
-
-		return ChunkCoordinate.getPopulatingChunk(centerX, centerZ);
+		BoundingBox box = ((BO3)object).getBoundingBox(this.rotation);
+		int centerX = this.x + box.getMinX() + (box.getWidth() / 2);
+		int centerZ = this.z + box.getMinZ() + (box.getDepth() / 2);
+		// TODO: Remove this offset for 1.16, to align with other resources?
+		return ChunkCoordinate.fromBlockCoords(
+			centerX - ChunkCoordinate.CHUNK_CENTER,
+			centerZ - ChunkCoordinate.CHUNK_CENTER
+		);
 	}
 }

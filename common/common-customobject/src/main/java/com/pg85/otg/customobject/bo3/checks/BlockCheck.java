@@ -4,7 +4,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -16,20 +15,19 @@ public class BlockCheck extends BO3Check
 	MaterialSet toCheck;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenregion, int x, int y, int z)
 	{
-		//toCheck.parseForWorld(worldGenregion.getWorldConfig());
-		return y > Constants.WORLD_DEPTH && y < Constants.WORLD_HEIGHT && !toCheck.contains(worldGenregion.getMaterial(x, y, z, chunkBeingDecorated));
+		return y > Constants.WORLD_DEPTH && y < Constants.WORLD_HEIGHT && !this.toCheck.contains(worldGenregion.getMaterial(x, y, z));
 	}
 
 	@Override
 	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(4, args);
-		x = readInt(args.get(0), -100, 100);
-		y = readInt(args.get(1), -100, 100);
-		z = readInt(args.get(2), -100, 100);
-		toCheck = readMaterials(args, 3, materialReader);
+		this.x = readInt(args.get(0), -100, 100);
+		this.y = readInt(args.get(1), -100, 100);
+		this.z = readInt(args.get(2), -100, 100);
+		this.toCheck = readMaterials(args, 3, materialReader);
 	}
 
 	@Override

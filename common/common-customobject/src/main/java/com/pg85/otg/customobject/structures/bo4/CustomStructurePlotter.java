@@ -54,8 +54,6 @@ public class CustomStructurePlotter
 	private boolean processing = false;
 	//
 	
-	private boolean structurePlottedAtSpawn; // Used by ChunkDecorator to make sure the structureatspawn is plotted first.
-	
 	// Non-persistent caches (optimisations)
 	private final FifoMap<ChunkCoordinate, ArrayList<String>> structureNamesPerChunk;
 	private final FifoMap<ChunkCoordinate, Object> plottedChunksFastCache; // TODO: Technically we don't need a map, we need a FIFO list with unique entries.
@@ -171,12 +169,12 @@ public class CustomStructurePlotter
 	}
 
 	// Only used by ChunkDecorator
-	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BO4CustomStructure structureStart = getFromStructureCache(chunkCoordinate);
 		if (structureStart != null && structureStart.start != null)
 		{
-			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingDecorated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		} else {
 			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
 			if(structureStart != null && structureStart.start == null)
@@ -206,14 +204,7 @@ public class CustomStructurePlotter
 	{
 		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
-	
-	private int getStructureCount()
-	{
-		// TODO: Should return all structure start points combined,
-		// not just all structure names.
-		return spawnedStructuresByName.entrySet().size();
-	}	
-	
+
 	private void setChunkOccupied(ChunkCoordinate chunkCoord)
 	{
 		// Add empty list as an optimisation, so null means not handled, emtpy means done
@@ -225,19 +216,6 @@ public class CustomStructurePlotter
 	
 	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		// Make sure the BO4 at spawn is plotted before anything else
-		// This isn't thread-safe so there's a race condition, shouldn't 
-		// cause problems though due to the lock later on.
-		// TODO: Reimplement IsSpawnPoint
-		//if(!this.structurePlottedAtSpawn) 
-		{
-			//this.structurePlottedAtSpawn = true;
-			//if(!chunkCoord.equals(worldGenRegion.getSpawnChunk()))
-			{
-				//plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, worldGenRegion.getSpawnChunk(), true);
-			}
-		}
-
 		// This method can be called by /otg spawn and during chunkgeneration.
 		// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
 		// When called by /otg spawn, skip this attempt to spawn and let chunk generation complete first.
@@ -1126,16 +1104,6 @@ public class CustomStructurePlotter
 				// This is an optimisation so that PlotStructures knows not to plot anything in this chunk
 				// TODO: This could easily exceed the capacity of the StructuresPerChunkCache, mostly defeating the point?
 				setChunkOccupied(chunkCoord);
-			}
-
-			// If any structure plotting/spawning has occurred, we can assume the spawn chunks have been handled.
-			// TODO: What about plotted null chunks?
-			if(
-				(loadedStructures != null && loadedStructures.size() > 0) || 
-				getStructureCount() > 0
-			)
-			{
-				this.structurePlottedAtSpawn = true;
 			}
 		}
 		logger.log(LogMarker.DEBUG, "Loading done");

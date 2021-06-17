@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -35,10 +34,10 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-		if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated))
+		if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z))
 		{
 			return;
 		}
@@ -84,7 +83,7 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 				{
 					for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
 					{
-						material = worldGenRegion.getMaterial(xLake, yLake, zLake, chunkBeingDecorated);
+						material = worldGenRegion.getMaterial(xLake, yLake, zLake);
 						if (material == null || material.isEmptyOrAir() || material.isMaterial(LocalMaterials.BEDROCK))
 						{
 							// Don't replace air or bedrock
@@ -99,14 +98,14 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 							continue;
 						}
 
-						materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake, chunkBeingDecorated);
+						materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake);
 						if (materialBelow != null && materialBelow.isAir())
 						{
 							// Air block, also set position above to air
-							worldGenRegion.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingDecorated, false);
+							worldGenRegion.setBlock(xLake, yLake, zLake, materialBelow);
 						} else {
 							// Not air, set position above to water
-							worldGenRegion.setBlock(xLake, yLake, zLake, material, null, chunkBeingDecorated, false);
+							worldGenRegion.setBlock(xLake, yLake, zLake, material);
 						}
 					}
 				}

@@ -4,7 +4,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -36,7 +35,7 @@ public class PlantResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
@@ -51,8 +50,8 @@ public class PlantResource extends FrequencyResourceBase
 			localX = x + rand.nextInt(8) - rand.nextInt(8);
 			localY = y + rand.nextInt(4) - rand.nextInt(4);
 			localZ = z + rand.nextInt(8) - rand.nextInt(8);
-			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingDecorated);
-			worldMaterialBelow = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingDecorated);
+			worldMaterial = worldGenregion.getMaterial(localX, localY, localZ);
+			worldMaterialBelow = worldGenregion.getMaterial(localX, localY - 1, localZ);
 			if (
 				(worldMaterial == null || !worldMaterial.isAir()) ||
 				(worldMaterialBelow == null || !this.sourceBlocks.contains(worldMaterialBelow))
@@ -61,7 +60,7 @@ public class PlantResource extends FrequencyResourceBase
 				continue;
 			}
 
-			this.plant.spawn(worldGenregion, localX, localY, localZ, chunkBeingDecorated);
+			this.plant.spawn(worldGenregion, localX, localY, localZ);
 		}
 	}
 	

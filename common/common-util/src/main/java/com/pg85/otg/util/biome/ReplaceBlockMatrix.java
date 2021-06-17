@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class ReplacedBlocksMatrix
+public class ReplaceBlockMatrix
 {
 	private static final String NO_REPLACE = "None";
 	
@@ -86,7 +86,7 @@ public class ReplacedBlocksMatrix
 		 *			be smaller than or equal to 0.
 		 * @param maxHeight Maximum height for this replace, inclusive. Must
 		 *			not be larger than
-		 *			{@link ReplacedBlocksMatrix#maxHeight}.
+		 *			{@link ReplaceBlockMatrix#maxHeight}.
 		 */
 		public ReplacedBlocksInstruction(LocalMaterialData from, LocalMaterialData to, int minHeight, int maxHeight)
 		{
@@ -136,7 +136,7 @@ public class ReplacedBlocksMatrix
 	public boolean replacesSandStone = false;
 	public boolean replacesRedSandStone = false;
 
-	public ReplacedBlocksMatrix(String setting, int maxHeight, IMaterialReader reader) throws InvalidConfigException
+	public ReplaceBlockMatrix(String setting, int maxHeight, IMaterialReader reader) throws InvalidConfigException
 	{
 		this.maxHeight = maxHeight;
 		this.targetsAtHeights = (ReplaceBlockEntry[])new ReplaceBlockEntry[256];
@@ -396,10 +396,10 @@ public class ReplacedBlocksMatrix
 	 * @param maxHeight Max height for the replace setting, inclusive.
 	 * @return The empty matrix.
 	 */
-	public static ReplacedBlocksMatrix createEmptyMatrix(int maxHeight, IMaterialReader materialReader)
+	public static ReplaceBlockMatrix createEmptyMatrix(int maxHeight, IMaterialReader materialReader)
 	{
 		try {
-			return new ReplacedBlocksMatrix(NO_REPLACE, maxHeight, materialReader);
+			return new ReplaceBlockMatrix(NO_REPLACE, maxHeight, materialReader);
 		} catch (InvalidConfigException e) {
 			throw new AssertionError(e); // Should never happen
 		}

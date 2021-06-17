@@ -11,6 +11,7 @@ class NoiseGeneratorSimplex
 	private final int[] p;
 	private double xo;
 	private double yo;
+	@SuppressWarnings("unused")
 	private double zo;
 	private static final double F2 = 0.5D * (SQRT_3 - 1.0D);
 	private static final double G2 = (3.0D - SQRT_3) / 6.0D;

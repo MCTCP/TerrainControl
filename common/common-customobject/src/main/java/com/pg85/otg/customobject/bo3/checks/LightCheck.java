@@ -3,7 +3,6 @@ package com.pg85.otg.customobject.bo3.checks;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
@@ -11,25 +10,20 @@ import java.util.List;
 
 public class LightCheck extends BO3Check
 {
-	/**
-	 * The minimum Light level, inclusive
-	 */
+	/** The minimum Light level, inclusive */
 	private int minLightLevel;
-	/**
-	 * The maximum Light level, inclusive
-	 */
+	/** The maximum Light level, inclusive */
 	private int maxLightLevel;
 
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
-		int lightLevel = worldGenRegion.getLightLevel(x, y, z, chunkBeingDecorated);
+		int lightLevel = worldGenRegion.getLightLevel(x, y, z);
 		if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
 		{
 			// Out of bounds
 			return true;
 		}
-
 		return false;
 	}
 

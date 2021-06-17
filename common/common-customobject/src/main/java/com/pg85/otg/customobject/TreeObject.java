@@ -53,19 +53,17 @@ class TreeObject implements CustomObject
 	
 	// Called during decoration.
 	@Override
-	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord)
+	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random)
 	{
 		// A tree has no frequency or rarity, so spawn it once in the chunk
 		// Make sure we stay within decoration bounds.
-		int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-		int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-				
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkCoord);		
+		int x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+		int z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		if (y < minHeight || y > maxHeight)
 		{
 			return false;
-		}
-		
+		}	
 		return spawnForced(structureCache, worldGenRegion, random, Rotation.NORTH, x, y, z);
 	}
 	
@@ -82,9 +80,9 @@ class TreeObject implements CustomObject
 	}
 	
 	@Override
-	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated)
+	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		Rotation rotation = Rotation.getRandomRotation(random);
 
 		if(!(minY == -1 && maxY == -1))

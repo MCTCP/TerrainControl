@@ -11,7 +11,7 @@ import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -23,31 +23,35 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 {
 	public BO4BlockFunction() { }
 	
-	 public BO4BlockFunction(BO4Config holder)
-	 {
-	 	this.holder = holder;
-	 }
+	public BO4BlockFunction(BO4Config holder)
+	{
+		this.holder = holder;
+	}
 
-	 @Override
-	 public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
-	 {  	
-	 	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingDecorated, true, false);
-	 }
-	 
-	 public BO4BlockFunction rotate(Rotation rotation)
-	 {
-		  BO4BlockFunction rotatedBlock = new BO4BlockFunction(this.getHolder());
-
-		rotatedBlock.material = material; // TODO: Make sure this won't cause problems
-
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z)
+	{
+		 worldGenRegion.setBlock(x, y, z, this.material, this.nbt);
+	}	
+	
+	@Override
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks)
+	{
+		 worldGenRegion.setBlock(x, y, z, this.material, this.nbt, replaceBlocks);			 
+	}
+ 
+	public BO4BlockFunction rotate(Rotation rotation)
+	{
+		BO4BlockFunction rotatedBlock = new BO4BlockFunction(this.getHolder());
+		rotatedBlock.material = this.material; // TODO: Make sure this won't cause problems
+		
 		BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
-
 		rotatedBlock.x = rotatedCoords.getX();
 		rotatedBlock.y = rotatedCoords.getY();
 		rotatedBlock.z = rotatedCoords.getZ();
-
+		
 		// TODO: This makes no sense, why is rotation inverted??? Should be: NORTH:0,WEST:1,SOUTH:2,EAST:3
-
+		
 		// Apply rotation
 		if(rotation.getRotationId() == 3)
 		{
@@ -61,19 +65,19 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		{
 			rotatedBlock.material = rotatedBlock.material.rotate(3);
 		}
-
+		
 		rotatedBlock.nbt = nbt;
 		rotatedBlock.nbtName = nbtName;
-
+		
 		return rotatedBlock;
-	}	
-	
+	}
+
 	@Override
 	public Class<BO4Config> getHolderType()
 	{
 		return BO4Config.class;
 	}
-		
+
 	public void writeToStream(String[] metaDataNames, LocalMaterialData[] materials, DataOutput stream) throws IOException
 	{
 		stream.writeShort(this.y);
@@ -98,7 +102,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		if(this.nbtName != null)
 		{
 			for(int i = 0; i < metaDataNames.length; i++)
-			{			
+			{
 				if(metaDataNames[i].equals(this.nbtName))
 				{
 					stream.writeShort(i);
@@ -112,13 +116,13 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 			stream.writeShort(-1);
 		}
 	}
-		
+
 	public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer, boolean spawnLog, ILogger logger) throws IOException
 	{
 		BO4BlockFunction rbf = new BO4BlockFunction(holder);
 		
 		File file = holder.getFile();
-				
+		
 		rbf.x = x;
 		rbf.y = buffer.getShort();
 		rbf.z = z;
@@ -128,7 +132,6 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		{
 			rbf.material = materials[materialId];
 		}
-		
 		short metaDataNameId = buffer.getShort();
 		if(metaDataNameId != -1)
 		{

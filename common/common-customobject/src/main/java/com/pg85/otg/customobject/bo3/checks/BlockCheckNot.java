@@ -1,15 +1,14 @@
 package com.pg85.otg.customobject.bo3.checks;
 
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public final class BlockCheckNot extends BlockCheck
 {
 	@Override
-	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingDecorated)
+	public boolean preventsSpawn(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		// We want the exact opposite as BlockCheck
-		return !super.preventsSpawn(worldGenRegion, x, y, z, chunkBeingDecorated);
+		return !super.preventsSpawn(worldGenRegion, x, y, z);
 	}
 
 	@Override

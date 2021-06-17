@@ -4,7 +4,6 @@ import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -66,11 +65,11 @@ public class VeinResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingDecorated, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
 		// Find all veins that reach this chunk, and spawn them
 		int searchRadius = (this.maxSizeInBlocks + 15) / 16;
-		
+
 		if(worldGenRegion.getWorldConfig().isDisableOreGen())
 		{
 			if(this.material.isOre())
@@ -78,9 +77,9 @@ public class VeinResource extends ResourceBase implements IBasicResource
 				return;
 			}
 		}
-		
-		int currentChunkX = chunkBeingDecorated.getChunkX();
-		int currentChunkZ = chunkBeingDecorated.getChunkZ();
+
+		int currentChunkX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getChunkX();
+		int currentChunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getChunkZ();
 		Vein vein;
 		for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
 		{
@@ -89,7 +88,7 @@ public class VeinResource extends ResourceBase implements IBasicResource
 				vein = getVeinStartInChunk(worldGenRegion, searchChunkX, searchChunkZ);
 				if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
 				{
-					vein.spawn(worldGenRegion, random, chunkBeingDecorated, this);
+					vein.spawn(worldGenRegion, random, this);
 				}
 			}
 		}

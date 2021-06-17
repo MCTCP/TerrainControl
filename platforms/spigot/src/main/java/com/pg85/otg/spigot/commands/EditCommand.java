@@ -12,7 +12,7 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
@@ -139,7 +139,7 @@ public class EditCommand
 			{
 				for (int y1 = min.y-1; y1 <= max.y+1; y1++)
 				{
-					region.setBlock(x1, y1, z1, LocalMaterials.AIR, null, ChunkCoordinate.fromBlockCoords(x1, z1), false);
+					region.setBlock(x1, y1, z1, LocalMaterials.AIR);
 				}
 			}
 		}
@@ -224,12 +224,15 @@ public class EditCommand
 		}
 	}
 
-	protected static void spawnAndFixObject(int x, int y, int z, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, SpigotWorldGenRegion genRegion, boolean fixObject)
+	protected static void spawnAndFixObject(int x, int y, int z, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, SpigotWorldGenRegion worldGenRegion, boolean fixObject)
 	{
 		BO3BlockFunction[] blocks = bo3.getSettings().getBlocks(0);
+		
 		Random random = new Random();
 		HashSet<BlockPosition> updates = new HashSet<>();
-
+		ReplaceBlockMatrix replaceBlocks = null;
+		int lastX = Integer.MIN_VALUE;
+		int lastZ = Integer.MIN_VALUE;
 		for (BO3BlockFunction block : blocks)
 		{
 			if (fixObject && block.material != null && updateMap.contains(((SpigotMaterialData) block.material).internalBlock().getBlock().r()))
@@ -247,16 +250,29 @@ public class EditCommand
 				extraBlocks.add(block);
 				continue;
 			}
-			block.spawn(genRegion, random, x + block.x, y + block.y, z + block.z, null, true);
+			if(
+				bo3.doReplaceBlocks() && 
+				(lastX != x + block.x || lastZ != z + block.z))
+			{
+				replaceBlocks = worldGenRegion.getBiomeConfig(x + block.x, z + block.z).getReplaceBlocks();
+				lastX = x + block.x;
+				lastZ = z + block.z;
+			}
+			if(bo3.doReplaceBlocks())
+			{
+				block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, replaceBlocks);
+			} else {
+				block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
+			}
 		}
 
 		if (fixObject)
 		{
 			for (BlockPosition blockpos : updates)
 			{
-				IBlockData blockstate = genRegion.getBlockData(blockpos);
-				IBlockData blockstate1 = Block.b(blockstate, genRegion.getInternal(), blockpos);
-				genRegion.setBlockState(blockpos, blockstate1, 20);
+				IBlockData blockstate = worldGenRegion.getBlockData(blockpos);
+				IBlockData blockstate1 = Block.b(blockstate, worldGenRegion.getInternal(), blockpos);
+				worldGenRegion.setBlockState(blockpos, blockstate1, 20);
 			}
 		}
 	}

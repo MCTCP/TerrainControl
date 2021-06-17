@@ -7,21 +7,9 @@ public class BO3Enums
 	// The spawn height
 	public static enum SpawnHeightEnum
 	{
-		randomY(StructurePartSpawnHeight.PROVIDED),
-		highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
-		highestSolidBlock(StructurePartSpawnHeight.HIGHEST_SOLID_BLOCK);
-
-		private StructurePartSpawnHeight height;
-
-		private SpawnHeightEnum(StructurePartSpawnHeight height)
-		{
-			this.height = height;
-		}
-
-		public StructurePartSpawnHeight toStructurePartSpawnHeight()
-		{
-			return height;
-		}
+		randomY,
+		highestBlock,
+		highestSolidBlock
 	}
 
 	// How an object should be extended to a surface

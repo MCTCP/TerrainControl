@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -34,13 +33,13 @@ public class ReedResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
-		int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingDecorated);
-		LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z, chunkBeingDecorated);
-		LocalMaterialData materialB = worldGenRegion.getMaterial(x + 1, y - 1, z, chunkBeingDecorated);
-		LocalMaterialData materialC = worldGenRegion.getMaterial(x, y - 1, z - 1, chunkBeingDecorated);
-		LocalMaterialData materialD = worldGenRegion.getMaterial(x, y - 1, z + 1, chunkBeingDecorated);
+		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
+		LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z);
+		LocalMaterialData materialB = worldGenRegion.getMaterial(x + 1, y - 1, z);
+		LocalMaterialData materialC = worldGenRegion.getMaterial(x, y - 1, z - 1);
+		LocalMaterialData materialD = worldGenRegion.getMaterial(x, y - 1, z + 1);
 		if (
 			y > this.maxAltitude || 
 			y < this.minAltitude || 
@@ -55,7 +54,7 @@ public class ReedResource extends FrequencyResourceBase
 			return;
 		}
 		
-		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 1, z, chunkBeingDecorated);		
+		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 1, z);		
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
@@ -64,7 +63,7 @@ public class ReedResource extends FrequencyResourceBase
 		int height = 1 + rand.nextInt(2);
 		for (int y1 = 0; y1 < height; y1++)
 		{
-			worldGenRegion.setBlock(x, y + y1, z, this.material, null, chunkBeingDecorated, false);
+			worldGenRegion.setBlock(x, y + y1, z, this.material);
 		}
 	}
 	

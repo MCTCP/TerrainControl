@@ -3,7 +3,6 @@ package com.pg85.otg.customobject;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.ICustomObject;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -77,7 +76,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 * @param z
 	 * @return Whether the attempt was successful.
 	 */
-	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingDecorated);
+	public boolean spawnAsTree(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY);
 	
 	/**
 	 * Spawns the object one or more times in a chunk. The object can search a good y position by
@@ -88,7 +87,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 * @param chunkCoord The chunk to spawn the objects in.
 	 * @return Whether at least one object spawned successfully.
 	 */
-	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord);
+	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random);
 
 	boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);  
 

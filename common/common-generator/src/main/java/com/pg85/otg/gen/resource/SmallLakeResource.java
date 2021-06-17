@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -35,7 +34,7 @@ public class SmallLakeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random rand, boolean villageInChunk, int x, int z)
 	{
 		if (villageInChunk)
 		{
@@ -49,7 +48,7 @@ public class SmallLakeResource extends FrequencyResourceBase
 		LocalMaterialData worldMaterial;
 		while (
 			y > 5 && 
-			(worldMaterial = world.getMaterial(x, y, z, chunkBeingDecorated)) != null && 
+			(worldMaterial = world.getMaterial(x, y, z)) != null && 
 			worldMaterial.isAir()
 		)
 		{
@@ -129,12 +128,12 @@ public class SmallLakeResource extends FrequencyResourceBase
 
 					if (flag)
 					{
-						localMaterialData = world.getMaterial(x + lakeX, y + lakeY, z + lakeZ, chunkBeingDecorated);
+						localMaterialData = world.getMaterial(x + lakeX, y + lakeY, z + lakeZ);
 						if ((lakeY >= 4) && (localMaterialData == null || localMaterialData.isLiquid()))
 						{
 							return;
 						}
-						localMaterialData2 = world.getMaterial(x + lakeX, y + lakeY, z + lakeZ, chunkBeingDecorated);
+						localMaterialData2 = world.getMaterial(x + lakeX, y + lakeY, z + lakeZ);
 						if ((lakeY < 4) && (localMaterialData == null || !localMaterialData.isSolid()) && (localMaterialData2 == null || !localMaterialData2.equals(material)))
 						{
 							return;
@@ -152,7 +151,7 @@ public class SmallLakeResource extends FrequencyResourceBase
 				{
 					if (lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)])
 					{
-						world.setBlock(x + lakeX, y + lakeY, z + lakeZ, this.material, null, chunkBeingDecorated, false);
+						world.setBlock(x + lakeX, y + lakeY, z + lakeZ, this.material);
 						lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)] = false;
 					}
 				}
@@ -161,14 +160,14 @@ public class SmallLakeResource extends FrequencyResourceBase
 				{
 					if (lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)])
 					{
-						world.setBlock(x + lakeX, y + lakeY, z + lakeZ, air, null, chunkBeingDecorated, false);
+						world.setBlock(x + lakeX, y + lakeY, z + lakeZ, air);
 						lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)] = false;
 					}
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{

@@ -929,7 +929,7 @@ public class SmoothingAreaGenerator
 	
 	// Merges all the smoothing lines that were plotted earlier into one smoothing area per chunk and then spawns the smoothing area.
 	// Returns false if a smoothing area could not be finalised and spawning has to be delayed until other chunks have spawned.
-	public void spawnSmoothAreas(BO4Config startBO4Config, ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public void spawnSmoothAreas(BO4Config startBO4Config, ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		// Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
 		ArrayList<SmoothingAreaLine> smoothingAreaInChunk = smoothingAreasToSpawn.get(chunkCoordinate);
@@ -966,10 +966,11 @@ public class SmoothingAreaGenerator
 			// cutting lines should never be below their origin
 			if(smoothingBeginAndEndPoints.finalDestinationPointY == -1)
 			{
-				smoothingBeginAndEndPoints.finalDestinationPointY = (short)worldGenRegion.getHighestBlockYAt(
-					smoothingBeginAndEndPoints.finalDestinationPointX, 
-					smoothingBeginAndEndPoints.finalDestinationPointZ, 
-					true, false, true, true, true, null
+				// We may target unloaded/ungenerated chunks, so we'll use shadowgen when doing height/material checks.
+				smoothingBeginAndEndPoints.finalDestinationPointY = (short)worldGenRegion.getHighestBlockYAtWithoutLoading(
+					smoothingBeginAndEndPoints.finalDestinationPointX,
+					smoothingBeginAndEndPoints.finalDestinationPointZ,
+					true, false, true, true, true
 				);
 				
 				// Set the y coord for every smoothing line that uses this coord as an end point, so we don't have to do multiple height checks.
@@ -1070,7 +1071,7 @@ public class SmoothingAreaGenerator
 		// TODO: This causes problems when multiple lines on a diferent axis target the same endpoint
 		for(Entry<ChunkCoordinate, SmoothingAreaColumn> smoothingBlocksInColumn : smoothingBlocksPerColumn.entrySet())
 		{
-			smoothingBlocksInColumn.getValue().processBlocks(worldGenRegion, chunkCoordinate, startBO4Config, spawnLog, logger, materialReader);
+			smoothingBlocksInColumn.getValue().processBlocks(worldGenRegion, startBO4Config, spawnLog, logger, materialReader);
 		}
 	}
 	

@@ -2,7 +2,7 @@ package com.pg85.otg.customobject.bo3;
 
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.util.BO3Enums.ExtrudeMode;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.MaterialSet;
 
@@ -86,25 +86,37 @@ class ObjectExtrusionHelper
 	 * @param y	  The BO3 base Y spawn location
 	 * @param z	  The BO3 base Z spawn location
 	 */
-	void extrude(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingDecorated, boolean replaceBlock)
+	void extrude(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, boolean replaceBlock, boolean forceSpawn)
 	{
 		for (BO3BlockFunction block : blocksToExtrude)
 		{
+			IBiomeConfig biomeConfig = forceSpawn ? worldGenRegion.getBiomeConfig(x + block.x, z + block.z) : worldGenRegion.getBiomeConfigForDecoration(x + block.x, z + block.z);
 			if (extrudeMode == ExtrudeMode.BottomDown)
 			{
 				for (int yi = y + block.y - 1;
-					 yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingDecorated));
+					 yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z));
 					 --yi)
 				{
-					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingDecorated, replaceBlock);
+					if(replaceBlock)
+					{
+						worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, biomeConfig.getReplaceBlocks());
+					} else {
+						worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt);
+					}
 				}
-			} else if (extrudeMode == ExtrudeMode.TopUp)
+			}
+			else if (extrudeMode == ExtrudeMode.TopUp)
 			{
 				for (int yi = y + block.y + 1;
-					 yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingDecorated));
+					 yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z));
 					 ++yi)
 				{
-					worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingDecorated, replaceBlock);
+					if(replaceBlock)
+					{
+						worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, biomeConfig.getReplaceBlocks());
+					} else {
+						worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt);
+					}
 				}
 			}
 		}

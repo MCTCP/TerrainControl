@@ -1,6 +1,6 @@
 package com.pg85.otg.util.materials;
 
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 
 /**
  * Represents one of Minecraft's materials.
@@ -142,7 +142,7 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	 */
 	public abstract LocalMaterialData rotate(int rotateTimes);
 	  
-	public LocalMaterialData parseWithBiomeAndHeight(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
+	public LocalMaterialData parseWithBiomeAndHeight(boolean biomeConfigsHaveReplacement, ReplaceBlockMatrix replaceBlocks, int y)
 	{	
 		if (!biomeConfigsHaveReplacement)
 		{

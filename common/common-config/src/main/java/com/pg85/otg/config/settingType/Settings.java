@@ -1,7 +1,7 @@
 package com.pg85.otg.config.settingType;
 
 import com.pg85.otg.util.biome.ReplaceBlocks;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -134,11 +134,11 @@ public abstract class Settings
 	}
 
 	/**
-	 * Creates a setting that represents a {@link ReplacedBlocksMatrix}.
+	 * Creates a setting that represents a {@link ReplaceBlockMatrix}.
 	 * @param name Name of the setting.
 	 * @return The newly created setting.
 	 */
-	protected static final Setting<ReplacedBlocksMatrix> replacedBlocksSetting(String name)
+	protected static final Setting<ReplaceBlockMatrix> replacedBlocksSetting(String name)
 	{
 		return new ReplacedBlocksSetting(name);
 	}

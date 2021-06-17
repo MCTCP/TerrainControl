@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -38,23 +37,23 @@ public class LiquidResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
-		LocalMaterialData worldMaterial = worldGenregion.getMaterial(x, y + 1, z, chunkBeingDecorated);
+		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y + 1, z);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
 		}
 		
-		worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x, y - 1, z);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
 		}
 
-		worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x, y, z);
 		if (worldMaterial == null || !worldMaterial.isAir() || !this.sourceBlocks.contains(worldMaterial))
 		{
 			return;
@@ -63,25 +62,25 @@ public class LiquidResource extends FrequencyResourceBase
 		int sourceCount = 0;
 		int airCount = 0;
 
-		worldMaterial = worldGenregion.getMaterial(x - 1, y, z, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x - 1, y, z);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
-		worldMaterial = worldGenregion.getMaterial(x + 1, y, z, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x + 1, y, z);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
-		worldMaterial = worldGenregion.getMaterial(x, y, z - 1, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x, y, z - 1);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
-		worldMaterial = worldGenregion.getMaterial(x, y, z + 1, chunkBeingDecorated);
+		worldMaterial = worldGenRegion.getMaterial(x, y, z + 1);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
 		if ((sourceCount == 3) && (airCount == 1))
 		{
-			worldGenregion.setBlock(x, y, z, this.material, null, chunkBeingDecorated, false);
+			worldGenRegion.setBlock(x, y, z, this.material);
 		}
 	}
 	

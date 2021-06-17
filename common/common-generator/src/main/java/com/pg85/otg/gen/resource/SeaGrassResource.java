@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -25,19 +24,19 @@ public class SeaGrassResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
 		// Find lowest point
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
+		int y = world.getBlockAboveSolidHeight(x, z);
 
 		// TODO: sourceblocks
-		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingDecorated);
+		LocalMaterialData below = world.getMaterial(x, y - 1, z);
 		if (below == null || !below.isSolid())
 		{
 			return;
 		}
 
-		LocalMaterialData material = world.getMaterial(x, y, z, chunkBeingDecorated);
+		LocalMaterialData material = world.getMaterial(x, y, z);
 
 		if (material == null)
 		{
@@ -47,12 +46,12 @@ public class SeaGrassResource extends FrequencyResourceBase
 		if (material.isLiquid())
 		{
 			// If the tall chance check succeeds and the above material is also water, place tall seagrass
-			if (random.nextDouble() <= this.tallChance && world.getMaterial(x, y + 1, z, chunkBeingDecorated).isLiquid())
+			if (random.nextDouble() <= this.tallChance && world.getMaterial(x, y + 1, z).isLiquid())
 			{
-				world.setBlock(x, y, z, LocalMaterials.TALL_SEAGRASS_LOWER, null, chunkBeingDecorated, false);
-				world.setBlock(x, y + 1, z, LocalMaterials.TALL_SEAGRASS_UPPER, null, chunkBeingDecorated, false);
+				world.setBlock(x, y, z, LocalMaterials.TALL_SEAGRASS_LOWER);
+				world.setBlock(x, y + 1, z, LocalMaterials.TALL_SEAGRASS_UPPER);
 			} else {
-				world.setBlock(x, y, z, LocalMaterials.SEAGRASS, null, chunkBeingDecorated, false);
+				world.setBlock(x, y, z, LocalMaterials.SEAGRASS);
 			}
 		}
 	}

@@ -3,7 +3,6 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -22,9 +21,9 @@ public class CoralMushroomResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingDecorated)
+	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
 	{
-		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingDecorated);
+		int y = world.getBlockAboveSolidHeight(x, z);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		int xRadius = random.nextInt(3) + 3;
@@ -46,7 +45,7 @@ public class CoralMushroomResource extends FrequencyResourceBase
 						(x1 != 0 && x1 != yRadius || z1 != 0 && z1 != zRadius) &&
 						(x1 == 0 || x1 == yRadius || y1 == 0 || y1 == xRadius || z1 == 0 || z1 == zRadius) &&
 						!(random.nextFloat() < 0.1F) &&
-						!CoralHelper.placeCoralBlock(world, random, chunkBeingDecorated, x + x1, y + y1 - yOffset, z + z1, coral)
+						!CoralHelper.placeCoralBlock(world, random, x + x1, y + y1 - yOffset, z + z1, coral)
 					)
 					{
 						// Lol

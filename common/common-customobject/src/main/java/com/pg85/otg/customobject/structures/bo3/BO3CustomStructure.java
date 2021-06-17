@@ -9,7 +9,7 @@ import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
-import com.pg85.otg.customobject.util.StructurePartSpawnHeight;
+import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class BO3CustomStructure extends CustomStructure
 {
-	private StructurePartSpawnHeight height;
+	private SpawnHeightEnum height;
 	private int maxBranchDepth;
 	
 	public BO3CustomStructure(BO3CustomStructureCoordinate start)
@@ -41,10 +41,7 @@ public class BO3CustomStructure extends CustomStructure
 		this.start = start;
 	}
 	
-	public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder,
-							  boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager,
-							  IMaterialReader materialReader, CustomObjectResourcesManager manager,
-							  IModLoadedChecker modLoadedChecker)
+	public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		StructuredCustomObject object = (StructuredCustomObject)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
@@ -67,7 +64,7 @@ public class BO3CustomStructure extends CustomStructure
 		this.random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), worldGenRegion.getSeed());
 
 		// Calculate all branches and add them to a list
-		objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomStructureCoordinate>>();
+		this.objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomStructureCoordinate>>();
 
 		addToSpawnList((BO3CustomStructureCoordinate)start, object, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker); // Add the object itself
 		addBranches((BO3CustomStructureCoordinate)start, 1, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -82,7 +79,7 @@ public class BO3CustomStructure extends CustomStructure
 			for (Branch branch : getBranches(object, coordObject.getRotation()))
 			{
 				// TODO: Does passing null as startbo3name work?
-				BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 				// Don't add null objects
 				if (childCoordObject == null)
@@ -94,7 +91,7 @@ public class BO3CustomStructure extends CustomStructure
 				addToSpawnList(childCoordObject, object, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				
 				// Also add the branches of this object
-				if (depth < maxBranchDepth)
+				if (depth < this.maxBranchDepth)
 				{
 					addBranches(childCoordObject, depth + 1, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				}
@@ -117,11 +114,11 @@ public class BO3CustomStructure extends CustomStructure
 		ChunkCoordinate chunkCoordinate = coordObject.getPopulatingChunk(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(chunkCoordinate != null)
 		{
-			Set<CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
+			Set<CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);
 			if (objectsInChunk == null)
 			{
 				objectsInChunk = new LinkedHashSet<CustomStructureCoordinate>();
-				objectsToSpawn.put(chunkCoordinate, objectsInChunk);
+				this.objectsToSpawn.put(chunkCoordinate, objectsInChunk);
 			}
 			objectsInChunk.add(coordObject);
 		} else {
@@ -132,23 +129,31 @@ public class BO3CustomStructure extends CustomStructure
 		}
 	}
 
-	public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion,
-							 ChunkCoordinate chunkCoordinate, Path otgRootFolder, boolean spawnLog, ILogger logger,
-							 CustomObjectManager customObjectManager, IMaterialReader materialReader,
-							 CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		Set<CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
-		if(!worldGenRegion.getWorldConfig().doPopulationBoundsCheck())
-		{
-			chunkCoordinate = null;
-		}
+		Set<CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(worldGenRegion.getDecorationArea().getChunkBeingDecorated());
 		if (objectsInChunk != null)
 		{
 			for (CustomStructureCoordinate coordObject : objectsInChunk)
 			{
 				BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
-				bo3.trySpawnAt(this, structureCache, worldGenRegion, random, coordObject.rotation, coordObject.x, height.getCorrectY(worldGenRegion, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y, chunkCoordinate, bo3.doReplaceBlocks());
+				bo3.trySpawnAt(this, structureCache, worldGenRegion, this.random, coordObject.rotation, coordObject.x, getCorrectY(worldGenRegion, coordObject.x, coordObject.y, coordObject.z), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y);
 			}
 		}
 	}
+	
+	public int getCorrectY(IWorldGenRegion worldGenRegion, int x, int y, int z)
+	{
+		switch(this.height)
+		{
+			case randomY:
+				return y;
+			case highestBlock:
+				return worldGenRegion.getHighestBlockAboveYAt(x, z);
+			case highestSolidBlock:
+				return worldGenRegion.getBlockAboveSolidHeight(x, z);
+			default:
+				return -1;
+		}		
+	}	
 }

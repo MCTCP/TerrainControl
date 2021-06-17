@@ -15,7 +15,7 @@ import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
-import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
+import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -94,7 +94,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected LocalMaterialData sandStoneBlock;
 	protected LocalMaterialData redSandStoneBlock;
 	protected SurfaceGenerator surfaceAndGroundControl;
-	protected ReplacedBlocksMatrix replacedBlocks;
+	protected ReplaceBlockMatrix replacedBlocks;
 	
 	// Water / lava / freezing
 	
@@ -216,19 +216,27 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(!this.replacedBlocksInited)
 		{
-			this.replacedBlocks.init(
-				this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
-				this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
-				this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
-				this.stoneBlock,
-				this.groundBlock,
-				this.surfaceBlock,
-				this.worldConfig.getDefaultBedrockBlock(),
-				this.sandStoneBlock,
-				this.redSandStoneBlock
-			);
+			// Multiple threads may be working with
+			// the same biome configs async, lock.
+			synchronized(this)
+			{
+				if(!this.replacedBlocksInited)
+				{					
+					this.replacedBlocks.init(
+						this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
+						this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
+						this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
+						this.stoneBlock,
+						this.groundBlock,
+						this.surfaceBlock,
+						this.worldConfig.getDefaultBedrockBlock(),
+						this.sandStoneBlock,
+						this.redSandStoneBlock
+					);					
+				}
+				this.replacedBlocksInited = true;				
+			}
 		}
-		this.replacedBlocksInited = true;
 	}
 	
 	@Override
@@ -312,9 +320,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.replacedBlocks.hasReplaceSettings();
 	}
-	
+
 	@Override
-	public ReplacedBlocksMatrix getReplaceBlocks()
+	public ReplaceBlockMatrix getReplaceBlocks()
 	{
 		initReplaceBlocks();
 		return this.replacedBlocks;

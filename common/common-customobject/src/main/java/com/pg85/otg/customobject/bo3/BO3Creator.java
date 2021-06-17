@@ -44,7 +44,7 @@ public class BO3Creator extends BOCreator
 					for (int z = min.z; z <= max.z; z++)
 						for (int y = min.y; y <= max.y; y++)
 						{
-							LocalMaterialData data = localWorld.getMaterial(x, y, z, ChunkCoordinate.fromBlockCoords(x, z));
+							LocalMaterialData data = localWorld.getMaterial(x, y, z);
 							if (data != null && data.isMaterial(centerBlock))
 							{
 								center = new Corner(x, y, z);
@@ -101,8 +101,7 @@ public class BO3Creator extends BOCreator
 			{
 				for (int y = min.y; y <= max.y; y++)
 				{
-					LocalMaterialData materialData = localWorld.getMaterial(
-						x, y, z, ChunkCoordinate.fromBlockCoords(x, z));
+					LocalMaterialData materialData = localWorld.getMaterial(x, y, z);
 					if (materialData == null || (!includeAir && materialData.isMaterial(LocalMaterials.AIR)))
 					{
 						continue;

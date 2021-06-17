@@ -303,6 +303,8 @@ public class BO4CustomStructure extends CustomStructure
 
 	private boolean doStartChunkBlockChecks(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
+		// We may target unloaded/ungenerated chunks, so we'll use shadowgen when doing height/material checks for this chunk.
+		
 		if(!startChunkBlockChecksDone)
 		{
 			startChunkBlockChecksDone = true;
@@ -363,8 +365,7 @@ public class BO4CustomStructure extends CustomStructure
 				{
 					startY = (short) (worldGenRegion.getBiomeConfig(centerX, centerZ).getWaterLevelMax());
 				} else {
-					// Passing null for chunk being decorated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
-					int highestBlock = worldGenRegion.getHighestBlockYAt(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true, null);
+					int highestBlock = worldGenRegion.getHighestBlockYAtWithoutLoading(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true);
 					if(highestBlock < 0)
 					{
 						if(config.heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
@@ -400,7 +401,7 @@ public class BO4CustomStructure extends CustomStructure
 
 			if(!config.canSpawnOnWater)
 			{
-				if(worldGenRegion.getMaterial(this.start.getX() + 8, worldGenRegion.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null), this.start.getZ() + 7, null).isLiquid())
+				if(worldGenRegion.getMaterialWithoutLoading(this.start.getX() + 8, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true), this.start.getZ() + 7).isLiquid())
 				{
 					return false;
 				}
@@ -410,15 +411,15 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				if(
 					!(
-						worldGenRegion.getMaterial(this.start.getX(), worldGenRegion.getHighestBlockYAt(this.start.getX(), this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
-						worldGenRegion.getMaterial(this.start.getX(), worldGenRegion.getHighestBlockYAt(this.start.getX(), this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid() &&
-						worldGenRegion.getMaterial(this.start.getX() + 15, worldGenRegion.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
-						worldGenRegion.getMaterial(this.start.getX() + 15, worldGenRegion.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid()
+						worldGenRegion.getMaterialWithoutLoading(this.start.getX(), worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX(), this.start.getZ(), true, true, false, true, true), this.start.getZ()).isLiquid() &&
+						worldGenRegion.getMaterialWithoutLoading(this.start.getX(), worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX(), this.start.getZ() + 15, true, true, false, true, true), this.start.getZ() + 15).isLiquid() &&
+						worldGenRegion.getMaterialWithoutLoading(this.start.getX() + 15, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + 15, this.start.getZ(), true, true, false, true, true), this.start.getZ()).isLiquid() &&
+						worldGenRegion.getMaterialWithoutLoading(this.start.getX() + 15, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, true), this.start.getZ() + 15).isLiquid()
 					)
 				)
 				{
 					return false;
-				}								
+				}
 			}
 			
 			this.start.y = startY;
@@ -675,6 +676,8 @@ public class BO4CustomStructure extends CustomStructure
 	
 	private void addBranches(BO4Config startBO4Config, BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
+		// We may target unloaded/ungenerated chunks, so we'll use shadowgen when doing height/material checks.
+		
 		// CanOverride optional branches are spawned only after the main structure has spawned.
 		// This is useful for adding interiors and knocking out walls between rooms.
 		if(!SpawningCanOverrideBranches)
@@ -843,10 +846,10 @@ public class BO4CustomStructure extends CustomStructure
 						{
 							if(
 								!(
-									worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-									worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid() &&
-									worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-									worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid()
+									worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ()).isLiquid() &&
+									worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ() + 15).isLiquid() &&
+									worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ()).isLiquid() &&
+									worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ() + 15).isLiquid()
 								)
 							)
 							{
@@ -857,7 +860,7 @@ public class BO4CustomStructure extends CustomStructure
 						
 						if(canSpawn && !minimumSize && !bo3.getConfig().canSpawnOnWater)
 						{
-							if(worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 8, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 7, null).isLiquid())
+							if(worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 8, worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ() + 7).isLiquid())
 							{
 								wasOnWater = true;
 								canSpawn = false;
@@ -2170,7 +2173,7 @@ public class BO4CustomStructure extends CustomStructure
 	* Checks if this structure or any of its branches are inside the given
 	* chunk and spawns all objects that are including their smoothing areas (if any)
 	*/
-	void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{		
 		if (
 			!this.objectsToSpawn.containsKey(chunkCoordinate) && 
@@ -2193,7 +2196,7 @@ public class BO4CustomStructure extends CustomStructure
 			}
 
 			// Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.
-			smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, chunkBeingDecorated, spawnLog, logger, materialReader);
+			smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, spawnLog, logger, materialReader);
 			
 			// Spawn ReplaceAbove / ReplaceBelow before bo4 blocks.
 			for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
@@ -2234,8 +2237,7 @@ public class BO4CustomStructure extends CustomStructure
 						config.spawnUnderWater,  
 						!config.spawnUnderWater ? -1 : biomeConfig.getWaterLevelMax(), 
 						false, 
-						true, 
-						chunkBeingDecorated,
+						true,
 						objectConfig.doReplaceBlocks
 					)
 				)
@@ -2294,7 +2296,6 @@ public class BO4CustomStructure extends CustomStructure
 						!config.spawnUnderWater ? -1 : biomeConfig.getWaterLevelMax(), 
 						false, 
 						false, 
-						chunkBeingDecorated,
 						objectConfig.doReplaceBlocks
 					)
 				)
@@ -2320,7 +2321,7 @@ public class BO4CustomStructure extends CustomStructure
 			}
 		} else {
 			// Spawn smooth areas in this chunk if any exist
-			smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, chunkBeingDecorated, spawnLog, logger, materialReader);
+			smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, spawnLog, logger, materialReader);
 		}
 
 		this.objectsToSpawn.remove(chunkCoordinate);
