@@ -83,38 +83,54 @@ class Vein
 		double d5 = y + rand.nextInt(3) - 2;
 		double d6 = y + rand.nextInt(3) - 2;
 
+		float iFactor;
+		double d7;
+		double d8;
+		double d9;
+		double d10;
+		double d11;
+		double d12;
+		int j;
+		int k;
+		int m;
+		int n;
+		int i1;
+		int i2;
+		double d13;
+		double d14;
+		double d15;
 		for (int i = 0; i < maxSize; i++)
 		{
-			float iFactor = (float) i / (float) maxSize;
-			double d7 = d1 + (d2 - d1) * iFactor;
-			double d8 = d5 + (d6 - d5) * iFactor;
-			double d9 = d3 + (d4 - d3) * iFactor;
+			iFactor = (float) i / (float) maxSize;
+			d7 = d1 + (d2 - d1) * iFactor;
+			d8 = d5 + (d6 - d5) * iFactor;
+			d9 = d3 + (d4 - d3) * iFactor;
 
-			double d10 = rand.nextDouble() * maxSize / 16.0D;
-			double d11 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
-			double d12 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
+			d10 = rand.nextDouble() * maxSize / 16.0D;
+			d11 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
+			d12 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
 
-			int j = MathHelper.floor(d7 - d11 / 2.0D);
-			int k = MathHelper.floor(d8 - d12 / 2.0D);
-			int m = MathHelper.floor(d9 - d11 / 2.0D);
+			j = MathHelper.floor(d7 - d11 / 2.0D);
+			k = MathHelper.floor(d8 - d12 / 2.0D);
+			m = MathHelper.floor(d9 - d11 / 2.0D);
 
-			int n = MathHelper.floor(d7 + d11 / 2.0D);
-			int i1 = MathHelper.floor(d8 + d12 / 2.0D);
-			int i2 = MathHelper.floor(d9 + d11 / 2.0D);
+			n = MathHelper.floor(d7 + d11 / 2.0D);
+			i1 = MathHelper.floor(d8 + d12 / 2.0D);
+			i2 = MathHelper.floor(d9 + d11 / 2.0D);
 
 			for (int i3 = j; i3 <= n; i3++)
 			{
-				double d13 = (i3 + 0.5D - d7) / (d11 / 2.0D);
+				d13 = (i3 + 0.5D - d7) / (d11 / 2.0D);
 				if (d13 * d13 < 1.0D)
 				{
 					for (int i4 = k; i4 <= i1; i4++)
 					{
-						double d14 = (i4 + 0.5D - d8) / (d12 / 2.0D);
+						d14 = (i4 + 0.5D - d8) / (d12 / 2.0D);
 						if (d13 * d13 + d14 * d14 < 1.0D)
 						{
 							for (int i5 = m; i5 <= i2; i5++)
 							{
-								double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
+								d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
 								if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(worldGenRegion.getMaterial(i3, i4, i5)))
 								{
 									worldGenRegion.setBlock(i3, i4, i5, material);

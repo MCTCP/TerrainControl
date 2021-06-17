@@ -78,7 +78,6 @@ public class CoralTreeResource extends FrequencyResourceBase
 				{
 					dx += direction.getX();
 					dz += direction.getZ();
-
 					placedIndex = 0;
 				}
 			}
