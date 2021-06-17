@@ -4,6 +4,11 @@ import com.pg85.otg.util.ChunkCoordinate;
 
 public class DecorationArea
 {
+	// Anything that uses decoration bounds should be using the methods in this class.
+	// TODO: Refactor this, change the decorated area from 2x2 to 3x3 chunks and 
+	// remove the +8 decoration offset used for resources.
+
+	public static final int decorationOffset = ChunkCoordinate.CHUNK_CENTER;
 	private final int minX;
 	private final int maxX;
 	private final int minZ;

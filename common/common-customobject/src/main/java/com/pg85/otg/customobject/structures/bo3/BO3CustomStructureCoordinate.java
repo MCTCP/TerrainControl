@@ -2,6 +2,7 @@ package com.pg85.otg.customobject.structures.bo3;
 
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
@@ -63,8 +64,8 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 		int centerZ = this.z + box.getMinZ() + (box.getDepth() / 2);
 		// TODO: Remove this offset for 1.16, to align with other resources?
 		return ChunkCoordinate.fromBlockCoords(
-			centerX - ChunkCoordinate.CHUNK_CENTER,
-			centerZ - ChunkCoordinate.CHUNK_CENTER
+			centerX - DecorationArea.decorationOffset,
+			centerZ - DecorationArea.decorationOffset
 		);
 	}
 }
