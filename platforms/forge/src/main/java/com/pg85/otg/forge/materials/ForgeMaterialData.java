@@ -227,8 +227,8 @@ public class ForgeMaterialData extends LocalMaterialData
 
 	@Override
 	public boolean isSolid()
-	{		
-		return this.blockData != null && this.blockData.getMaterial().isSolid();
+	{
+		return this.blockData != null && this.blockData.getMaterial().isSolid() && this.blockData.getMaterial().isSolidBlocking();
 	}
 	
 	@Override

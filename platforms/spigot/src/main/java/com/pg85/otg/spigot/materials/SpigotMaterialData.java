@@ -227,14 +227,18 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public boolean isLiquid()
 	{
-		return this.blockData != null
-				&& (this.blockData.getMaterial() == Material.WATER
-					|| this.blockData.getMaterial() == Material.LAVA);
+		return 
+			this.blockData != null &&
+			(
+				this.blockData.getMaterial() == Material.WATER || 
+				this.blockData.getMaterial() == Material.LAVA
+			);
 	}
 
 	@Override
 	public boolean isSolid()
 	{
+		// TODO: This should check for isSolid and isSolidBlocking, there is no isSolidBlocking for Spigot tho?
 		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
 
