@@ -33,8 +33,8 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 		this.x = x;
 		this.y = y;
 		this.z = z;
-	}	
-		
+	}
+
 	/**
 	 * Gets the chunk that should spawn this object during decoration.
 	 */

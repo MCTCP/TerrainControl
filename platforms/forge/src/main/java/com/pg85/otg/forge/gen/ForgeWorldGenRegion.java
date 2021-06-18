@@ -390,7 +390,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				)
 				||
 				(
-					!ignoreLeaves && 
+					!ignoreLeaves &&
 					(
 						block == Blocks.ACACIA_LEAVES ||
 						block == Blocks.BIRCH_LEAVES ||
