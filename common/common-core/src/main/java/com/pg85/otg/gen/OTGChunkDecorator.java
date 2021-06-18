@@ -2,6 +2,7 @@ package com.pg85.otg.gen;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.config.ErroredFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObjectManager;
@@ -191,8 +192,15 @@ public class OTGChunkDecorator implements IChunkDecorator
 			{
 				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, hasVillage, OTG.getEngine().getLogger(), OTG.getEngine().getMaterialReader());
 			}
+			else if(res instanceof ErroredFunction)
+			{
+				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				{
+					((ErroredFunction<IBiomeConfig>)res).log(logger, biomeConfig.getName());
+				}
+			}
 		}
-		
+
 		// Snow and ice
 		// TODO: Snow is appearing below structures, indicating it spawned before 
 		// it should. Check and align decoration bounds for resources and make sure

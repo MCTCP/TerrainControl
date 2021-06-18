@@ -81,9 +81,24 @@ public abstract class StringHelper
 				return maxValue;
 			}
 			return number;
-		} catch (NumberFormatException e)
-		{
-			throw new InvalidConfigException("Incorrect number: " + string);
+		} catch (NumberFormatException e) {
+			try
+			{
+				int number = (int)Double.parseDouble(string);
+				if (number < minValue)
+				{
+					return minValue;
+				}
+				if (number > maxValue)
+				{
+					return maxValue;
+				}
+				return number;
+			}
+			catch (NumberFormatException e2)
+			{
+				throw new InvalidConfigException("Incorrect number: " + string);				
+			}
 		}
 	}
 
