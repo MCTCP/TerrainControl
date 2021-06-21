@@ -111,7 +111,7 @@ public class BO3CustomStructure extends CustomStructure
 	 */
 	private void addToSpawnList(BO3CustomStructureCoordinate coordObject, ICustomObject parent, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		ChunkCoordinate chunkCoordinate = coordObject.getPopulatingChunk(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		ChunkCoordinate chunkCoordinate = coordObject.getDecoratingChunk(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(chunkCoordinate != null)
 		{
 			Set<CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);

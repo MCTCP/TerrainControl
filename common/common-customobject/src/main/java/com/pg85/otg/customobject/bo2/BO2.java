@@ -397,8 +397,8 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 		{
 			ObjectRarity -= 100;
 
-			x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockX() + rand.nextInt(Constants.CHUNK_SIZE);
+			z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZ() + rand.nextInt(Constants.CHUNK_SIZE);
 
 			// TODO: Are BO2/BO3 trees ever spawned via this method? If so, then don't replace blocks.
 			objectSpawned = spawn(worldGenRegion, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);

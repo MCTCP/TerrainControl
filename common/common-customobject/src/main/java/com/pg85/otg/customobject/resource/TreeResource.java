@@ -1,6 +1,7 @@
 package com.pg85.otg.customobject.resource;
 
 import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
@@ -8,7 +9,6 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
@@ -60,8 +60,8 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 				if (random.nextInt(100) < this.treeChances.get(treeNumber))
 				{
 					// TODO: Remove this offset for 1.16?
-					x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-					z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);					
+					x = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX() + random.nextInt(Constants.CHUNK_SIZE);
+					z = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ() + random.nextInt(Constants.CHUNK_SIZE);					
 					
 					tree = this.treeObjects[treeNumber];
 					// Min/Max == -1 means use bo2/bo3 internal min/max height, otherwise use the optional min/max height defined with Tree()

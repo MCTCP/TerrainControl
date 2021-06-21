@@ -1,13 +1,12 @@
 package com.pg85.otg.gen;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
-
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.carver.Carver;
@@ -87,7 +86,7 @@ public class OTGChunkGenerator
 	private final Carver ravines;
 	// Biome blocks noise
 	// TODO: Use new noise?
-	private ThreadLocal<double[]> biomeBlocksNoise = ThreadLocal.withInitial(() -> new double[CHUNK_SIZE * CHUNK_SIZE]);
+	private ThreadLocal<double[]> biomeBlocksNoise = ThreadLocal.withInitial(() -> new double[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE]);
 	private ThreadLocal<Integer> lastX = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
 	private ThreadLocal<Integer> lastZ = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
 	private ThreadLocal<Double> lastNoise = ThreadLocal.withInitial(() -> 0d);
@@ -661,11 +660,11 @@ public class OTGChunkGenerator
 		// Process surface and ground blocks for each column in the chunk
 		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 		double d1 = 0.03125D;
-		this.biomeBlocksNoise.set(this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise.get(), chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D));
+		this.biomeBlocksNoise.set(this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise.get(), chunkCoord.getBlockX(), chunkCoord.getBlockZ(), Constants.CHUNK_SIZE, Constants.CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D));
 		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise.get(), heightCap);
-		for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
+			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
 				// Get the current biome config and some properties
 				biomes[x * 16 + z].doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);

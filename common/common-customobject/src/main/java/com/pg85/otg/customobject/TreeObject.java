@@ -4,7 +4,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
@@ -57,8 +56,8 @@ class TreeObject implements CustomObject
 	{
 		// A tree has no frequency or rarity, so spawn it once in the chunk
 		// Make sure we stay within decoration bounds.
-		int x = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-		int z = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+		int x = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX() + random.nextInt(Constants.CHUNK_SIZE);
+		int z = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ() + random.nextInt(Constants.CHUNK_SIZE);
 		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		if (y < minHeight || y > maxHeight)
 		{

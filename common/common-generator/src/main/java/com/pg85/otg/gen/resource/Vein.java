@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -55,9 +55,9 @@ class Vein
 		{
 			if (random.nextInt(100) < gen.oreRarity)
 			{
-				oreX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+				oreX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX() + random.nextInt(Constants.CHUNK_SIZE);
 				oreY = RandomHelper.numberInRange(random, gen.minAltitude, gen.maxAltitude);
-				oreZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+				oreZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ() + random.nextInt(Constants.CHUNK_SIZE);
 
 				if ((oreX - x) * (oreX - x) + (oreY - y) * (oreY - y) + (oreZ - z) * (oreZ - z) < sizeSquared)
 				{

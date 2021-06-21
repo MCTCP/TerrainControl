@@ -1,6 +1,6 @@
 package com.pg85.otg.util.gen;
 
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
@@ -15,8 +15,8 @@ public class DecorationBiomeCache
 	{
 		this.biomes = new IBiome[areaWidth * areaHeight];
 		this.areaHeight = areaHeight;
-		this.startX = startChunkX * ChunkCoordinate.CHUNK_SIZE;
-		this.startZ = startChunkZ * ChunkCoordinate.CHUNK_SIZE;
+		this.startX = startChunkX * Constants.CHUNK_SIZE;
+		this.startZ = startChunkZ * Constants.CHUNK_SIZE;
 	}
 
 	public IBiome getBiome(int blockX, int blockZ, IWorldGenRegion worldGenRegion)

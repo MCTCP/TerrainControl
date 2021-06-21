@@ -3,8 +3,10 @@ package com.pg85.otg.gen.carver;
 import java.util.BitSet;
 import java.util.Random;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.MutableBoolean;
 import com.pg85.otg.util.gen.ChunkBuffer;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -29,8 +31,8 @@ public abstract class Carver
 	protected boolean carveRegion(ChunkBuffer chunk, long seed, int seaLevel, int chunkX, int chunkZ, double x, double y, double z, double yaw, double pitch, BitSet carvingMask)
 	{
 		Random random = new Random(seed + (long) chunkX + (long) chunkZ);
-		double d = chunkX * 16 + 8;
-		double e = chunkZ * 16 + 8;
+		double d = chunkX * 16 + DecorationArea.CARVER_OFFSET;
+		double e = chunkZ * 16 + DecorationArea.CARVER_OFFSET;
 		if (x >= d - 16.0D - yaw * 2.0D && z >= e - 16.0D - yaw * 2.0D && x <= d + 16.0D + yaw * 2.0D && z <= e + 16.0D + yaw * 2.0D)
 		{
 			int i = Math.max(MathHelper.floor(x - yaw) - chunkX * 16 - 1, 0);
@@ -154,8 +156,8 @@ public abstract class Carver
 
 	protected boolean canCarveBranch(int mainChunkX, int mainChunkZ, double x, double z, int branch, int branchCount, float baseWidth)
 	{
-		double d = mainChunkX * 16 + 8;
-		double e = mainChunkZ * 16 + 8;
+		double d = mainChunkX * 16 + DecorationArea.CARVER_OFFSET;
+		double e = mainChunkZ * 16 + DecorationArea.CARVER_OFFSET;
 		double f = x - d;
 		double g = z - e;
 		double h = branchCount - branch;

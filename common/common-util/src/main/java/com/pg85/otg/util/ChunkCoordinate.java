@@ -16,10 +16,6 @@ import com.pg85.otg.util.helpers.MathHelper;
  */
 public class ChunkCoordinate
 {
-	public static final int CHUNK_SIZE = 16;
-	public static final int CHUNK_Y_SIZE = 256;
-	public static final int CHUNK_CENTER = CHUNK_SIZE / 2 - 1;
-
 	private final int chunkX;
 	private final int chunkZ;
 
@@ -121,29 +117,13 @@ public class ChunkCoordinate
 	}
 
 	/**
-	 * Gets the x position of the block in the center of this chunk.
-	 * @return The x position.
-	 */
-	public int getBlockXCenter() {
-		return chunkX * CHUNK_SIZE + CHUNK_CENTER;
-	}
-	
-	/**
-	 * Gets the z position of the block in the center of this chunk.
-	 * @return The z position.
-	 */
-	public int getBlockZCenter() {
-		return chunkZ * CHUNK_SIZE + CHUNK_CENTER;
-	}
-
-	/**
 	 * Gets the x position of the block with the lowest x coordinate that is
 	 * still in this chunk.
 	 * @return The x position of the block.
 	 */
 	public int getBlockX()
 	{
-		return chunkX * CHUNK_SIZE;
+		return chunkX * Constants.CHUNK_SIZE;
 	}
 
 	/**
@@ -153,7 +133,7 @@ public class ChunkCoordinate
 	 */
 	public int getBlockZ()
 	{
-		return chunkZ * CHUNK_SIZE;
+		return chunkZ * Constants.CHUNK_SIZE;
 	}
 
 	/**

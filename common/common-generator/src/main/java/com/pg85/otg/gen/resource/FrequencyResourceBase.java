@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -23,8 +23,8 @@ public abstract class FrequencyResourceBase extends ResourceBase implements IBas
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
-		int blockX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter();
-		int blockZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter();		
+		int blockX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
+		int blockZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();		
 
 		for (int t = 0; t < this.frequency; t++)
 		{
@@ -32,8 +32,8 @@ public abstract class FrequencyResourceBase extends ResourceBase implements IBas
 			{
 				continue;
 			}
-			int x = blockX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			int z = blockZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			int x = blockX + random.nextInt(Constants.CHUNK_SIZE);
+			int z = blockZ + random.nextInt(Constants.CHUNK_SIZE);
 			spawn(worldGenRegion, random, false, x, z);
 		}
 	}

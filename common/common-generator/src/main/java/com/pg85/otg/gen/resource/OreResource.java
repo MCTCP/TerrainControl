@@ -4,7 +4,6 @@ import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -49,8 +48,8 @@ public class OreResource extends ResourceBase implements IBasicResource
 		// Override spawnForChunkDecoration so we can add a cache.
 		
 		// TODO: Remove this offset for 1.16?
-		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter();
-		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter();		
+		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
+		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();		
 		int startX = worldGenRegion.getDecorationArea().getLeft();
 		int startZ = worldGenRegion.getDecorationArea().getTop();
 		int width = worldGenRegion.getDecorationArea().getWidth();
@@ -66,8 +65,8 @@ public class OreResource extends ResourceBase implements IBasicResource
 			{
 				continue;
 			}
-			x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			x = chunkX + random.nextInt(Constants.CHUNK_SIZE);
+			z = chunkZ + random.nextInt(Constants.CHUNK_SIZE);
 			spawn(worldGenRegion, random, false, x, z, highestBlocksCache, width, height, startX, startZ);
 		}
 	}
@@ -84,6 +83,7 @@ public class OreResource extends ResourceBase implements IBasicResource
 
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);		
 		float f = rand.nextFloat() * (float)Math.PI;
+
 		double d0 = (double)((float)(x + 8) + MathHelper.sin(f) * (float)this.maxSize / 8.0F);
 		double d1 = (double)((float)(x + 8) - MathHelper.sin(f) * (float)this.maxSize / 8.0F);
 		double d2 = (double)((float)(z + 8) + MathHelper.cos(f) * (float)this.maxSize / 8.0F);
