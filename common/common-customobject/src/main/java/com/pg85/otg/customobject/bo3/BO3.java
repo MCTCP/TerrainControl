@@ -33,6 +33,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -231,14 +232,14 @@ public class BO3 implements StructuredCustomObject
 		boolean atLeastOneObjectHasSpawned = false;
 
 		// TODO: Remove this offset for 1.16?
-		int chunkMiddleX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter();
-		int chunkMiddleZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter();
+		int chunkMiddleX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
+		int chunkMiddleZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();
 		for (int i = 0; i < this.settings.frequency; i++)
 		{
 			if (this.settings.rarity > random.nextDouble() * 100.0)
 			{
-				int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-				int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+				int x = chunkMiddleX + random.nextInt(Constants.CHUNK_SIZE);
+				int z = chunkMiddleZ + random.nextInt(Constants.CHUNK_SIZE);
 
 				if (spawn(structureCache, worldGenRegion, random, x, z, this.settings.minHeight, this.settings.maxHeight))
 				{
@@ -590,7 +591,7 @@ public class BO3 implements StructuredCustomObject
 	{
 		Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 		int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
-		return new BO3CustomStructureCoordinate(presetFolderName, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
+		return new BO3CustomStructureCoordinate(presetFolderName, this, this.getName(), rotation, chunkX * 16 + DecorationArea.BO_CHUNK_CENTER_X + random.nextInt(16), (short)height, chunkZ * 16 + DecorationArea.BO_CHUNK_CENTER_Z + random.nextInt(16));
 	}
 
 	@Override

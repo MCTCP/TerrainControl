@@ -4,6 +4,7 @@ import com.pg85.otg.config.biome.ResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -54,9 +55,9 @@ public class VeinResource extends ResourceBase implements IBasicResource
 
 		if (random.nextDouble() * 100.0 < this.veinRarity)
 		{
-			int veinX = chunkX * 16 + random.nextInt(16) + 8;
+			int veinX = chunkX * 16 + random.nextInt(16) + DecorationArea.DECORATION_OFFSET;
 			int veinY = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
-			int veinZ = chunkZ * 16 + random.nextInt(16) + 8;
+			int veinZ = chunkZ * 16 + random.nextInt(16) + DecorationArea.DECORATION_OFFSET;
 			int veinSize = RandomHelper.numberInRange(random, this.minSizeInBlocks, this.maxSizeInBlocks);
 			return new Vein(veinX, veinY, veinZ, veinSize);
 		}

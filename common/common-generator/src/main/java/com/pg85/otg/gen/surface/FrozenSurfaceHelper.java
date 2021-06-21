@@ -2,6 +2,7 @@ package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -21,13 +22,13 @@ public class FrozenSurfaceHelper
 	 */
 	public static void freezeChunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord)
 	{
-		int x = chunkCoord.getBlockXCenter();
-		int z = chunkCoord.getBlockZCenter();
+		int x = chunkCoord.getChunkX() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET;
+		int z = chunkCoord.getChunkZ() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET;
 		int blockToFreezeX;
 		int blockToFreezeZ;
-		for (int i = 0; i < ChunkCoordinate.CHUNK_SIZE; i++)
+		for (int i = 0; i < Constants.CHUNK_SIZE; i++)
 		{
-			for (int j = 0; j < ChunkCoordinate.CHUNK_SIZE; j++)
+			for (int j = 0; j < Constants.CHUNK_SIZE; j++)
 			{
 				blockToFreezeX = x + i;
 				blockToFreezeZ = z + j;

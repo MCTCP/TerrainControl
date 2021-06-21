@@ -17,6 +17,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -188,7 +189,7 @@ public class BO4CustomStructure extends CustomStructure
 		}
 
 		this.start = start;
-		this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, worldSeed);
+		this.random = RandomHelper.getRandomForCoords(start.getX() + DecorationArea.BO_CHUNK_CENTER_X, start.getY(), start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z, worldSeed);
 	}
 	
 	BO4CustomStructure(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
@@ -201,7 +202,7 @@ public class BO4CustomStructure extends CustomStructure
 		}
 
 		this.start = start;
-		this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, worldGenRegion.getSeed());
+		this.random = RandomHelper.getRandomForCoords(start.getX() + DecorationArea.BO_CHUNK_CENTER_X, start.getY(), start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z, worldGenRegion.getSeed());
 
 		long startTime = System.currentTimeMillis();
 
@@ -321,8 +322,8 @@ public class BO4CustomStructure extends CustomStructure
 			BO4Config config = ((BO4)this.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig();
 
 			short startY = 0;
-			int centerX = this.start.getX() + 8;
-			int centerZ = this.start.getZ() + 7;
+			int centerX = this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X;
+			int centerZ = this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z;
 			if(config.useCenterForHighestBlock)
 			{
 				// If this structure has been exported as BO4Data with a minimum size,
@@ -335,23 +336,23 @@ public class BO4CustomStructure extends CustomStructure
 				{
 					if(this.start.rotation == Rotation.NORTH)
 					{
-						centerX = this.start.getX() + 8 + (((-config.minimumSizeLeft + config.minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
-						centerZ = this.start.getZ() + 7 + (((-config.minimumSizeTop + config.minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
+						centerX = this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X + (((-config.minimumSizeLeft + config.minimumSizeRight) * Constants.CHUNK_SIZE) / 2);
+						centerZ = this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z + (((-config.minimumSizeTop + config.minimumSizeBottom) * Constants.CHUNK_SIZE) / 2);
 					}
 					if(this.start.rotation == Rotation.SOUTH)
 					{
-						centerX = this.start.getX() + 8 + (((-config.minimumSizeRight + config.minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
-						centerZ = this.start.getZ() + 7 + (((-config.minimumSizeBottom + config.minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
+						centerX = this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X + (((-config.minimumSizeRight + config.minimumSizeLeft) * Constants.CHUNK_SIZE) / 2);
+						centerZ = this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z + (((-config.minimumSizeBottom + config.minimumSizeTop) * Constants.CHUNK_SIZE) / 2);
 					}
 					if(this.start.rotation == Rotation.EAST)
 					{
-						centerX = this.start.getX() + 8 + (((-config.minimumSizeBottom + config.minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
-						centerZ = this.start.getZ() + 7 + (((-config.minimumSizeLeft + config.minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
+						centerX = this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X + (((-config.minimumSizeBottom + config.minimumSizeTop) * Constants.CHUNK_SIZE) / 2);
+						centerZ = this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z + (((-config.minimumSizeLeft + config.minimumSizeRight) * Constants.CHUNK_SIZE) / 2);
 					}			
 					if(this.start.rotation == Rotation.WEST)
 					{
-						centerX = this.start.getX() + 8 + (((-config.minimumSizeTop + config.minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
-						centerZ = this.start.getZ() + 7 + (((-config.minimumSizeRight + config.minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
+						centerX = this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X + (((-config.minimumSizeTop + config.minimumSizeBottom) * Constants.CHUNK_SIZE) / 2);
+						centerZ = this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z + (((-config.minimumSizeRight + config.minimumSizeLeft) * Constants.CHUNK_SIZE) / 2);
 					}			
 				}
 			}
@@ -401,7 +402,7 @@ public class BO4CustomStructure extends CustomStructure
 
 			if(!config.canSpawnOnWater)
 			{
-				if(worldGenRegion.getMaterialWithoutLoading(this.start.getX() + 8, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true), this.start.getZ() + 7).isLiquid())
+				if(worldGenRegion.getMaterialWithoutLoading(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z, true, true, false, true, true), this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z).isLiquid())
 				{
 					return false;
 				}
@@ -860,7 +861,7 @@ public class BO4CustomStructure extends CustomStructure
 						
 						if(canSpawn && !minimumSize && !bo3.getConfig().canSpawnOnWater)
 						{
-							if(worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 8, worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ() + 7).isLiquid())
+							if(worldGenRegion.getMaterialWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, worldGenRegion.getHighestBlockYAtWithoutLoading(childBranchDataItem.chunkCoordinate.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, childBranchDataItem.chunkCoordinate.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z, true, true, false, true, true), childBranchDataItem.chunkCoordinate.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z).isLiquid())
 							{
 								wasOnWater = true;
 								canSpawn = false;
@@ -1945,7 +1946,7 @@ public class BO4CustomStructure extends CustomStructure
 				// If targetbiomes size is 0, allow all biomes.
 				if(targetBiomes.size() > 0)
 				{
-					IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
+					IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 					if(!targetBiomes.contains(biomeConfig3.getName()))
 					{
 						return null;
@@ -1957,7 +1958,7 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				ArrayList<String> biomeStructures;
 
-				IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
+				IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 				// Get Bo3's for this biome
 				ArrayList<String> structuresToSpawn = new ArrayList<String>();
 				for (List<String> res : biomeConfig3.getCustomStructureNames())
@@ -2015,7 +2016,7 @@ public class BO4CustomStructure extends CustomStructure
 								// If targetbiomes size is 0, allow all biomes.
 								if(targetBiomes.size() > 0)
 								{
-									IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + 8, z * 16 + 7);
+									IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 									if(!targetBiomes.contains(biomeConfig3.getName()))
 									{
 										return null;
@@ -2027,7 +2028,7 @@ public class BO4CustomStructure extends CustomStructure
 								// Check if the structure can spawn in this biome
 								ArrayList<String> biomeStructures;
 
-								IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + 8, z * 16 + 7);
+								IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 								// Get Bo3's for this biome
 								ArrayList<String> structuresToSpawn = new ArrayList<String>();
 								for (List<String> res : biomeConfig3.getCustomStructureNames())
@@ -2192,7 +2193,7 @@ public class BO4CustomStructure extends CustomStructure
 			IBiomeConfig biomeConfig = null;
 			if(config.spawnUnderWater)
 			{
-				biomeConfig = worldGenRegion.getBiomeConfig(this.start.getX() + 8, this.start.getZ() + 8);
+				biomeConfig = worldGenRegion.getBiomeConfig(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z);
 			}
 
 			// Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.

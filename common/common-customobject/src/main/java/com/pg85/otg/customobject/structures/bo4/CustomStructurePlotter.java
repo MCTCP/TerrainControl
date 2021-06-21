@@ -23,6 +23,7 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -248,7 +249,7 @@ public class CustomStructurePlotter
 		
 		if (!isBo4ChunkPlotted(chunkCoord))
 		{
-			IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 7);		  
+			IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);		  
 			List<ICustomStructureGen> customStructureGens = new ArrayList<>();
 			if(targetStructure == null && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 			{
@@ -474,7 +475,7 @@ public class CustomStructurePlotter
 															{
 																canSpawnHere = true;
 															} else {
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(targetBiomes.contains(biomeConfig3.getName()))
 																{
 																	canSpawnHere = true;
@@ -488,7 +489,7 @@ public class CustomStructurePlotter
 														{
 															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																// Get cached data if available
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
 																{
@@ -558,7 +559,7 @@ public class CustomStructurePlotter
 															{
 																canSpawnHere = true;
 															} else {
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() - scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(targetBiomes.contains(biomeConfig3.getName()))
 																{
 																	canSpawnHere = true;
@@ -572,7 +573,7 @@ public class CustomStructurePlotter
 														{
 															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() - scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
 																{
 																	structuresToSpawn = new ArrayList<String>();
@@ -641,7 +642,7 @@ public class CustomStructurePlotter
 															{
 																canSpawnHere = true;
 															} else {
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + scanDistance) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(targetBiomes.contains(biomeConfig3.getName()))
 																{
 																	canSpawnHere = true;
@@ -655,7 +656,7 @@ public class CustomStructurePlotter
 														{
 															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + scanDistance) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
 																{
 																	structuresToSpawn = new ArrayList<String>();
@@ -725,7 +726,7 @@ public class CustomStructurePlotter
 															{
 																canSpawnHere = true;
 															} else {
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - scanDistance) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(targetBiomes.contains(biomeConfig3.getName()))
 																{
 																	canSpawnHere = true;
@@ -739,7 +740,7 @@ public class CustomStructurePlotter
 														{
 															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
-																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - scanDistance) * 16 + 7);
+																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
 																{
 																	structuresToSpawn = new ArrayList<String>();

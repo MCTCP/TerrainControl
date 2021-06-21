@@ -5,7 +5,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -51,13 +50,13 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
 	{
-		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter();
-		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter();
+		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
+		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();
 		int x;
 		int z;
-		for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_SIZE; z0++)
+		for (int z0 = 0; z0 < Constants.CHUNK_SIZE; z0++)
 		{
-			for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_SIZE; x0++)
+			for (int x0 = 0; x0 < Constants.CHUNK_SIZE; x0++)
 			{
 				x = chunkX + x0;
 				z = chunkZ + z0;

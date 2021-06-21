@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
@@ -183,8 +184,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			CraftChunkData data = (CraftChunkData) chunk;
 
 			// TODO: Find some way to clone/swap chunk data efficiently :/
-			for (int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++) {
-				for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++) {
+			for (int x = 0; x < Constants.CHUNK_SIZE; x++) {
+				for (int z = 0; z < Constants.CHUNK_SIZE; z++) {
 					int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
 					for (int y = 0; y <= endY; y++) {
 						BlockPosition pos = new BlockPosition(x, y, z);
@@ -272,9 +273,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (cachedChunk != null)
 		{
 			// TODO: Find some way to clone/swap chunk data efficiently :/
-			for (int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++)
+			for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 			{
-				for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++)
+				for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 				{
 					int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
 					for (int y = 0; y <= endY; y++)

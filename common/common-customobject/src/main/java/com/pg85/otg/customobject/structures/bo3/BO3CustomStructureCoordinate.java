@@ -38,7 +38,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	/**
 	 * Gets the chunk that should spawn this object during decoration.
 	 */
-	ChunkCoordinate getPopulatingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	ChunkCoordinate getDecoratingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// In the past we simply returned the chunk decorating for the origin
 		// of the object. However, the origin is not guaranteed to be at the
@@ -64,8 +64,8 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 		int centerZ = this.z + box.getMinZ() + (box.getDepth() / 2);
 		// TODO: Remove this offset for 1.16, to align with other resources?
 		return ChunkCoordinate.fromBlockCoords(
-			centerX - DecorationArea.decorationOffset,
-			centerZ - DecorationArea.decorationOffset
+			centerX - DecorationArea.DECORATION_OFFSET,
+			centerZ - DecorationArea.DECORATION_OFFSET
 		);
 	}
 }

@@ -2,12 +2,13 @@ package com.pg85.otg.constants;
 
 import java.io.File;
 
-import com.pg85.otg.util.ChunkCoordinate;
-
 public class Constants
 {
 	// Plugin constants
 	
+	public static final int CHUNK_SIZE = 16;
+	public static final int CHUNK_Y_SIZE = 256;
+
 	// Files
 	
 	// Main Plugin Config
@@ -112,5 +113,5 @@ public class Constants
 	/**
 	 * The amount of noise pieces that fit inside a chunk on the y axis.
 	 */
-	public static final int PIECES_PER_CHUNK_Y = ChunkCoordinate.CHUNK_Y_SIZE / PIECE_Y_SIZE;
+	public static final int PIECES_PER_CHUNK_Y = CHUNK_Y_SIZE / PIECE_Y_SIZE;
 }

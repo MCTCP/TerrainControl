@@ -5,7 +5,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -81,8 +80,8 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 		if (random.nextDouble() * 100.0 <= this.rarity)
 		{
 			// Passed Rarity test, place about Frequency grass in this chunk
-			int centerX = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			int centerZ = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			int centerX = worldGenregion.getDecorationArea().getChunkBeingDecoratedCenterX() + random.nextInt(Constants.CHUNK_SIZE);
+			int centerZ = worldGenregion.getDecorationArea().getChunkBeingDecoratedCenterZ() + random.nextInt(Constants.CHUNK_SIZE);
 			int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ);
 			
 			if(centerY < Constants.WORLD_DEPTH)
@@ -150,8 +149,8 @@ public class GrassResource  extends ResourceBase implements IBasicResource
 				continue;
 			}
 			
-			x = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-			z = worldGenregion.getDecorationArea().getChunkBeingDecorated().getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+			x = worldGenregion.getDecorationArea().getChunkBeingDecoratedCenterX() + random.nextInt(Constants.CHUNK_SIZE);
+			z = worldGenregion.getDecorationArea().getChunkBeingDecoratedCenterZ() + random.nextInt(Constants.CHUNK_SIZE);
 			y = worldGenregion.getHighestBlockAboveYAt(x, z);
 
 			if(y < Constants.WORLD_DEPTH)

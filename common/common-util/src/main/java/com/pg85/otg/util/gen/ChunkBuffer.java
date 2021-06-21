@@ -1,5 +1,6 @@
 package com.pg85.otg.util.gen;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -45,17 +46,17 @@ public abstract class ChunkBuffer
 
 	// TODO: Are these really necessary, can use heightmaps?
 	
-	private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
+	private final short[] highestBlockHeight = new short[Constants.CHUNK_SIZE * Constants.CHUNK_SIZE];
 	public int getHighestBlockForColumn(int blockX, int blockZ)
 	{
-		return highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ];
+		return highestBlockHeight[blockX * Constants.CHUNK_SIZE + blockZ];
 	}
 
 	public void setHighestBlockForColumn(int blockX, int blockZ, int height)
 	{
-		if(height > highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ])
+		if(height > highestBlockHeight[blockX * Constants.CHUNK_SIZE + blockZ])
 		{
-			highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ] = (short)height;
+			highestBlockHeight[blockX * Constants.CHUNK_SIZE + blockZ] = (short)height;
 		}
 	}
 }

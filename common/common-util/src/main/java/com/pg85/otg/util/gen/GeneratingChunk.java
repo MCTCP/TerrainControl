@@ -1,8 +1,7 @@
 package com.pg85.otg.util.gen;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.ChunkCoordinate;
-
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.Random;
 
@@ -37,7 +36,7 @@ public final class GeneratingChunk
 	 */
 	public double getNoise(int x, int z)
 	{
-		return this.surfaceNoise[x + z * CHUNK_SIZE];
+		return this.surfaceNoise[x + z * Constants.CHUNK_SIZE];
 	}
 
 	/**
@@ -49,7 +48,7 @@ public final class GeneratingChunk
 	 */
 	public int getWaterLevel(int x, int z)
 	{
-		return this.waterLevel[z + x * CHUNK_SIZE];
+		return this.waterLevel[z + x * Constants.CHUNK_SIZE];
 	}
 
 	/**
