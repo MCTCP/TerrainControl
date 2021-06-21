@@ -90,7 +90,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int worldHeightScale;
 	protected int maxSmoothRadius = 2;
 	protected boolean betterSnowFall;	
-	protected boolean fullyFreezeLakes;
 	protected int waterLevelMin;
 	protected int waterLevelMax;
 
@@ -304,12 +303,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public boolean isBetterSnowFall()
 	{
 		return this.betterSnowFall;
-	}
-	
-	@Override
-	public boolean isFullyFreezeLakes()
-	{
-		return this.fullyFreezeLakes;
 	}
 	
 	@Override

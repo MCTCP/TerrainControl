@@ -92,7 +92,6 @@ public class WorldStandardValues extends Settings
 		RANDOM_RIVERS = booleanSetting("RandomRivers", false),
 		FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
 		BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
-		FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),
 		EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistribution", false),
 		DISABLE_BEDROCK = booleanSetting("DisableBedrock", false),
 		CEILING_BEDROCK = booleanSetting("CeilingBedrock", false),

@@ -212,7 +212,6 @@ public class WorldConfig extends WorldConfigBase
 		this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
 		this.worldHeightScale = 1 << this.worldHeightScaleBits;
 		this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL, logger);
-		this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES, logger);
 		this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX, logger);
 		this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN, logger);
 
@@ -591,11 +590,6 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
 			"Block used as cooled or frozen lava.",
 			"Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes"
-		);
-
-		writer.putSetting(WorldStandardValues.FULLY_FREEZE_LAKES, this.fullyFreezeLakes,
-			"By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.",
-			"Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze"
 		);
 
 		writer.putSetting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall,

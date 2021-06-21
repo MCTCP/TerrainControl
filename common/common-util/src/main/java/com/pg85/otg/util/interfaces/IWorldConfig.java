@@ -90,7 +90,6 @@ public interface IWorldConfig
 	public void setMaxSmoothRadius(int smoothRadius);
 	public int getMaxSmoothRadius();
 	public boolean isBetterSnowFall();
-	public boolean isFullyFreezeLakes();
 	public int getWaterLevelMax();
 	public int getWaterLevelMin();
 
