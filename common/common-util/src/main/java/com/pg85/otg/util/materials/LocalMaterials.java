@@ -125,8 +125,8 @@ public class LocalMaterials
 	public static final String DIAMOND_BLOCK_NAME = getRegistryKey("diamond_block");
 	public static final String LAPIS_BLOCK_NAME = getRegistryKey("lapis_block");
 	public static final String COAL_BLOCK_NAME = getRegistryKey("coal_block");
-	public static final String QUARTZ_BLOCK_NAME = getRegistryKey("nether_quartz_ore");
-	public static final String EMERALD_BLOCK_NAME = getRegistryKey("emerald_ore");
+	public static final String QUARTZ_BLOCK_NAME = getRegistryKey("quartz_block");
+	public static final String EMERALD_BLOCK_NAME = getRegistryKey("emerald_block");
 
 	// Blocks used in OTG code, these must be initialised by 
 	// the forge/spigot classes extending this class.

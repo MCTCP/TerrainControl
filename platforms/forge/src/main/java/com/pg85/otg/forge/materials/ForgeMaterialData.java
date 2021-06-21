@@ -230,7 +230,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	{
 		return this.blockData != null && this.blockData.getMaterial().isSolid() && this.blockData.getMaterial().isSolidBlocking();
 	}
-	
+
 	@Override
 	public boolean isEmptyOrAir()
 	{

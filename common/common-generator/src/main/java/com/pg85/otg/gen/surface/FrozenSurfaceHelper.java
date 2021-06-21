@@ -11,7 +11,6 @@ import com.pg85.otg.util.materials.MaterialProperties;
 
 public class FrozenSurfaceHelper
 {
-	private static final int MAX_PROPAGATION_SIZE = 15;
 	private static final int MAX_LAYERS_ON_LEAVES = 3;
 
 	public FrozenSurfaceHelper() { }
@@ -47,15 +46,16 @@ public class FrozenSurfaceHelper
 		IBiome biome = worldGenRegion.getBiomeForDecoration(x, z);
 		if (biome != null)
 		{
+			IBiomeConfig biomeConfig = biome.getBiomeConfig();			
 			int blockToFreezeY = worldGenRegion.getHighestBlockAboveYAt(x, z);
 			float tempAtBlockToFreeze = biome.getTemperatureAt(x, blockToFreezeY, z);
 			if (blockToFreezeY > 0 && tempAtBlockToFreeze < Constants.SNOW_AND_ICE_TEMP)
 			{
 				// Start to freeze liquids
-				if (!freezeLiquid(worldGenRegion, x, blockToFreezeY -1, z, 0))
+				if (!freezeLiquid(biomeConfig, worldGenRegion, x, blockToFreezeY -1, z, 0))
 				{
 					// Snow has to be placed on an empty space on a block that accepts snow in the world
-					startSnowFall(worldGenRegion, x, blockToFreezeY, z, biome);
+					startSnowFall(biomeConfig, worldGenRegion, x, blockToFreezeY, z, biome);
 				}
 			}
 		}
@@ -68,36 +68,24 @@ public class FrozenSurfaceHelper
 	 * @param z Location Z
 	 * @return If a liquid was present at the given location (not necessarily successful in freezing)
 	 */
-	private static boolean freezeLiquid(IWorldGenRegion worldGenRegion, int x, int y, int z, int currentPropagationSize)
+	private static boolean freezeLiquid(IBiomeConfig biomeConfig, IWorldGenRegion worldGenRegion, int x, int y, int z, int currentPropagationSize)
 	{
-		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfigForDecoration(x, z);
 		if (biomeConfig != null)
 		{
 			LocalMaterialData materialToFreeze = worldGenRegion.getMaterial(x, y, z);
 			if (materialToFreeze.isLiquid())
 			{
-				boolean bFroze = false;
 				// Water & Stationary Water => IceBlock
 				LocalMaterialData iceBlock = biomeConfig.getIceBlockReplaced(y);
 				if(shouldFreeze(x, y, z, materialToFreeze, iceBlock, LocalMaterials.WATER))
 				{
 					worldGenRegion.setBlock(x, y, z, iceBlock);
-					bFroze = true;
 				} else {
 					LocalMaterialData cooledLavaBlock = biomeConfig.getCooledLavaBlockReplaced(y);
 					// Lava & Stationary Lava => CooledLavaBlock
 					if(shouldFreeze(x, y, z, materialToFreeze, cooledLavaBlock, LocalMaterials.LAVA))
 					{
 						worldGenRegion.setBlock(x, y, z, cooledLavaBlock);
-						bFroze = true;
-					}
-				}
-				if(bFroze)
-				{
-					if (worldGenRegion.getWorldConfig().isFullyFreezeLakes() && currentPropagationSize < MAX_PROPAGATION_SIZE)
-					{
-						currentPropagationSize++;
-						propagateFreeze(worldGenRegion, x, y, z, currentPropagationSize);
 					}
 				}
 				return true;
@@ -117,9 +105,9 @@ public class FrozenSurfaceHelper
 	 * @param frozenMaterial The material to freeze the thawed material to if checks pass
 	 * @param check1 The first material to check for
 	 */
-	private static boolean shouldFreeze(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, LocalMaterialData check1)
+	private static boolean shouldFreeze(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, LocalMaterialData source)
 	{
-		return (thawedMaterial.isMaterial(check1) && !frozenMaterial.isMaterial(check1));
+		return (thawedMaterial.isMaterial(source) && !frozenMaterial.isMaterial(source));
 	}
 
 	/**
@@ -130,11 +118,9 @@ public class FrozenSurfaceHelper
 	 * @param z Location Z
 	 * @param biome The biome associated with the chunk column
 	 */
-	private static void startSnowFall(IWorldGenRegion worldGenRegion, int x, int y, int z, IBiome biome)
+	private static void startSnowFall(IBiomeConfig biomeConfig, IWorldGenRegion worldGenRegion, int x, int y, int z, IBiome biome)
 	{
 		int decreaseFactor = 0;
-		IBiomeConfig biomeConfig = biome.getBiomeConfig();
-
 		float tempAtBlockToFreeze;
 		int snowHeight;
 		LocalMaterialData materialToSnowAt = null;
@@ -214,37 +200,5 @@ public class FrozenSurfaceHelper
 		}
 
 		return true;
-	}
-
-	/**
-	 * Helps propagate the freezing of liquids.
-	 * @param x Location X
-	 * @param y Location Y
-	 * @param z Location Z
-	 */
-	private static void propagateFreeze(IWorldGenRegion worldGenRegion, int x, int y, int z, int currentPropagationSize)
-	{
-		propagationHelper(worldGenRegion, x + 1, y, z, currentPropagationSize);
-		propagationHelper(worldGenRegion, x + 1, y, z + 1, currentPropagationSize);
-		propagationHelper(worldGenRegion, x, y, z + 1, currentPropagationSize);
-		propagationHelper(worldGenRegion, x - 1, y, z + 1, currentPropagationSize);
-		propagationHelper(worldGenRegion, x - 1, y, z, currentPropagationSize);
-		propagationHelper(worldGenRegion, x - 1, y, z - 1, currentPropagationSize);
-		propagationHelper(worldGenRegion, x, y, z - 1, currentPropagationSize);
-		propagationHelper(worldGenRegion, x + 1 , y, z - 1, currentPropagationSize);
-	}
-
-	/**
-	 * Called by propagateFreeze, does the actual checks and then called freezeLiquid
-	 * @param x Location X
-	 * @param y Location Y
-	 * @param z Location Z
-	 */
-	private static void propagationHelper(IWorldGenRegion worldGenRegion, int x, int y, int z, int currentPropagationSize)
-	{
-		if (worldGenRegion.getHighestBlockAboveYAt(x, z) - 1 > y && currentPropagationSize < MAX_PROPAGATION_SIZE)
-		{
-			freezeLiquid(worldGenRegion, x, y, z, currentPropagationSize);
-		}
 	}
 }

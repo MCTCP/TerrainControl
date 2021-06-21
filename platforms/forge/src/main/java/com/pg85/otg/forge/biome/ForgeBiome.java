@@ -114,9 +114,9 @@ public class ForgeBiome implements IBiome
 		if (event != null)
 		{
 			biomeAmbienceBuilder.backgroundMusic(new BackgroundMusicSelector(event,
-					biomeConfig.getMusicMinDelay(),
-					biomeConfig.getMusicMaxDelay(),
-					biomeConfig.isReplaceCurrentMusic()));
+				biomeConfig.getMusicMinDelay(),
+				biomeConfig.getMusicMaxDelay(),
+				biomeConfig.isReplaceCurrentMusic()));
 		}
 
 		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAmbientSound()));
@@ -129,16 +129,16 @@ public class ForgeBiome implements IBiome
 		if (event != null)
 		{
 			biomeAmbienceBuilder.ambientMoodSound(new MoodSoundAmbience(event,
-					biomeConfig.getMoodSoundDelay(),
-					biomeConfig.getMoodSearchRange(),
-					biomeConfig.getMoodOffset()));
+				biomeConfig.getMoodSoundDelay(),
+				biomeConfig.getMoodSearchRange(),
+				biomeConfig.getMoodOffset()));
 		}
 
 		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAdditionsSound()));
 		if (event != null)
 		{
 			biomeAmbienceBuilder.ambientAdditionsSound(new SoundAdditionsAmbience(event,
-					biomeConfig.getAdditionsTickChance()));
+				biomeConfig.getAdditionsTickChance()));
 		}
 
 		if(biomeConfig.getFoliageColor() != 0xffffff)

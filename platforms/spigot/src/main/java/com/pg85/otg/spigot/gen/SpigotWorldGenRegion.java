@@ -299,40 +299,22 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			return -1;
 		}
 
-		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
-	}	
-
-	private int getHighestBlockYAt(IChunkAccess chunk, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
-	{
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
+		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE, internalX, internalZ);
+		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
+	}
 
-		// TODO: For some reason, on rare occasions WORLD_SURFACE_WG heightmap returns 0 for chunks
-		// with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
-		// If we use a later status like FEATURES though, resource decoration may have problems
-		// fetching chunks.
-		int heightMapy = chunk.a(HeightMap.Type.WORLD_SURFACE).a(internalX, internalZ);
-		if (heightMapy == 0)
-		{
-			// Check the wg heightmap as a secondary measure
-			// The heightmap doesn't track any changes to terrain after initial generation, and is out of date, so it's a last resort in case things don't work.
-			int heightMapCheck = chunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(internalX, internalZ);
-			if (heightMapCheck != 0)
-			{
-				heightMapy = heightMapCheck;
-			} else {
-				heightMapy = Constants.WORLD_HEIGHT - 1;
-			}
-		}
-
+	private int getHighestBlockYAt(IChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
 		LocalMaterialData material;
 		boolean isSolid;
 		boolean isLiquid;
 		IBlockData blockState;
 		Block block;
 
-		for (int i = heightMapy; i >= 0; i--)
+		for (int i = heightMapY; i >= 0; i--)
 		{
 			blockState = chunk.getType(new BlockPosition(internalX, i, internalZ));
 			block = blockState.getBlock();
@@ -644,8 +626,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			return -1;
 		}
 
-		return getHighestBlockYAt(chunk, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves); 
-	}	
+		// Get internal coordinates for block in chunk
+		int internalX = x & 0xF;
+		int internalZ = z & 0xF;
+		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE_WG, internalX, internalZ);
+		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves); 
+	}
 	
 	@Override
 	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
