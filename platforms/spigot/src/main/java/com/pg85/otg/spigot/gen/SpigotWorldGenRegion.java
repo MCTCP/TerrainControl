@@ -574,7 +574,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x, y, z);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
 			}
 		}
 
@@ -616,7 +616,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 			}
 		}
 

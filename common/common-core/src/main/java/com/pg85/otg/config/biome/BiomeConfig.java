@@ -352,6 +352,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Because of this, the following OTG settings cannot be used:",
 			"- Colors (foliage, grass, water, fog etc), mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
 			"What can be configured via this file: ",
+			" - Biome generator settings.",
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - Any OTG settings not mentioned above that are internal to OTG and so don't rely on MC logic.",
