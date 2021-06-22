@@ -3,7 +3,6 @@ package com.pg85.otg.gen.carver;
 import java.util.BitSet;
 import java.util.Random;
 
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.MutableBoolean;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.DecorationArea;

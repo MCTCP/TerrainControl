@@ -25,9 +25,7 @@ class BiomeGroupLayer implements ParentedLayer
 		if (data.oldGroupRarity)
 		{
 			this.maxRarity = Math.max(data.cumulativeGroupRarities[depth], 100);
-		}
-		else
-		{
+		} else {
 			this.maxRarity = data.groupMaxRarityPerDepth[depth];
 		}
 		int cumulativeRarity = 0;
@@ -75,7 +73,8 @@ class BiomeGroupLayer implements ParentedLayer
 		// Iterate through the rarity map and see if the chosen rarity is less than the rarity for each group, if it is then return.
 		for (Map.Entry<Integer, NewBiomeGroup> entry : rarityMap.entrySet())
 		{
-			if (chosenRarity < entry.getKey()) {
+			if (chosenRarity < entry.getKey())
+			{
 				return entry.getValue();
 			}
 		}

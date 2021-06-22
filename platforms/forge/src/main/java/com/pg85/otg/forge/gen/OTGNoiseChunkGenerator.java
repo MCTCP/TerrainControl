@@ -2,13 +2,10 @@ package com.pg85.otg.forge.gen;
 
 import java.nio.file.Path;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -47,7 +44,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.SectionPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Blockreader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -62,7 +58,6 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.jigsaw.JigsawJunction;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
@@ -111,14 +106,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	private final ShadowChunkGenerator shadowChunkGenerator; 
 	private final OTGChunkGenerator internalGenerator;
-	private final OTGChunkDecorator chunkPopulator;
+	private final OTGChunkDecorator chunkDecorator;
 	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
 	private boolean isInitialised = false;
-	private final Map<Integer, List<Structure<?>>> biomeStructures;
 	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
@@ -147,10 +141,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
 		
-		this.biomeStructures = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy((structure) -> {
-			return structure.step().ordinal();
-		}));
-
 		this.dimensionConfig = dimensionConfigSupplier;
 		this.worldSeed = seed;
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();
@@ -162,14 +152,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
-		this.chunkPopulator = new OTGChunkDecorator();
+		this.chunkDecorator = new OTGChunkDecorator();
 	}
 
 	public void saveStructureCache()
 	{
-		if (this.chunkPopulator.getIsSaveRequired())
+		if (this.chunkDecorator.getIsSaveRequired())
 		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkPopulator);
+			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
 	}
 
@@ -279,9 +269,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (stage == GenerationStage.Carving.AIR)
 		{
 			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
-
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
+			// TODO: Allow non-OTG carvers, call super?
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
 		}
 	}
@@ -290,6 +280,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Does decoration for a given pos/chunk
 	@Override
+	@SuppressWarnings("deprecation")	
 	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
 		int chunkX = worldGenRegion.getCenterX();
@@ -304,102 +295,21 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		Biome biome = this.biomeSource.getNoiseBiome((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
+		// World save folder name may not be identical to level name, fetch it.
+		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+		init(worldSaveFolder);
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(blockpos.getX(), blockpos.getZ());		
 		try
 		{
-			// Override normal decoration (Biome.func_242427_a()) with OTG's.
-			biomeDecorate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
+			ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
+			this.chunkDecorator.decorate(chunkBeingDecorated, forgeWorldGenRegion, biomeConfig, this.structureCache);
+			biome.generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
 			crashreport.addCategory("Generation").setDetail("CenterX", chunkX).setDetail("CenterZ", chunkZ).setDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
-		}	
-	}
-
-	// Chunk decoration method taken from Biome class
-	@SuppressWarnings("deprecation")
-	private void biomeDecorate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
-	{
-		// World save folder name may not be identical to level name, fetch it.
-		Path worldSaveFolder = world.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-		init(worldSaveFolder);
-		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
-		
-		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingDecorated, new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
-		
-		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
-		
-		// TODO: Spawn snow only after this!
-		// Vanilla structure generation
-		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
-		{
-			int index = 0;
-			// Generate features if enabled
-			if (structureManager.shouldGenerateFeatures())
-			{
-				// Go through all the structures set to generate at this step
-				for (Structure<?> structure : this.biomeStructures.getOrDefault(step, Collections.emptyList()))
-				{
-					// Reset the random
-					random.setFeatureSeed(seed, index, step);
-					int chunkX = pos.getX() >> 4;
-					int chunkZ = pos.getZ() >> 4;
-					int chunkStartX = chunkX << 4;
-					int chunkStartZ = chunkZ << 4;
-
-					try
-					{
-						// Generate the structure if it exists in a biome in this chunk.
-						// We don't have to do any work here, we can just let StructureManager handle it all.
-						structureManager.startsForFeature(SectionPos.of(pos), structure)
-							.forEach(start ->
-								start.placeInChunk(
-									world, 
-									structureManager, 
-									chunkGenerator, 
-									random, 
-									new MutableBoundingBox(
-										chunkStartX, 
-										chunkStartZ, 
-										chunkStartX + 15, 
-										chunkStartZ + 15
-									), 
-									new ChunkPos(chunkX, chunkZ)
-								)
-							)
-						;
-					} catch (Exception exception) {
-						CrashReport crashreport = CrashReport.forThrowable(exception, "Feature placement");
-						crashreport.addCategory("Feature")
-							.setDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure))
-							.setDetail("Description", () -> structure.toString())
-						;
-						throw new ReportedException(crashreport);
-					}
-
-					++index;
-				}
-			}
-
-			// Spawn any non-OTG resources registered to this biome.
-			if (list.size() > step)
-			{
-				for(Supplier<ConfiguredFeature<?, ?>> supplier : list.get(step))
-				{
-					ConfiguredFeature<?, ?> configuredfeature = supplier.get();
-					random.setFeatureSeed(seed, index, step);
-					try {
-						configuredfeature.place(world, chunkGenerator, random, pos);
-					} catch (Exception exception1) {
-						CrashReport crashreport1 = CrashReport.forThrowable(exception1, "Feature placement");
-						crashreport1.addCategory("Feature").setDetail("Id", Registry.FEATURE.getKey(configuredfeature.feature)).setDetail("Config", configuredfeature.config).setDetail("Description", () -> {
-							return configuredfeature.feature.toString();
-						});
-						throw new ReportedException(crashreport1);
-					}
-					++index;
-				}
-			}
 		}
 	}
 

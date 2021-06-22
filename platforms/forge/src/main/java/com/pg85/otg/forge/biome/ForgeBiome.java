@@ -10,6 +10,7 @@ import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -270,7 +271,7 @@ public class ForgeBiome implements IBiome
 			int villageSize = biomeConfig.getVillageSize();
 			VillageType villageType = biomeConfig.getVillageType();
 			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customVillage = register(
-				biomeConfig.getRegistryKey().withBiomeResource("village").toResourceLocationString(),
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
 				Structure.VILLAGE.configured(
 					new VillageConfig(
 						() -> {
@@ -351,7 +352,7 @@ public class ForgeBiome implements IBiome
 			float mineShaftProbability = biomeConfig.getMineShaftProbability();
 			MineshaftType mineShaftType = biomeConfig.getMineShaftType();
 			StructureFeature<MineshaftConfig, ? extends Structure<MineshaftConfig>> customMineShaft = register(
-				biomeConfig.getRegistryKey().withBiomeResource("mineshaft").toResourceLocationString(),
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("mineshaft").toResourceLocationString(),
 				Structure.MINESHAFT.configured(
 					new MineshaftConfig(
 						mineShaftProbability,
@@ -367,7 +368,7 @@ public class ForgeBiome implements IBiome
 		{
 			float buriedTreasureProbability = biomeConfig.getBuriedTreasureProbability();
 			StructureFeature<ProbabilityConfig, ? extends Structure<ProbabilityConfig>> customBuriedTreasure = register(
-				biomeConfig.getRegistryKey().withBiomeResource("buried_treasure").toResourceLocationString(),
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("buried_treasure").toResourceLocationString(),
 				Structure.BURIED_TREASURE.configured(new ProbabilityConfig(buriedTreasureProbability))
 			);
 			biomeGenerationSettingsBuilder.addStructureStart(customBuriedTreasure);
@@ -380,7 +381,7 @@ public class ForgeBiome implements IBiome
 			float oceanRuinsClusterProbability = biomeConfig.getOceanRuinsClusterProbability();
 			OceanRuinsType oceanRuinsType = biomeConfig.getOceanRuinsType();
 			StructureFeature<OceanRuinConfig, ? extends Structure<OceanRuinConfig>> customOceanRuins = register(
-				biomeConfig.getRegistryKey().withBiomeResource("ocean_ruin").toResourceLocationString(),
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("ocean_ruin").toResourceLocationString(),
 				Structure.OCEAN_RUIN.configured(
 					new OceanRuinConfig(
 						oceanRuinsType == OceanRuinsType.cold ? OceanRuinStructure.Type.COLD : OceanRuinStructure.Type.WARM,
@@ -411,7 +412,7 @@ public class ForgeBiome implements IBiome
 		{
 			int outpostSize = biomeConfig.getPillagerOutPostSize();
 			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customOutpost = register(
-				biomeConfig.getRegistryKey().withBiomeResource("pillager_outpost").toResourceLocationString(), 
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("pillager_outpost").toResourceLocationString(), 
 				Structure.PILLAGER_OUTPOST.configured(
 					new VillageConfig(
 						() -> {
@@ -429,7 +430,7 @@ public class ForgeBiome implements IBiome
 		{
 			int bastionRemnantSize = biomeConfig.getBastionRemnantSize();
 			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customBastionRemnant = register(
-				biomeConfig.getRegistryKey().withBiomeResource("bastion_remnant").toResourceLocationString(), 
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("bastion_remnant").toResourceLocationString(), 
 				Structure.BASTION_REMNANT.configured(
 					new VillageConfig(
 						() -> {
