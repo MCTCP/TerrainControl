@@ -38,7 +38,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
 {
@@ -79,8 +78,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	// IChunk -> IChunkAccess
 	private final FifoMap<ChunkCoordinate, IChunkAccess> unloadedChunksCache;
-	// Structure -> StructureGenerator
-	private final Map<Integer, List<StructureGenerator<?>>> biomeStructures;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
@@ -116,13 +113,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
-
-		// stream() -> g()
-		this.biomeStructures = IRegistry.STRUCTURE_FEATURE.g().collect(Collectors.groupingBy((structure) ->
-		{
-			// getDecorationStage() -> f()
-			return structure.f().ordinal();
-		}));
 
 		this.dimensionConfig = dimensionConfigSupplier;
 		this.worldSeed = seed;
@@ -414,87 +404,13 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
 		init(((IWorldDataServer) world.getWorldData()).getName());
-		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
-		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.decorate(chunkBeingDecorated, new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
-
-		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
 		
-		// TODO: Spawn snow only after this!		
-		// Vanilla structure generation
-		for (int step = 0; step < WorldGenStage.Decoration.values().length; ++step)
-		{
-			int index = 0;
-			// Generate features if enabled
-			if (structureManager.a())
-			{
-				// Go through all the structures set to generate at this step
-				for (StructureGenerator<?> structure : this.biomeStructures.getOrDefault(step, Collections.emptyList()))
-				{
-					// Reset the random
-					// setFeatureSeed() -> b()
-					random.b(seed, index, step);
-					int chunkX = pos.getX() >> 4;
-					int chunkZ = pos.getZ() >> 4;
-					int chunkStartX = chunkX << 4;
-					int chunkStartZ = chunkZ << 4;
-
-					try
-					{
-						// Generate the structure if it exists in a biome in this chunk.
-						// We don't have to do any work here, we can just let StructureManager handle it all.
-						structureManager.a(SectionPosition.a(pos), structure)
-							.forEach(start ->
-								start.a(
-									world,
-									structureManager,
-									chunkGenerator,
-									random,
-									new StructureBoundingBox(
-										chunkStartX,
-										chunkStartZ,
-										chunkStartX + 15,
-										chunkStartZ + 15
-									),
-									new ChunkCoordIntPair(chunkX, chunkZ)
-								)
-							)
-						;
-					}
-					catch (Exception exception)
-					{
-						CrashReport crashreport = CrashReport.a(exception, "Feature placement");
-						crashreport.a("Feature")
-							.a("Id", IRegistry.STRUCTURE_FEATURE.getKey(structure))
-							.a("Description", structure::toString)
-						;
-						throw new ReportedException(crashreport);
-					}
-
-					++index;
-				}
-			}
-			
-			// Spawn any non-OTG resources registered to this biome.
-			if (list.size() > step)
-			{
-				for(Supplier<WorldGenFeatureConfigured<?, ?>> supplier : list.get(step))
-				{
-					WorldGenFeatureConfigured<?, ?> configuredfeature = supplier.get();
-					random.b(seed, index, step);
-					try {
-						configuredfeature.a(world, chunkGenerator, random, pos);
-					} catch (Exception exception1) {
-						CrashReport crashreport1 = CrashReport.a(exception1, "Feature placement");
-						crashreport1.a("Feature").a("Id", IRegistry.FEATURE.getKey(configuredfeature.e)).a("Config", configuredfeature.f).a("Description", () -> {
-							return configuredfeature.e.toString();
-						});
-						throw new ReportedException(crashreport1);
-					}
-					++index;
-				}
-			}
-		}
+		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this);
+		this.chunkPopulator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, this.structureCache);
+		biome.a(structureManager, this, world, seed, random, pos);
+		this.chunkPopulator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 	}
 
 	// Mob spawning on initial chunk spawn (animals).

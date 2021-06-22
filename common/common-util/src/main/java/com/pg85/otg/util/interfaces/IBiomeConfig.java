@@ -8,7 +8,6 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
-import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -30,12 +29,12 @@ public interface IBiomeConfig
 	// Misc
 
 	String getName();
-	BiomeResourceLocation getRegistryKey();
+	IBiomeResourceLocation getRegistryKey();
 
 	// WorldConfig getters
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
 	// use a parent object that holds both, like a worldgenregion.
-	
+
 	boolean biomeConfigsHaveReplacement();
 	double getFractureHorizontal();
 	double getFractureVertical();
@@ -43,14 +42,15 @@ public interface IBiomeConfig
 	boolean isCeilingBedrock();
 	boolean isBedrockDisabled();
 	boolean isRemoveSurfaceStone();
-	
+
 	// Inheritance
-	
+
 	List<String> getBiomeDictTags();
 	String getBiomeCategory();
-	
+	String getTemplateForBiome();
+
 	// Placement
-	
+
 	int getBiomeSize();
 	int getBiomeRarity();
 	int getBiomeColor();

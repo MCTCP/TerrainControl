@@ -3,8 +3,9 @@ package com.pg85.otg.util.biome;
 import java.nio.file.Path;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
 
-public class BiomeResourceLocation
+public class OTGBiomeResourceLocation implements IBiomeResourceLocation
 {
 	private static final String BIOME_RESOURCE_LOCATION_SEPARATOR = ".";
 
@@ -15,7 +16,7 @@ public class BiomeResourceLocation
 	private final String biomeName;
 	private final String resourceName;
 
-	public BiomeResourceLocation(Path presetFolder, String presetShortName, int presetMajorVersion, String biomeName, String resourceName)
+	public OTGBiomeResourceLocation(Path presetFolder, String presetShortName, int presetMajorVersion, String biomeName, String resourceName)
 	{
 		this.presetMajorVersion = presetMajorVersion;
 		this.presetFolder = presetFolder.toFile().getName();
@@ -25,12 +26,17 @@ public class BiomeResourceLocation
 		this.resourceName = resourceName;
 	}
 
-	public BiomeResourceLocation(Path presetFolder, String presetShortName, int presetMajorVersion, String biomeName)
+	public OTGBiomeResourceLocation(Path presetFolder, String presetShortName, int presetMajorVersion, String biomeName)
 	{
 		this(presetFolder, presetShortName, presetMajorVersion, biomeName, null);
 	}
 	
-	private BiomeResourceLocation(String presetFolderName, String presetShortName, int presetMajorVersion, String presetRegistryName, String biomeName, String resourceName)
+	public IBiomeResourceLocation withBiomeResource(String resourceName)
+	{
+		return new OTGBiomeResourceLocation(this.presetFolder, this.presetShortName, this.presetMajorVersion, this.presetRegistryName, this.biomeName, resourceName);
+	}
+	
+	private OTGBiomeResourceLocation(String presetFolderName, String presetShortName, int presetMajorVersion, String presetRegistryName, String biomeName, String resourceName)
 	{
 		this.presetMajorVersion = presetMajorVersion;
 		this.presetFolder = presetFolderName;
@@ -40,11 +46,18 @@ public class BiomeResourceLocation
 		this.resourceName = resourceName;
 	}
 	
+	@Override
 	public String getPresetFolderName()
 	{
 		return this.presetFolder;
+	}
+	
+	@Override
+	public String toResourceLocationString()
+	{
+		return String.format("%s%s%s", getResourceDomain(), ":", getResourcePath());
 	}	
-
+	
 	private String getResourceDomain()
 	{
 		return Constants.MOD_ID_SHORT;
@@ -58,15 +71,5 @@ public class BiomeResourceLocation
 		} else {			
 			return String.format("%s%s%s", this.presetRegistryName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName);
 		}
-	}
-
-	public String toResourceLocationString()
-	{
-		return String.format("%s%s%s", getResourceDomain(), ":", getResourcePath());
-	}
-
-	public BiomeResourceLocation withBiomeResource(String resourceName)
-	{
-		return new BiomeResourceLocation(this.presetFolder, this.presetShortName, this.presetMajorVersion, this.presetRegistryName, this.biomeName, resourceName);
 	}
 }

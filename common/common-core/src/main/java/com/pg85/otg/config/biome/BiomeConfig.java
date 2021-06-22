@@ -20,7 +20,7 @@ import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.biome.BiomeResourceLocation;
+import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -114,10 +114,11 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetDir, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		super(biomeName, new BiomeResourceLocation(presetDir, presetShortName, presetMajorVersion, biomeName));
-
+		super(biomeName);
+		this.setRegistryKey(new OTGBiomeResourceLocation(presetFolder, presetShortName, presetMajorVersion, biomeName));
+		
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
 		// Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes
@@ -144,7 +145,7 @@ public class BiomeConfig extends BiomeConfigBase
 
 		this.renameOldSettings(settings, logger, materialReader);
 		this.readConfigSettings(settings, biomeResourcesManager, spawnLog, logger, materialReader);
-		this.validateAndCorrectSettings(presetDir, true, logger);
+		this.validateAndCorrectSettings(presetFolder, true, logger);
 
 		// Set water level
 		if (this.useWorldWaterLevel)
@@ -201,7 +202,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
 		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
 		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
-		this.vanillaBiome = reader.getSetting(BiomeStandardValues.VANILLA_BIOME, logger);
+		this.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
 		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
 		this.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, logger);
 		this.smoothRadius = reader.getSetting(BiomeStandardValues.SMOOTH_RADIUS, logger);
@@ -342,12 +343,18 @@ public class BiomeConfig extends BiomeConfigBase
 	protected void writeConfigSettings(SettingsMap writer)
 	{
 		writer.header1("Biome Identity");
-		
-		writer.putSetting(BiomeStandardValues.VANILLA_BIOME, this.vanillaBiome,
-			"When converting an existing OTG world to a vanilla world that can be",
-			"used without OTG, this is the vanilla biome that replaces this biome.",
-			"* Converting to vanilla biomes via console command is not yet",
-			"  implemented, but is planned for the future.",
+
+		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.templateForBiome,
+			"Enter the registry name of a non-OTG biome to make OTG use that biome for biome generation",
+			"and chunk decoration, instead of OTG registering its own biome for this BiomeConfig.",
+			"OTG will generate the base terrain for the biome, configured via this file, ",
+			"but will not override any settings registered to the biome.",
+			"Because of this, the following OTG settings cannot be used:",
+			"- Colors (foliage, grass, water, fog etc), mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
+			"What can be configured via this file: ",
+			" - Terrain settings.",
+			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
+			" - Any OTG settings not mentioned above that are internal to OTG and so don't rely on MC logic.",
 			"Example: minecraft:plains"
 		);
 		
@@ -960,7 +967,6 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void renameOldSettings(SettingsMap settings, ILogger logger, IMaterialReader materialReader)
 	{
-		settings.renameOldSetting("ReplaceToBiomeName", BiomeStandardValues.VANILLA_BIOME);
 		settings.renameOldSetting("DisableNotchHeightControl", BiomeStandardValues.DISABLE_BIOME_HEIGHT);
 		settings.renameOldSetting("BiomeDictId", BiomeStandardValues.BIOME_DICT_TAGS);
 	}

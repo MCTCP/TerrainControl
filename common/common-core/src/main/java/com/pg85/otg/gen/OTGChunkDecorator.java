@@ -200,14 +200,17 @@ public class OTGChunkDecorator implements IChunkDecorator
 				}
 			}
 		}
+	}
 
+	public void doSnowAndIce(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord)
+	{
 		// Snow and ice
 		// TODO: Snow is appearing below structures, indicating it spawned before 
 		// it should. Check and align decoration bounds for resources and make sure
 		// freezing is done during the correct decoration step.
 		FrozenSurfaceHelper.freezeChunk(worldGenRegion, chunkCoord);
 	}
-
+	
 	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{
 		// Plot and spawn BO4's for all chunks that may have blocks spawned on them while decorating this chunk, 

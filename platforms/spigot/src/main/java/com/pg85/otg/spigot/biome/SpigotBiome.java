@@ -7,6 +7,7 @@ import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -164,7 +165,7 @@ public class SpigotBiome implements IBiome
 			int villageSize = biomeConfig.getVillageSize();
 			SettingsEnums.VillageType villageType = biomeConfig.getVillageType();
 			StructureFeature<WorldGenFeatureVillageConfiguration, ? extends StructureGenerator<WorldGenFeatureVillageConfiguration>> customVillage = register(
-					biomeConfig.getRegistryKey().withBiomeResource("village").toResourceLocationString(),
+					((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
 					StructureGenerator.VILLAGE.a(
 							new WorldGenFeatureVillageConfiguration(
 									() ->
@@ -247,13 +248,13 @@ public class SpigotBiome implements IBiome
 			float mineShaftProbability = biomeConfig.getMineShaftProbability();
 			SettingsEnums.MineshaftType mineShaftType = biomeConfig.getMineShaftType();
 			StructureFeature<WorldGenMineshaftConfiguration, ? extends StructureGenerator<WorldGenMineshaftConfiguration>> customMineShaft = register(
-					biomeConfig.getRegistryKey().withBiomeResource("mineshaft").toResourceLocationString(),
-					StructureGenerator.MINESHAFT.a(
-							new WorldGenMineshaftConfiguration(
-									mineShaftProbability,
-									mineShaftType == SettingsEnums.MineshaftType.mesa ? WorldGenMineshaft.Type.MESA : WorldGenMineshaft.Type.NORMAL
-							)
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("mineshaft").toResourceLocationString(),
+				StructureGenerator.MINESHAFT.a(
+					new WorldGenMineshaftConfiguration(
+						mineShaftProbability,
+						mineShaftType == SettingsEnums.MineshaftType.mesa ? WorldGenMineshaft.Type.MESA : WorldGenMineshaft.Type.NORMAL
 					)
+				)
 			);
 			biomeGenerationSettingsBuilder.a(customMineShaft);
 		}
@@ -263,8 +264,8 @@ public class SpigotBiome implements IBiome
 		{
 			float buriedTreasureProbability = biomeConfig.getBuriedTreasureProbability();
 			StructureFeature<WorldGenFeatureConfigurationChance, ? extends StructureGenerator<WorldGenFeatureConfigurationChance>> customBuriedTreasure = register(
-					biomeConfig.getRegistryKey().withBiomeResource("buried_treasure").toResourceLocationString(),
-					StructureGenerator.BURIED_TREASURE.a(new WorldGenFeatureConfigurationChance(buriedTreasureProbability))
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("buried_treasure").toResourceLocationString(),
+				StructureGenerator.BURIED_TREASURE.a(new WorldGenFeatureConfigurationChance(buriedTreasureProbability))
 			);
 			biomeGenerationSettingsBuilder.a(customBuriedTreasure);
 		}
@@ -276,14 +277,14 @@ public class SpigotBiome implements IBiome
 			float oceanRuinsClusterProbability = biomeConfig.getOceanRuinsClusterProbability();
 			SettingsEnums.OceanRuinsType oceanRuinsType = biomeConfig.getOceanRuinsType();
 			StructureFeature<WorldGenFeatureOceanRuinConfiguration, ? extends StructureGenerator<WorldGenFeatureOceanRuinConfiguration>> customOceanRuins = register(
-					biomeConfig.getRegistryKey().withBiomeResource("ocean_ruin").toResourceLocationString(),
-					StructureGenerator.OCEAN_RUIN.a(
-							new WorldGenFeatureOceanRuinConfiguration(
-									oceanRuinsType == SettingsEnums.OceanRuinsType.cold ? WorldGenFeatureOceanRuin.Temperature.COLD : WorldGenFeatureOceanRuin.Temperature.WARM,
-									oceanRuinsLargeProbability,
-									oceanRuinsClusterProbability
-							)
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("ocean_ruin").toResourceLocationString(),
+				StructureGenerator.OCEAN_RUIN.a(
+					new WorldGenFeatureOceanRuinConfiguration(
+						oceanRuinsType == SettingsEnums.OceanRuinsType.cold ? WorldGenFeatureOceanRuin.Temperature.COLD : WorldGenFeatureOceanRuin.Temperature.WARM,
+						oceanRuinsLargeProbability,
+						oceanRuinsClusterProbability
 					)
+				)
 			);
 			biomeGenerationSettingsBuilder.a(customOceanRuins);
 		}
@@ -307,13 +308,13 @@ public class SpigotBiome implements IBiome
 		{
 			int outpostSize = biomeConfig.getPillagerOutPostSize();
 			StructureFeature<WorldGenFeatureVillageConfiguration, ? extends StructureGenerator<WorldGenFeatureVillageConfiguration>> customOutpost = register(
-					biomeConfig.getRegistryKey().withBiomeResource("pillager_outpost").toResourceLocationString(),
-					StructureGenerator.PILLAGER_OUTPOST.a(
-							new WorldGenFeatureVillageConfiguration(
-									() -> WorldGenFeaturePillagerOutpostPieces.a,
-									outpostSize
-							)
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("pillager_outpost").toResourceLocationString(),
+				StructureGenerator.PILLAGER_OUTPOST.a(
+					new WorldGenFeatureVillageConfiguration(
+						() -> WorldGenFeaturePillagerOutpostPieces.a,
+						outpostSize
 					)
+				)
 			);
 			biomeGenerationSettingsBuilder.a(customOutpost);
 		}
@@ -323,13 +324,13 @@ public class SpigotBiome implements IBiome
 		{
 			int bastionRemnantSize = biomeConfig.getBastionRemnantSize();
 			StructureFeature<WorldGenFeatureVillageConfiguration, ? extends StructureGenerator<WorldGenFeatureVillageConfiguration>> customBastionRemnant = register(
-					biomeConfig.getRegistryKey().withBiomeResource("bastion_remnant").toResourceLocationString(),
-					StructureGenerator.BASTION_REMNANT.a(
-							new WorldGenFeatureVillageConfiguration(
-									() -> WorldGenFeatureBastionPieces.a,
-									bastionRemnantSize
-							)
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("bastion_remnant").toResourceLocationString(),
+				StructureGenerator.BASTION_REMNANT.a(
+					new WorldGenFeatureVillageConfiguration(
+						() -> WorldGenFeatureBastionPieces.a,
+						bastionRemnantSize
 					)
+				)
 			);
 			biomeGenerationSettingsBuilder.a(customBastionRemnant);
 		}

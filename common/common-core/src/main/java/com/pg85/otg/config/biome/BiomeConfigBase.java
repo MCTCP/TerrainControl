@@ -14,11 +14,11 @@ import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
-import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -39,7 +39,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
 	// Misc
 	
-	private final BiomeResourceLocation registryKey;
+	private IBiomeResourceLocation registryKey;
 	private boolean replacedBlocksInited = false;
 	
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
@@ -48,7 +48,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	// Identity
 	
-	protected String vanillaBiome;
+	protected String templateForBiome;
 	protected String biomeCategory;
 	
 	// Inheritance
@@ -177,19 +177,23 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	protected List<ConfigFunction<IBiomeConfig>> resourceQueue = new ArrayList<ConfigFunction<IBiomeConfig>>();
 	
-	protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
+	protected BiomeConfigBase(String configName)
 	{
 		super(configName);
-		this.registryKey = registryKey;
 	}
-	
+
 	public List<ConfigFunction<IBiomeConfig>> getResourceQueue()
 	{
 		return this.resourceQueue;
 	}
 	
+	public void setRegistryKey(IBiomeResourceLocation registryKey)
+	{
+		this.registryKey = registryKey;
+	}
+	
 	@Override
-	public BiomeResourceLocation getRegistryKey()
+	public IBiomeResourceLocation getRegistryKey()
 	{
 		return this.registryKey;
 	}
@@ -366,6 +370,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public String getName()
 	{
 		return this.configName;
+	}
+	
+	@Override
+	public String getTemplateForBiome()
+	{
+		return this.templateForBiome;
 	}
 
 	@Override

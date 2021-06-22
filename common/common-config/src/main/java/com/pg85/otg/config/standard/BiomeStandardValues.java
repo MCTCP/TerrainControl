@@ -49,7 +49,7 @@ public class BiomeStandardValues extends Settings
 
 	public static final Setting<String>
 		RIVER_BIOME = stringSetting("RiverBiome", "River"),
-		VANILLA_BIOME = stringSetting("ReplaceToBiomeName", ""),
+		TEMPLATE_FOR_BIOME = stringSetting("TemplateForBiome", ""),
 		INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", ""),
 		PARTICLE_TYPE = stringSetting("ParticleType", ""),
 		MUSIC = stringSetting("Music", ""),
