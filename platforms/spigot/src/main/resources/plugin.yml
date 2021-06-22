@@ -26,7 +26,8 @@ otg.cmd.*:
     otg.cmd.check: true
     otg.cmd.help: true
     otg.cmd.list: true
-    otg.cmd.map: true
+    otg.cmd.mapbiomes: true
+    otg.cmd.mapterrain: true
     otg.cmd.reload: true
     otg.cmd.spawn: true
     otg.cmd.tp: true
@@ -42,9 +43,12 @@ otg.cmd.*:
   otg.cmd.list:
     default: op
     description: list bo2 objects
-  otg.cmd.map:
+  otg.cmd.mapbiomes:
     default: op
-    description: generate biome map image
+    description: generate biome map image    
+  otg.cmd.mapterrain:
+    default: op
+    description: generate base terrain map image
   otg.cmd.reload:
     default: op
     description: reload world settings

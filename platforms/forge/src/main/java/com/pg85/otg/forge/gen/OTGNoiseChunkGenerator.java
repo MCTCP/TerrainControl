@@ -104,7 +104,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final long worldSeed;
 	private final int noiseHeight;
 
-	private final ShadowChunkGenerator shadowChunkGenerator; 
+	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
 	private final DimensionConfig dimensionConfig;
@@ -131,7 +131,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
-	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -149,12 +148,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.noiseHeight = noisesettings.height();
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
-
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
 
+	private void init(Path worldSaveFolder)
+	{
+		if (!isInitialised)
+		{
+			isInitialised = true;
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
+		}
+	}
+	
 	public void saveStructureCache()
 	{
 		if (this.chunkDecorator.getIsSaveRequired())
@@ -173,15 +180,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	public ChunkGenerator withSeed(long seed)
 	{
 		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
-	}
-
-	private void init(Path worldSaveFolder)
-	{
-		if (!isInitialised)
-		{
-			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
-		}
 	}
 
 	// Base terrain gen
@@ -276,7 +274,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	// Population / decoration
+	// Decoration
 
 	// Does decoration for a given pos/chunk
 	@Override

@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
@@ -15,15 +14,11 @@ import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
-import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
@@ -31,8 +26,6 @@ import net.minecraft.server.v1_16_R3.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
-
 import javax.annotation.Nullable;
 import java.nio.file.Paths;
 import java.util.*;
@@ -70,14 +63,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final long worldSeed;
 	private final int noiseHeight;
 
+	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
-	private final OTGChunkDecorator chunkPopulator;
+	private final OTGChunkDecorator chunkDecorator;
 	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
-	// Unloaded chunk data caches for BO4's
-	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
-	// IChunk -> IChunkAccess
-	private final FifoMap<ChunkCoordinate, IChunkAccess> unloadedChunksCache;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
@@ -123,33 +113,26 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// func_236169_a_() -> a()
 		this.noiseHeight = noisesettings.a();
 
-		// Unloaded chunk data caches for BO4's
-		// TODO: Add a setting to the world config for the size of these caches.
-		// Worlds with lots of BO4's and large smoothing areas may want to increase this.
-		this.unloadedBlockColumnsCache = new FifoMap<>(1024);
-		this.unloadedChunksCache = new FifoMap<>(128);
-		//
-
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
-
+		this.shadowChunkGenerator = new ShadowChunkGenerator();
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
-		this.chunkPopulator = new OTGChunkDecorator();
+		this.chunkDecorator = new OTGChunkDecorator();
 	}
-
-	public void saveStructureCache ()
-	{
-		if (this.chunkPopulator.getIsSaveRequired())
-		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkPopulator);
-		}
-	}
-
+	
 	private void init (String worldSaveFolderName)
 	{
 		if (!isInitialised)
 		{
 			isInitialised = true;
 			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), Paths.get("./saves/" + worldSaveFolderName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
+		}
+	}	
+
+	public void saveStructureCache ()
+	{
+		if (this.chunkDecorator.getIsSaveRequired())
+		{
+			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
 	}
 
@@ -167,26 +150,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildNoiseSpigot (WorldServer world, org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
 	{
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk, chunkCoord);
-
-		IChunkAccess cachedChunk = unloadedChunksCache.get(chunkCoord);
+		IChunkAccess cachedChunk = this.shadowChunkGenerator.getChunkFromCache(chunkCoord);
 		if (cachedChunk != null)
 		{
-			CraftChunkData data = (CraftChunkData) chunk;
-
-			// TODO: Find some way to clone/swap chunk data efficiently :/
-			for (int x = 0; x < Constants.CHUNK_SIZE; x++) {
-				for (int z = 0; z < Constants.CHUNK_SIZE; z++) {
-					int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
-					for (int y = 0; y <= endY; y++) {
-						BlockPosition pos = new BlockPosition(x, y, z);
-						data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getType(pos));
-					}
-				}
-			}
-
-			this.unloadedChunksCache.remove(chunkCoord);
+			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunkCoord, chunk, cachedChunk);
 		} else {
-
 			// Setup jigsaw data
 			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
@@ -197,8 +165,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startZ = chunkZ << 4;
 
 			StructureManager manager = world.getStructureManager();
-
-		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
+			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
 			for (StructureGenerator<?> structure : StructureGenerator.t) {
 				// Get all structure starts in this chunk
 				manager.a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
@@ -235,6 +202,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
+			this.shadowChunkGenerator.setChunkGenerated(chunkCoord);			
 		}
 	}
 
@@ -258,27 +226,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			fixBiomesForChunk = null;
 		}
 		// ChunkPrimer -> ProtoChunk
-		ChunkBuffer buffer = new SpigotChunkBuffer((ProtoChunk) chunk);
-		IChunkAccess cachedChunk = unloadedChunksCache.get(chunkCoord);
+		ChunkBuffer buffer = new SpigotChunkBuffer((ProtoChunk)chunk);
+		IChunkAccess cachedChunk = this.shadowChunkGenerator.getChunkFromCache(chunkCoord);
 		if (cachedChunk != null)
 		{
-			// TODO: Find some way to clone/swap chunk data efficiently :/
-			for (int x = 0; x < Constants.CHUNK_SIZE; x++)
-			{
-				for (int z = 0; z < Constants.CHUNK_SIZE; z++)
-				{
-					int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
-					for (int y = 0; y <= endY; y++)
-					{
-						BlockPosition pos = new BlockPosition(x, y, z);
-						chunk.setType(pos, cachedChunk.getType(pos), false);
-					}
-				}
-			}
-			this.unloadedChunksCache.remove(chunkCoord);
-		}
-		else
-		{
+			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunkCoord, chunk, cachedChunk);
+		} else {
 			// Setup jigsaw data
 			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
@@ -325,6 +278,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate(), structures, junctions);
+			this.shadowChunkGenerator.setChunkGenerated(chunkCoord);
 		}
 	}
 
@@ -408,9 +362,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this);
-		this.chunkPopulator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, this.structureCache);
+		this.chunkDecorator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, this.structureCache);
 		biome.a(structureManager, this, world, seed, random, pos);
-		this.chunkPopulator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
+		this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
@@ -598,169 +552,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		return this.structureCache;
 	}
-
-	// BO4's / Smoothing Areas
-
-	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates
-	// base terrain for the chunks in memory and caches the result in a limited size-cache. Cached
-	// data is used if/when the chunk is "properly" generated.
-
-	private LocalMaterialData[] getBlockColumnInUnloadedChunk (IWorldGenRegion worldGenRegion, int x, int z)
-	{
-		BlockPos2D blockPos = new BlockPos2D(x, z);
-		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-
-		// Get internal coordinates for block in chunk
-		byte blockX = (byte) (x & 0xF);
-		byte blockZ = (byte) (z & 0xF);
-
-		LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
-
-		if (cachedColumn != null)
-		{
-			return cachedColumn;
-		}
-
-		IChunkAccess chunk = this.unloadedChunksCache.get(chunkCoord);
-		if (chunk == null)
-		{
-			// Generate a chunk without loading/decorating it
-			chunk = getUnloadedChunk(((SpigotWorldGenRegion)worldGenRegion).getInternal().getMinecraftWorld(),worldGenRegion.getWorldRandom(), chunkCoord);
-			unloadedChunksCache.put(chunkCoord, chunk);
-		}
-
-		cachedColumn = new LocalMaterialData[256];
-
-		LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
-		IBlockData blockInChunk;
-		for (short y = 0; y < 256; y++)
-		{
-			blockInChunk = chunk.getType(new BlockPosition(blockX, y, blockZ));
-			if (blockInChunk != null)
-			{
-				blocksInColumn[y] = SpigotMaterialData.ofBlockData(blockInChunk);
-			}
-			else
-			{
-				break;
-			}
-		}
-		unloadedBlockColumnsCache.put(blockPos, cachedColumn);
-
-		return blocksInColumn;
-	}
-
-	private IChunkAccess getUnloadedChunk (WorldServer world, Random random, ChunkCoordinate chunkCoordinate)
-	{
-		ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
-		ChunkBuffer buffer = new SpigotChunkBuffer(chunk);
-
-		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
-		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
-		// BO4's avoid villages, so this method should never be called to fetch unloaded chunks that contain villages, 
-		// so we can skip noisegen affecting structures here.
-		// *TODO: Do we need to avoid any noisegen affecting structures other than villages?
-		
-		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
-		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
-
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
-		return chunk;
-	}
-
-	LocalMaterialData getMaterialInUnloadedChunk (IWorldGenRegion worldGenRegion, int x, int y, int z)
-	{
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
-		return blockColumn[y];
-	}
-
-	int getHighestBlockYInUnloadedChunk (IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-	{
-		int height = -1;
-
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
-		LocalMaterialData material;
-		boolean isLiquid;
-		boolean isSolid;
-
-		for (int y = 255; y > -1; y--)
-		{
-			material = blockColumn[y];
-			isLiquid = material.isLiquid();
-			isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(LocalMaterials.SNOW));
-			if (!(isLiquid && ignoreLiquid))
-			{
-				if ((findSolid && isSolid) || (findLiquid && isLiquid))
-				{
-					return y;
-				}
-				if ((findSolid && isLiquid) || (findLiquid && isSolid))
-				{
-					return -1;
-				}
-			}
-		}
-		return height;
-	}
-
-	public boolean checkHasVanillaStructureWithoutLoading(WorldServer serverWorld, ChunkCoordinate chunkCoordinate)
-	{
-		// Since we can't check for structure components/references, only structure starts,  
-		// we'll keep a safe distance away from any vanilla structure start points.
-		int radiusInChunks = 4;
-		for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
-		{
-			int cycleSquared = cycle *cycle;
-			int nextSquared = (cycle+1)*(cycle+1);
-			for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
-			{
-				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
-				{
-					float distance = xOffset*xOffset+zOffset*zOffset;
-					// If this is the correct cycle - doing it this way to avoid calls to Math.sqrt
-					if (cycleSquared <= distance && distance < nextSquared)
-					{
-						ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
-						ChunkCoordIntPair chunkpos = chunk.getPos();
-						
-						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
-						// based on biome and resource settings (distance etc). Does not plot any structure components.
-						if (serverWorld.worldDataServer.getGeneratorSettings().shouldGenerateMapFeatures())
-						{
-							// TODO: Optimise this, make the BO4 plotter reuse biome/default structure information.
-							BiomeBase biome = this.b.getBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
-							for(Supplier<StructureFeature<?, ?>> supplier : biome.e().a())
-							{
-								// *TODO: Do we need to avoid any structures other than villages?
-								if(supplier.get().d instanceof net.minecraft.server.v1_16_R3.WorldGenVillage)
-								{
-									if(this.hasStructureStart(supplier.get(), serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), serverWorld.getSeed(), chunkpos, biome))
-									{
-										return true;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, IRegistryCustom dynamicRegistries, StructureManager structureManager, IChunkAccess chunk, DefinedStructureManager templateManager, long seed, ChunkCoordIntPair chunkPos, BiomeBase biome)
-	{
-		StructureSettingsFeature structureseparationsettings = this.getSettings().a(structureFeature.d);
-		if (structureseparationsettings != null)
-		{
-			StructureStart<?> structureStart1 = structureFeature.a(dynamicRegistries, this, this.b, templateManager, seed, chunkPos, biome, 0, structureseparationsettings);
-			if(structureStart1 != StructureStart.a)
-			{
-				return true;
-			}
-		}
-		return false;
-	}	
 	
 	double getBiomeBlocksNoiseValue (int blockX, int blockZ)
 	{
@@ -771,4 +562,26 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		this.fixBiomesForChunk = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 	}
+	
+	// Shadowgen
+	
+	public Boolean checkHasVanillaStructureWithoutLoading(WorldServer world, ChunkCoordinate chunkCoord)
+	{
+		return this.shadowChunkGenerator.checkHasVanillaStructureWithoutLoading(world, this, this.b, this.getSettings(), chunkCoord);
+	}
+
+	public int getHighestBlockYInUnloadedChunk(Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	{
+		return this.shadowChunkGenerator.getHighestBlockYInUnloadedChunk(this.internalGenerator, this.preset.getWorldConfig().getWorldHeightCap(), worldRandom, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+	}
+
+	public LocalMaterialData getMaterialInUnloadedChunk(Random worldRandom, int x, int y, int z)
+	{
+		return this.shadowChunkGenerator.getMaterialInUnloadedChunk(this.internalGenerator, this.preset.getWorldConfig().getWorldHeightCap(), worldRandom, x, y, z);
+	}
+
+	public SpigotChunkBuffer getChunkWithoutLoadingOrCaching(Random random, ChunkCoordinate chunkCoord)
+	{
+		return this.shadowChunkGenerator.getChunkWithoutLoadingOrCaching(this.internalGenerator, this.preset.getWorldConfig().getWorldHeightCap(), random, chunkCoord);
+	}	
 }
