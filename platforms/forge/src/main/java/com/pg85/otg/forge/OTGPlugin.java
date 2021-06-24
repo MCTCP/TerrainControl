@@ -37,13 +37,15 @@ public class OTGPlugin
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 		
-		// These are needed to let the game know about our chunk generator and biome provider. If they are not added, then the game will error and not save games properly.
+		// These are needed to let the game know about our chunk generator and biome provider. 
+		// If they are not added, then the game will error and not save games properly.
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
 	}
 	
-	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
+	// OTG World Type MP: Register the OTG world type. 
+	// For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
 	@OnlyIn(Dist.DEDICATED_SERVER)
 	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)

@@ -66,6 +66,11 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return this.worldGenRegion.getRandom();
 	}
 
+	public GeneratorAccessSeed getInternal()
+	{
+		return this.worldGenRegion;
+	}	
+	
 	@Override
 	public IBiome getBiome(int x, int z)
 	{
@@ -118,102 +123,6 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld)
 	{
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
-	{
-		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
-		{
-			return false;
-		}
-		BlockPosition blockPos = new BlockPosition(x, y, z);
-		try
-		{
-			// Features -> BiomeDecoratorGroups
-			// ConfiguredFeature.feature -> WorldGenFeatureConfigured.e
-			// ConfiguredFeature.config -> WorldGenFeatureConfigured.f
-			WorldGenFeatureConfigured<WorldGenFeatureTreeConfiguration, ?> tree = null;
-			WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?> other = null;
-			switch (type)
-			{
-				case Acacia:
-					tree = BiomeDecoratorGroups.ACACIA;
-					break;
-				case BigTree:
-					tree = BiomeDecoratorGroups.FANCY_OAK;
-					break;
-				case Forest:
-				case Birch:
-					tree = BiomeDecoratorGroups.BIRCH;
-					break;
-				case JungleTree:
-					tree = BiomeDecoratorGroups.MEGA_JUNGLE_TREE;
-					break;
-				case CocoaTree:
-					tree = BiomeDecoratorGroups.JUNGLE_TREE;
-					break;
-				case DarkOak:
-					tree = BiomeDecoratorGroups.DARK_OAK;
-					break;
-				case GroundBush:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.JUNGLE_BUSH;
-					break;
-				case HugeMushroom:
-					if (rand.nextBoolean())
-					{
-						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
-					}
-					else
-					{
-						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
-					}
-					break;
-				case HugeRedMushroom:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
-					break;
-				case HugeBrownMushroom:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
-					break;
-				case SwampTree:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.SWAMP_TREE;
-					break;
-				case Taiga1:
-					tree = BiomeDecoratorGroups.PINE;
-					break;
-				case Taiga2:
-					tree = BiomeDecoratorGroups.SPRUCE;
-					break;
-				case HugeTaiga1:
-					tree = BiomeDecoratorGroups.MEGA_PINE;
-					break;
-				case HugeTaiga2:
-					tree = BiomeDecoratorGroups.MEGA_SPRUCE;
-					break;
-				case TallBirch:
-					tree = BiomeDecoratorGroups.SUPER_BIRCH_BEES_0002;
-					break;
-				case Tree:
-					tree = BiomeDecoratorGroups.OAK;
-					break;
-				default:
-					throw new RuntimeException("Failed to handle tree of type " + type.toString());
-			}
-			if (tree != null)
-				tree.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.f);
-			else if (other != null)
-				other.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.f);
-			else throw new RuntimeException("Incorrect handling of tree of type " + type.toString());
-			return true;
-		}
-		catch (NullPointerException ex)
-		{
-			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
-			ex.printStackTrace();
-			// Return true to prevent further attempts.
-			return true;
-		}
 	}
 
 	@Override
@@ -482,6 +391,107 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			}
 		}
 	}
+	
+	public TileEntity getTileEntity(BlockPosition blockPos)
+	{
+		return worldGenRegion.getTileEntity(blockPos);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
+	{
+		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		{
+			return false;
+		}
+		BlockPosition blockPos = new BlockPosition(x, y, z);
+		try
+		{
+			// Features -> BiomeDecoratorGroups
+			// ConfiguredFeature.feature -> WorldGenFeatureConfigured.e
+			// ConfiguredFeature.config -> WorldGenFeatureConfigured.f
+			WorldGenFeatureConfigured<WorldGenFeatureTreeConfiguration, ?> tree = null;
+			WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?> other = null;
+			switch (type)
+			{
+				case Acacia:
+					tree = BiomeDecoratorGroups.ACACIA;
+					break;
+				case BigTree:
+					tree = BiomeDecoratorGroups.FANCY_OAK;
+					break;
+				case Forest:
+				case Birch:
+					tree = BiomeDecoratorGroups.BIRCH;
+					break;
+				case JungleTree:
+					tree = BiomeDecoratorGroups.MEGA_JUNGLE_TREE;
+					break;
+				case CocoaTree:
+					tree = BiomeDecoratorGroups.JUNGLE_TREE;
+					break;
+				case DarkOak:
+					tree = BiomeDecoratorGroups.DARK_OAK;
+					break;
+				case GroundBush:
+					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.JUNGLE_BUSH;
+					break;
+				case HugeMushroom:
+					if (rand.nextBoolean())
+					{
+						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
+					}
+					else
+					{
+						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
+					}
+					break;
+				case HugeRedMushroom:
+					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
+					break;
+				case HugeBrownMushroom:
+					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
+					break;
+				case SwampTree:
+					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.SWAMP_TREE;
+					break;
+				case Taiga1:
+					tree = BiomeDecoratorGroups.PINE;
+					break;
+				case Taiga2:
+					tree = BiomeDecoratorGroups.SPRUCE;
+					break;
+				case HugeTaiga1:
+					tree = BiomeDecoratorGroups.MEGA_PINE;
+					break;
+				case HugeTaiga2:
+					tree = BiomeDecoratorGroups.MEGA_SPRUCE;
+					break;
+				case TallBirch:
+					tree = BiomeDecoratorGroups.SUPER_BIRCH_BEES_0002;
+					break;
+				case Tree:
+					tree = BiomeDecoratorGroups.OAK;
+					break;
+				default:
+					throw new RuntimeException("Failed to handle tree of type " + type.toString());
+			}
+			if (tree != null)
+				tree.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.f);
+			else if (other != null)
+				other.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.f);
+			else throw new RuntimeException("Incorrect handling of tree of type " + type.toString());
+			return true;
+		}
+		catch (NullPointerException ex)
+		{
+			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
+			ex.printStackTrace();
+			// Return true to prevent further attempts.
+			return true;
+		}
+	}	
 
 	@Override
 	public void spawnEntity (IEntityFunction<?> newEntityData)
@@ -522,27 +532,21 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Implement this.
 		return true;
 	}
-
-	public TileEntity getTileEntity(BlockPosition blockPos)
-	{
-		return worldGenRegion.getTileEntity(blockPos);
-	}
+	
+	// Edit command
+	// TODO: We already have getMaterial/setBlock, rename/refactor these
+	// so it's clear they are/should be used only in a specific context.	
 
 	public IBlockData getBlockData(BlockPosition blockpos)
 	{
 		return worldGenRegion.getType(blockpos);
 	}
 
-	public GeneratorAccessSeed getInternal()
-	{
-		return this.worldGenRegion;
-	}
-
 	public void setBlockState(BlockPosition blockpos, IBlockData blockstate1, int i)
 	{
 		worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
-	
+
 	// Shadowgen
 	
 	@Override
@@ -644,5 +648,5 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
 		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
 		return hasDefaultStructure;
-	}	
+	}
 }
