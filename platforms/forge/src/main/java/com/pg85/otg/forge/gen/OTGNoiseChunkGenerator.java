@@ -141,6 +141,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
+	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -226,29 +227,36 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startZ = chunkZ << 4;
 
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES) {
+			for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES)
+			{
 				// Get all structure starts in this chunk
-				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
+				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) ->
+				{
 					// Iterate through the pieces in the structure
-					for(StructurePiece piece : start.getPieces()) {
+					for(StructurePiece piece : start.getPieces())
+					{
 						// Check if it intersects with this chunk
-						if (piece.isCloseToChunk(pos, 12)) {
+						if (piece.isCloseToChunk(pos, 12))
+						{
 							MutableBoundingBox box = piece.getBoundingBox();
-
-							if (piece instanceof AbstractVillagePiece) {
+							if (piece instanceof AbstractVillagePiece)
+							{
 								AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
 								// Add to the list if it's a rigid piece
-								if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID) {
+								if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID)
+								{
 									structures.add(new JigsawStructureData(box.x0, box.y0, box.z0, box.x1, villagePiece.getGroundLevelDelta(), box.z1, true, 0, 0, 0));
 								}
 
 								// Get all the junctions in this piece
-								for(JigsawJunction junction : villagePiece.getJunctions()) {
+								for(JigsawJunction junction : villagePiece.getJunctions())
+								{
 									int sourceX = junction.getSourceX();
 									int sourceZ = junction.getSourceZ();
 
 									// If the junction is in this chunk, then add to list
-									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
+									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12)
+									{
 										junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.getSourceX(), junction.getSourceGroundY(), junction.getSourceZ()));
 									}
 								}
@@ -257,10 +265,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 							}
 						}
 					}
-
 				});
 			}
-
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate(), structures, junctions);			
 			this.shadowChunkGenerator.setChunkGenerated(chunkCoord);
 		}
@@ -291,7 +297,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ChunkPos chunkpos1 = chunk.getPos();
 			int k = chunkpos1.getMinBlockX();
 			int l = chunkpos1.getMinBlockZ();
-			double d0 = 0.0625D;
 			BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable();	
 			for(int i1 = 0; i1 < 16; ++i1)
 			{
@@ -304,10 +309,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					worldGenRegion.getBiome(blockpos$mutable.set(k + i1, i2, l + j1)).buildSurfaceAt(sharedseedrandom, chunk, k1, l1, i2, d1, this.defaultBlock, this.defaultFluid, this.getSeaLevel(), worldGenRegion.getSeed());
 				}
 			}
+			// Skip bedrock, OTG always handles that.
 		}
 	}
 
 	// Carves caves and ravines
+	// TODO: Allow non-OTG carvers?
 	@Override
 	public void applyCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{
@@ -316,7 +323,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			// TODO: Allow non-OTG carvers, call super?
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
 		}
 	}

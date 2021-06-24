@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 
 /**
  * New biome group data for testing purposes
@@ -14,7 +14,7 @@ public class NewBiomeGroup
 {
 	public int id = 0;
 	public int rarity = 0;
-	public List<NewBiomeData> biomes = new ArrayList<>();	
+	public List<BiomeData> biomes = new ArrayList<>();	
 	
 	public float avgTemp = 0;
 	public boolean isColdGroup() 
@@ -35,7 +35,7 @@ public class NewBiomeGroup
 	
 	public void init(Map<String, Integer> worldIsleBiomes)
 	{
-		for(NewBiomeData biomeData : this.biomes)
+		for(BiomeData biomeData : this.biomes)
 		{
 			biomeData.init(worldIsleBiomes);
 		}
@@ -47,7 +47,7 @@ public class NewBiomeGroup
 		clone.id = this.id;
 		clone.rarity = this.rarity;
 		clone.biomes = new ArrayList<>();
-		for(NewBiomeData biomeData : this.biomes)
+		for(BiomeData biomeData : this.biomes)
 		{
 			clone.biomes.add(biomeData.clone());
 		}

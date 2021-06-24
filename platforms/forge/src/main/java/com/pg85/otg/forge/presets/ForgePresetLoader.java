@@ -38,7 +38,7 @@ import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraftforge.common.BiomeDictionary;
@@ -152,8 +152,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size()];
 			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
 
-			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
-			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
+			Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
+			Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 			
 			Map<String, Integer> worldBiomes = new HashMap<>();
 
@@ -236,9 +236,9 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if(biomeConfig.isIsleBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
+					List<BiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
-						new NewBiomeData(
+						new BiomeData(
 							otgBiomeId, 
 							biomeConfig.getName(), 
 							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
@@ -255,9 +255,9 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if(biomeConfig.isBorderBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
+					List<BiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
-						new NewBiomeData(
+						new BiomeData(
 							otgBiomeId,
 							biomeConfig.getName(), 
 							biomeConfig.getBiomeRarity(),
@@ -317,7 +317,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					if(config != null)
 					{
 						// Make and add the generation data
-						NewBiomeData newBiomeData = new NewBiomeData(
+						BiomeData newBiomeData = new BiomeData(
 							presetReverseIdMapping.getInt(config),
 							config.getName(),
 							config.getBiomeRarity(),

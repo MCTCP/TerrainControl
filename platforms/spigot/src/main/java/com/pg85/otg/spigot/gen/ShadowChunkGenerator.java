@@ -58,7 +58,9 @@ public class ShadowChunkGenerator
 	private final FifoMap<ChunkCoordinate, IChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunkAccess>(512);
 	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
+	@SuppressWarnings("unused")
 	private int cacheHits = 0;
+	@SuppressWarnings("unused")
 	private int cacheMisses = 0;
 
 	public ShadowChunkGenerator() { }

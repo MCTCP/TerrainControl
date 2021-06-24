@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 
@@ -30,15 +30,15 @@ public class BiomeLayerData
 	public final int[] oceanTemperatures;
 	public final double frozenOceanTemperature;
 	public final int biomeRarityScale;
-	public final NewBiomeData oceanBiomeData;
+	public final BiomeData oceanBiomeData;
 	public final Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
 	public final int[] cumulativeGroupRarities;
 	public final int[] groupMaxRarityPerDepth;
 	public final boolean oldGroupRarity;
 	public final List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
 	public final Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
-	public final Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
-	public final Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
+	public final Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
+	public final Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 	public int[] riverBiomes;
 	public final boolean freezeGroups;
 	public final boolean riversEnabled;
@@ -115,12 +115,12 @@ public class BiomeLayerData
 				this.groups.put(entry.getKey().intValue(), null);
 			}
 		}
-		for(Entry<Integer, List<NewBiomeData>> entry : data.isleBiomesAtDepth.entrySet())
+		for(Entry<Integer, List<BiomeData>> entry : data.isleBiomesAtDepth.entrySet())
 		{
 			if(entry.getValue() != null)
 			{
-				List<NewBiomeData> clonedList = new ArrayList<>();
-				for(NewBiomeData biome : entry.getValue())
+				List<BiomeData> clonedList = new ArrayList<>();
+				for(BiomeData biome : entry.getValue())
 				{
 					clonedList.add(biome.clone());
 				}
@@ -129,12 +129,12 @@ public class BiomeLayerData
 				this.isleBiomesAtDepth.put(entry.getKey().intValue(), null);
 			}
 		}
-		for(Entry<Integer, List<NewBiomeData>> entry : data.borderBiomesAtDepth.entrySet())
+		for(Entry<Integer, List<BiomeData>> entry : data.borderBiomesAtDepth.entrySet())
 		{
 			if(entry.getValue() != null)
 			{
-				List<NewBiomeData> clonedList = new ArrayList<>();
-				for(NewBiomeData biome : entry.getValue())
+				List<BiomeData> clonedList = new ArrayList<>();
+				for(BiomeData biome : entry.getValue())
 				{
 					clonedList.add(biome.clone());
 				}
@@ -174,9 +174,9 @@ public class BiomeLayerData
 
 		if (oceanBiomeConfig == null)
 		{
-			this.oceanBiomeData = new NewBiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+			this.oceanBiomeData = new BiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
 		} else {
-			this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
+			this.oceanBiomeData = new BiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
 		}
 
 		this.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
@@ -188,7 +188,7 @@ public class BiomeLayerData
 		this.riversEnabled = worldConfig.getRiversEnabled();
 	}
 
-	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<NewBiomeData>> isleBiomesAtDepth, Map<Integer, List<NewBiomeData>> borderBiomesAtDepth, Map<String, Integer> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiomeConfig[] biomes)
+	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<BiomeData>> isleBiomesAtDepth, Map<Integer, List<BiomeData>> borderBiomesAtDepth, Map<String, Integer> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiomeConfig[] biomes)
 	{		
 		this.biomeDepths.addAll(biomeDepths);
 		this.groups.putAll(groupDepth);
@@ -216,22 +216,22 @@ public class BiomeLayerData
 			}
 		}
 
-		for(Entry<Integer, List<NewBiomeData>> entry : this.isleBiomesAtDepth.entrySet())
+		for(Entry<Integer, List<BiomeData>> entry : this.isleBiomesAtDepth.entrySet())
 		{
 			if(entry.getValue() != null)
 			{
-				for(NewBiomeData biome : entry.getValue())
+				for(BiomeData biome : entry.getValue())
 				{
 					biome.init(biomeIdsByName);
 				}
 			}
 		}
 		
-		for(Entry<Integer, List<NewBiomeData>> entry : this.borderBiomesAtDepth.entrySet())
+		for(Entry<Integer, List<BiomeData>> entry : this.borderBiomesAtDepth.entrySet())
 		{
 			if(entry.getValue() != null)
 			{
-				for(NewBiomeData biome : entry.getValue())
+				for(BiomeData biome : entry.getValue())
 				{
 					biome.init(biomeIdsByName);
 				}

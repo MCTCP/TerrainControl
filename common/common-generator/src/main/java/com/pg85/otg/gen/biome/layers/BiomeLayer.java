@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
@@ -15,7 +15,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
  */
 class BiomeLayer extends BiomeLayerBase
 {
-	protected final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
+	protected final Map<NewBiomeGroup, Map<Integer, BiomeData>> groupBiomes = new HashMap<>();
 
 	BiomeLayer(BiomeLayerData data, int depth)
 	{
@@ -28,9 +28,9 @@ class BiomeLayer extends BiomeLayerBase
 			{
 				int cumulativeRarity = 0;
 
-				Map<Integer, NewBiomeData> biomes = new TreeMap<>();
+				Map<Integer, BiomeData> biomes = new TreeMap<>();
 
-				for (NewBiomeData biome : group.biomes)
+				for (BiomeData biome : group.biomes)
 				{
 					if (depth == biome.biomeSize)
 					{
@@ -64,7 +64,7 @@ class BiomeLayer extends BiomeLayerBase
 				NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);
 				if (group.maxRarityPerDepth[depth] != 0 && this.groupBiomes.containsKey(group))
 				{
-					NewBiomeData biomeData = getBiomeFromGroup(context, group.maxRarityPerDepth[depth], this.groupBiomes.get(group));
+					BiomeData biomeData = getBiomeFromGroup(context, group.maxRarityPerDepth[depth], this.groupBiomes.get(group));
 					return sample | biomeData.id |
 						// Set IceBit based on Biome Temperature
 						(biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
@@ -76,13 +76,13 @@ class BiomeLayer extends BiomeLayerBase
 		return sample;
 	}
 
-	private NewBiomeData getBiomeFromGroup(LayerRandomnessSource random, int maxRarity, Map<Integer, NewBiomeData> rarityMap)
+	private BiomeData getBiomeFromGroup(LayerRandomnessSource random, int maxRarity, Map<Integer, BiomeData> rarityMap)
 	{
 		// Get a random rarity number from our max rarity
 		int chosenRarity = random.nextInt(maxRarity);
 
 		// Iterate through the rarity map and see if the chosen rarity is less than the rarity for each group, if it is then return.
-		for (Map.Entry<Integer, NewBiomeData> entry : rarityMap.entrySet())
+		for (Map.Entry<Integer, BiomeData> entry : rarityMap.entrySet())
 		{
 			if (chosenRarity < entry.getKey())
 			{

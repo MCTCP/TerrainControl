@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 
@@ -25,10 +25,10 @@ class BeforeGroupsLayer extends BiomeLayerBase
 		this.normalGroup = new NewBiomeGroup();
 		this.iceGroup = new NewBiomeGroup();
 		
-		List<NewBiomeData> normalBiomes = new ArrayList<NewBiomeData>();
-		List<NewBiomeData> iceBiomes= new ArrayList<NewBiomeData>();
+		List<BiomeData> normalBiomes = new ArrayList<BiomeData>();
+		List<BiomeData> iceBiomes= new ArrayList<BiomeData>();
 		
-		for (NewBiomeData biome : configNormalGroup.biomes)
+		for (BiomeData biome : configNormalGroup.biomes)
 		{
 			if (biome.biomeSize != depth)
 			{
@@ -42,10 +42,10 @@ class BeforeGroupsLayer extends BiomeLayerBase
 		}
 		if (!normalBiomes.isEmpty())
 		{
-			this.normalGroup.biomes = Arrays.asList(normalBiomes.toArray(new NewBiomeData[normalBiomes.size() + configNormalGroup.totalGroupRarity]));
+			this.normalGroup.biomes = Arrays.asList(normalBiomes.toArray(new BiomeData[normalBiomes.size() + configNormalGroup.totalGroupRarity]));
 		}
 		
-		for (NewBiomeData biome : configIceGroup.biomes)
+		for (BiomeData biome : configIceGroup.biomes)
 		{
 			if (biome.biomeSize != depth)
 			{
@@ -59,7 +59,7 @@ class BeforeGroupsLayer extends BiomeLayerBase
 		}
 		if (!iceBiomes.isEmpty())
 		{
-			this.iceGroup.biomes = Arrays.asList(iceBiomes.toArray(new NewBiomeData[iceBiomes.size() + configIceGroup.totalGroupRarity]));
+			this.iceGroup.biomes = Arrays.asList(iceBiomes.toArray(new BiomeData[iceBiomes.size() + configIceGroup.totalGroupRarity]));
 		}
 	}
 
@@ -76,7 +76,7 @@ class BeforeGroupsLayer extends BiomeLayerBase
 			(sample & BiomeLayers.BIOME_BITS) == 0
 		)
 		{
-			NewBiomeData biomeData = null;
+			BiomeData biomeData = null;
 			if (this.normalGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) == 0)
 			{
 				biomeData = this.normalGroup.biomes.get(context.nextInt(this.normalGroup.biomes.size()));
