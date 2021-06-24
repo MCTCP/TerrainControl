@@ -45,9 +45,7 @@ public class SpigotChunkBuffer extends ChunkBuffer
 		if (chunkData != null)
 		{
 			this.chunkData.setBlock(blockX, blockY, blockZ, ((SpigotMaterialData) material).toSpigotBlockData());
-		}
-		else
-		{
+		} else {
 			// Forge: setPos()
 			// Spigot: d()
 			this.chunk.setType(this.mutable.d(blockX, blockY, blockZ), ((SpigotMaterialData) material).internalBlock(), false);
