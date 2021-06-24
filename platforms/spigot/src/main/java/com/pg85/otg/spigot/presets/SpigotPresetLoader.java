@@ -6,7 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.SettingsEnums;
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 import com.pg85.otg.logging.LogMarker;
@@ -62,8 +62,8 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size()];
 			Object2IntMap<BiomeConfig> presetReverseIdMapping = new Object2IntArrayMap<>();
 
-			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
-			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
+			Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
+			Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 
 			Map<String, Integer> worldBiomes = new HashMap<>();
 
@@ -120,18 +120,18 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				if (biomeConfig.isIsleBiome())
 				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
+					List<BiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
-							new NewBiomeData(
-									otgBiomeId,
-									biomeConfig.getName(),
-									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
-									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(),
-									biomeConfig.getBiomeTemperature(),
-									biomeConfig.getIsleInBiomes(),
-									biomeConfig.getBorderInBiomes(),
-									biomeConfig.getNotBorderNearBiomes()
-							)
+						new BiomeData(
+							otgBiomeId,
+							biomeConfig.getName(),
+							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
+							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(),
+							biomeConfig.getBiomeTemperature(),
+							biomeConfig.getIsleInBiomes(),
+							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getNotBorderNearBiomes()
+						)
 					);
 
 					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
@@ -140,18 +140,18 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				if (biomeConfig.isBorderBiome())
 				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
+					List<BiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
-							new NewBiomeData(
-									otgBiomeId,
-									biomeConfig.getName(),
-									biomeConfig.getBiomeRarity(),
-									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(),
-									biomeConfig.getBiomeTemperature(),
-									biomeConfig.getIsleInBiomes(),
-									biomeConfig.getBorderInBiomes(),
-									biomeConfig.getNotBorderNearBiomes()
-							)
+						new BiomeData(
+							otgBiomeId,
+							biomeConfig.getName(),
+							biomeConfig.getBiomeRarity(),
+							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(),
+							biomeConfig.getBiomeTemperature(),
+							biomeConfig.getIsleInBiomes(),
+							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getNotBorderNearBiomes()
+						)
 					);
 
 					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
@@ -206,15 +206,15 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					}
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(
-							presetReverseIdMapping.getInt(config),
-							config.getName(),
-							config.getBiomeRarity(),
-							config.getBiomeSize(),
-							config.getBiomeTemperature(),
-							config.getIsleInBiomes(),
-							config.getBorderInBiomes(),
-							config.getNotBorderNearBiomes());
+					BiomeData newBiomeData = new BiomeData(
+						presetReverseIdMapping.getInt(config),
+						config.getName(),
+						config.getBiomeRarity(),
+						config.getBiomeSize(),
+						config.getBiomeTemperature(),
+						config.getIsleInBiomes(),
+						config.getBorderInBiomes(),
+						config.getNotBorderNearBiomes());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done

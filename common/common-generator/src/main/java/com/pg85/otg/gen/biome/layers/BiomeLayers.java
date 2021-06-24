@@ -5,7 +5,7 @@ import java.util.function.LongFunction;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
-import com.pg85.otg.gen.biome.NewBiomeData;
+import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerContext;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.gen.biome.layers.util.LayerFactory;
@@ -161,11 +161,11 @@ public class BiomeLayers
 					}
 				}
 
-				List<NewBiomeData> isleBiomes = data.isleBiomesAtDepth.get(depth);
+				List<BiomeData> isleBiomes = data.isleBiomesAtDepth.get(depth);
 				if(isleBiomes != null && isleBiomes.size() > 0)
 				{
 					BiomeIsleLayer.IslesList islesAtCurrentDepth = new BiomeIsleLayer.IslesList();
-					for (NewBiomeData biome : isleBiomes)
+					for (BiomeData biome : isleBiomes)
 					{
 						boolean[] biomeCanSpawnIn = new boolean[1024];
 						boolean inOcean = false;
@@ -184,11 +184,11 @@ public class BiomeLayers
 					factory = new BiomeIsleLayer(islesAtCurrentDepth).create(contextProvider.apply(depth), factory);				
 				}
 				
-				List<NewBiomeData> borderBiomes = data.borderBiomesAtDepth.get(depth);
+				List<BiomeData> borderBiomes = data.borderBiomesAtDepth.get(depth);
 				if(borderBiomes != null && borderBiomes.size() > 0)
 				{
 					BiomeBorderLayer.BordersList bordersAtCurrentDepth = new BiomeBorderLayer.BordersList();
-					for (NewBiomeData biome : borderBiomes)
+					for (BiomeData biome : borderBiomes)
 					{
 						for(int targetBiomeId : biome.borderInBiomes)
 						{

@@ -67,7 +67,9 @@ public class ShadowChunkGenerator
 	private final ChunkCoordinate[] chunksBeingLoaded;
 	private final int waitTimeInMS = 25;
 	private final int idleTimeInMS = 50;
+	@SuppressWarnings("unused")
 	private int cacheHits = 0;
+	@SuppressWarnings("unused")
 	private int cacheMisses = 0;
 
 	public ShadowChunkGenerator(int maxConcurrentThreads)
@@ -85,7 +87,10 @@ public class ShadowChunkGenerator
 		{
 			for(int i = 0; i < this.maxConcurrent; i++)
 			{
-				this.threads[i].stop();
+				if(this.threads[i] != null)
+				{
+					this.threads[i].stop();
+				}
 			}
 		}
 	}
