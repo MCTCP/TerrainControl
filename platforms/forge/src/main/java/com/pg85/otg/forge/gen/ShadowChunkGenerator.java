@@ -85,7 +85,10 @@ public class ShadowChunkGenerator
 		{
 			for(int i = 0; i < this.maxConcurrent; i++)
 			{
-				this.threads[i].stop();
+				if(this.threads[i] != null)
+				{
+					this.threads[i].stop();
+				}
 			}
 		}
 	}
