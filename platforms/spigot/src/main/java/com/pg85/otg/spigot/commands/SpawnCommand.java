@@ -6,6 +6,7 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -30,13 +31,7 @@ public class SpawnCommand
 			return true;
 		}
 		Player player = (Player) sender;
-		
-    	if(!(((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
-    	{
-    		sender.sendMessage("This command can only be used in OTG worlds/dimensions.");
-    		return true;
-    	}
-		
+
 		String presetName = strings.get("1");
 		String objectName = strings.get("2");
 		boolean force = false;
@@ -60,22 +55,38 @@ public class SpawnCommand
 
 		Block block = getWatchedBlock(player, false);
 		Preset preset = ExportCommand.getPresetOrDefault(presetName);
-		SpigotWorldGenRegion genRegion = new SpigotWorldGenRegion(
-			preset.getFolderName(), 
-			preset.getWorldConfig(), 
-			((CraftWorld) player.getWorld()).getHandle(), 
-			((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
-		);
-		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
+		SpigotWorldGenRegion genRegion;
+		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+		{
+			genRegion = new SpigotWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld)player.getWorld()).getHandle(),
+				((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
+			);
+		} else {
+			genRegion = new MCWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld) player.getWorld()).getHandle()
+			);
+		}
 
 		if(objectToSpawn instanceof BO4)
 		{
+	    	if(!(((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+	    	{
+	    		sender.sendMessage("BO4 objects can only be spawned in OTG worlds/dimensions.");
+	    		return true;
+	    	}			
         	if(preset.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
         	{
         		sender.sendMessage("Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig.");
         		return true;
         	}
-        	
+
+    		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
+
         	// Try spawning the structure in available chunks around the player
             int playerX = block.getX();
             int playerZ = block.getZ();
@@ -113,14 +124,20 @@ public class SpawnCommand
             }
             sender.sendMessage(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
         	return true;        	
-		} else {		
+		} else {
+
+			if (genRegion instanceof MCWorldGenRegion && objectToSpawn.doReplaceBlocks())
+			{
+				sender.sendMessage("Cannot spawn objects with DoReplaceBlocks in non-OTG worlds");
+				return true;
+			}
+			
 			if (objectToSpawn.spawnForced(
 				null,
 				new SpigotWorldGenRegion(
 					preset.getFolderName(), 
 					preset.getWorldConfig(), 
-					((CraftWorld) player.getWorld()).getHandle(),
-					((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()
+					((CraftWorld) player.getWorld()).getHandle()
 				),
 				new Random(),
 				Rotation.NORTH,

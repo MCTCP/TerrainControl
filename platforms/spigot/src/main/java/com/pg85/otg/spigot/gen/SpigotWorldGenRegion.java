@@ -28,14 +28,14 @@ import java.util.Random;
 
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
-	private final GeneratorAccessSeed worldGenRegion;
-	private final ChunkGenerator chunkGenerator;
+	protected final GeneratorAccessSeed worldGenRegion;
+	private final OTGNoiseChunkGenerator chunkGenerator;
 
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
 	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
-	/** Creates a LocalWorldGenRegion to be used during chunk decoration */
+	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig, worldGenRegion.a(), worldGenRegion.b());
@@ -43,16 +43,21 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		this.chunkGenerator = chunkGenerator;
 	}
 	
-	/** Creates a LocalWorldGenRegion to be used outside of world generation.
-	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
-	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
-	 */
-	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, ChunkGenerator chunkGenerator)
+	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
+	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}	
+	
+	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
+	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion)
+	{
+		super(presetFolderName, worldConfig);
+		this.worldGenRegion = worldGenRegion;
+		this.chunkGenerator = null;
+	}
 	
 	@Override
 	public long getSeed()
@@ -78,6 +83,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		if (biome != null)
 		{
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
+			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?			
 			BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
 			if (biomeConfig != null)
 			{
@@ -90,13 +96,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfig(int x, int z)
 	{
-		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
-		if (biome != null)
-		{
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
-			return OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
-		}
-		return null;
+		int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
+		// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?		
+		return OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
 	}
 
 	@Override
@@ -122,7 +124,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld)
 	{
-		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+		return this.chunkGenerator.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
 	@Override
@@ -215,7 +217,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
 	}
 
-	private int getHighestBlockYAt(IChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	protected int getHighestBlockYAt(IChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		LocalMaterialData material;
 		boolean isSolid;
@@ -368,7 +370,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 
-	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, IBlockData state)
+	protected void attachNBT(int x, int y, int z, NamedBinaryTag nbt, IBlockData state)
 	{
 		NBTTagCompound nms = SpigotNBTHelper.getNMSFromNBTTagCompound(nbt);
 		nms.set("x", NBTTagInt.a(x));
@@ -568,7 +570,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// isAtLeast() -> b()
 		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
 		{
-			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
+			return this.chunkGenerator.getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -593,7 +595,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
 		{
-			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -611,7 +613,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		{
 			return hasDefaultStructure;
 		}
-		hasDefaultStructure = ((OTGNoiseChunkGenerator)this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
+		hasDefaultStructure = this.chunkGenerator.checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
 		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
 		return hasDefaultStructure;
 	}

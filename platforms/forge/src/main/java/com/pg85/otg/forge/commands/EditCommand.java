@@ -10,6 +10,8 @@ import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
+import com.pg85.otg.forge.gen.MCWorldGenRegion;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogMarker;
@@ -73,8 +75,22 @@ public class EditCommand
 			BO3 bo3 = (BO3) objectToSpawn;
 
 			// Use ForgeWorldGenRegion as a wrapper for the world that BO3Creator can interact with
-			ForgeWorldGenRegion genRegion = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(),
-				source.getLevel(), source.getLevel().getChunkSource().getGenerator());
+			ForgeWorldGenRegion genRegion;
+			if(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
+			{
+				genRegion = new ForgeWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel(), 
+					(OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()
+				);
+			} else {
+				genRegion = new MCWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel()
+				);
+			}
 
 			BlockPos pos = source.getEntity().blockPosition();
 

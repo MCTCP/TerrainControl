@@ -8,13 +8,14 @@ import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
+import com.pg85.otg.forge.gen.MCWorldGenRegion;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
@@ -100,10 +101,23 @@ public class ExportCommand
 				}
 			}
 
-			LocalWorldGenRegion otgRegion = new ForgeWorldGenRegion(
-				preset.getFolderName(), preset.getWorldConfig(), source.getLevel(),
-				source.getLevel().getChunkSource().getGenerator()
-			);
+			ForgeWorldGenRegion genRegion;
+			if(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
+			{
+				genRegion = new ForgeWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel(), 
+					(OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()
+				);
+			} else {
+				genRegion = new MCWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel()
+				);
+			}
+
 			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
 			BOCreator.Corner lowCorner = region.getLow();
 			BOCreator.Corner highCorner = region.getHigh();
@@ -123,7 +137,7 @@ public class ExportCommand
 			{
 				try
 				{
-					bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
+					bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, genRegion,
 						nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 						OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 						OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -141,7 +155,7 @@ public class ExportCommand
 				// Create a new BO3 from our settings
 				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
 				bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-					objectPath, otgRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
+					objectPath, genRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
 					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());

@@ -9,6 +9,8 @@ import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.gen.MCWorldGenRegion;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
@@ -81,8 +83,22 @@ public class EditCommand
 
 		BO3 bo3 = (BO3) objectToSpawn;
 
-		SpigotWorldGenRegion genRegion = new SpigotWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(),
-			((CraftWorld) player.getWorld()).getHandle(), ((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator());
+		SpigotWorldGenRegion genRegion;
+		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+		{
+			genRegion = new SpigotWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld)player.getWorld()).getHandle(),
+				((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
+			);
+		} else {
+			genRegion = new MCWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld) player.getWorld()).getHandle()
+			);
+		}
 
 		Location pos = player.getLocation();
 
@@ -147,8 +163,10 @@ public class EditCommand
 
 	public static boolean finish(CommandSender sender)
 	{
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("Only players can execute this command"); return true;}
+		if (!(sender instanceof Player))
+		{
+			sender.sendMessage("Only players can execute this command"); return true;
+		}
 		Player source = (Player) sender;
 
 		EditSession session = sessionsMap.get(source);
