@@ -132,7 +132,7 @@ public class FrozenSurfaceHelper
 			snowHeight = biomeConfig.getSnowHeight(tempAtBlockToFreeze);
 		} else {
 			snowHeight = 0;
-		}		
+		}
 		while (
 			y > Constants.WORLD_DEPTH + 1 && 
 			decreaseFactor < 8 &&

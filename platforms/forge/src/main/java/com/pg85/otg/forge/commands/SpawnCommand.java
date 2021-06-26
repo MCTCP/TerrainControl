@@ -29,10 +29,16 @@ import java.util.Random;
 
 public class SpawnCommand
 {
-	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos)
+	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos, boolean force)
 	{
 		try
 		{
+	    	if(!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
+	    	{
+	    		source.sendSuccess(new StringTextComponent("This command can only be used in OTG worlds/dimensions."), false);
+	    		return 0;
+	    	}
+			
 			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
 			CustomObject objectToSpawn = getObject(objectName, presetName);
 
@@ -45,18 +51,7 @@ public class SpawnCommand
 			Preset preset = ExportCommand.getPresetOrDefault(presetName);
 			ForgeWorldGenRegion region = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), source.getLevel(), source.getLevel().getChunkSource().getGenerator());
 			Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-			CustomStructureCache cache = 
-				source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator ?
-				((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder) :
-				null
-			;
-
-			// Cache is only null in non-OTG worlds
-			if (cache == null && objectToSpawn.doReplaceBlocks())
-			{
-				source.sendSuccess(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in non-OTG worlds"), false);
-				return 0;
-			}
+			CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
 
 			if(objectToSpawn instanceof BO4)
 			{
@@ -94,7 +89,7 @@ public class SpawnCommand
                         		)
 	                            {
 	                            	// TODO: Add targetBiomes parameter for command.
-	                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(region, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+	                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(region, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
 	                            	if(chunkCoordSpawned != null)
 	                            	{
 	                            		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);

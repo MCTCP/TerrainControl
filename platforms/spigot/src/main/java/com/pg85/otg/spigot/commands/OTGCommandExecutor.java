@@ -291,10 +291,15 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 
 	private boolean helpMessage (CommandSender sender)
 	{
+		// TODO: Update this
 		sender.sendMessage("OTG Help");
 		sender.sendMessage("/otg map -> Creates a 2048 x 2048 biome map of the world.");
-		sender.sendMessage("/otg spawn <preset name> : <object name>");
+		sender.sendMessage("/otg spawn <preset name> : <object name> : <coords> (BO3 only) or <force> (BO4 only)");
 		sender.sendMessage("/otg data <dataType>");
+		sender.sendMessage("/otg structure");
+		sender.sendMessage("/otg flush");
+		sender.sendMessage("/otg edit");
+		sender.sendMessage("/otg export");
 		return true;
 	}
 

@@ -6,7 +6,7 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.presets.Preset;
-import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
@@ -31,8 +31,19 @@ public class SpawnCommand
 		}
 		Player player = (Player) sender;
 		
+    	if(!(((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+    	{
+    		sender.sendMessage("This command can only be used in OTG worlds/dimensions.");
+    		return true;
+    	}
+		
 		String presetName = strings.get("1");
-		String objectName = strings.get("2");				
+		String objectName = strings.get("2");
+		boolean force = false;
+		if(strings.containsKey("3"))
+		{
+			force = Boolean.getBoolean(strings.get("3"));
+		}
 		if (presetName == null || objectName == null)
 		{
 			sender.sendMessage("Please specify a preset and an object");
@@ -53,21 +64,10 @@ public class SpawnCommand
 			preset.getFolderName(), 
 			preset.getWorldConfig(), 
 			((CraftWorld) player.getWorld()).getHandle(), 
-			((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()
+			((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
 		);
-		CustomStructureCache cache = 
-			((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator ?
-			((OTGNoiseChunkGenerator)((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()).getStructureCache(player.getWorld().getWorldFolder().toPath()) :
-			null
-		;
+		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
 
-		// Cache is only null in non-OTG worlds
-		if (cache == null && objectToSpawn.doReplaceBlocks())
-		{
-			sender.sendMessage("Cannot spawn objects with DoReplaceBlocks in non-OTG worlds");
-			return true;
-		}
-		
 		if(objectToSpawn instanceof BO4)
 		{
         	if(preset.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
@@ -100,8 +100,7 @@ public class SpawnCommand
                             // than we need to.
                             if(!player.getWorld().isChunkGenerated(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
                             {
-                            	// TODO: Add targetBiomes parameter for command.
-                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(genRegion, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(genRegion, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
                             	if(chunkCoordSpawned != null)
                             	{
                             		sender.sendMessage(objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());

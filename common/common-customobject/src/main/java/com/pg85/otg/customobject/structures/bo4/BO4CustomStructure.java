@@ -192,7 +192,7 @@ public class BO4CustomStructure extends CustomStructure
 		this.random = RandomHelper.getRandomForCoords(start.getX() + DecorationArea.BO_CHUNK_CENTER_X, start.getY(), start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z, worldSeed);
 	}
 	
-	BO4CustomStructure(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	BO4CustomStructure(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, boolean ignoreSpawnSettings, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		this.isStructureAtSpawn = isStructureAtSpawn;
 
@@ -206,7 +206,7 @@ public class BO4CustomStructure extends CustomStructure
 
 		long startTime = System.currentTimeMillis();
 
-		if(!doStartChunkBlockChecks(worldGenRegion, chunkBeingDecorated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+		if(!doStartChunkBlockChecks(worldGenRegion, chunkBeingDecorated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker, ignoreSpawnSettings))
 		{
 			return;
 		}
@@ -302,7 +302,7 @@ public class BO4CustomStructure extends CustomStructure
 		}
 	}
 
-	private boolean doStartChunkBlockChecks(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private boolean doStartChunkBlockChecks(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean ignoreSpawnSettings)
 	{
 		// We may target unloaded/ungenerated chunks, so we'll use shadowgen when doing height/material checks for this chunk.
 		
@@ -388,12 +388,15 @@ public class BO4CustomStructure extends CustomStructure
 				}
 			}
 
-			if(startY < config.minHeight || startY > config.maxHeight)
+			if(!ignoreSpawnSettings && (startY < config.minHeight || startY > config.maxHeight))
 			{
 				return false;
 			}
 
-			startY += config.heightOffset;
+			if(!ignoreSpawnSettings)
+			{
+				startY += config.heightOffset;
+			}
 
 			if(startY < Constants.WORLD_DEPTH || startY >= Constants.WORLD_HEIGHT)
 			{
