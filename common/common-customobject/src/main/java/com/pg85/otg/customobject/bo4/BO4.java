@@ -124,7 +124,7 @@ public class BO4 implements StructuredCustomObject
 			
 	// BO4 CustomStructures cannot be force-spawned, only plotted in unloaded chunks and then spawned when the chunk is decorated.
 	@Override
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks)
 	{
 		return false;
 	}

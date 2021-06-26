@@ -126,7 +126,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	}
 
 	@Override
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks)
 	{
 		ObjectCoordinate[] data = this.data[rotation.getRotationId()];
 
@@ -158,7 +158,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 				}
 				else if (this.dig)
 				{
-					if(this.doReplaceBlocks)
+					if(allowReplaceBlocks && this.doReplaceBlocks)
 					{
 						setBlock(worldGenRegion, x + point.x, y + point.y, z + point.z, point.material, replaceBlocks);
 					} else {

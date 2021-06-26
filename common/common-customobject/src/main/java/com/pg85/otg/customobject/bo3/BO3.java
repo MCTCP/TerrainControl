@@ -192,7 +192,7 @@ public class BO3 implements StructuredCustomObject
 	// Force spawns a BO3 object. Used by /otg spawn and bo3AtSpawn.
 	// This method ignores the maxPercentageOutsideBlock setting
 	@Override
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks)
 	{
 		BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
 		ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
@@ -203,7 +203,7 @@ public class BO3 implements StructuredCustomObject
 		int lastZ = Integer.MIN_VALUE;
 		for (BO3BlockFunction block : blocks)
 		{
-			if(doReplaceBlocks())
+			if(allowReplaceBlocks && doReplaceBlocks())
 			{
 				if(lastX != x + block.x || lastZ != z + block.z)
 				{
@@ -500,6 +500,7 @@ public class BO3 implements StructuredCustomObject
 			chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
 		}
 
+		// StructureCache can be null for non-otg worlds, when using /otg spawn/edit/export.
 		if (structure != null && structureCache != null)
 		{
 			structure.modDataManager.modData.addAll(newModDataInObject);

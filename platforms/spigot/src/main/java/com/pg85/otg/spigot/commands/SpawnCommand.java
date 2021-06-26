@@ -5,6 +5,7 @@ import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
@@ -54,6 +55,11 @@ public class SpawnCommand
 		}
 
 		Block block = getWatchedBlock(player, false);
+		// TODO: Why can watched block be null?
+		if(block == null)
+		{
+			block = player.getLocation().getBlock();
+		}
 		Preset preset = ExportCommand.getPresetOrDefault(presetName);
 		SpigotWorldGenRegion genRegion;
 		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
@@ -88,7 +94,8 @@ public class SpawnCommand
     		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
 
         	// Try spawning the structure in available chunks around the player
-            int maxRadius = 1000;    		
+            int maxRadius = 1000;  
+            OTG.getEngine().getLogger().log(LogMarker.INFO, "Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."); 
             sender.sendMessage("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while.");
             int playerX = block.getX();
             int playerZ = block.getZ();
@@ -115,6 +122,7 @@ public class SpawnCommand
                             	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(genRegion, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
                             	if(chunkCoordSpawned != null)
                             	{
+                                    OTG.getEngine().getLogger().log(LogMarker.INFO, objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
                             		sender.sendMessage(objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
                             		return true;
                             	}
@@ -123,28 +131,19 @@ public class SpawnCommand
                     }
                 }
             }
+            OTG.getEngine().getLogger().log(LogMarker.INFO, objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
             sender.sendMessage(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
         	return true;        	
 		} else {
-
-			if (genRegion instanceof MCWorldGenRegion && objectToSpawn.doReplaceBlocks())
-			{
-				sender.sendMessage("Cannot spawn objects with DoReplaceBlocks in non-OTG worlds");
-				return true;
-			}
-			
 			if (objectToSpawn.spawnForced(
 				null,
-				new SpigotWorldGenRegion(
-					preset.getFolderName(), 
-					preset.getWorldConfig(), 
-					((CraftWorld) player.getWorld()).getHandle()
-				),
+				genRegion,
 				new Random(),
 				Rotation.NORTH,
 				block.getX(),
 				block.getY(),
-				block.getZ()
+				block.getZ(),
+				!(genRegion instanceof MCWorldGenRegion)
 			))
 			{
 				sender.sendMessage("Spawned object " + objectName + " at " + block.getLocation().toString());

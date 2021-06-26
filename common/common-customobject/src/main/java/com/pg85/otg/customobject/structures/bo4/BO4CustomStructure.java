@@ -405,7 +405,20 @@ public class BO4CustomStructure extends CustomStructure
 
 			if(!config.canSpawnOnWater)
 			{
-				if(worldGenRegion.getMaterialWithoutLoading(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, worldGenRegion.getHighestBlockYAtWithoutLoading(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z, true, true, false, true, true), this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z).isLiquid())
+				if(
+					worldGenRegion.getMaterialWithoutLoading(
+						this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X,
+						worldGenRegion.getHighestBlockYAtWithoutLoading(
+							this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X,
+							this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z,
+							true,
+							true,
+							false,
+							true,
+							true
+						),
+						this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z).isLiquid()
+					)
 				{
 					return false;
 				}

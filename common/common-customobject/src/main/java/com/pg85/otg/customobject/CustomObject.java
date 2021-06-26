@@ -54,17 +54,6 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 * @return Whether this object can be placed with a random rotation.
 	 */
 	public boolean canRotateRandomly();
-
-	/**
-	 * Spawns the object at the given position. It shouldn't execute any checks.
-	 *
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return Whether the attempt was successful. (It should never fail, but you never know.)
-	 */
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);
 		
 	/**
 	 * Spawns the object at the given position. It should search a suitable y

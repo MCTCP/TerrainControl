@@ -62,7 +62,6 @@ public class SpawnCommand
 			}
 			
 			Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-			CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
 
 			if(objectToSpawn instanceof BO4)
 			{
@@ -77,13 +76,15 @@ public class SpawnCommand
 	        		return 0;
 	        	}
 	        	
+				CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
+	        	
 	        	// Try spawning the structure in available chunks around the player
 	        	int maxRadius = 1000;
 	        	source.sendSuccess(new StringTextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
 	            int playerX = blockPos.getX();
 	            int playerZ = blockPos.getZ();
 	            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
-	            
+
 	            ChunkCoordinate chunkCoord;
 	            for (int cycle = 1; cycle < maxRadius; cycle++)
 	            {
@@ -123,23 +124,17 @@ public class SpawnCommand
 	                }
 	            }
 	            source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information."), false);
-	        	return 0;	        	
+	        	return 0;
 			} else {
-				
-				if (genRegion instanceof MCWorldGenRegion && objectToSpawn.doReplaceBlocks())
-				{
-					source.sendSuccess(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in non-OTG worlds"), false);
-					return 0;
-				}
-
 				if (objectToSpawn.spawnForced(
-					cache,
+					null,
 					genRegion,
 					new Random(),
 					Rotation.NORTH,
 					blockPos.getX(),
 					blockPos.getY(),
-					blockPos.getZ()
+					blockPos.getZ(),
+					!(genRegion instanceof MCWorldGenRegion)
 				))
 				{
             		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);

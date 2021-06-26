@@ -406,7 +406,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		sharedseedrandom.a(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
 		// performWorldGenSpawning() -> a()
 		SpawnerCreature.a(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
-
 	}
 
 	// Mob spawning on chunk tick

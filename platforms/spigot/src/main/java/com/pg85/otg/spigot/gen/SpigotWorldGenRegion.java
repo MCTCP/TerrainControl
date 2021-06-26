@@ -2,13 +2,11 @@ package com.pg85.otg.spigot.gen;
 
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
+import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -26,6 +24,9 @@ import net.minecraft.server.v1_16_R3.*;
 import java.util.Optional;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	protected final GeneratorAccessSeed worldGenRegion;
@@ -42,14 +43,14 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
-	
+
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
-	}	
+	}
 	
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion)
@@ -79,16 +80,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiome(int x, int z)
 	{
-		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
-		if (biome != null)
+		String key = this.chunkGenerator.getBiomeRegistryName(x, -1, z);
+		IBiomeConfig biomeConfig = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key);
+		BiomeBase biome = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay).get(new MinecraftKey(key));
+		if (biomeConfig != null)
 		{
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
-			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?			
-			BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
-			if (biomeConfig != null)
-			{
-				return new SpigotBiome(biome, biomeConfig);
-			}
+			return new SpigotBiome(biome, biomeConfig);
 		}
 		return null;
 	}
@@ -96,9 +93,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfig(int x, int z)
 	{
-		int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
-		// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?		
-		return OTG.getEngine().getPresetLoader().getBiomeConfig(this.presetFolderName, id);
+		String key = this.chunkGenerator.getBiomeRegistryName(x, -1, z);
+		return ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key);
 	}
 
 	@Override

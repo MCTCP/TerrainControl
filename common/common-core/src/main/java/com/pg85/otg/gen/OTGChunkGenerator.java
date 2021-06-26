@@ -277,7 +277,7 @@ public class OTGChunkGenerator
 		}
 		if(center == null)
 		{
-			center = getBiomeAt(noiseX, noiseZ);
+			center = biomeGenerator.getConfig(noiseX, noiseZ);
 			if(biomeCache != null)
 			{
 				biomeCache[biomeCacheX * biomeCacheSize + biomeCacheZ] = center;
@@ -312,7 +312,7 @@ public class OTGChunkGenerator
 				}
 				if(biome == null)
 				{
-					biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+					biome = biomeGenerator.getConfig(noiseX + x1, noiseZ + z1);
 					if(biomeCache != null)
 					{
 						biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)] = biome;
@@ -353,7 +353,7 @@ public class OTGChunkGenerator
 				}
 				if(biome == null)
 				{
-					biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+					biome = biomeGenerator.getConfig(noiseX + x1, noiseZ + z1);
 					if(biomeCache != null)
 					{
 						biomeCache[(biomeCacheX + x1) * biomeCacheSize + (biomeCacheZ + z1)] = biome;
@@ -433,11 +433,6 @@ public class OTGChunkGenerator
 			// Store value
 			noiseColumn[y] = noise;
 		}
-	}
-
-	private IBiomeConfig getBiomeAt(int biomeX, int biomeZ)
-	{
-		return biomeGenerator.getConfig(biomeX, biomeZ);
 	}
 
 	public IBiomeConfig getBiomeAtWorldCoord(int x, int z)

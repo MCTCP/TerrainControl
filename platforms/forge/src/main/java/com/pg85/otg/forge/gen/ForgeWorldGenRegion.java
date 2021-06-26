@@ -8,11 +8,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.ForgeBiome;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -99,17 +97,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
 	{
-		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
-		if(biome != null)
+		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
+		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
+		if(biomeConfig != null)
 		{
-			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
-			if(biomeConfig != null)
-			{
-				// TODO: cache this?
-				return new ForgeBiome(biome, biomeConfig);
-			}
+			return new ForgeBiome(biome, biomeConfig);
 		}
 		return null;
 	}
@@ -117,10 +109,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
 	{
-		int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-		// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
-		return biomeConfig;
+		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
+		return ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
 	}
 
 	@Override

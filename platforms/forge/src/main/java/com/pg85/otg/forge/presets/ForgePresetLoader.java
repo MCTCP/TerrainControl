@@ -49,7 +49,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();	
 	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
-	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	private Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	private Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 	
 	public ForgePresetLoader(Path otgRootFolder)
@@ -67,7 +67,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	@Override
 	public BiomeConfig getBiomeConfig(String resourceLocationString)
 	{
-		return this.biomeConfigsByRegistryKey.get(new ResourceLocation(resourceLocationString));
+		return this.biomeConfigsByRegistryKey.get(resourceLocationString);
 	}
 	
 	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetFolderName)
@@ -197,7 +197,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
 				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
- 				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
+ 				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
  				
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				
