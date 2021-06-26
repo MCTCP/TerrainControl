@@ -195,13 +195,13 @@ public class CustomStructurePlotter
 	}
 
 	// Only used by ChunkDecorator during decoration
-	public BO4CustomStructure plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public ChunkCoordinate plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Used by ChunkDecorator during decoration and /otg spawn. targetStructure and targetBiomes only used for /spawn (make that prettier?)
-	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public ChunkCoordinate plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
@@ -215,7 +215,7 @@ public class CustomStructurePlotter
 		this.plottedChunksFastCache.put(chunkCoord, null);
 	}
 	
-	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private ChunkCoordinate plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// This method can be called by /otg spawn and during chunkgeneration.
 		// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
@@ -949,7 +949,7 @@ public class CustomStructurePlotter
 												if(structureCacheContainsKey(chunkCoord) || targetStructure != null)
 												{
 													this.processing = false;
-													return structureStart2;
+													return spawnChunk;
 												}
 												break;
 											}
