@@ -36,12 +36,13 @@ public class OTGChunkDecorator implements IChunkDecorator
 
 	// Locking objects / checks to prevent decorate running on multiple threads,
 	// or when the world is waiting for an opportunity to save.
-	// TODO: Make this prettier, may need to move this to chunk save as well.
+	// TODO: Is this still required for 1.16?
 	private final Object lockingObject = new Object();
 	private boolean decorating;
 	private boolean processing = false;
 	private boolean saving;
 	private boolean saveRequired;
+	private Object asynChunkDecorationLock = new Object();
 
 	public OTGChunkDecorator()
 	{
@@ -77,7 +78,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 	public Object getLockingObject()
 	{
 		return this.lockingObject;
-	}	
+	}
 
 	public void decorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
 	{
@@ -174,7 +175,13 @@ public class OTGChunkDecorator implements IChunkDecorator
 		// Use BO4 logic for BO4 worlds
 		if(isBO4Enabled)
 		{
-			plotAndSpawnBO4s(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+			// BO4 Plotting cannot currently be done in a thread-safe/non-blocking way,
+			// Paper may try to do async chunkgen, so lock here. This will ofcourse 
+			// slow down any multithreaded chunk decoration implementation.
+			synchronized(asynChunkDecorationLock)
+			{
+				plotAndSpawnBO4s(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+			}
 		}
 
 		// Resource sequence
