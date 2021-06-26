@@ -8,11 +8,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.ForgeBiome;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -39,7 +37,6 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
@@ -49,13 +46,14 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
-	private final ISeedReader worldGenRegion;
-	private final ChunkGenerator chunkGenerator;
+	protected final ISeedReader worldGenRegion;
+	private final OTGNoiseChunkGenerator chunkGenerator;
 	
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
 	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
+	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig, worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
@@ -63,15 +61,20 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		this.chunkGenerator = chunkGenerator;
 	}
 	
-	/** Creates a LocalWorldGenRegion to be used outside of world generation.
-	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
-	 * 	It may crash if you try to do replaceblocks or use similar otg-specific features. 
-	 */	
-	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
+	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
+	}	
+	
+	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
+	{
+		super(presetFolderName, worldConfig);
+		this.worldGenRegion = worldGenRegion;
+		this.chunkGenerator = null;
 	}
 		
 	@Override
@@ -94,17 +97,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
 	{
-		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
-		if(biome != null)
+		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
+		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
+		if(biomeConfig != null)
 		{
-			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
-			if(biomeConfig != null)
-			{
-				// TODO: cache this
-				return new ForgeBiome(biome, biomeConfig);
-			}
+			return new ForgeBiome(biome, biomeConfig);
 		}
 		return null;
 	}
@@ -112,15 +109,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
 	{
-		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
-		if(biome != null)
-		{
-			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetFolderName, id);
-			return biomeConfig;
-		}
-		return null;
+		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
+		return ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
 	}
 
 	@Override
@@ -146,7 +136,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
-		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(blockX, blockZ);
+		return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}
 
 	@Override
@@ -239,7 +229,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		return getHighestBlockYAt(chunk, internalX, heightMapy, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}	
 
-	private int getHighestBlockYAt(IChunk chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	protected int getHighestBlockYAt(IChunk chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		LocalMaterialData material;
 		boolean isSolid;
@@ -601,7 +591,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
+			return this.chunkGenerator.getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -626,9 +616,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 		}
-			
+
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
@@ -644,7 +634,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			return hasDefaultStructure.booleanValue();
 		}
-		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
+		hasDefaultStructure = this.chunkGenerator.checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
 		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
 		return hasDefaultStructure;
 	}

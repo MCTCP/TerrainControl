@@ -2,12 +2,15 @@ package com.pg85.otg.forge.biome;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import net.minecraft.block.BlockState;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.MutableRegistry;
@@ -145,4 +148,11 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		int biomeId = this.layer.get().sample(biomeX, biomeZ);
 		return this.configLookup.length > biomeId ? configLookup[biomeId] : null;
 	}
+	
+	// TODO: May have to override this for spawn?
+	@Override
+	public Set<BlockState> getSurfaceBlocks()
+	{
+		return super.getSurfaceBlocks();
+	}	
 }

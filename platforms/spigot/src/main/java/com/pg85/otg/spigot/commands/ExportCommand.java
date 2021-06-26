@@ -10,12 +10,13 @@ import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.gen.MCWorldGenRegion;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -101,10 +102,22 @@ public class ExportCommand
 		}
 		
 		// Get required pieces
-		LocalWorldGenRegion otgRegion = new SpigotWorldGenRegion(
-			preset.getFolderName(), preset.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
-			((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()
-		);
+		SpigotWorldGenRegion genRegion;
+		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+		{
+			genRegion = new SpigotWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld)player.getWorld()).getHandle(),
+				((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
+			);
+		} else {
+			genRegion = new MCWorldGenRegion(
+				preset.getFolderName(), 
+				preset.getWorldConfig(), 
+				((CraftWorld) player.getWorld()).getHandle()
+			);
+		}
 
 		LocalNBTHelper nbtHelper = new SpigotNBTHelper();
 		BOCreator.Corner lowCorner = region.getLow();
@@ -126,7 +139,7 @@ public class ExportCommand
 		{
 			try
 			{
-				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
+				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, genRegion,
 					nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
@@ -144,7 +157,7 @@ public class ExportCommand
 			// Create a new BO3 from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : SpigotMaterialData.ofBlockData(centerBlockState);
 			bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-				objectPath, otgRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
+				objectPath, genRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
 				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());

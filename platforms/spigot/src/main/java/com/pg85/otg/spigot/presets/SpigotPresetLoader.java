@@ -31,7 +31,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	private final HashMap<String, Object2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
-	private final Map<MinecraftKey, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	private final Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetFolderName = new LinkedHashMap<>();
 
 	private final ResourceKey<IRegistry<BiomeBase>> BIOME_KEY = IRegistry.ay;
@@ -105,10 +105,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				ResourceKey<BiomeBase> registryKey = ResourceKey.a(IRegistry.ay, resourceLocation);
 				// Store the biome in the registry
 				biome_registry.a(registryKey, biome, Lifecycle.experimental());
-
+				
 				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
-				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
-
+				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
+				
 				presetBiomes.add(ResourceKey.a(BIOME_KEY, resourceLocation));
 
 				presetIdMapping[otgBiomeId] = biomeConfig;
@@ -199,7 +199,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				for (String biome : group.biomes.keySet())
 				{
 					MinecraftKey location = new MinecraftKey(new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
-					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
+					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location.toString());
 					if (config == null)
 					{
 						throw new NullPointerException("Failed to fetch biome config using ResourceLocation '"+location+"'");
@@ -263,7 +263,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	@Override
 	public BiomeConfig getBiomeConfig (String resourceLocationString)
 	{
-		return this.biomeConfigsByRegistryKey.get(new MinecraftKey(resourceLocationString));
+		return this.biomeConfigsByRegistryKey.get(resourceLocationString);
 	}
 
 	@Override

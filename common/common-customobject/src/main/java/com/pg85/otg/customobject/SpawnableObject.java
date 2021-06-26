@@ -25,7 +25,7 @@ interface SpawnableObject
 	 * @param z		Z coord of the object origin.
 	 * @return Whether the attempt was successful. (It should never fail, but you never know.)
 	 */
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);
+	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks);
 	
 	/**
 	 * Returns the name of this object.

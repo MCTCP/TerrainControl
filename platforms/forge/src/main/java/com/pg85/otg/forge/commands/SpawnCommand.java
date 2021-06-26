@@ -6,6 +6,7 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
+import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
@@ -33,12 +34,6 @@ public class SpawnCommand
 	{
 		try
 		{
-	    	if(!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
-	    	{
-	    		source.sendSuccess(new StringTextComponent("This command can only be used in OTG worlds/dimensions."), false);
-	    		return 0;
-	    	}
-			
 			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
 			CustomObject objectToSpawn = getObject(objectName, presetName);
 
@@ -49,23 +44,47 @@ public class SpawnCommand
 			}
 
 			Preset preset = ExportCommand.getPresetOrDefault(presetName);
-			ForgeWorldGenRegion region = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), source.getLevel(), source.getLevel().getChunkSource().getGenerator());
+			ForgeWorldGenRegion genRegion;
+			if(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
+			{
+				genRegion = new ForgeWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel(), 
+					(OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()
+				);
+			} else {
+				genRegion = new MCWorldGenRegion(
+					preset.getFolderName(), 
+					preset.getWorldConfig(), 
+					source.getLevel()
+				);
+			}
+			
 			Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-			CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
 
 			if(objectToSpawn instanceof BO4)
 			{
+				if(!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
+				{
+	        		source.sendSuccess(new StringTextComponent("BO4 objects can only be spawned in OTG worlds/dimensions."), false);
+	        		return 0;					
+				}
 	        	if(preset.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
 	        	{
 	        		source.sendSuccess(new StringTextComponent("Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."), false);
 	        		return 0;
 	        	}
 	        	
+				CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
+	        	
 	        	// Try spawning the structure in available chunks around the player
+	        	int maxRadius = 1000;
+	        	source.sendSuccess(new StringTextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
 	            int playerX = blockPos.getX();
 	            int playerZ = blockPos.getZ();
 	            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
-	            int maxRadius = 1000;
+
 	            ChunkCoordinate chunkCoord;
 	            for (int cycle = 1; cycle < maxRadius; cycle++)
 	            {
@@ -89,7 +108,7 @@ public class SpawnCommand
                         		)
 	                            {
 	                            	// TODO: Add targetBiomes parameter for command.
-	                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(region, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
+	                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(genRegion, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
 	                            	if(chunkCoordSpawned != null)
 	                            	{
 	                            		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);
@@ -105,17 +124,17 @@ public class SpawnCommand
 	                }
 	            }
 	            source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information."), false);
-	        	return 0;	        	
-	        	
-			} else {			
+	        	return 0;
+			} else {
 				if (objectToSpawn.spawnForced(
-					cache,
-					region,
+					null,
+					genRegion,
 					new Random(),
 					Rotation.NORTH,
 					blockPos.getX(),
 					blockPos.getY(),
-					blockPos.getZ()
+					blockPos.getZ(),
+					!(genRegion instanceof MCWorldGenRegion)
 				))
 				{
             		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);

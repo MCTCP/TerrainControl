@@ -63,7 +63,7 @@ class TreeObject implements CustomObject
 		{
 			return false;
 		}	
-		return spawnForced(structureCache, worldGenRegion, random, Rotation.NORTH, x, y, z);
+		return spawnForced(structureCache, worldGenRegion, random, Rotation.NORTH, x, y, z, false);
 	}
 	
 	@Override
@@ -73,7 +73,7 @@ class TreeObject implements CustomObject
 	}
 	
 	@Override
-	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks)
 	{
 		return worldGenRegion.placeTree(type, random, x, y, z);
 	}
@@ -96,8 +96,8 @@ class TreeObject implements CustomObject
 		{
 			return false;
 		}
-		
-		return spawnForced(structureCache, worldGenRegion, random, rotation, x, y, z);
+
+		return spawnForced(structureCache, worldGenRegion, random, rotation, x, y, z, true);
 	}
 	
 	@Override
