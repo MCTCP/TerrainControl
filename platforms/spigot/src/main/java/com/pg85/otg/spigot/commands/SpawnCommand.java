@@ -88,10 +88,11 @@ public class SpawnCommand
     		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
 
         	// Try spawning the structure in available chunks around the player
+            int maxRadius = 1000;    		
+            sender.sendMessage("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while.");
             int playerX = block.getX();
             int playerZ = block.getZ();
             ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
-            int maxRadius = 1000;
             ChunkCoordinate chunkCoord;
             for (int cycle = 1; cycle < maxRadius; cycle++)
             {

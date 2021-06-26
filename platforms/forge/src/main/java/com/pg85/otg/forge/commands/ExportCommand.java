@@ -325,9 +325,7 @@ public class ExportCommand
 			{
 				posArr[1] = blockPos;
 				updateCorners();
-			}
-			else
-			{
+			} else {
 				posArr[0] = posArr[1];
 				posArr[1] = blockPos;
 				updateCorners();

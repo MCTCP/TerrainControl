@@ -78,10 +78,12 @@ public class SpawnCommand
 	        	}
 	        	
 	        	// Try spawning the structure in available chunks around the player
+	        	int maxRadius = 1000;
+	        	source.sendSuccess(new StringTextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
 	            int playerX = blockPos.getX();
 	            int playerZ = blockPos.getZ();
 	            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
-	            int maxRadius = 1000;
+	            
 	            ChunkCoordinate chunkCoord;
 	            for (int cycle = 1; cycle < maxRadius; cycle++)
 	            {
