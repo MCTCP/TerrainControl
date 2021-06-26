@@ -344,8 +344,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			return;
 		}
 
-		// If no chunk was passed, we're doing something outside of the decoration cycle.
-		// If a chunk was passed, only spawn in the area being decorated.
+		// If no decorationArea is present, we're doing something outside of the decoration cycle.
+		// If a decorationArea exists, only spawn in the area being decorated.
 		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			if(replaceBlocksMatrix != null)
@@ -561,31 +561,14 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
-		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
 		// isAtLeast() -> b()
 		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if (
-				!(
-					chunk == null &&
-					this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
-					(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
-			}
-		}
-
-		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
-		{
-			return null;
+			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -601,7 +584,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
-		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
@@ -610,24 +593,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if (
-				!(
-					chunk == null &&
-					this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
-					(chunk = this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-			}
-		}
-
-		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
-		{
-			return -1;
+			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -645,7 +611,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		{
 			return hasDefaultStructure;
 		}
-		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
+		hasDefaultStructure = ((OTGNoiseChunkGenerator)this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
 		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
 		return hasDefaultStructure;
 	}

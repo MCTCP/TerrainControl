@@ -224,7 +224,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
-
+		
 		// Tried to query an unloaded chunk outside the area being decorated
 		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
@@ -368,8 +368,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return;
 		}
 
-		// If no chunk was passed, we're doing something outside of the decoration cycle.
-		// If a chunk was passed, only spawn in the area being decorated.
+		// If no decorationArea is present, we're doing something outside of the decoration cycle.
+		// If a decorationArea exists, only spawn in the area being decorated.
 		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			if(replaceBlocksMatrix != null)
@@ -587,38 +587,21 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			return null;
 		}
-	 
+
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		
+
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunk chunk = null;
-		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		if(this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
-		
+
 		// If the chunk doesn't exist so we're doing something outside the
 		// decoration sequence, return the material without loading the chunk.
 		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
-				!(
-					chunk == null && 
-					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
-			}
-		}
-		
-		// Tried to query an unloaded chunk outside the area being decorated
-		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
-		{
-			return null;
+			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this.getWorldRandom(), x , y, z);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -634,7 +617,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunk chunk = null;
-		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
+		if(this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
@@ -643,29 +626,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
-				!(
-					chunk == null && 
-					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
-				)
-			)
-			{
-				// Calculate the material without loading the chunk.
-				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-			}
+			return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 		}
-		
-		// Tried to query an unloaded chunk outside the area being decorated
-		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
-		{
-			return -1;
-		}
-		
+			
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
-		int internalZ = z & 0xF;		
+		int internalZ = z & 0xF;
 		int heightMapy = chunk.getHeight(Type.WORLD_SURFACE_WG, internalX, internalZ);	
 		return getHighestBlockYAt(chunk, internalX, heightMapy, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}	

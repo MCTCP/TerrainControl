@@ -195,15 +195,15 @@ public class CustomStructurePlotter
 	}
 
 	// Only used by ChunkDecorator during decoration
-	public BO4CustomStructure plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public ChunkCoordinate plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker, false);
 	}
 	
 	// Used by ChunkDecorator during decoration and /otg spawn. targetStructure and targetBiomes only used for /spawn (make that prettier?)
-	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public ChunkCoordinate plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean force)
 	{
-		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker, force);
 	}
 
 	private void setChunkOccupied(ChunkCoordinate chunkCoord)
@@ -215,7 +215,7 @@ public class CustomStructurePlotter
 		this.plottedChunksFastCache.put(chunkCoord, null);
 	}
 	
-	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private ChunkCoordinate plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean force)
 	{
 		// This method can be called by /otg spawn and during chunkgeneration.
 		// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
@@ -469,7 +469,7 @@ public class CustomStructurePlotter
 													canSpawnHere = false;
 													if(targetStructure != null)
 													{
-														if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+														if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 														{
 															if(targetBiomes.size() == 0)
 															{
@@ -487,7 +487,7 @@ public class CustomStructurePlotter
 														biomeStructures = this.structureNamesPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));															
 														if(biomeStructures == null)
 														{
-															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+															if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
 																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																// Get cached data if available
@@ -553,7 +553,7 @@ public class CustomStructurePlotter
 													canSpawnHere = false;
 													if(targetStructure != null)
 													{
-														if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+														if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 														{
 															if(targetBiomes.size() == 0)
 															{
@@ -571,7 +571,7 @@ public class CustomStructurePlotter
 														biomeStructures = this.structureNamesPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
 														if(biomeStructures == null)
 														{
-															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+															if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
 																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
@@ -636,7 +636,7 @@ public class CustomStructurePlotter
 													canSpawnHere = false;
 													if(targetStructure != null)
 													{
-														if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+														if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 														{
 															if(targetBiomes.size() == 0)
 															{
@@ -654,7 +654,7 @@ public class CustomStructurePlotter
 														biomeStructures = this.structureNamesPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
 														if(biomeStructures == null)
 														{
-															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+															if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
 																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() + scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
@@ -720,7 +720,7 @@ public class CustomStructurePlotter
 													canSpawnHere = false;
 													if(targetStructure != null)
 													{
-														if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+														if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 														{
 															if(targetBiomes.size() == 0)
 															{
@@ -738,7 +738,7 @@ public class CustomStructurePlotter
 														biomeStructures = this.structureNamesPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
 														if(biomeStructures == null)
 														{
-															if(!worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
+															if(!isBo4ChunkPlotted(chunkCoord) && !worldGenRegion.chunkHasDefaultStructure(rand, chunkCoord))
 															{
 																biomeConfig3 = worldGenRegion.getBiomeConfig((chunkCoord.getChunkX() + i) * 16 + DecorationArea.BO_CHUNK_CENTER_X, (chunkCoord.getChunkZ() - scanDistance) * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 																if(!biomeConfig3.getName().equals(biomeConfig.getName()))
@@ -875,11 +875,11 @@ public class CustomStructurePlotter
 										int spawnCoordX = structureBBInsideAreaX + (rotation == Rotation.NORTH ? structureLeft : rotation == Rotation.EAST ? structureBottom : rotation == Rotation.SOUTH ? structureRight : structureTop);
 										int spawnCoordZ = structureBBInsideAreaZ + (rotation == Rotation.NORTH ? structureTop : rotation == Rotation.EAST ? structureLeft : rotation == Rotation.SOUTH ? structureBottom : structureRight);
 										ChunkCoordinate spawnChunk = ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ);
-																					
+
 										if(isBO4AllowedToSpawnAtByFrequency(spawnChunk, (BO4)currentStructureSpawning[0]))
 										{
 											structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetFolderName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
-											structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+											structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, force, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 											if(structureStart2.isSpawned())
 											{
@@ -949,7 +949,7 @@ public class CustomStructurePlotter
 												if(structureCacheContainsKey(chunkCoord) || targetStructure != null)
 												{
 													this.processing = false;
-													return structureStart2;
+													return spawnChunk;
 												}
 												break;
 											}

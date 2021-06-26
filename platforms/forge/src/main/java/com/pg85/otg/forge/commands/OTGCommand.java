@@ -3,6 +3,7 @@ package com.pg85.otg.forge.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -93,7 +94,8 @@ public class OTGCommand
 								context.getSource(),
 								context.getArgument("preset", String.class),
 								context.getArgument("object", String.class),
-								Objects.requireNonNull(context.getSource().getEntity()).blockPosition())
+								Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
+								false)
 						).then(
 							Commands.argument("location", BlockPosArgument.blockPos())
 								.executes(
@@ -101,7 +103,20 @@ public class OTGCommand
 										context.getSource(),
 										context.getArgument("preset", String.class),
 										context.getArgument("object", String.class),
-										BlockPosArgument.getLoadedBlockPos(context, "location")))
+										BlockPosArgument.getLoadedBlockPos(context, "location"),
+										false
+									))
+								)
+						).then(
+							Commands.argument("force", BoolArgumentType.bool())
+								.executes(
+									(context -> SpawnCommand.execute(
+										context.getSource(),
+										context.getArgument("preset", String.class),
+										context.getArgument("object", String.class),
+										Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
+										context.getArgument("force", Boolean.class)
+									))
 								)
 						)
 					)

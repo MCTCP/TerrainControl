@@ -21,13 +21,49 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeManager;
+import net.minecraft.server.v1_16_R3.BiomeSettingsMobs;
+import net.minecraft.server.v1_16_R3.BiomeStorage;
+import net.minecraft.server.v1_16_R3.BlockColumn;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.Blocks;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.ChunkGenerator;
+import net.minecraft.server.v1_16_R3.CrashReport;
+import net.minecraft.server.v1_16_R3.EnumCreatureType;
+import net.minecraft.server.v1_16_R3.GeneratorAccess;
+import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
+import net.minecraft.server.v1_16_R3.HeightMap;
+import net.minecraft.server.v1_16_R3.IBlockAccess;
+import net.minecraft.server.v1_16_R3.IBlockData;
+import net.minecraft.server.v1_16_R3.IChunkAccess;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.MathHelper;
+import net.minecraft.server.v1_16_R3.NoiseSettings;
+import net.minecraft.server.v1_16_R3.ProtoChunk;
+import net.minecraft.server.v1_16_R3.RegionLimitedWorldAccess;
+import net.minecraft.server.v1_16_R3.ReportedException;
+import net.minecraft.server.v1_16_R3.ResourceKey;
+import net.minecraft.server.v1_16_R3.SectionPosition;
+import net.minecraft.server.v1_16_R3.SeededRandom;
+import net.minecraft.server.v1_16_R3.SpawnerCreature;
+import net.minecraft.server.v1_16_R3.StructureBoundingBox;
+import net.minecraft.server.v1_16_R3.StructureGenerator;
+import net.minecraft.server.v1_16_R3.StructureManager;
+import net.minecraft.server.v1_16_R3.StructurePiece;
+import net.minecraft.server.v1_16_R3.WorldChunkManager;
+import net.minecraft.server.v1_16_R3.WorldGenFeatureDefinedStructureJigsawJunction;
+import net.minecraft.server.v1_16_R3.WorldGenFeatureDefinedStructurePoolTemplate;
+import net.minecraft.server.v1_16_R3.WorldGenFeaturePillagerOutpostPoolPiece;
+import net.minecraft.server.v1_16_R3.WorldGenStage;
+import net.minecraft.server.v1_16_R3.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import javax.annotation.Nullable;
-import java.nio.file.Paths;
+
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -70,8 +106,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final Preset preset;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
-	// TODO: Move this to WorldLoader when ready?
-	private boolean isInitialised = false;
 
 	// Used to specify which chunk to regen biomes and structures for
 	// Necessary because Spigot calls those methods before we have the chance to inject
@@ -118,19 +152,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-	
-	private void init (String worldSaveFolderName)
-	{
-		if (!isInitialised)
-		{
-			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), Paths.get("./saves/" + worldSaveFolderName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
-		}
-	}	
 
 	public void saveStructureCache ()
 	{
-		if (this.chunkDecorator.getIsSaveRequired())
+		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
 		{
 			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
@@ -354,15 +379,13 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 	
 	// Chunk decoration method taken from Biome class
+	@SuppressWarnings("deprecation")
 	private void biomeDecorate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
 	{
-		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
-		init(((IWorldDataServer) world.getWorldData()).getName());
-		
 		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this);
-		this.chunkDecorator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, this.structureCache);
+		this.chunkDecorator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(world.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
 		biome.a(structureManager, this, world, seed, random, pos);
 		this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 	}
@@ -548,8 +571,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().g();
 	}
 
-	public CustomStructureCache getStructureCache()
+	public CustomStructureCache getStructureCache(Path worldSaveFolder)
 	{
+		if(this.structureCache == null)
+		{
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
+		}
 		return this.structureCache;
 	}
 	

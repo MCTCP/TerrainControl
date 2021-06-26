@@ -182,7 +182,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				} else {
 					IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 					biomeConfig.setRegistryKey(otgLocation);
-					resourceLocation = new ResourceLocation(otgLocation.toResourceLocationString());					
+					resourceLocation = new ResourceLocation(otgLocation.toResourceLocationString());	
  	 				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
  					presetBiomes.add(registryKey);
 	 				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
