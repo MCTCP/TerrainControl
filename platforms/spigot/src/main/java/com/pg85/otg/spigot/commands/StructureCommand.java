@@ -23,16 +23,18 @@ public class StructureCommand
 {
 	public static boolean execute(CommandSender sender, String[] args)
 	{
-		if (!(sender instanceof Player)) {
+		if (!(sender instanceof Player))
+		{
 			sender.sendMessage("Only players can execute this command");
 			return true;
 		}
+		Player player = (Player) sender;
 	
 		String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)((Player)sender).getLocation().getBlockX(), (int)((Player)sender).getLocation().getBlockZ());
 		// if the player is in range
 
-		CustomStructure worldInfoChunk = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache().getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath()).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();

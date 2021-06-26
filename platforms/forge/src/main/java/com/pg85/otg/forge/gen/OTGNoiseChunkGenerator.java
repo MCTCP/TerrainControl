@@ -121,8 +121,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final Preset preset;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
-	// TODO: Move this to WorldLoader when ready?
-	private boolean isInitialised = false;
 	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
@@ -167,19 +165,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-
-	private void init(Path worldSaveFolder)
-	{
-		if (!isInitialised)
-		{
-			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
-		}
-	}
 	
 	public void saveStructureCache()
 	{
-		if (this.chunkDecorator.getIsSaveRequired())
+		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
 		{
 			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
@@ -346,15 +335,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		Biome biome = this.biomeSource.getNoiseBiome((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
-		// World save folder name may not be identical to level name, fetch it.
-		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-		init(worldSaveFolder);
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(blockpos.getX(), blockpos.getZ());		
 		try
 		{
 			// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
 			ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
-			this.chunkDecorator.decorate(chunkBeingDecorated, forgeWorldGenRegion, biomeConfig, this.structureCache);
+			// World save folder name may not be identical to level name, fetch it.
+			Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+			this.chunkDecorator.decorate(chunkBeingDecorated, forgeWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
 			biome.generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
 		} catch (Exception exception) {
@@ -538,8 +526,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().seaLevel();
 	}
 
-	public CustomStructureCache getStructureCache()
+	public CustomStructureCache getStructureCache(Path worldSaveFolder)
 	{
+		if(this.structureCache == null)
+		{
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getFolderName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
+		}
 		return this.structureCache;
 	}
 

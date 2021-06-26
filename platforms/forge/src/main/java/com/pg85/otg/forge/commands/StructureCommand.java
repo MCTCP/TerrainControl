@@ -17,6 +17,7 @@ import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.storage.FolderName;
 
 public class StructureCommand
 {
@@ -30,8 +31,9 @@ public class StructureCommand
 		
 		String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)source.getPosition().x, (int)source.getPosition().z);
+		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
 		// if the player is in range
-		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache().getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
