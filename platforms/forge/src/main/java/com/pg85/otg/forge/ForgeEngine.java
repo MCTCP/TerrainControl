@@ -6,7 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.MobSpawnGroupHelper;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.materials.ForgeMaterialReader;
+import com.pg85.otg.forge.materials.ForgeMaterials;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeModLoadedChecker;
@@ -31,18 +31,24 @@ public class ForgeEngine extends OTGEngine
 {
 	public ForgeEngine()
 	{
-		super(			
+		super(				
 			new ForgeLogger(), 
 			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID),
-			new ForgeMaterialReader(),
-			new ForgeModLoadedChecker(),			
+			new ForgeModLoadedChecker(),
 			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID))
 		);
+	}
+	
+	@Override
+	public void onStart()
+	{
+		ForgeMaterials.init();
+		super.onStart();
 	}
 
 	public void reloadPreset(String presetFolderName, MutableRegistry<Biome> biomeRegistry)
 	{
-		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, pluginConfig.getSpawnLogEnabled(), this.logger, this.materialReader, biomeRegistry);
+		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, pluginConfig.getSpawnLogEnabled(), this.logger, biomeRegistry);
 	}
 	
 	public void onSave(IWorld world)

@@ -41,7 +41,7 @@ public class StructureCommand
 			boolean spawnLog = OTG.getEngine().getPluginConfig().getSpawnLogEnabled();
 			ILogger logger = OTG.getEngine().getLogger();
 			CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-			IMaterialReader materialReader = OTG.getEngine().getMaterialReader();
+			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).getPreset().getFolderName());
 			CustomObjectResourcesManager manager = OTG.getEngine().getCustomObjectResourcesManager();
 			IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 			

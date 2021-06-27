@@ -78,7 +78,6 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.COAL_ORE) ||
 			isMaterial(LocalMaterials.DIAMOND_ORE) ||
 			isMaterial(LocalMaterials.EMERALD_ORE) ||
-			isMaterial(LocalMaterials.GLOWING_REDSTONE_ORE) ||
 			isMaterial(LocalMaterials.GOLD_ORE) ||
 			isMaterial(LocalMaterials.IRON_ORE) ||
 			isMaterial(LocalMaterials.LAPIS_ORE) ||

@@ -21,6 +21,7 @@ import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
+import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
@@ -46,17 +47,23 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();	
+	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();
 	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
 	private Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	private Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
-	
+
 	public ForgePresetLoader(Path otgRootFolder)
 	{
 		super(otgRootFolder);
 	}
 
+	@Override
+	public IMaterialReader createMaterialReader()
+	{
+		return new ForgeMaterialReader();
+	}
+	
 	@Override
 	public BiomeConfig getBiomeConfig(String presetFolderName, int biomeId)
 	{
@@ -91,7 +98,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader, MutableRegistry<Biome> biomeRegistry)
+	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, MutableRegistry<Biome> biomeRegistry)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
@@ -102,8 +109,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 					for(File file : presetDir.listFiles())
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
-						{						
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
+						{
+							this.materialReaderByPresetFolderName.put(presetFolderName, new ForgeMaterialReader());							
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger);
 							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
 							break;
@@ -122,6 +130,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		this.biomeConfigsByRegistryKey = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
+		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
 		registerBiomes(true, biomeRegistry);
 	}
 	

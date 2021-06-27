@@ -152,7 +152,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-
+	
 	public void saveStructureCache ()
 	{
 		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
@@ -386,7 +386,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this);
-		this.chunkDecorator.decorate(chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(world.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
+		this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(world.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
 		biome.a(structureManager, this, world, seed, random, pos);
 		this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 	}

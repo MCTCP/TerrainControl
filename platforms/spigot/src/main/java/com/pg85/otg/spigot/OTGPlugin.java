@@ -126,8 +126,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		if (OTGGen.generator == null)
 		{
 			OTGDelegate = new OTGNoiseChunkGenerator(
-				new DimensionConfig(OTGGen.preset.getFolderName()),
-				new OTGBiomeProvider(OTGGen.preset.getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+				new DimensionConfig(OTGGen.getPreset().getFolderName()),
+				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
 				world.getSeed(),
 				GeneratorSettingBase::i
 			);

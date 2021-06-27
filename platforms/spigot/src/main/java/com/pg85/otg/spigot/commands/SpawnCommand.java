@@ -119,7 +119,23 @@ public class SpawnCommand
                             // than we need to.
                             if(!player.getWorld().isChunkGenerated(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
                             {
-                            	final ChunkCoordinate chunkCoordSpawned = cache.plotBo4Structure(genRegion, (BO4)objectToSpawn, new ArrayList<String>(), chunkCoord, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker(), force);
+                            	final ChunkCoordinate chunkCoordSpawned = 
+                        			cache.plotBo4Structure(
+                    					genRegion, 
+                    					(BO4)objectToSpawn, 
+                    					new ArrayList<String>(), 
+                    					chunkCoord, 
+                    					OTG.getEngine().getOTGRootFolder(), 
+                    					OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), 
+                    					OTG.getEngine().getLogger(), 
+                    					OTG.getEngine().getCustomObjectManager(), 
+                    					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), 
+                    					OTG.getEngine().getCustomObjectResourcesManager(), 
+                    					OTG.getEngine().getModLoadedChecker(), 
+                    					force
+                					)
+                    			;
+                            	
                             	if(chunkCoordSpawned != null)
                             	{
                                     OTG.getEngine().getLogger().log(LogMarker.INFO, objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
@@ -181,20 +197,20 @@ public class SpawnCommand
 
 		return null;
 	}
-	public static CustomObject getObject(String objectName, String presetName)
+	public static CustomObject getObject(String objectName, String presetFolderName)
 	{
-		if (presetName == null)
+		if (presetFolderName == null)
 		{
-			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+			presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
 		}
 		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
 			objectName,
-			presetName,
+			presetFolderName,
 			OTG.getEngine().getOTGRootFolder(),
 			false,
 			OTG.getEngine().getLogger(),
 			OTG.getEngine().getCustomObjectManager(),
-			OTG.getEngine().getMaterialReader(),
+			OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
 			OTG.getEngine().getCustomObjectResourcesManager(),
 			OTG.getEngine().getModLoadedChecker()
 		);

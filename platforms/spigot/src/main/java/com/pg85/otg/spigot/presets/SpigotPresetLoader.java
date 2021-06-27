@@ -13,8 +13,10 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
+import com.pg85.otg.spigot.materials.SpigotMaterialReader;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -27,21 +29,25 @@ import java.util.*;
 
 public class SpigotPresetLoader extends LocalPresetLoader
 {
-	private final HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
-	// Using a ref is much faster than using an object
-	private final HashMap<String, Object2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
-	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
-
-	private final Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
-	// We have to store biomes, since Spigot doesn't expose registry key on BiomeBase.
-	private final Map<BiomeBase, BiomeConfig> biomeConfigsByBiome = new HashMap<>();
 	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetFolderName = new LinkedHashMap<>();
+	private final HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();	
+	private final HashMap<String, Object2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>(); // Using a ref is much faster than using an object
+	private final Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();	
+	// We have to store biomes, since Spigot doesn't expose registry key on BiomeBase.
+	private final Map<BiomeBase, BiomeConfig> biomeConfigsByBiome = new HashMap<>();	
 
 	private final ResourceKey<IRegistry<BiomeBase>> BIOME_KEY = IRegistry.ay;
 
 	public SpigotPresetLoader (File otgRootFolder)
 	{
 		super(otgRootFolder.toPath());
+	}
+
+	@Override
+	public IMaterialReader createMaterialReader()
+	{
+		return new SpigotMaterialReader();
 	}
 
 	@Override

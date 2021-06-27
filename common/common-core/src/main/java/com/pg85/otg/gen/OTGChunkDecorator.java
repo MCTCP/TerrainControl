@@ -80,7 +80,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 		return this.lockingObject;
 	}
 
-	public void decorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
+	public void decorate(String presetFolderName, ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
 	{
 		boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
@@ -120,10 +120,10 @@ public class OTGChunkDecorator implements IChunkDecorator
 		boolean isBO4Enabled = worldGenRegion.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4;
 		ILogger logger = OTG.getEngine().getLogger();
 		CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-		IMaterialReader materialReader = OTG.getEngine().getMaterialReader();
+		IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName);
 		CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
 		IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
-		
+
 		if (!this.processing)
 		{
 			this.processing = true;
@@ -197,7 +197,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 			}			
 			else if (res instanceof IBasicResource)
 			{
-				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, hasVillage, OTG.getEngine().getLogger(), OTG.getEngine().getMaterialReader());
+				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, hasVillage, logger, materialReader);
 			}
 			else if(res instanceof ErroredFunction)
 			{
