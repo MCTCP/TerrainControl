@@ -24,9 +24,6 @@ import net.minecraft.server.v1_16_R3.*;
 import java.util.Optional;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	protected final GeneratorAccessSeed worldGenRegion;
@@ -80,9 +77,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiome(int x, int z)
 	{
-		String key = this.chunkGenerator.getBiomeRegistryName(x, -1, z);
-		IBiomeConfig biomeConfig = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key);
-		BiomeBase biome = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay).get(new MinecraftKey(key));
+		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
+		// to do magnification correctly by itself? Test and verify.
+		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
+		IBiomeConfig biomeConfig = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome);
 		if (biomeConfig != null)
 		{
 			return new SpigotBiome(biome, biomeConfig);
@@ -93,8 +91,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfig(int x, int z)
 	{
-		String key = this.chunkGenerator.getBiomeRegistryName(x, -1, z);
-		return ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key);
+		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
+		// to do magnification correctly by itself? Test and verify.		
+		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
+		return ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome);
 	}
 
 	@Override
@@ -542,12 +542,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 	public IBlockData getBlockData(BlockPosition blockpos)
 	{
-		return worldGenRegion.getType(blockpos);
+		return this.worldGenRegion.getType(blockpos);
 	}
 
 	public void setBlockState(BlockPosition blockpos, IBlockData blockstate1, int i)
 	{
-		worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
+		this.worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
 
 	// Shadowgen

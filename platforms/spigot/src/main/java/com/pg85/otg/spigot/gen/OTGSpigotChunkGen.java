@@ -45,9 +45,7 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 	@Override
 	public boolean isParallelCapable()
 	{
-		// Experimental, requires we're thread safe, which is not the case
-		// OreGen borks with this bc of cache
-		return false;
+		return true;
 	}
 
 	@Override

@@ -72,27 +72,26 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 {
 	// Create a codec to serialise/deserialise OTGNoiseChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
-			(p_236091_0_) ->
-					p_236091_0_
-							.group(
-									Codec.STRING.fieldOf("otg_dimension_config").forGetter(
-											(p_236090_0_) -> p_236090_0_.dimensionConfig.toYamlString() // TODO: Use bytestream instead?
-									),
-									// BiomeProvider -> WorldChunkManager
-									WorldChunkManager.a.fieldOf("biome_source").forGetter(
-											(p_236096_0_) -> p_236096_0_.b
-									),
-									Codec.LONG.fieldOf("seed").stable().forGetter(
-											(p_236093_0_) -> p_236093_0_.worldSeed
-									),
-									// DimensionSettings -> GeneratorSettingsBase
-									GeneratorSettingBase.b.fieldOf("settings").forGetter(
-											(p_236090_0_) -> p_236090_0_.dimensionSettingsSupplier
-									)
-							).apply(
-							p_236091_0_,
-							p_236091_0_.stable(OTGNoiseChunkGenerator::new)
-					)
+		(p_236091_0_) -> p_236091_0_
+			.group(
+				Codec.STRING.fieldOf("otg_dimension_config").forGetter(
+					(p_236090_0_) -> p_236090_0_.dimensionConfig.toYamlString() // TODO: Use bytestream instead?
+				),
+				// BiomeProvider -> WorldChunkManager
+				WorldChunkManager.a.fieldOf("biome_source").forGetter(
+					(p_236096_0_) -> p_236096_0_.b
+				),
+				Codec.LONG.fieldOf("seed").stable().forGetter(
+					(p_236093_0_) -> p_236093_0_.worldSeed
+				),
+				// DimensionSettings -> GeneratorSettingsBase
+				GeneratorSettingBase.b.fieldOf("settings").forGetter(
+					(p_236090_0_) -> p_236090_0_.dimensionSettingsSupplier
+				)
+			).apply(
+				p_236091_0_,
+				p_236091_0_.stable(OTGNoiseChunkGenerator::new)
+			)
 	);
 
 	private final Supplier<GeneratorSettingBase> dimensionSettingsSupplier;
