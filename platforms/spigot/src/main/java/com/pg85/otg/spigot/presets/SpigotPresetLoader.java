@@ -14,6 +14,7 @@ import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
 
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -32,6 +33,8 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
 	private final Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	// We have to store biomes, since Spigot doesn't expose registry key on BiomeBase.
+	private final Map<BiomeBase, BiomeConfig> biomeConfigsByBiome = new HashMap<>();
 	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetFolderName = new LinkedHashMap<>();
 
 	private final ResourceKey<IRegistry<BiomeBase>> BIOME_KEY = IRegistry.ay;
@@ -108,6 +111,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				
 				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
 				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
+				this.biomeConfigsByBiome.put(biome,  biomeConfig);
 				
 				presetBiomes.add(ResourceKey.a(BIOME_KEY, resourceLocation));
 
@@ -265,6 +269,11 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	{
 		return this.biomeConfigsByRegistryKey.get(resourceLocationString);
 	}
+	
+	public IBiomeConfig getBiomeConfig(BiomeBase biome)
+	{
+		return this.biomeConfigsByBiome.get(biome);
+	}	
 
 	@Override
 	public BiomeConfig getBiomeConfig (String presetFolderName, int biomeId)

@@ -98,6 +98,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
 	{
+		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
+		// to do magnification correctly by itself? Test and verify.		
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
 		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
 		if(biomeConfig != null)
@@ -110,6 +112,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
 	{
+		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
+		// to do magnification correctly by itself? Test and verify.		
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
 		return ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
 	}
