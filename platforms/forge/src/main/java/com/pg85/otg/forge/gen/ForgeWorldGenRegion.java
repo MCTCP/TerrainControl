@@ -41,6 +41,7 @@ import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 
@@ -520,16 +521,15 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void placeDungeon(Random random, int x, int y, int z)
+	public void placeDungeon(Random random, int x, int y, int z, int range, int count)
 	{
-		// TODO: dungeons don't spawn due to us not using cave air in caves
-		Features.MONSTER_ROOM.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.MONSTER_ROOM.configured(IFeatureConfig.NONE).range(range).squared().count(count).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
-	public void placeFossil(Random random, ChunkCoordinate chunkCoord)
+	public void placeFossil(Random random, int x, int y, int z, int chance)
 	{
-		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+		Feature.FOSSIL.configured(IFeatureConfig.NONE).chance(chance).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override

@@ -87,12 +87,9 @@ public final class SimpleSettingsMap implements SettingsMap
 				continue;
 			}
 			result.add(function);
-			if (function instanceof ErroredFunction)
+			if (spawnLog && function instanceof ErroredFunction)
 			{
-				if(spawnLog)
-				{
-					logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
-				}
+				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
 			}
 		}
 

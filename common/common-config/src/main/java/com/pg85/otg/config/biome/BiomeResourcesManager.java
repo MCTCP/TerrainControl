@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.ErroredFunction;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -88,11 +87,7 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
 		catch (InvocationTargetException e)
 		{
 			Throwable cause = e.getCause();
-			if (cause instanceof InvalidConfigException)
-			{
-				return new ErroredFunction<T>(name, args, cause.getMessage());
-			}
-			throw new RuntimeException(e);
+			return new ErroredFunction<T>(name, args, "Resource type " + name + " had invalid parameters and could not be parsed, error: " + cause);
 		}
 	}
 }

@@ -39,8 +39,8 @@ public interface IWorldGenRegion
 	public void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ReplaceBlockMatrix replaceBlocksMatrix);
 	public void spawnEntity(IEntityFunction<?> newEntityData);
-	public void placeDungeon(Random random, int x, int y, int z);
-	public void placeFossil(Random random, ChunkCoordinate chunkCoord);
+	public void placeDungeon(Random random, int x, int y, int z, int range, int count);
+	public void placeFossil(Random random, int x, int y, int z, int chance);
 	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 	public DecorationArea getDecorationArea();

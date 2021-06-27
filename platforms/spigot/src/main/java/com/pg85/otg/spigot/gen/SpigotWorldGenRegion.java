@@ -476,10 +476,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());
 			}
 			if (tree != null)
+			{
 				tree.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.f);
+			}
 			else if (other != null)
+			{
 				other.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.f);
-			else throw new RuntimeException("Incorrect handling of tree of type " + type.toString());
+			} else {
+				throw new RuntimeException("Incorrect handling of tree of type " + type.toString());
+			}
 			return true;
 		}
 		catch (NullPointerException ex)
@@ -489,7 +494,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			// Return true to prevent further attempts.
 			return true;
 		}
-	}	
+	}
 
 	@Override
 	public void spawnEntity (IEntityFunction<?> newEntityData)
@@ -498,15 +503,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void placeDungeon (Random random, int x, int y, int z)
+	public void placeDungeon (Random random, int x, int y, int z, int range, int count)
 	{
-		BiomeDecoratorGroups.MONSTER_ROOM.a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
+		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).d(range).a().b(count).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
 	}
 
 	@Override
-	public void placeFossil (Random random, ChunkCoordinate chunkCoord)
+	public void placeFossil(Random random, int x, int y, int z, int chance)
 	{
-		BiomeDecoratorGroups.FOSSIL.a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(chance).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
 	}
 
 	@Override
@@ -514,10 +519,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	{
 		IRegistryCustom registries = this.worldGenRegion.getMinecraftWorld().r();
 		IRegistry<WorldGenFeatureConfigured<?, ?>> registry = registries.b(IRegistry.au);
-
 		Optional<WorldGenFeatureConfigured<?, ?>> feature = registry.getOptional(new MinecraftKey(id));
 
-		if (feature.isPresent()) {
+		if (feature.isPresent())
+		{
 			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
 			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
