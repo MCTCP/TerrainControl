@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.gen;
 
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.OTGPlugin;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -14,7 +15,19 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 {
 	public OTGNoiseChunkGenerator generator = null;
 	private final FifoMap<ChunkCoordinate, ChunkData> chunkDataCache = new FifoMap<>(128);
-
+	private final Preset preset;
+	
+	public OTGSpigotChunkGen(Preset preset)
+	{
+		this.preset = preset;
+	}
+	
+	// In case generator isn't loaded yet, expose preset.
+	public Preset getPreset()
+	{
+		return this.preset;
+	}
+	
 	@Override
 	public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome)
 	{		

@@ -152,11 +152,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-
-	public Preset getPreset()
-	{
-		return this.preset;
-	}	
 	
 	public void saveStructureCache ()
 	{
