@@ -130,7 +130,7 @@ public class ExportCommand
 
 		// Initialize the settings
 		template.onEnable(preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-			OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
+			OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
 			OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
 		BO3 bo3;
@@ -141,7 +141,7 @@ public class ExportCommand
 			{
 				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, genRegion,
 					nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
+					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 			}
 			catch (Exception e)
@@ -159,7 +159,7 @@ public class ExportCommand
 			bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
 				objectPath, genRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
 				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
+				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 		}
 

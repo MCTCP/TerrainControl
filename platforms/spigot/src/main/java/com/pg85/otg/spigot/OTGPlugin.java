@@ -4,7 +4,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
@@ -77,14 +76,13 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		{
 			id = "Default";
 		}
-		Preset preset = OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(id);
-		if (preset == null)
+		if (OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(id) == null)
 		{
 			OTG.log(LogMarker.WARN, "Could not find preset '"+id+"', did you install it correctly?");
 			return null;
 		}
 		worlds.put(worldName, id);
-		return new OTGSpigotChunkGen(preset);
+		return new OTGSpigotChunkGen();
 	}
 
 	@EventHandler
@@ -126,8 +124,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		if (OTGGen.generator == null)
 		{
 			OTGDelegate = new OTGNoiseChunkGenerator(
-				new DimensionConfig(OTGGen.preset.getFolderName()),
-				new OTGBiomeProvider(OTGGen.preset.getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+				new DimensionConfig(OTGGen.generator.getPreset().getFolderName()),
+				new OTGBiomeProvider(OTGGen.generator.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
 				world.getSeed(),
 				GeneratorSettingBase::i
 			);

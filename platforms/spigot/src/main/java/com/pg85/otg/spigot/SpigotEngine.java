@@ -6,7 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfigFinder;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.spigot.biome.MobSpawnGroupHelper;
-import com.pg85.otg.spigot.materials.SpigotMaterialReader;
+import com.pg85.otg.spigot.materials.SpigotMaterials;
 import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import com.pg85.otg.spigot.util.SpigotLogger;
 import com.pg85.otg.spigot.util.SpigotPluginLoadedChecker;
@@ -33,14 +33,22 @@ public class SpigotEngine extends OTGEngine
 
 	protected SpigotEngine (JavaPlugin plugin)
 	{
-		super(new SpigotLogger(),
-				plugin.getDataFolder().toPath(),
-				new SpigotMaterialReader(),
-				new SpigotPluginLoadedChecker(),
-				new SpigotPresetLoader(plugin.getDataFolder()));
+		super(
+			new SpigotLogger(),
+			plugin.getDataFolder().toPath(),
+			new SpigotPluginLoadedChecker(),
+			new SpigotPresetLoader(plugin.getDataFolder())
+		);
 		this.plugin = plugin;
 	}
 
+	@Override
+	public void onStart()
+	{
+		SpigotMaterials.init();
+		super.onStart();
+	}
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void mergeVanillaBiomeMobSpawnSettings (BiomeConfigFinder.BiomeConfigStub biomeConfigStub, String biomeResourceLocation)

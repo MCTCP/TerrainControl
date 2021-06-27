@@ -15,7 +15,6 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IPluginConfig;
 
@@ -43,7 +42,6 @@ public abstract class OTGEngine
 	
 	protected final LocalPresetLoader presetLoader;
 	protected final ILogger logger;
-	protected final IMaterialReader materialReader;
 	private final IModLoadedChecker modLoadedChecker;
 
 	// Common classes
@@ -56,13 +54,12 @@ public abstract class OTGEngine
 	private CustomObjectResourcesManager customObjectResourcesManager;
 	private CustomObjectManager customObjectManager;
 	
-	protected OTGEngine(ILogger logger, Path otgRootFolder, IMaterialReader materialReader, IModLoadedChecker modLoadedChecker, LocalPresetLoader presetLoader)
+	protected OTGEngine(ILogger logger, Path otgRootFolder, IModLoadedChecker modLoadedChecker, LocalPresetLoader presetLoader)
 	{
 		this.logger = logger;
 		this.otgRootFolder = otgRootFolder;
 		this.globalObjectsFolder = otgRootFolder.resolve(Constants.GLOBAL_OBJECTS_FOLDER);
 		this.presetLoader = presetLoader;
-		this.materialReader = materialReader;
 		this.modLoadedChecker = modLoadedChecker;
 	}
 	
@@ -83,8 +80,7 @@ public abstract class OTGEngine
 		this.pluginConfig = new PluginConfig(
 			FileSettingsReader.read(Constants.PluginConfigFilename, pluginConfigFile, this.logger), 
 			this.biomeResourcesManager,
-			this.logger,
-			this.materialReader
+			this.logger
 		);
 		this.logger.setLevel(this.pluginConfig.getLogLevel().getLevel());
 		FileSettingsWriter.writeToFile(this.pluginConfig.getSettingsAsMap(), pluginConfigFile, this.pluginConfig.getSettingsMode(), this.logger);
@@ -118,7 +114,6 @@ public abstract class OTGEngine
 		ILogger logger = this.logger;
 		Path otgRootFolder = this.otgRootFolder;
 		Path presetsDirectory = this.getPresetsDirectory();
-		IMaterialReader materialReader = this.materialReader;
 
 		this.customObjectResourcesManager = new CustomObjectResourcesManager();
 		this.customObjectManager = new CustomObjectManager(spawnLog, developerMode, logger, otgRootFolder, presetsDirectory, this.customObjectResourcesManager);
@@ -132,7 +127,7 @@ public abstract class OTGEngine
 
 		// Load presets
 		
-		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
+		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger);
 	}
 
 	private void unpackDefaultPreset(File presetsDir)
@@ -284,11 +279,6 @@ public abstract class OTGEngine
 	{
 		return this.modLoadedChecker;
 	}
-	
-	public IMaterialReader getMaterialReader()
-	{
-		return this.materialReader;
-	}
 
 	// OTG Configs
 	
@@ -326,6 +316,6 @@ public abstract class OTGEngine
 	public CustomStructureCache createCustomStructureCache(String presetFolderName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(presetFolderName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(presetFolderName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getPresetLoader().getMaterialReader(presetFolderName), getCustomObjectResourcesManager(), null);
 	}
 }

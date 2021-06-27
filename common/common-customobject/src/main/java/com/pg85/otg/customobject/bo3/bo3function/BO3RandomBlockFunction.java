@@ -160,7 +160,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 				break;
 			}
 		}
-	}	
+	}
 	
 	@Override
 	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ReplaceBlockMatrix replaceBlocks)

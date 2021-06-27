@@ -29,17 +29,25 @@ import com.pg85.otg.util.minecraft.BiomeRegistryNames;
  * and registers all biomes with their worldconfig/biomeconfig settings.
  */
 public abstract class LocalPresetLoader
-{
+{	
 	private static final int MAX_INHERITANCE_DEPTH = 15;
 	protected final File presetsDir;
 	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
 	protected final HashMap<String, String> aliasMap = new HashMap<String, String>();
+	protected HashMap<String, IMaterialReader> materialReaderByPresetFolderName = new HashMap<>();
 
 	public LocalPresetLoader(Path otgRootFolder)
 	{
 		this.presetsDir = Paths.get(otgRootFolder.toString(), File.separator + Constants.PRESETS_FOLDER).toFile();
 	}
 
+	public IMaterialReader getMaterialReader(String presetFolderName)
+	{
+		return this.materialReaderByPresetFolderName.get(presetFolderName);
+	}
+	
+	protected abstract IMaterialReader createMaterialReader();
+	
 	public abstract void registerBiomes();
 
 	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
@@ -76,7 +84,7 @@ public abstract class LocalPresetLoader
 		return this.presets.keySet().size() > 0 ? (String) this.presets.keySet().toArray()[0] : Constants.DEFAULT_PRESET_NAME;
 	}
 		
-	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
@@ -87,10 +95,11 @@ public abstract class LocalPresetLoader
 					for(File file : presetDir.listFiles())
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
-						{						
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
-							presets.put(preset.getFolderName(), preset);
-							aliasMap.put(preset.getShortPresetName(), preset.getFolderName());
+						{
+							this.materialReaderByPresetFolderName.put(presetDir.getName(), createMaterialReader());
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger);
+							this.presets.put(preset.getFolderName(), preset);
+							this.aliasMap.put(preset.getShortPresetName(), preset.getFolderName());
 							break;
 						}
 					}
@@ -99,7 +108,7 @@ public abstract class LocalPresetLoader
 		}
 	}
 	
-	protected Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	protected Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger)
 	{
 		File worldConfigFile = new File(presetDir.toString(), Constants.WORLD_CONFIG_FILE);
 		File biomesDirectory = new File(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER);
@@ -110,11 +119,11 @@ public abstract class LocalPresetLoader
 		String presetFolderName = presetDir.toFile().getName();
 		
 		SettingsMap worldConfigSettings = FileSettingsReader.read(presetFolderName, worldConfigFile, logger);
-		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, spawnLog, logger, materialReader);
+		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, spawnLog, logger, getMaterialReader(presetFolderName));
 		FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
 		// use shortPresetName to register the biomes, instead of presetName
-		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(worldConfig.getShortPresetName(), worldConfig.getMajorVersion(), presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
+		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(worldConfig.getShortPresetName(), worldConfig.getMajorVersion(), presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, getMaterialReader(presetFolderName));
 
 		// We have to wait for the loading in order to get things like temperature
 		// TODO: Re-implement this for 1.16

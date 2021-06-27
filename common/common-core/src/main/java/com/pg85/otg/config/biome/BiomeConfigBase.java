@@ -225,7 +225,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 			synchronized(this)
 			{
 				if(!this.replacedBlocksInited)
-				{					
+				{
 					this.replacedBlocks.init(
 						this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
 						this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,

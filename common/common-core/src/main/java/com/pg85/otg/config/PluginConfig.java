@@ -21,10 +21,10 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
  */
 public final class PluginConfig extends PluginConfigBase
 {
-	public PluginConfig(SettingsMap settingsReader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	public PluginConfig(SettingsMap settingsReader, IConfigFunctionProvider biomeResourcesManager, ILogger logger)
 	{
 		super(settingsReader.getName());
-		readConfigSettings(settingsReader, biomeResourcesManager, false, logger, materialReader);
+		readConfigSettings(settingsReader, biomeResourcesManager, false, logger, null);
 	}
 
 	@Override

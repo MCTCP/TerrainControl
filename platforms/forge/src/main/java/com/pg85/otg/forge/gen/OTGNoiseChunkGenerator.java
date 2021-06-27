@@ -344,7 +344,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
 			// World save folder name may not be identical to level name, fetch it.
 			Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
-			this.chunkDecorator.decorate(chunkBeingDecorated, forgeWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
+			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
 			biome.generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
 		} catch (Exception exception) {
