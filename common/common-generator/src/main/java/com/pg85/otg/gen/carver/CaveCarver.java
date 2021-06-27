@@ -62,7 +62,10 @@ public class CaveCarver extends Carver
 
 	public boolean shouldCarve(Random random, int chunkX, int chunkZ)
 	{
-		if (this.worldConfig.getCaveFrequency() <= 0)
+		if (
+			this.worldConfig.getCavesEnabled() &&
+			this.worldConfig.getCaveFrequency() <= 0
+		)
 		{
 			return false;
 		}

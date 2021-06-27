@@ -129,6 +129,7 @@ public interface IWorldConfig
 
 	// Caves & Ravines
 
+	public boolean getCavesEnabled();
 	public int getCaveFrequency();
 	public int getCaveRarity();
 	public boolean isEvenCaveDistribution();
@@ -139,11 +140,11 @@ public interface IWorldConfig
 	public int getCaveSystemPocketMinSize();
 	public int getCaveSystemPocketChance();
 	public int getCaveSystemPocketMaxSize();
+	public boolean getRavinesEnabled();
 	public int getRavineRarity();
 	public int getRavineMinLength();
 	public int getRavineMaxLength();
 	public double getRavineDepth();
 	public int getRavineMinAltitude();
 	public int getRavineMaxAltitude();
-
 }

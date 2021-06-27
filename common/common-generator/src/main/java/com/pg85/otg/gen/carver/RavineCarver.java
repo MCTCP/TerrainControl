@@ -19,7 +19,7 @@ public class RavineCarver extends Carver
 	public boolean shouldCarve(Random random, int chunkX, int chunkZ)
 	{
 		// TODO: This should be changed to 1 / rarity
-		return random.nextInt(100) < this.worldConfig.getRavineRarity();
+		return this.worldConfig.getRavinesEnabled() && (random.nextInt(100) < this.worldConfig.getRavineRarity());
 	}
 
 	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet)

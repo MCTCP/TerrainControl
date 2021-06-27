@@ -128,7 +128,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	// Caves & Ravines
 	
-	protected int caveFrequency;	
+	protected boolean cavesEnabled;
+	protected int caveFrequency;
 	protected int caveRarity;	
 	protected boolean evenCaveDistribution;	
 	protected int caveMinAltitude;	
@@ -139,6 +140,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int caveSystemPocketMinSize;
 	protected int caveSystemPocketMaxSize;	
 
+	protected boolean ravinesEnabled;
 	protected int ravineRarity;
 	protected int ravineMinLength;
 	protected int ravineMaxLength;
@@ -204,6 +206,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	}
 	
 	@Override
+	public boolean getRavinesEnabled()
+	{
+		return this.ravinesEnabled;
+	}
+	
+	@Override
 	public int getRavineRarity()
 	{
 		return this.ravineRarity;
@@ -237,6 +245,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public int getRavineMaxAltitude()
 	{
 		return this.ravineMaxAltitude;
+	}
+	
+	@Override
+	public boolean getCavesEnabled()
+	{
+		return this.cavesEnabled;
 	}
 	
 	@Override

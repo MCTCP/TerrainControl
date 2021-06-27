@@ -15,6 +15,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
@@ -314,6 +315,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
 		}
+		super.applyCarvers(seed, biomeManager, chunk, stage);
 	}
 
 	// Decoration
@@ -325,8 +327,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		int chunkX = worldGenRegion.getCenterX();
 		int chunkZ = worldGenRegion.getCenterZ();
-		int blockX = chunkX * 16;
-		int blockZ = chunkZ * 16;
+		int blockX = chunkX * Constants.CHUNK_SIZE;
+		int blockZ = chunkZ * Constants.CHUNK_SIZE;
 		BlockPos blockpos = new BlockPos(blockX, 0, blockZ);
 		
 		// Fetch the biomeConfig by registryKey

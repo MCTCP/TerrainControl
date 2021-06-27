@@ -49,7 +49,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	protected final ISeedReader worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
-	
+
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
 	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
@@ -68,7 +68,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		super(presetFolderName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
-	}	
+	}
 	
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
