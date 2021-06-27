@@ -101,7 +101,8 @@ public class WorldStandardValues extends Settings
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 
 		OLD_GROUP_RARITY = booleanSetting("OldGroupRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin
-		
+		CAVES_ENABLED = booleanSetting("CavesEnabled", true),
+		RAVINES_ENABLED = booleanSetting("RavinesEnabled", true),
 		MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
 		OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
 		RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),

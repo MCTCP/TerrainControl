@@ -259,6 +259,7 @@ public class WorldConfig extends WorldConfigBase
 
 		// Caves & Ravines
 
+		this.cavesEnabled = reader.getSetting(WorldStandardValues.CAVES_ENABLED, logger);
 		this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger);
 		this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger);
 		this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, logger);		
@@ -270,6 +271,7 @@ public class WorldConfig extends WorldConfigBase
 		this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, logger);
 		this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, logger);
 
+		this.ravinesEnabled = reader.getSetting(WorldStandardValues.RAVINES_ENABLED, logger);
 		this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY, logger);
 		this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH, logger);
 		this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH, logger);
@@ -656,9 +658,13 @@ public class WorldConfig extends WorldConfigBase
 			"Set this to false to disable the bounds check during chunk decoration.",
 			"While this allows you to spawn objects larger than 32x32, it also makes terrain generation dependent on the direction you explored the world in."
 		);
-
+		
 		writer.header1("Cave settings");
 
+		writer.putSetting(WorldStandardValues.CAVES_ENABLED, this.cavesEnabled,
+			"Enables/disables OTG caves. set this to false if you're using modded caves."
+		);		
+		
 		writer.putSetting(WorldStandardValues.CAVE_RARITY, this.caveRarity,
 			"This controls the odds that a given chunk will host a single cave and/or the start of a cave system."
 		);
@@ -714,6 +720,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.header1("Ravine settings");
 		
+		writer.putSetting(WorldStandardValues.RAVINES_ENABLED, this.ravinesEnabled,
+			"Enables/disables OTG ravines. set this to false if you're using modded ravines."
+		);
+
 		writer.putSetting(WorldStandardValues.RAVINE_RARITY, this.ravineRarity);
 		writer.putSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, this.ravineMinAltitude);
 		writer.putSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, this.ravineMaxAltitude);
