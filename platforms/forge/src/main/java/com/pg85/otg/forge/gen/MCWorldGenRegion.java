@@ -176,13 +176,13 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 	}
 	
 	@Override
-	public void placeDungeon(Random random, int x, int y, int z)
+	public void placeDungeon(Random random, int x, int y, int z, int range, int count)
 	{
 		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");		
 	}
 
 	@Override
-	public void placeFossil(Random random, ChunkCoordinate chunkCoord)
+	public void placeFossil(Random random, int x, int y, int z, int chance)
 	{
 		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");		
 	}
