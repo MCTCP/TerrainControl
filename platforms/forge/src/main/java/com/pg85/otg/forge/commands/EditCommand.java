@@ -113,19 +113,30 @@ public class EditCommand
 
 			if (immediate)
 			{
-				BO3 fixedBO3 = BO3Creator.create(region.getLow(), region.getHigh(), center, null, "fixed_" + bo3.getName(), false, objectPath,
-					genRegion, new ForgeNBTHelper(), extraBlocks, bo3.getSettings(), preset.getFolderName(),
-					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				BO3 fixedBO3 = BO3Creator.create(
+					region.getLow(), 
+					region.getHigh(), 
+					center, 
+					null, 
+					"fixed_" + bo3.getName(), 
+					false, 
+					objectPath,
+					genRegion, 
+					new ForgeNBTHelper(), 
+					extraBlocks, 
+					bo3.getSettings(), preset.getFolderName(),
+					OTG.getEngine().getOTGRootFolder(),
+					OTG.getEngine().getLogger(), 
+					OTG.getEngine().getCustomObjectManager(), 
+					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()
+				);
 
 				if (fixedBO3 != null)
 				{
 					source.sendSuccess(new StringTextComponent("Successfully updated BO3 " + bo3.getName()), false);
 					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getSettings().getFile(), bo3);
-				}
-				else
-				{
+				} else {
 					source.sendSuccess(new StringTextComponent("Failed to update BO3 " + bo3.getName()), false);
 				}
 				cleanArea(genRegion, region.getLow(), region.getHigh());
@@ -162,11 +173,26 @@ public class EditCommand
 
 			ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
 
-			BO3 bo3 = BO3Creator.create(region.getLow(), region.getHigh(), session.center, null, session.bo3.getName(), false, session.objectPath,
-				session.genRegion, new ForgeNBTHelper(), session.extraBlocks, session.bo3.getSettings(), session.presetFolderName,
-				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+			BO3 bo3 = BO3Creator.create(
+				region.getLow(), 
+				region.getHigh(), 
+				session.center, 
+				null, 
+				session.bo3.getName(), 
+				false, 
+				session.objectPath,
+				session.genRegion, 
+				new ForgeNBTHelper(), 
+				session.extraBlocks, 
+				session.bo3.getSettings(), 
+				session.presetFolderName,
+				OTG.getEngine().getOTGRootFolder(),
+				OTG.getEngine().getLogger(), 
+				OTG.getEngine().getCustomObjectManager(), 
+				OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName),
+				OTG.getEngine().getCustomObjectResourcesManager(), 
+				OTG.getEngine().getModLoadedChecker()
+			);
 
 			if (bo3 != null)
 			{

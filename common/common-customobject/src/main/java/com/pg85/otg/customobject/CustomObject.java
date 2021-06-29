@@ -30,7 +30,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 * @param otherObjectsInDirectory A map of all other objects in the
 	 *								directory. Keys are lowercase.
 	 */
-	public boolean onEnable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker);
+	public boolean onEnable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker);
 
 	/**
 	 * Returns the name of this object.

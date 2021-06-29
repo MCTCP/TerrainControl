@@ -70,7 +70,7 @@ public class BO4 implements StructuredCustomObject
 	}
 	
 	@Override
-	public boolean onEnable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public boolean onEnable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(isInvalidConfig)
 		{
@@ -83,10 +83,10 @@ public class BO4 implements StructuredCustomObject
 		
 		try
 		{
-			this.config = new BO4Config(new FileSettingsReaderBO4(name, file, logger), true, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			this.config = new BO4Config(new FileSettingsReaderBO4(name, file, logger), true, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			if(this.config.settingsMode != ConfigMode.WriteDisable && !this.config.isBO4Data)
 			{
-				FileSettingsWriterBO4.writeToFile(this.config, this.config.settingsMode, spawnLog, logger, materialReader, manager);
+				FileSettingsWriterBO4.writeToFile(this.config, this.config.settingsMode, logger, materialReader, manager);
 			}
 		}
 		catch(InvalidConfigException ex)
@@ -152,7 +152,7 @@ public class BO4 implements StructuredCustomObject
 	}
 	
 	// BO4's should always spawn within decoration bounds, so there is no SpawnForced, only TrySpawnAt
-	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, boolean doBiomeConfigReplaceBlocks)
+	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, boolean doBiomeConfigReplaceBlocks)
 	{
 		//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
 
@@ -173,7 +173,7 @@ public class BO4 implements StructuredCustomObject
 			bo3SurfaceBlock = replaceWithSurfaceBlock != null && replaceWithSurfaceBlock.length() > 0 ? materialReader.readMaterial(replaceWithSurfaceBlock) : LocalMaterials.GRASS;
 		} catch (InvalidConfigException e1) {
 			bo3SurfaceBlock = LocalMaterials.GRASS;
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO4 " + this.getName() + " was not recognised. Using GRASS instead.");
 			}
@@ -182,7 +182,7 @@ public class BO4 implements StructuredCustomObject
 			bo3GroundBlock = replaceWithGroundBlock != null && replaceWithGroundBlock.length() > 0 ? materialReader.readMaterial(replaceWithGroundBlock) : LocalMaterials.DIRT;
 		} catch (InvalidConfigException e1) {
 			bo3GroundBlock = LocalMaterials.DIRT;
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
@@ -191,7 +191,7 @@ public class BO4 implements StructuredCustomObject
 			bo3StoneBlock = replaceWithStoneBlock != null && replaceWithStoneBlock.length() > 0 ? materialReader.readMaterial(replaceWithStoneBlock) : LocalMaterials.STONE;
 		} catch (InvalidConfigException e1) {
 			bo3StoneBlock = LocalMaterials.STONE;
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "Value " + replaceWithStoneBlock + " for replaceWithStoneBlock in BO4 " + this.getName() + " was not recognised. Using STONE instead.");
 			}
@@ -201,7 +201,7 @@ public class BO4 implements StructuredCustomObject
 			replaceBelowMaterial = config.replaceBelow != null && config.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? materialReader.readMaterial(replaceBelow) : null;
 		} catch (InvalidConfigException e1) {
 			replaceBelowMaterial = LocalMaterials.DIRT;
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.INFO, "Value " + config.replaceBelow + " for replaceBelow in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
@@ -210,7 +210,7 @@ public class BO4 implements StructuredCustomObject
 			replaceAboveMaterial = config.replaceAbove != null && config.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? materialReader.readMaterial(replaceAbove) : null;
 		} catch (InvalidConfigException e1) {
 			replaceAboveMaterial = LocalMaterials.AIR;
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.INFO, "Value " + config.replaceAbove + " for replaceAbove in BO4 " + this.getName() + " was not recognised. Using AIR instead.");
 			}
@@ -256,10 +256,10 @@ public class BO4 implements StructuredCustomObject
 		
 		// Spawn
 		long startTime = System.currentTimeMillis();
-		BO4BlockFunction[] blocks = config.getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		BO4BlockFunction[] blocks = config.getBlocks(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(blocks != null)
 		{
-			for (BO4BlockFunction block : config.getBlocks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+			for (BO4BlockFunction block : config.getBlocks(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 			{
 				if(block instanceof BO4RandomBlockFunction)
 				{
@@ -727,13 +727,13 @@ public class BO4 implements StructuredCustomObject
 			}
 			if(outOfBounds)
 			{
-				if(spawnLog)
+				if(logger.getSpawnLogEnabled())
 				{
 					logger.log(LogMarker.WARN, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being decorated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
 				}
 			}
 	
-			if(spawnLog && (System.currentTimeMillis() - startTime) > 50)
+			if(logger.getSpawnLogEnabled() && (System.currentTimeMillis() - startTime) > 50)
 			{
 				logger.log(LogMarker.WARN, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 			}

@@ -114,7 +114,7 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		super(biomeName);
 		this.setRegistryKey(new OTGBiomeResourceLocation(presetFolder, presetShortName, presetMajorVersion, biomeName));
@@ -144,7 +144,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.worldConfig = worldConfig;
 
 		this.renameOldSettings(settings, logger, materialReader);
-		this.readConfigSettings(settings, biomeResourcesManager, spawnLog, logger, materialReader);
+		this.readConfigSettings(settings, biomeResourcesManager, logger, materialReader);
 		this.validateAndCorrectSettings(presetFolder, true, logger);
 
 		// Set water level
@@ -187,7 +187,7 @@ public class BiomeConfig extends BiomeConfigBase
 	}	
 	
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
 		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
@@ -273,7 +273,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
 		this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 
-		this.readResourceSettings(reader, biomeResourcesManager, spawnLog, logger, materialReader);
+		this.readResourceSettings(reader, biomeResourcesManager, logger, materialReader);
 		
 		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
 		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
@@ -288,10 +288,10 @@ public class BiomeConfig extends BiomeConfigBase
 		}
 	}
 
-	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		// Disable resourceinheritance for saplings
-		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, spawnLog, logger, materialReader));
+		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)
@@ -313,7 +313,7 @@ public class BiomeConfig extends BiomeConfigBase
 						}
 						catch (NullPointerException e)
 						{
-							OTG.log(LogMarker.WARN, "Unrecognized sapling type in biome "+ this.getName());
+							logger.log(LogMarker.WARN, "Unrecognized sapling type in biome "+ this.getName());
 						}
 					} else {
 						this.saplingGrowers.put(sapling.saplingType, sapling);
@@ -322,7 +322,7 @@ public class BiomeConfig extends BiomeConfigBase
 			}
 		}
 
-		resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, spawnLog, logger, materialReader));
+		resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)

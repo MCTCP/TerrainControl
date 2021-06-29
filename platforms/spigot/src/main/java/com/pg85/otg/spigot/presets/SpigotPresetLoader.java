@@ -3,8 +3,10 @@ package com.pg85.otg.spigot.presets;
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfigFinder;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
@@ -12,14 +14,19 @@ import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.biome.MobSpawnGroupHelper;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialReader;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.minecraft.EntityCategory;
 
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
@@ -307,4 +314,51 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		}
 		return clonedData;
 	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void mergeVanillaBiomeMobSpawnSettings (BiomeConfigFinder.BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
+	{
+		String[] resourceLocationArr = biomeResourceLocation.split(":");			
+		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
+		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];		
+		
+		NamespacedKey location = null;
+		try
+		{
+			location = new NamespacedKey(resourceDomain, resourceLocation);
+		}
+		catch(IllegalArgumentException ex)
+		{
+			// Can happen when input is invalid.
+		}
+		
+		if(location != null)
+		{
+			Biome biome = Registry.BIOME.get(location);
+			BiomeBase biomeBase = null;
+			if(biome != null)
+			{
+				biomeBase = RegistryGeneration.WORLDGEN_BIOME.get(new MinecraftKey(biome.getKey().toString()));		
+			}
+			if(biomeBase != null)
+			{
+				// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
+				// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
+				// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
+				
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.MONSTER), EntityCategory.MONSTER);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.CREATURE), EntityCategory.CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.MISC), EntityCategory.MISC);
+				return;
+			}
+		}
+		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+		{
+			OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
+		}
+	}	
 }

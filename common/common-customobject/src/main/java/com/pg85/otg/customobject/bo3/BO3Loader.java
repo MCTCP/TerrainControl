@@ -73,7 +73,7 @@ public class BO3Loader implements CustomObjectLoader
 			return new BO3(objectName, file);
 	}
 
-	public static NamedBinaryTag loadMetadata(String name, File bo3Folder, boolean spawnLog, ILogger logger)
+	public static NamedBinaryTag loadMetadata(String name, File bo3Folder, ILogger logger)
 	{
 		String path = bo3Folder.getParent() + File.separator + name;
 
@@ -83,12 +83,12 @@ public class BO3Loader implements CustomObjectLoader
 			return LoadedTags.get(path);
 		}
 
-		NamedBinaryTag tag = loadTileEntityFromNBT(path, spawnLog, logger);
+		NamedBinaryTag tag = loadTileEntityFromNBT(path, logger);
 		registerMetadata(path, tag);
 		return tag;
 	}
 
-	private static NamedBinaryTag loadTileEntityFromNBT(String path, boolean spawnLog, ILogger logger)
+	private static NamedBinaryTag loadTileEntityFromNBT(String path, ILogger logger)
 	{
 		// Load from file
 		NamedBinaryTag metadata;
@@ -102,7 +102,7 @@ public class BO3Loader implements CustomObjectLoader
 		} catch (FileNotFoundException e)
 		{
 			// File not found
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
 			}
@@ -122,7 +122,7 @@ public class BO3Loader implements CustomObjectLoader
 			}			 
 			catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
 			{
-				if(spawnLog)
+				if(logger.getSpawnLogEnabled())
 				{
 					logger.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 					logger.printStackTrace(LogMarker.ERROR, corruptFile);
@@ -131,7 +131,7 @@ public class BO3Loader implements CustomObjectLoader
 			}
 			catch (IOException corruptFile)
 			{
-				if(spawnLog)
+				if(logger.getSpawnLogEnabled())
 				{
 					logger.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 					logger.printStackTrace(LogMarker.ERROR, corruptFile);

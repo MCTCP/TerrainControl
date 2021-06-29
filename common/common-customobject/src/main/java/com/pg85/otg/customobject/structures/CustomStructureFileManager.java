@@ -49,7 +49,7 @@ public class CustomStructureFileManager
 {
 	// Plotted chunks
 	
-	public static void savePlottedChunksData(Path worldSaveDir, int dimensionId, Map<ChunkCoordinate, PlottedChunksRegion> decoratedChunks, boolean spawnLog, ILogger logger)
+	public static void savePlottedChunksData(Path worldSaveDir, int dimensionId, Map<ChunkCoordinate, PlottedChunksRegion> decoratedChunks, ILogger logger)
 	{
 		int regionsSaved = 0;
 		if(decoratedChunks.size() > 0)
@@ -114,7 +114,7 @@ public class CustomStructureFileManager
 					} else {
 						Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 					}
-					byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), spawnLog, logger);
+					byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), logger);
 					dos.close();
 					fos = new FileOutputStream(occupiedChunksFile);
 					dos2 = new DataOutputStream(fos);
@@ -359,7 +359,7 @@ public class CustomStructureFileManager
 	// Structure cache
 
 	// TODO: Since we're using regions, use short/byte for (internal) coords?
-	static void saveStructureData(Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks, int dimensionId, Path worldSaveDir, boolean spawnLog, ILogger logger)
+	static void saveStructureData(Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks, int dimensionId, Path worldSaveDir, ILogger logger)
 	{		
 		// Collect all structure start points (and chunks that have bo3's with spawners/moddata/particles in them)
 		// and group them by BO name (or "NULL" for bo3's with spawners/moddata/particles).
@@ -417,13 +417,13 @@ public class CustomStructureFileManager
 						}
 					}
 				}
-				saveStructuresRegionFile(worldSaveDir, dimensionId, cachedRegion.getKey(), structuresPerRegion, spawnLog, logger);
+				saveStructuresRegionFile(worldSaveDir, dimensionId, cachedRegion.getKey(), structuresPerRegion, logger);
 			}
 		}
 		logger.log(LogMarker.INFO, regionsSaved + " structure data regions saved.");
 	}
 
-	private static void saveStructuresRegionFile(Path worldSaveDir, int dimensionId, ChunkCoordinate regionCoord, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> structuresPerRegion, boolean spawnLog, ILogger logger)
+	private static void saveStructuresRegionFile(Path worldSaveDir, int dimensionId, ChunkCoordinate regionCoord, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> structuresPerRegion, ILogger logger)
 	{
 		File structuresRegionFile = new File(
 			worldSaveDir + File.separator + 
@@ -698,7 +698,7 @@ public class CustomStructureFileManager
 			} else {
 				Files.move(structuresRegionFile.toPath(), structuresRegionBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
-			byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), spawnLog, logger);
+			byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), logger);
 			dos.close();
 			fos = new FileOutputStream(structuresRegionFile);
 			dos2 = new DataOutputStream(fos);
@@ -732,7 +732,7 @@ public class CustomStructureFileManager
 	
 	// TODO: Load one region file at a time, on-demand, rather than loading all region files at once.
 	// Almost everything should be set up for it, auto-replacing CustomStructurePlaceHolders take care of most things?
-	static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> loadStructureData(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> loadStructureData(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> output = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
 		
@@ -820,7 +820,7 @@ public class CustomStructureFileManager
 					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
 					buffer = ByteBuffer.wrap(decompressedBytes);
 										
-					result = parseStructuresFileFromStream(buffer, regionCoord, presetFolderName, worldSeed, isBO4Enabled, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					result = parseStructuresFileFromStream(buffer, regionCoord, presetFolderName, worldSeed, isBO4Enabled, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				}
 				catch (Exception ex)
 				{
@@ -865,7 +865,7 @@ public class CustomStructureFileManager
 					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
 					buffer = ByteBuffer.wrap(decompressedBytes);
 										
-					result = parseStructuresFileFromStream(buffer, regionCoord, presetFolderName, worldSeed, isBO4Enabled, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					result = parseStructuresFileFromStream(buffer, regionCoord, presetFolderName, worldSeed, isBO4Enabled, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				}
 				catch (Exception ex)
 				{
@@ -944,7 +944,7 @@ public class CustomStructureFileManager
 
 	// TODO: Since we're using regions now, can use byte/short for internal coords instead of int.
 	// TODO: Dev versions of v9 used region size 100, not 250, this may cause problems.
-	private static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> parseStructuresFileFromStream(ByteBuffer buffer, ChunkCoordinate regionCoord, String presetFolderName, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
+	private static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> parseStructuresFileFromStream(ByteBuffer buffer, ChunkCoordinate regionCoord, String presetFolderName, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
 	{
 		buffer.getInt(); // Version, not used atm.
 		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> structuresFile = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
@@ -1148,9 +1148,9 @@ public class CustomStructureFileManager
 					ChunkCoordinate startChunkCoord = ChunkCoordinate.fromChunkCoords(structureStart.getChunkX(), structureStart.getChunkZ());
 					if(!startChunkCoord.toRegionCoord().equals(regionCoord))
 					{
-						structure = new CustomStructurePlaceHolder(worldSeed, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+						structure = new CustomStructurePlaceHolder(worldSeed, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					} else {
-						structure = new BO4CustomStructure(worldSeed, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+						structure = new BO4CustomStructure(worldSeed, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					}
 					((BO4CustomStructure)structure).setStartChunkBlockChecksDone();
 				} else {
@@ -1166,7 +1166,7 @@ public class CustomStructureFileManager
 		return structuresFile;
 	}
 
-	public static void saveChunksMapFile(Path worldSaveDir, int dimensionId, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, boolean spawnLog, ILogger logger)
+	public static void saveChunksMapFile(Path worldSaveDir, int dimensionId, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, ILogger logger)
 	{
 		File occupiedChunksFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresFileName);
 		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresBackupFileName);
@@ -1219,7 +1219,7 @@ public class CustomStructureFileManager
 				} else {
 					Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				}
-				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), spawnLog, logger);
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), logger);
 				fos = new FileOutputStream(occupiedChunksFile);
 				dos2 = new DataOutputStream(fos);
 				dos2.write(compressedBytes, 0, compressedBytes.length);

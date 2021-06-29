@@ -6,5 +6,7 @@ public interface ILogger
 
 	public void printStackTrace(LogMarker fatal, Exception e);
 
-	public void setLevel(LogMarker level);
+	public void init(LogMarker level, boolean spawnLogEnabled, boolean logBO4Plotting, boolean logConfigErrors, boolean logDecorationErrors);
+	
+	public boolean getSpawnLogEnabled();
 }

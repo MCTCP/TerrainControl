@@ -29,7 +29,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 	public int rotation = 0;
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
@@ -42,7 +42,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 
 		if(args.size() > 5)
 		{
-			processNameTagOrFileName(args.get(5), spawnLog, logger);
+			processNameTagOrFileName(args.get(5), logger);
 		}
 	}
 
@@ -68,7 +68,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 		this.name = resourceLocation.split(":")[1];
 	}
 
-	public void processNameTagOrFileName(String s, boolean spawnLog, ILogger logger)
+	public void processNameTagOrFileName(String s, ILogger logger)
 	{
 		originalNameTagOrNBTFileName = s;
 
@@ -86,7 +86,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 					FileInputStream stream = new FileInputStream(nameTagOrNBTFileName);
 					namedBinaryTag = NamedBinaryTag.readFrom(stream, true);
 				} catch (FileNotFoundException e) {
-					if(spawnLog)
+					if(logger.getSpawnLogEnabled())
 					{
 						logger.log(LogMarker.WARN, "Could not find file: "+nameTagOrNBTFileName);
 					}
@@ -95,7 +95,6 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-
 			}
 		} else {
 			// It's a name tag

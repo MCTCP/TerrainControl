@@ -5,7 +5,6 @@ import java.util.Random;
 import org.apache.commons.lang3.NotImplementedException;
 
 import com.google.gson.JsonSyntaxException;
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -159,12 +158,12 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 				tileEntity.deserializeNBT(state, nms);
 			} catch (JsonSyntaxException e)
 			{
-				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
 			}
 		} else {
-			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			if(this.logger.getSpawnLogEnabled())
 			{
-				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
 			}
 		}
 	}

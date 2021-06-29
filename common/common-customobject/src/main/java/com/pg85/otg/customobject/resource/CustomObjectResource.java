@@ -41,9 +41,9 @@ public class CustomObjectResource extends ResourceBase implements ICustomObjectR
 	}
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		for (CustomObject object : getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+		for (CustomObject object : getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 		{
 			if(object != null) // if null then BO2/BO3 file could not be found
 			{
@@ -52,14 +52,14 @@ public class CustomObjectResource extends ResourceBase implements ICustomObjectR
 		}
 	}	
 	
-	private List<CustomObject> getObjects(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private List<CustomObject> getObjects(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(this.objects.isEmpty() && !this.objectNames.isEmpty())
 		{
 			CustomObject object;
 			for (int i = 0; i < this.objectNames.size(); i ++)
 			{
-				object = customObjectManager.getGlobalObjects().getObjectByName(this.objectNames.get(i), presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				object = customObjectManager.getGlobalObjects().getObjectByName(this.objectNames.get(i), presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				this.objects.add(object);				  	
 			}
 		}

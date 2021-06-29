@@ -63,7 +63,7 @@ public class CustomStructureCache
 	// WorldInfoChunks is used as little as possible, due to its size and slowness.
 	private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
 
-	public CustomStructureCache(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public CustomStructureCache(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		this.plotter = new CustomStructurePlotter();
@@ -73,7 +73,7 @@ public class CustomStructureCache
 		this.dimensionId = dimensionId;
 		this.presetFolderName = presetFolderName;
 		this.worldSeed = worldSeed;
-		loadStructureCache(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		loadStructureCache(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// WorldInfoChunks
@@ -159,7 +159,7 @@ public class CustomStructureCache
 		this.bo3StructureCache.clear();
 	}
 
-	public BO3CustomStructure getBo3StructureStart(IWorldGenRegion worldGenRegion, Random worldRandom, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO3CustomStructure getBo3StructureStart(IWorldGenRegion worldGenRegion, Random worldRandom, int chunkX, int chunkZ, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 		BO3CustomStructure structureStart = bo3StructureCache.get(chunkCoord);
@@ -180,10 +180,10 @@ public class CustomStructureCache
 
 		if (structureGen != null)
 		{
-			BO3CustomStructureCoordinate customObject = getRandomObjectCoordinate(structureGen, worldGenRegion, random, chunkX, chunkZ, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			BO3CustomStructureCoordinate customObject = getRandomObjectCoordinate(structureGen, worldGenRegion, random, chunkX, chunkZ, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			if (customObject != null)
 			{
-				structureStart = new BO3CustomStructure(worldGenRegion, customObject, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				structureStart = new BO3CustomStructure(worldGenRegion, customObject, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				bo3StructureCache.put(chunkCoord, structureStart);
 				return structureStart;
 			}
@@ -193,22 +193,22 @@ public class CustomStructureCache
 	}
 	
 	// TODO: Taken from structuregen, duplicate code, clean this up.
-	private BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if (structureGen.isEmpty())
 		{
 			return null;
 		}
-		for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
+		for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
 		{
 			if (random.nextDouble() * 100.0 < structureGen.getObjectChance(objectNumber))
 			{
-				IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
+				IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
 				if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
 				{
 					return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), random, chunkX, chunkZ);
 				} else {
-					if(spawnLog)
+					if(logger.getSpawnLogEnabled())
 					{
 						IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
 						logger.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
@@ -251,26 +251,26 @@ public class CustomStructureCache
 	}
 	
 	// Only used by ChunkDecorator during decoration
-	public void plotBo4Structures(IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void plotBo4Structures(IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		plotter.plotStructures(this, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		plotter.plotStructures(this, worldGenRegion, rand, chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	// Only used by ChunkDecorator during decoration
-	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, developerMode, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Only used by /spawn command	
-	public ChunkCoordinate plotBo4Structure(IWorldGenRegion worldGenRegion, BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean force)
+	public ChunkCoordinate plotBo4Structure(IWorldGenRegion worldGenRegion, BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean force)
 	{
-		return plotter.plotStructures(structure, biomes, this, worldGenRegion, new Random(), chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker, force);
+		return plotter.plotStructures(structure, biomes, this, worldGenRegion, new Random(), chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker, force);
 	}
 
 	// Persistence - WorldInfoChunks for BO3+BO4, plotter structurecache for BO4
 
-	public void saveToDisk(boolean spawnLog, ILogger logger, IChunkDecorator chunkPopulator)
+	public void saveToDisk(ILogger logger, IChunkDecorator chunkPopulator)
 	{
 		logger.log(LogMarker.INFO, "Saving structure and pregenerator data.");
 		boolean firstLog = false;
@@ -299,7 +299,7 @@ public class CustomStructureCache
 			}
 		}		
 
-		saveStructureCache(spawnLog, logger);
+		saveStructureCache(logger);
 
 		synchronized(chunkPopulator.getLockingObject())
 		{
@@ -308,28 +308,28 @@ public class CustomStructureCache
 		logger.log(LogMarker.INFO, "Structure and pregenerator data saved.");
 	}
 
-	private void saveStructureCache(boolean spawnLog, ILogger logger)
+	private void saveStructureCache(ILogger logger)
 	{
-		CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.dimensionId, this.worldSaveDir, spawnLog, logger);
+		CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.dimensionId, this.worldSaveDir, logger);
 		
 		if(this.isBO4Enabled)
 		{
-			plotter.saveStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, spawnLog, logger);
+			plotter.saveStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, logger);
 		}
 	}
 
-	private void loadStructureCache(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void loadStructureCache(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{		
 		logger.log(LogMarker.DEBUG, "Loading structures and pre-generator data");
 
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
-		Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetFolderName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetFolderName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(loadedStructures != null)
 		{
 			if(this.isBO4Enabled)
 			{
-				this.plotter.loadStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, loadedStructures, spawnLog, logger);
+				this.plotter.loadStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, loadedStructures, logger);
 			}
 
 			for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructure : loadedStructures.entrySet())

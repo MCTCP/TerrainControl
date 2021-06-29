@@ -34,9 +34,9 @@ public abstract class CustomObjectConfigFile
 	 * @param setting The setting to read.
 	 * @return The value of the setting.
 	 */
-	protected <T> T readSettings(Setting<T> setting, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	protected <T> T readSettings(Setting<T> setting, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
-		return readSettings(setting, setting.getDefaultValue(materialReader), spawnLog, logger, materialReader, manager);
+		return readSettings(setting, setting.getDefaultValue(materialReader), logger, materialReader, manager);
 	}
 
 	/**
@@ -47,9 +47,9 @@ public abstract class CustomObjectConfigFile
 	 * @param defaultValue Default value for the setting.
 	 * @return The value of the setting.
 	 */
-	private <T> T readSettings(Setting<T> setting, T defaultValue, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	private <T> T readSettings(Setting<T> setting, T defaultValue, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
-		return reader.getSetting(setting, defaultValue, spawnLog, logger, materialReader, manager);
+		return reader.getSetting(setting, defaultValue, logger, materialReader, manager);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public abstract class CustomObjectConfigFile
 	 * @param configMode
 	 * @throws IOException
 	 */
-	public void write(SettingsWriterBO4 writer, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	public void write(SettingsWriterBO4 writer, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		if (configMode == ConfigMode.WriteDisable)
 		{
@@ -69,7 +69,7 @@ public abstract class CustomObjectConfigFile
 		try
 		{
 			writer.open();
-			writeConfigSettings(writer, spawnLog, logger, materialReader, manager);
+			writeConfigSettings(writer, logger, materialReader, manager);
 		} finally
 		{
 			writer.close(logger);
@@ -88,9 +88,9 @@ public abstract class CustomObjectConfigFile
 		*/
 	}
 
-	protected abstract void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
+	protected abstract void writeConfigSettings(SettingsWriterBO4 writer, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
 
-	protected abstract void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
+	protected abstract void readConfigSettings(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
 	
 	protected abstract void correctSettings();
 

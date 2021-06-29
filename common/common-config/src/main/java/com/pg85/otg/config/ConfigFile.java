@@ -54,7 +54,7 @@ public abstract class ConfigFile
 	 * {@link SettingsMap} provided to the constructor.
 	 * @param reader The settings reader.
 	 */
-	protected abstract void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader);
+	protected abstract void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader);
 
 	/**
 	 * Called directly after {@link #readConfigSettings(SettingsMap)} to fix

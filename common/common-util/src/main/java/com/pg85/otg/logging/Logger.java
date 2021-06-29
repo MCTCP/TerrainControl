@@ -27,10 +27,38 @@ public abstract class Logger implements ILogger
 	}
 	
 	protected LogMarker minimumLevel = LogMarker.INFO;
+	private boolean spawnLogEnabled;
+	private boolean logBO4Plotting;
+	private boolean logConfigErrors;
+	private boolean logDecorationErrors;
 
-	public void setLevel(LogMarker level)
+	public void init(LogMarker level, boolean spawnLogEnabled, boolean logBO4Plotting, boolean logConfigErrors, boolean logDecorationErrors)
 	{
-		minimumLevel = level;
+		this.minimumLevel = level;
+		this.spawnLogEnabled = spawnLogEnabled; 
+		this.logBO4Plotting = logBO4Plotting;
+		this.logConfigErrors = logConfigErrors;
+		this.logDecorationErrors = logDecorationErrors;
+	}
+	
+	public boolean getSpawnLogEnabled()
+	{
+		return spawnLogEnabled;
+	}
+	
+	public boolean getLogBO4Plotting()
+	{
+		return logBO4Plotting;
+	}
+	
+	public boolean getLogConfigErrors()
+	{
+		return logConfigErrors;
+	}
+	
+	public boolean getLogDecorationErrors()
+	{
+		return logDecorationErrors;
 	}
 
 	/**

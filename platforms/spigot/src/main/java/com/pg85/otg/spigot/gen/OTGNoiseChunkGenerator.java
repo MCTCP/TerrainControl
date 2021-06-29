@@ -157,7 +157,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
 		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
+			this.structureCache.saveToDisk(OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
 	}
 
@@ -335,9 +335,15 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Population / decoration
 
 	// Does decoration for a given pos/chunk
+	@SuppressWarnings("deprecation")
 	@Override
 	public void addDecorations (RegionLimitedWorldAccess worldGenRegion, StructureManager structureManager)
 	{
+		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
+		{
+			return;
+		}
+
 		// getMainChunkX -> a()
 		// getMainChunkZ -> b()
 		int chunkX = worldGenRegion.a();
@@ -358,8 +364,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		long decorationSeed = sharedseedrandom.a(worldGenRegion.getSeed(), blockX, blockZ);
 		try
 		{
-			// Override normal decoration (Biome.func_242427_a()) with OTG's.
-			biomeDecorate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
+			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(blockpos.getX(), blockpos.getZ());
+			SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
+			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
+			biome.a(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);			
 		}
 		catch (Exception exception)
 		{
@@ -377,18 +387,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		ChunkCoordIntPair chunkcoordintpair = ichunkaccess.getPos();
 		((ProtoChunk) ichunkaccess).a(new BiomeStorage(iregistry, chunkcoordintpair, this.c));
-	}
-	
-	// Chunk decoration method taken from Biome class
-	@SuppressWarnings("deprecation")
-	private void biomeDecorate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
-	{
-		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
-		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
-		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), world, this);
-		this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(world.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
-		biome.a(structureManager, this, world, seed, random, pos);
-		this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 	}
 
 	// Mob spawning on initial chunk spawn (animals).

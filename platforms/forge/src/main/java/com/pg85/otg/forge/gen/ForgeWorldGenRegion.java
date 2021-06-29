@@ -57,7 +57,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig, worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -65,7 +65,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -73,11 +73,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = null;
 	}
-		
+	
 	@Override
 	public long getSeed()
 	{
@@ -401,12 +401,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				tileEntity.deserializeNBT(state, nms);
 			} catch (JsonSyntaxException e)
 			{
-				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
 			}
 		} else {
-			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			if(this.logger.getSpawnLogEnabled())
 			{
-				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
 			}
 		}
 	}

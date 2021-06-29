@@ -24,7 +24,7 @@ public final class PluginConfig extends PluginConfigBase
 	public PluginConfig(SettingsMap settingsReader, IConfigFunctionProvider biomeResourcesManager, ILogger logger)
 	{
 		super(settingsReader.getName());
-		readConfigSettings(settingsReader, biomeResourcesManager, false, logger, null);
+		readConfigSettings(settingsReader, biomeResourcesManager, logger, null);
 	}
 
 	@Override
@@ -34,11 +34,15 @@ public final class PluginConfig extends PluginConfigBase
 	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger) { }
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);
 		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger);
 		this.spawnLog = reader.getSetting(PluginConfigStandardValues.SPAWN_LOG, logger);
+		this.logBO4Plotting = reader.getSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, logger);
+		this.logConfigErrors = reader.getSetting(PluginConfigStandardValues.LOG_CONFIG_ERRORS, logger);
+		this.logDecorationErrors = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION_ERRORS, logger);
+		this.decorationEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
 		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
 		this.workerThreads = reader.getSetting(PluginConfigStandardValues.WORKER_THREADS, logger);
 	}
@@ -82,9 +86,29 @@ public final class PluginConfig extends PluginConfigBase
 			"information (TRACE is the highest).",
 			"Defaults to: false"
 		);
+		
+		writer.putSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, this.logBO4Plotting,
+			"Logs information about BO4 customstructures plotting branches.",
+			"Defaults to: false"
+		);		
 
+		writer.putSetting(PluginConfigStandardValues.LOG_CONFIG_ERRORS, this.logConfigErrors,
+			"Logs information about invalid settings in configs.",
+			"Defaults to: false"
+		);
+		
+		writer.putSetting(PluginConfigStandardValues.LOG_DECORATION_ERRORS, this.logDecorationErrors,
+			"Logs information about any problems spawning resources during decoration.",
+			"Defaults to: false"
+		);
+		
 		writer.header2("Developer settings");
 
+		writer.putSetting(PluginConfigStandardValues.DECORATION_ENABLED, this.decorationEnabled,
+			"Set this to false to disable chunk decoration and generate only base terrain.",
+			"Defaults to: true"
+		);
+		
 		writer.putSetting(PluginConfigStandardValues.DEVELOPER_MODE, this.developerMode,
 			"Changes the behaviour of some features to speed up development: Clears the",
 			"BO2/BO3 cache whenever a world or dimension is unloaded (similar to using",

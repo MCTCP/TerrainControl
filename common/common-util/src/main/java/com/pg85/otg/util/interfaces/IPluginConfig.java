@@ -19,5 +19,9 @@ public interface IPluginConfig
 	public int getMaxWorkerThreads();
 	public boolean getDeveloperModeEnabled();
 	public boolean getSpawnLogEnabled();
+	public boolean logBO4Plotting();
+	public boolean logConfigErrors();
+	public boolean logDecorationErrors();	
+	public boolean getDecorationEnabled();
 	public ConfigMode getSettingsMode();
 }

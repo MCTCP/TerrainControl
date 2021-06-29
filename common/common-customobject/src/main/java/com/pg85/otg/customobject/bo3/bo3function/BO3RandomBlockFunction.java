@@ -49,7 +49,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 	}
 	
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		x = readInt(args.get(0), -100, 100);
@@ -111,7 +111,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 				// Maybe it's a NBT file?
 
 				// Get the file
-				NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile(), spawnLog, logger);
+				NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile(), logger);
 				if (metaData != null)
 				{
 					metaDataNames[blockCount] = args.get(i);

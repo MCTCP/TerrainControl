@@ -26,7 +26,7 @@ public class ModCheck extends BO3Check
 	}
 
 	@Override
-	protected void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	protected void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(1, args);
 		mods = new String[args.size()];

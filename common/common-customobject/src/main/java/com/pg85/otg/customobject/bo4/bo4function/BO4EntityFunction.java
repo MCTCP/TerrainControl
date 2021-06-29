@@ -68,7 +68,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 		StreamHelper.writeStringToStream(stream, this.originalNameTagOrNBTFileName);			
 	}
 	
-	public static BO4EntityFunction fromStream(BO4Config holder, ByteBuffer buffer, boolean spawnLog, ILogger logger) throws IOException
+	public static BO4EntityFunction fromStream(BO4Config holder, ByteBuffer buffer, ILogger logger) throws IOException
 	{
 		BO4EntityFunction entityFunction = new BO4EntityFunction(holder);
 				
@@ -82,7 +82,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 		entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
 		if (entityFunction.originalNameTagOrNBTFileName != null)
 		{
-			entityFunction.processNameTagOrFileName(entityFunction.originalNameTagOrNBTFileName, spawnLog, logger);
+			entityFunction.processNameTagOrFileName(entityFunction.originalNameTagOrNBTFileName, logger);
 		}
 		entityFunction.rotation = 0;
 		

@@ -30,7 +30,7 @@ public final class CustomObjectErroredFunction<T> extends CustomObjectConfigFunc
 	}
 
 	@Override
-	protected void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	protected void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -2,13 +2,6 @@ package com.pg85.otg.constants;
 
 public class SettingsEnums
 {
-	public enum TerrainMode
-	{
-		Normal,
-		TerrainTest,
-		NotGenerate
-	}
-
 	public enum BiomeMode
 	{
 		Normal,

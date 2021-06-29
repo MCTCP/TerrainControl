@@ -117,7 +117,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		}
 	}
 
-	public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer, boolean spawnLog, ILogger logger) throws IOException
+	public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer, ILogger logger) throws IOException
 	{
 		BO4BlockFunction rbf = new BO4BlockFunction(holder);
 		
@@ -141,7 +141,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		if(rbf.nbtName != null)
 		{
 			// Get the file
-			rbf.nbt = BO3Loader.loadMetadata(rbf.nbtName, file, spawnLog, logger);
+			rbf.nbt = BO3Loader.loadMetadata(rbf.nbtName, file, logger);
 			if(rbf.nbt == null)
 			{
 				rbf.nbtName = null;

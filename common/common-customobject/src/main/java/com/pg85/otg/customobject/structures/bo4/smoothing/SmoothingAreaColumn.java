@@ -32,7 +32,7 @@ class SmoothingAreaColumn
 		this.blocks.add(block);
 	}
 
-	void processBlocks(IWorldGenRegion worldGenRegion, BO4Config bo4Config, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	void processBlocks(IWorldGenRegion worldGenRegion, BO4Config bo4Config, ILogger logger, IMaterialReader materialReader)
 	{
 		if(this.highestFillingBlock == null && this.lowestCuttingBlock == null)
 		{
@@ -64,10 +64,10 @@ class SmoothingAreaColumn
 			// TODO: When using SmoothStartTop:true, if a smoothing line is underneath a bo4 block, we can 
 			// cancel spawning the rest of the line since we know we won't need it.
 		}
-		spawn(worldGenRegion, bo4Config, spawnLog, logger, materialReader);
+		spawn(worldGenRegion, bo4Config, logger, materialReader);
 	}
 	
-	private void spawn(IWorldGenRegion worldGenRegion, BO4Config bo4Config, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private void spawn(IWorldGenRegion worldGenRegion, BO4Config bo4Config, ILogger logger, IMaterialReader materialReader)
 	{
 		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfigForDecoration(this.x, this.z);
 
@@ -75,7 +75,7 @@ class SmoothingAreaColumn
 		try {
 			replaceAboveMaterial = materialReader.readMaterial(bo4Config.replaceAbove);
 		} catch (InvalidConfigException e) {
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "ReplaceAbove: " + bo4Config.replaceAbove + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}
@@ -86,7 +86,7 @@ class SmoothingAreaColumn
 		try {
 			smoothingSurfaceBlock = materialReader.readMaterial(bo4Config.smoothingSurfaceBlock);
 		} catch (InvalidConfigException e) {
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "SmoothingSurfaceBlock: " + bo4Config.smoothingSurfaceBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}
@@ -94,7 +94,7 @@ class SmoothingAreaColumn
 		try {
 			smoothingGroundBlock = materialReader.readMaterial(bo4Config.smoothingGroundBlock);
 		} catch (InvalidConfigException e) {
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "SmoothingGroundBlock: " + bo4Config.smoothingGroundBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}

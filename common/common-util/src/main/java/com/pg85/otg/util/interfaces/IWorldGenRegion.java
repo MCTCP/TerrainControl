@@ -11,6 +11,7 @@ import com.pg85.otg.util.minecraft.TreeType;
 
 public interface IWorldGenRegion
 {
+	public IPluginConfig getPluginConfig();
 	public IWorldConfig getWorldConfig();
 	public String getPresetFolderName();
 	public long getSeed();

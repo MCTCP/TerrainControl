@@ -11,7 +11,7 @@ import com.pg85.otg.logging.LogMarker;
 
 public class CompressionUtils
 {
-	public static byte[] compress(byte[] data, boolean spawnLog, ILogger logger) throws IOException
+	public static byte[] compress(byte[] data, ILogger logger) throws IOException
 	{  
 		Deflater deflater = new Deflater();  
 		deflater.setInput(data);  
@@ -25,7 +25,7 @@ public class CompressionUtils
 		}  
 		outputStream.close();  
 		byte[] output = outputStream.toByteArray();
-		if(spawnLog)
+		if(logger.getSpawnLogEnabled())
 		{
 			logger.log(LogMarker.INFO, "Original: " + data.length / 1024 + " Kb");  
 			logger.log(LogMarker.INFO, "Compressed: " + output.length / 1024 + " Kb");

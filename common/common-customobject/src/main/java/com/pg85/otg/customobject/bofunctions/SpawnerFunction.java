@@ -48,7 +48,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 	protected boolean metaDataProcessed = false;
 	
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(8, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
@@ -179,7 +179,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 		}
 	}
 
-	public String getMetaData(boolean spawnLog, ILogger logger)
+	public String getMetaData(ILogger logger)
 	{
 		if(nbtFileName != null && nbtFileName.length() > 0 && metaDataTag == null && !metaDataProcessed)
 		{
@@ -209,7 +209,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 					e1.printStackTrace();
 				}
 			} else {
-				if(spawnLog)
+				if(logger.getSpawnLogEnabled())
 				{
 					logger.log(LogMarker.WARN, "Could not find file \"" + nbtFileName  + "\" for Spawner: " + this.makeString());
 				}

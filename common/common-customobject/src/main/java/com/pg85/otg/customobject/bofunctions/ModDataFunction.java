@@ -18,7 +18,7 @@ public abstract class ModDataFunction<T extends CustomObjectConfigFile> extends 
 	public String modData;
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it

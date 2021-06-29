@@ -33,10 +33,10 @@ public abstract class BranchFunction<T extends CustomObjectConfigFile> extends C
 	protected boolean totalChanceSet = false;
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		branches = new TreeSet<BranchNode>();
-		readArgs(args, false, spawnLog, logger);
+		readArgs(args, false, logger);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public abstract class BranchFunction<T extends CustomObjectConfigFile> extends C
 		return "Branch";
 	}
 
-	protected abstract double readArgs(List<String> args, boolean accumulateChances, boolean spawnLog, ILogger logger) throws InvalidConfigException;
+	protected abstract double readArgs(List<String> args, boolean accumulateChances, ILogger logger) throws InvalidConfigException;
 
 	@Override
 	public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)

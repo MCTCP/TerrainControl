@@ -15,12 +15,14 @@ import java.util.Set;
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
+import com.pg85.otg.forge.biome.MobSpawnGroupHelper;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
@@ -28,13 +30,16 @@ import com.pg85.otg.util.biome.MCBiomeResourceLocation;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -98,7 +103,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, MutableRegistry<Biome> biomeRegistry)
+	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry, boolean developerMode)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
@@ -111,7 +116,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
 							this.materialReaderByPresetFolderName.put(presetFolderName, new ForgeMaterialReader());							
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger);
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger, developerMode);
 							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
 							break;
@@ -380,4 +385,40 @@ public class ForgePresetLoader extends LocalPresetLoader
 			this.presetGenerationData.put(preset.getFolderName(), data);
 		}
 	}
+	
+	@Override
+	protected void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
+	{		
+		String[] resourceLocationArr = biomeResourceLocation.split(":");			
+		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
+		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];
+			
+		Biome biome = null;
+		try
+		{
+			ResourceLocation location = new ResourceLocation(resourceDomain, resourceLocation);
+			biome = ForgeRegistries.BIOMES.getValue(location);
+		}
+		catch(ResourceLocationException ex)
+		{
+			// Can happen when no biome is registered or input is otherwise invalid.
+		}
+		if(biome != null)
+		{
+			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
+			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
+			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
+		} else {
+			if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+			{
+				OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
+			}
+		}
+	}	
 }

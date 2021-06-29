@@ -44,7 +44,7 @@ public abstract class CustomObjectConfigFunction<T>
 	 * @param args
 	 * @return
 	 */
-	public static final <T> CustomObjectConfigFunction<T> create(T holder, Class<? extends CustomObjectConfigFunction<T>> clazz, boolean spawnLog, ILogger logger, IMaterialReader materialReader, Object... args)
+	public static final <T> CustomObjectConfigFunction<T> create(T holder, Class<? extends CustomObjectConfigFunction<T>> clazz, ILogger logger, IMaterialReader materialReader, Object... args)
 	{
 		List<String> stringArgs = new ArrayList<String>(args.length);
 		for (Object arg : args)
@@ -66,7 +66,7 @@ public abstract class CustomObjectConfigFunction<T>
 		configFunction.setHolder(holder);
 		try
 		{
-			configFunction.load(stringArgs, spawnLog, logger, materialReader);
+			configFunction.load(stringArgs, logger, materialReader);
 		} catch (InvalidConfigException e)
 		{
 			logger.log(LogMarker.FATAL, "Invalid default config function! Please report! {}: {}",
@@ -134,10 +134,10 @@ public abstract class CustomObjectConfigFunction<T>
 	 * @param args	Arguments to parse.
 	 * @throws InvalidConfigException If the arguments are invalid.
 	 */
-	final void init(T holder, List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	final void init(T holder, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		this.holder = holder;
-		load(args, spawnLog, logger, materialReader);
+		load(args, logger, materialReader);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public abstract class CustomObjectConfigFunction<T>
 	 * @param args The arguments to parse.
 	 * @throws InvalidConfigException If the syntax is invalid.
 	 */
-	protected abstract void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException;
+	protected abstract void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException;
 	
 	/**
 	 * Formats the material list as a string list.

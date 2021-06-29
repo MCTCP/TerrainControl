@@ -34,9 +34,9 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static final void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
-		writeToFile(config, config.getFile(), configMode, spawnLog, logger, materialReader, manager);
+		writeToFile(config, config.getFile(), configMode, logger, materialReader, manager);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		if (configMode == ConfigMode.WriteDisable)
 		{
@@ -58,7 +58,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 		try
 		{
 			SettingsWriterBO4 writer = new FileSettingsWriterBO4(file);
-			config.write(writer, configMode, spawnLog, logger, materialReader, manager);
+			config.write(writer, configMode, logger, materialReader, manager);
 		} catch (IOException e)
 		{
 			logIOError(e, file, logger);

@@ -53,6 +53,8 @@ public abstract class LocalPresetLoader
 	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
 
 	public abstract BiomeConfig getBiomeConfig(String presetFolderName, int biomeId);	
+
+	protected abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String inheritMobsBiomeName);
 	
 	public Preset getPresetByShortNameOrFolderName(String name)
 	{
@@ -84,7 +86,7 @@ public abstract class LocalPresetLoader
 		return this.presets.keySet().size() > 0 ? (String) this.presets.keySet().toArray()[0] : Constants.DEFAULT_PRESET_NAME;
 	}
 		
-	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger)
+	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, ILogger logger, boolean developerMode)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
@@ -97,7 +99,7 @@ public abstract class LocalPresetLoader
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
 							this.materialReaderByPresetFolderName.put(presetDir.getName(), createMaterialReader());
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger);
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger, developerMode);
 							this.presets.put(preset.getFolderName(), preset);
 							this.aliasMap.put(preset.getShortPresetName(), preset.getFolderName());
 							break;
@@ -108,7 +110,7 @@ public abstract class LocalPresetLoader
 		}
 	}
 	
-	protected Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger)
+	protected Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, ILogger logger, boolean developerMode)
 	{
 		File worldConfigFile = new File(presetDir.toString(), Constants.WORLD_CONFIG_FILE);
 		File biomesDirectory = new File(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER);
@@ -119,11 +121,11 @@ public abstract class LocalPresetLoader
 		String presetFolderName = presetDir.toFile().getName();
 		
 		SettingsMap worldConfigSettings = FileSettingsReader.read(presetFolderName, worldConfigFile, logger);
-		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, spawnLog, logger, getMaterialReader(presetFolderName));
+		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, logger, getMaterialReader(presetFolderName));
 		FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
 		// use shortPresetName to register the biomes, instead of presetName
-		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(worldConfig.getShortPresetName(), worldConfig.getMajorVersion(), presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, getMaterialReader(presetFolderName));
+		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(worldConfig.getShortPresetName(), worldConfig.getMajorVersion(), presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, logger, getMaterialReader(presetFolderName), developerMode);
 
 		// We have to wait for the loading in order to get things like temperature
 		// TODO: Re-implement this for 1.16
@@ -152,7 +154,7 @@ public abstract class LocalPresetLoader
 		return biomes;
 	}
 
-	private ArrayList<BiomeConfig> loadBiomeConfigs(String presetShortName, int presetMajorVersion, Path presetDir, Path presetBiomesDir, IWorldConfig worldConfig, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private ArrayList<BiomeConfig> loadBiomeConfigs(String presetShortName, int presetMajorVersion, Path presetDir, Path presetBiomesDir, IWorldConfig worldConfig, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, boolean developerMode)
 	{
 		// Establish folders
 		List<Path> biomeDirs = new ArrayList<Path>(2);
@@ -163,28 +165,28 @@ public abstract class LocalPresetLoader
 		Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig.getWorldBiomes(), worldConfig.getWorldHeightScale(), biomeDirs, logger, materialReader);
 
 		// Read all settings
-		ArrayList<BiomeConfig> biomeConfigs = readAndWriteSettings(worldConfig, biomeConfigStubs, presetDir, presetShortName, presetMajorVersion, true, biomeResourcesManager, spawnLog, logger, materialReader);
+		ArrayList<BiomeConfig> biomeConfigs = readAndWriteSettings(worldConfig, biomeConfigStubs, presetDir, presetShortName, presetMajorVersion, true, biomeResourcesManager, logger, materialReader, developerMode);
 
 		// Update settings dynamically, these changes don't get written back to the file
 		processSettings(worldConfig, biomeConfigs);
 
-		OTG.log(LogMarker.DEBUG, "{} biomes Loaded", biomeConfigs.size());
-		OTG.log(LogMarker.DEBUG, "{}", biomeConfigs.stream().map(item -> item.getName()).collect(Collectors.joining(", ")));
+		logger.log(LogMarker.DEBUG, "{} biomes Loaded", biomeConfigs.size());
+		logger.log(LogMarker.DEBUG, "{}", biomeConfigs.stream().map(item -> item.getName()).collect(Collectors.joining(", ")));
 
 		return biomeConfigs;
 	}
 
-	private static ArrayList<BiomeConfig> readAndWriteSettings(IWorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, Path presetDir, String presetShortName, int presetMajorVersion, boolean write, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private ArrayList<BiomeConfig> readAndWriteSettings(IWorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, Path presetDir, String presetShortName, int presetMajorVersion, boolean write, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, boolean developerMode)
 	{
 		ArrayList<BiomeConfig> biomeConfigs = new ArrayList<BiomeConfig>();
 
 		for (BiomeConfigStub biomeConfigStub : biomeConfigStubs.values())
 		{
 			// Inheritance
-			processMobInheritance(biomeConfigStubs, biomeConfigStub, 0, logger);
+			processMobInheritance(biomeConfigStubs, biomeConfigStub, 0, logger, developerMode);
 
 			// Settings reading
-			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getBiomeName(), biomeConfigStub, presetDir, biomeConfigStub.getSettings(), worldConfig, presetShortName, presetMajorVersion, biomeResourcesManager, spawnLog, logger, materialReader);
+			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getBiomeName(), biomeConfigStub, presetDir, biomeConfigStub.getSettings(), worldConfig, presetShortName, presetMajorVersion, biomeResourcesManager, logger, materialReader);
 			biomeConfigs.add(biomeConfig);
 
 			// Settings writing
@@ -220,7 +222,7 @@ public abstract class LocalPresetLoader
 		}
 	}
 
-	private static void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth, ILogger logger)
+	private void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth, ILogger logger, boolean developerMode)
 	{
 		if (biomeConfigStub.inheritMobsBiomeNameProcessed)
 		{
@@ -254,9 +256,9 @@ public abstract class LocalPresetLoader
 					}
 					else if(inheritMobsBiomeConfig == biomeConfigStub)
 					{
-						if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+						if(developerMode)
 						{
-							OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
+							logger.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
 						}
 						continue;
 					}
@@ -265,9 +267,9 @@ public abstract class LocalPresetLoader
 				// Check for too much recursion
 				if (currentDepth > MAX_INHERITANCE_DEPTH)
 				{
-					if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+					if(developerMode)
 					{
-						OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getPath().toFile().getName(), inheritMobsBiomeConfig.getPath().toFile().getName()});
+						logger.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getPath().toFile().getName(), inheritMobsBiomeConfig.getPath().toFile().getName()});
 					}
 				}
 
@@ -276,7 +278,7 @@ public abstract class LocalPresetLoader
 					if (!inheritMobsBiomeConfig.inheritMobsBiomeNameProcessed)
 					{
 						// This biome has not been processed yet, do that first
-						processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1, logger);
+						processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1, logger, developerMode);
 					}
 
 					// Merge the two
@@ -284,7 +286,7 @@ public abstract class LocalPresetLoader
 				} else {
 
 					// This is a vanilla biome or a biome added by another mod.
-					OTG.getEngine().mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, inheritMobsBiomeName);
+					mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, inheritMobsBiomeName);
 					continue;
 				}
 			}

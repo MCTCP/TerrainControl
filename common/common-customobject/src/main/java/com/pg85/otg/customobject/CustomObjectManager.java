@@ -48,7 +48,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	
 	private final CustomObjectCollection globalCustomObjects;
 
-	public CustomObjectManager(boolean spawnLog, boolean developerMode, ILogger logger, Path otgRootFolder, Path otgPresetsFolder, CustomObjectResourcesManager manager)
+	public CustomObjectManager(boolean developerMode, ILogger logger, Path otgRootFolder, Path otgPresetsFolder, CustomObjectResourcesManager manager)
 	{
 		// These are the actual lists, not just a copy.
 		this.loaders = new HashMap<String, CustomObjectLoader>();
@@ -69,14 +69,14 @@ public class CustomObjectManager implements ICustomObjectManager
 			new Thread() { 
 				public void run()
 				{
-					globalCustomObjects.indexGlobalObjectsFolder(spawnLog, logger, otgRootFolder);
+					globalCustomObjects.indexGlobalObjectsFolder(logger, otgRootFolder);
 					
 					for(File file : otgPresetsFolder.toFile().listFiles())
 					{
 						if(file.isDirectory())
 						{
 							String presetFolderName = file.getName();
-							globalCustomObjects.indexPresetObjectsFolder(presetFolderName, spawnLog, logger, otgRootFolder);
+							globalCustomObjects.indexPresetObjectsFolder(presetFolderName, logger, otgRootFolder);
 						}
 					}
 					logger.log(LogMarker.INFO, "All CustomObject files indexed.");

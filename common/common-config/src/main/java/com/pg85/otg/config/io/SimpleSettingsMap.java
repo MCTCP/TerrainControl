@@ -69,7 +69,7 @@ public final class SimpleSettingsMap implements SettingsMap
 	}
 
 	@Override
-	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
 		for (RawSettingValue configFunctionLine : configFunctions)
@@ -87,7 +87,7 @@ public final class SimpleSettingsMap implements SettingsMap
 				continue;
 			}
 			result.add(function);
-			if (spawnLog && function instanceof ErroredFunction)
+			if (logger.getSpawnLogEnabled() && function instanceof ErroredFunction)
 			{
 				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
 			}

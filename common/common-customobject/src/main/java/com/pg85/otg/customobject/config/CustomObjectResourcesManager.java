@@ -45,7 +45,7 @@ public class CustomObjectResourcesManager implements ICustomObjectResourcesManag
 	 */
 	// It's checked with clazz.getConstructor(holder.getClass(), ...))
 	@SuppressWarnings("unchecked")
-	public <T> CustomObjectConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public <T> CustomObjectConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, ILogger logger, IMaterialReader materialReader)
 	{
 		// If a Block() tag has the parameters of a RandomBlock tag then transform it into a RandomBlock
 		// This allows users to edit Bo3's and change Blocks to RandomBlocks with a simple find/replace.
@@ -83,7 +83,7 @@ public class CustomObjectResourcesManager implements ICustomObjectResourcesManag
 			// Initialize the function
 			try
 			{
-				configFunction.init(holder, args, spawnLog, logger, materialReader);
+				configFunction.init(holder, args, logger, materialReader);
 			} catch (InvalidConfigException e)
 			{
 				configFunction.invalidate(name, args, e.getMessage());

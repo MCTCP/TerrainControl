@@ -20,6 +20,10 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	protected boolean developerMode;
 	protected int workerThreads;
 	protected boolean spawnLog;
+	protected boolean logBO4Plotting;
+	protected boolean logConfigErrors;
+	protected boolean logDecorationErrors;	
+	protected boolean decorationEnabled;
 	protected ConfigMode settingsMode;
 
 	public PluginConfigBase(String configName)
@@ -50,7 +54,31 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	{
 		return this.spawnLog;
 	}
+	
+	@Override
+	public boolean logBO4Plotting()
+	{
+		return this.logBO4Plotting;
+	}
+	
+	@Override
+	public boolean logConfigErrors()
+	{
+		return this.logConfigErrors;
+	}	
 
+	@Override
+	public boolean logDecorationErrors()
+	{
+		return this.logDecorationErrors;
+	}
+	
+	@Override
+	public boolean getDecorationEnabled()
+	{
+		return this.decorationEnabled;
+	}
+	
 	@Override
 	public ConfigMode getSettingsMode()
 	{

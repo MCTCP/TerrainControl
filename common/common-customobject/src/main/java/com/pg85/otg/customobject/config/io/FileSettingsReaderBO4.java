@@ -131,7 +131,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 	}
 
 	@Override
-	public <T> List<CustomObjectConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public <T> List<CustomObjectConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		List<CustomObjectConfigFunction<T>> result = new ArrayList<CustomObjectConfigFunction<T>>(configFunctions.size());
 		for (StringOnLine configFunctionLine : configFunctions)
@@ -141,13 +141,13 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 			String functionName = configFunctionString.substring(0, bracketIndex);
 			String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
 			List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
-			CustomObjectConfigFunction<T> function = manager.getConfigFunction(functionName, holder, args, spawnLog, logger, materialReader);
+			CustomObjectConfigFunction<T> function = manager.getConfigFunction(functionName, holder, args, logger, materialReader);
 			if(function == null)
 			{
-				function = manager.getConfigFunction(functionName, holder, args, spawnLog, logger, materialReader);	
+				function = manager.getConfigFunction(functionName, holder, args, logger, materialReader);	
 			}
 			result.add(function);
-			if (!function.isValid() && spawnLog)
+			if (!function.isValid() && logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.line, function.getError());
 			}
@@ -156,7 +156,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 		// Add inherited functions
 		if (useFallback && fallback != null)
 		{
-			return FileSettingsReaderBO4.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, spawnLog, logger, materialReader, manager));
+			return FileSettingsReaderBO4.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, logger, materialReader, manager));
 		}
 
 		return result;
@@ -186,7 +186,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 	}
 
 	@Override
-	public <S> S getSetting(Setting<S> setting, S defaultValue, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		// Try reading the setting from the file
 		StringOnLine stringWithLineNumber = this.settingsCache.get(setting.getName().toLowerCase());
@@ -206,7 +206,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 		// Try the fallback
 		if (fallback != null)
 		{
-			return fallback.getSetting(setting, defaultValue, spawnLog, logger, materialReader, manager);
+			return fallback.getSetting(setting, defaultValue, logger, materialReader, manager);
 		}
 
 		// Return default value

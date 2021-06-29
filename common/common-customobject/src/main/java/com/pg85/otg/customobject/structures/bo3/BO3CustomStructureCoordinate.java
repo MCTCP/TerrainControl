@@ -38,21 +38,21 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	/**
 	 * Gets the chunk that should spawn this object during decoration.
 	 */
-	ChunkCoordinate getDecoratingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	ChunkCoordinate getDecoratingChunk(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// In the past we simply returned the chunk decorating for the origin
 		// of the object. However, the origin is not guaranteed to be at the
 		// center of the object. We need to know the exact center to choose
 		// the appropriate spawning chunk.
 
-		IStructuredCustomObject object = getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		IStructuredCustomObject object = getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(object == null)
 		{
 			return null;
 		}
 		if(!(object instanceof BO3))
 		{
-			if(spawnLog)
+			if(logger.getSpawnLogEnabled())
 			{
 				logger.log(LogMarker.WARN, "BO3CustomStructure loaded with non-BO3 object " + object.getName());
 			}

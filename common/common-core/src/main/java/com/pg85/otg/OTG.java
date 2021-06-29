@@ -22,12 +22,12 @@ public class OTG
 
 	public static void startEngine(OTGEngine engine)
 	{
-		if (OTG.Engine != null)
+		if (Engine != null)
 		{
 			throw new IllegalStateException("Engine is already set.");
 		}
 
-		OTG.Engine = engine;
+		Engine = engine;
 		engine.onStart();
 	}
 

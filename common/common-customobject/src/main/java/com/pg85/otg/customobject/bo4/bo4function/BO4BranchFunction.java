@@ -37,7 +37,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 		this.holder = holder;
 	}
 	
-	public BO4BranchFunction rotate(Rotation rotation, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO4BranchFunction rotate(Rotation rotation, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BO4BranchFunction rotatedBranch = new BO4BranchFunction(this.getHolder());
 
@@ -74,7 +74,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 			ArrayList<BO4BranchNode> rotatedBranchBranches = new ArrayList<BO4BranchNode>();
 			for (BO4BranchNode holder : rotatedBranch.branchesBO4)
 			{
-				rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
+				rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
 			}
 			rotatedBranch.branchesBO4 = rotatedBranchBranches;
 		}
@@ -83,14 +83,14 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 	}
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		branchesBO4 = new ArrayList<BO4BranchNode>();
-		readArgs(args, false, spawnLog, logger);
+		readArgs(args, false, logger);
 	}
 
 	@Override
-	protected double readArgs(List<String> args, boolean accumulateChances, boolean spawnLog, ILogger logger) throws InvalidConfigException
+	protected double readArgs(List<String> args, boolean accumulateChances, ILogger logger) throws InvalidConfigException
 	{
 		double cumulativeChance = 0;
 		// assureSize only returns false if size() < size
@@ -108,7 +108,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 			double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
 			if(isRequiredBranch && args.size() > 9)
 			{
-				if(spawnLog)
+				if(logger.getSpawnLogEnabled())
 				{
 					String branchString = "";
 					for(String arg : args)
@@ -188,7 +188,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 	 * should spawn. Returns null if no branch passes the check.
 	 */
 	@Override
-	public CustomStructureCoordinate toCustomObjectCoordinate(String presetFolderName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public CustomStructureCoordinate toCustomObjectCoordinate(String presetFolderName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (Iterator<BO4BranchNode> it = branchesBO4.iterator(); it.hasNext();)
 		{
@@ -199,7 +199,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 			{
 				BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
 				Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-				return new BO4CustomStructureCoordinate(presetFolderName, branch.getCustomObject(false, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
+				return new BO4CustomStructureCoordinate(presetFolderName, branch.getCustomObject(false, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
 			}
 		}
 		return null;
@@ -216,14 +216,14 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 		StreamHelper.writeStringToStream(stream, makeString());
 	}
 	
-	public static BO4BranchFunction fromStream(BO4Config holder, ByteBuffer buffer, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws IOException, InvalidConfigException
+	public static BO4BranchFunction fromStream(BO4Config holder, ByteBuffer buffer, ILogger logger, IMaterialReader materialReader) throws IOException, InvalidConfigException
 	{
 		BO4BranchFunction branchFunction = new BO4BranchFunction(holder);		
 		String configFunctionString = StreamHelper.readStringFromBuffer(buffer);
 		int bracketIndex = configFunctionString.indexOf('(');
 		String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
 		List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));		
-		branchFunction.load(args, spawnLog, logger, materialReader);
+		branchFunction.load(args, logger, materialReader);
 		return branchFunction;
 	}
 }
