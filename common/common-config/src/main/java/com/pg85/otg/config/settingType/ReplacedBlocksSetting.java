@@ -2,8 +2,8 @@ package com.pg85.otg.config.settingType;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 
 /**
  * Setting that handles {@link ReplaceBlockMatrix}.

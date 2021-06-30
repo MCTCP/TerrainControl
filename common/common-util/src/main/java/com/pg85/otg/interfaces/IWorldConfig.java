@@ -1,4 +1,4 @@
-package com.pg85.otg.util.interfaces;
+package com.pg85.otg.interfaces;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,10 +9,10 @@ import java.util.Stack;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.bo4.smoothing.SmoothingAreaLine;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
 public class CustomStructurePlaceHolder extends BO4CustomStructure
 {

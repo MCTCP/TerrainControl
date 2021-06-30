@@ -1,7 +1,7 @@
 package com.pg85.otg.gen.resource.util;
 
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.OTGDirection;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.materials.MaterialProperties;

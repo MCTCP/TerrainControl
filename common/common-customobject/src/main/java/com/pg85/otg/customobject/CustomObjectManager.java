@@ -4,10 +4,10 @@ import com.pg85.otg.customobject.bo2.BO2Loader;
 import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Loader;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.interfaces.ICustomObjectManager;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
-import com.pg85.otg.util.interfaces.ICustomObjectManager;
-import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.File;
 import java.nio.file.Path;

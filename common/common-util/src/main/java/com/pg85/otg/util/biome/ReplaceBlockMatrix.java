@@ -2,8 +2,8 @@ package com.pg85.otg.util.biome;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LocalMaterialBase;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;

@@ -13,7 +13,7 @@ import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4SpawnerFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4WeightedBranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.util.interfaces.ILogger;
+import com.pg85.otg.interfaces.ILogger;
 
 public class BO4Loader implements CustomObjectLoader
 {

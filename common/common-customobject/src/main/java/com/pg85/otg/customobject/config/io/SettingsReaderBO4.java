@@ -3,8 +3,8 @@ package com.pg85.otg.customobject.config.io;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 
 import java.io.File;
 import java.util.List;

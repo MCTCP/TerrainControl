@@ -13,17 +13,17 @@ import com.pg85.otg.customobject.structures.bo4.smoothing.SmoothingAreaGenerator
 import com.pg85.otg.customobject.structures.bo4.smoothing.SmoothingAreaLine;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.nio.file.Path;
 import java.util.*;

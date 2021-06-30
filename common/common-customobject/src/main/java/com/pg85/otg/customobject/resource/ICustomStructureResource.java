@@ -8,10 +8,10 @@ import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.bo3.BO3CustomStructure;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 
 public interface ICustomStructureResource
 {

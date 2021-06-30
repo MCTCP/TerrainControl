@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 
 /**
  * Represents a BiomeConfig ResourceQueue resource.

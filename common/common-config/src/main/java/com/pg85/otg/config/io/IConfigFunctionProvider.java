@@ -2,8 +2,8 @@ package com.pg85.otg.config.io;
 
 import java.util.List;
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 
 public interface IConfigFunctionProvider
 {

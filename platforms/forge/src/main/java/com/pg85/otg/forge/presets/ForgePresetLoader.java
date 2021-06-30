@@ -28,12 +28,12 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
-import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.interfaces.IBiomeResourceLocation;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 

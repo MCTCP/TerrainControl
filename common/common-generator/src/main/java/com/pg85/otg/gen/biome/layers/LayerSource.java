@@ -1,7 +1,7 @@
 package com.pg85.otg.gen.biome.layers;
 
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IBiomeConfig;
 
 public interface LayerSource
 {

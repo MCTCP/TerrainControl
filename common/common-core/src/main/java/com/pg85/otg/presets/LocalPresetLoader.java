@@ -16,11 +16,11 @@ import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 /**

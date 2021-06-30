@@ -1,8 +1,8 @@
 package com.pg85.otg.config.settingType;
 
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.util.Collections;
 import java.util.List;

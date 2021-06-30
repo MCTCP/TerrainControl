@@ -18,12 +18,12 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.smoothing.SmoothingAreaBlock.enumSmoothingBlockType;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 public class SmoothingAreaGenerator

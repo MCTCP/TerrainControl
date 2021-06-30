@@ -4,9 +4,9 @@ import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.minecraft.DefaultStructurePart;
 
 import java.util.List;

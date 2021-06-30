@@ -2,7 +2,7 @@ package com.pg85.otg.config;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.LogLevels;
-import com.pg85.otg.util.interfaces.IPluginConfig;
+import com.pg85.otg.interfaces.IPluginConfig;
 
 /**
  * OTG.ini / PluginConfig classes

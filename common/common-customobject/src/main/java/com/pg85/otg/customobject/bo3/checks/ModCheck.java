@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 
 public class ModCheck extends BO3Check
 {

@@ -1,6 +1,6 @@
 package com.pg85.otg.customobject.bo3.checks;
 
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IModLoadedChecker;
 
 public class ModCheckNot extends ModCheck
 {

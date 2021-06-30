@@ -1,7 +1,7 @@
 package com.pg85.otg.customobject.bo2;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 class ObjectCoordinate

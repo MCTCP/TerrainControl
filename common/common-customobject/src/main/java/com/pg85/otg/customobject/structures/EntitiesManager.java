@@ -1,9 +1,9 @@
 package com.pg85.otg.customobject.structures;
 
 import com.pg85.otg.customobject.bofunctions.EntityFunction;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public class EntitiesManager
 {

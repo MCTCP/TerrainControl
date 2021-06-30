@@ -3,11 +3,11 @@ package com.pg85.otg.gen.carver;
 import java.util.BitSet;
 import java.util.Random;
 
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.MutableBoolean;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 

@@ -4,16 +4,16 @@ import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IStructuredCustomObject;
 
 import java.nio.file.Path;
 
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IStructuredCustomObject;
 
 /**
  * Represents an object along with its location in the world.

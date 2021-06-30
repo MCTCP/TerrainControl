@@ -1,4 +1,4 @@
-package com.pg85.otg.util.interfaces;
+package com.pg85.otg.interfaces;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.LogLevels;
