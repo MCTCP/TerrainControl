@@ -435,7 +435,7 @@ public class SpigotBiome implements IBiome
 				}
 			}
 		}
-	}	
+	}
 	
 	@Override
 	public IBiomeConfig getBiomeConfig ()
