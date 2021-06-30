@@ -83,7 +83,7 @@ public final class PluginConfig extends PluginConfigBase
 		);
 
 		writer.putSetting(PluginConfigStandardValues.LOG_CUSTOM_OBJECTS, this.logCustomObjects,
-			"Shows information about BO2/BO3/BO4 config errors and spawning.",
+			"Logs information about BO2/BO3/BO4 config errors and spawning.",
 			"Defaults to: false"
 		);
 

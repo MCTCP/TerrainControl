@@ -22,12 +22,12 @@ import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
-import com.pg85.otg.forge.biome.MobSpawnGroupHelper;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
+import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.EntityCategory;
@@ -44,6 +44,7 @@ import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 
 import com.pg85.otg.gen.biome.BiomeData;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
@@ -412,17 +413,32 @@ public class ForgePresetLoader extends LocalPresetLoader
 			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
 			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
-			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
 		} else {
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 			{
 				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
 			}
 		}
+	}
+
+	private List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, EntityClassification type)
+	{
+		List<Spawners> mobList = biome.getMobSettings().getMobs(type);		
+		List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
+		for (Spawners spawner : mobList)
+		{
+			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.weight, spawner.minCount, spawner.maxCount);
+			if(wMSG != null)
+			{
+				result.add(wMSG);
+			}
+		}
+		return result;
 	}	
 }
