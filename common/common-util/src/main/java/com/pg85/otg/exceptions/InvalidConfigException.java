@@ -1,4 +1,4 @@
-package com.pg85.otg.exception;
+package com.pg85.otg.exceptions;
 
 @SuppressWarnings("serial")
 public class InvalidConfigException extends Exception

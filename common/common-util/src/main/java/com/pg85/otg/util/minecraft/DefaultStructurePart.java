@@ -1,7 +1,7 @@
 package com.pg85.otg.util.minecraft;
 
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 
 import java.util.HashMap;
 import java.util.Map;

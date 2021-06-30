@@ -1,10 +1,10 @@
 package com.pg85.otg.util.helpers;
 
-import com.pg85.otg.exception.InvalidConfigException;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.pg85.otg.exceptions.InvalidConfigException;
 
 /**
  * Some methods for string parsing and printing.

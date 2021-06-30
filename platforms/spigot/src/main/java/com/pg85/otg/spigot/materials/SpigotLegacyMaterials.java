@@ -1,8 +1,8 @@
 package com.pg85.otg.spigot.materials;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LegacyMaterials;
 
 import net.minecraft.server.v1_16_R3.*;

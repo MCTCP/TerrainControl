@@ -14,9 +14,9 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.IPluginConfig;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.LocalPresetLoader;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import java.io.*;
 import java.nio.file.Path;

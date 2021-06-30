@@ -4,13 +4,13 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotChunkBuffer;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 import net.minecraft.server.v1_16_R3.BlockPosition;

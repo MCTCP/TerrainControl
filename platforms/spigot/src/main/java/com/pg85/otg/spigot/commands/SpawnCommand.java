@@ -5,14 +5,14 @@ import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

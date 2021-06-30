@@ -2,8 +2,9 @@ package com.pg85.otg.forge.commands;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
+
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
 
