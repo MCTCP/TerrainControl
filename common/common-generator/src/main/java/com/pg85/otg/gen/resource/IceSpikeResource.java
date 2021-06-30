@@ -55,7 +55,7 @@ public class IceSpikeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenregion, Random random, int x, int z)
 	{
 		switch(this.type)
 		{

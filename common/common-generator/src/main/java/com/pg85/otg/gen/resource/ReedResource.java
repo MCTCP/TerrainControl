@@ -33,7 +33,7 @@ public class ReedResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z);

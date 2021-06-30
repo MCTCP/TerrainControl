@@ -31,7 +31,7 @@ public class DungeonResource extends BiomeResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 		worldGenRegion.placeDungeon(random, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX(), y, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ(), this.range, this.count);

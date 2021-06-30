@@ -23,7 +23,7 @@ public class RegistryResource  extends BiomeResourceBase implements IBasicResour
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		worldGenRegion.placeFromRegistry(random, worldGenRegion.getDecorationArea().getChunkBeingDecorated(), this.id);
 	}

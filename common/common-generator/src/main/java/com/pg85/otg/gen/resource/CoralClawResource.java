@@ -42,7 +42,7 @@ public class CoralClawResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion world, Random random, int x, int z)
 	{
 		int y = world.getBlockAboveSolidHeight(x, z);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);

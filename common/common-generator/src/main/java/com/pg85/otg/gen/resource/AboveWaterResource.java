@@ -25,7 +25,7 @@ public class AboveWaterResource extends FrequencyResourceBase
 	}
 	
 	@Override
-	public void spawn(IWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenregion, Random rand, int x, int z)
 	{
 		int y = worldGenregion.getBlockAboveLiquidHeight(x, z);
 		if (y == -1)

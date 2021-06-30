@@ -43,7 +43,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		// Override spawnForChunkDecoration so we can add a cache.
 		

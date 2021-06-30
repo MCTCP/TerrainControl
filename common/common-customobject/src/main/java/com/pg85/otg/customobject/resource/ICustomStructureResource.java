@@ -18,14 +18,14 @@ public interface ICustomStructureResource
 	// This code is only used for BO3 custom structures, they share the same biomeconfig
 	// resource with bo4's though, so this is probably as clean a separation as we'll get.
 
-	default void processForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	default void processForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// TODO: Fire Forge resource decoration events, when they're available.
-		spawnForChunkDecoration(structureCache, worldGenRegion, random, villageInChunk, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		spawnForChunkDecoration(structureCache, worldGenRegion, random, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	// Only used for BO3 CustomStructure
-	default void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	default void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		// Don't process BO4's, they're plotted and spawned separately from other resources.
 		if(worldGenRegion.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)

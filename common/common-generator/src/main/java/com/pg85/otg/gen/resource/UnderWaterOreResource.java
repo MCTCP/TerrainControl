@@ -33,7 +33,7 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z) - 1;
 		if (worldGenRegion.getBlockAboveLiquidHeight(x, z) < firstSolidBlock || firstSolidBlock == -1)

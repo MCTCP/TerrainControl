@@ -258,9 +258,9 @@ public class CustomStructureCache
 	}
 
 	// Only used by ChunkDecorator during decoration
-	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBo4Chunk(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, developerMode, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Only used by /spawn command	

@@ -34,14 +34,19 @@ public class SmallLakeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random rand, boolean villageInChunk, int x, int z)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
-		if (villageInChunk)
+		// TODO: This only checks for a structure start, need to expose the MC method for finding villages on worldGenRegion.
+		if(worldGenRegion.chunkHasDefaultStructure(random, worldGenRegion.getDecorationArea().getChunkBeingDecorated()))
 		{
-			// Lakes and villages don't like each other.
 			return;
 		}
-
+		super.spawnForChunkDecoration(worldGenRegion, random, logger, materialReader);
+	}	
+	
+	@Override
+	public void spawn(IWorldGenRegion world, Random rand, int x, int z)
+	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
 		// Search any free space

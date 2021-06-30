@@ -156,7 +156,7 @@ public class BO4 implements StructuredCustomObject
 	}
 	
 	// BO4's should always spawn within decoration bounds, so there is no SpawnForced, only TrySpawnAt
-	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, boolean doBiomeConfigReplaceBlocks)
+	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, boolean doBiomeConfigReplaceBlocks)
 	{
 		//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
 
@@ -383,7 +383,7 @@ public class BO4 implements StructuredCustomObject
 										// ReplaceAbove is not affected by sagc
 										blockToQueueForSpawn.material = replaceAboveMaterial;								
 									}
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 								} else {
 									outOfBounds = true;
 								}
@@ -444,7 +444,7 @@ public class BO4 implements StructuredCustomObject
 														blockToQueueForSpawn.material = LocalMaterials.DIRT;
 													}
 												}
-												setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+												setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 											} else {
 												outOfBounds = true;
 											}
@@ -480,13 +480,13 @@ public class BO4 implements StructuredCustomObject
 								if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
 								{
 									blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 								else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
 								{
 									blockToQueueForSpawn.material = biomeConfig.getStoneBlockReplaced(blockToQueueForSpawn.y);
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 								else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
@@ -508,7 +508,7 @@ public class BO4 implements StructuredCustomObject
 											blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? newBlock.material.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : newBlock.material;
 										}
 									}
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 							}
@@ -524,9 +524,9 @@ public class BO4 implements StructuredCustomObject
 							}
 							if(doBiomeConfigReplaceBlocks)
 							{
-								setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn, biomeConfig.getReplaceBlocks());
+								setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn, biomeConfig.getReplaceBlocks());
 							} else {
-								setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+								setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 							}
 						} else {
 							outOfBounds = true;
@@ -579,7 +579,7 @@ public class BO4 implements StructuredCustomObject
 								destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
 								if(chunkCoord.equals(destChunk))
 								{
-										setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+										setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 								} else {
 									outOfBounds = true;
 								}
@@ -639,7 +639,7 @@ public class BO4 implements StructuredCustomObject
 														blockToQueueForSpawn.material = LocalMaterials.DIRT;
 													}
 												}
-												setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+												setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 											} else {
 												outOfBounds = true;
 											}
@@ -675,13 +675,13 @@ public class BO4 implements StructuredCustomObject
 								if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
 								{
 									blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 								else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
 								{
 									blockToQueueForSpawn.material = biomeConfig.getStoneBlockReplaced(blockToQueueForSpawn.y);
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 								else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
@@ -703,7 +703,7 @@ public class BO4 implements StructuredCustomObject
 											blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? block.material.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : block.material;
 										}
 									}
-									setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+									setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 									continue;
 								}
 							}
@@ -719,9 +719,9 @@ public class BO4 implements StructuredCustomObject
 							}
 							if(doBiomeConfigReplaceBlocks)
 							{
-								setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn, biomeConfig.getReplaceBlocks());
+								setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn, biomeConfig.getReplaceBlocks());
 							} else {
-								setBlock(worldGenRegion, developerMode, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+								setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
 							}
 						} else {
 							outOfBounds = true;
@@ -746,14 +746,14 @@ public class BO4 implements StructuredCustomObject
 		return true;
 	}
 	
-	private void setBlock(IWorldGenRegion worldGenRegion, boolean developerMode, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+	private void setBlock(IWorldGenRegion worldGenRegion, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
 	{
-		setBlock(worldGenRegion, developerMode, x, y, z, material, metaDataTag, isStructureAtSpawn, null);
+		setBlock(worldGenRegion, x, y, z, material, metaDataTag, isStructureAtSpawn, null);
 	}
 	
-	private void setBlock(IWorldGenRegion worldGenRegion, boolean developerMode, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ReplaceBlockMatrix replaceBlocks)
+	private void setBlock(IWorldGenRegion worldGenRegion, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ReplaceBlockMatrix replaceBlocks)
 	{
-		if(developerMode)
+		if(worldGenRegion.getPluginConfig().getDeveloperModeEnabled())
 		{
 			LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y, z);
 			if(

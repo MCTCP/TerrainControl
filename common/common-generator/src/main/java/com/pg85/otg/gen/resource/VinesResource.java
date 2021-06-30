@@ -63,7 +63,7 @@ public class VinesResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int _x = x;
 		int _z = z;

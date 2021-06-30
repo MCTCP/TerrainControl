@@ -45,8 +45,7 @@ import java.util.Map;
  */
 public class CustomObjectManager implements ICustomObjectManager
 {
-	private final Map<String, CustomObjectLoader> loaders;
-	
+	private final Map<String, CustomObjectLoader> loaders;	
 	private final CustomObjectCollection globalCustomObjects;
 
 	public CustomObjectManager(boolean developerMode, ILogger logger, Path otgRootFolder, Path otgPresetsFolder, CustomObjectResourcesManager manager)
@@ -114,7 +113,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public void registerGlobalObject(CustomObject object)
 	{
-		globalCustomObjects.addLoadedGlobalObject(object);
+		this.globalCustomObjects.addLoadedGlobalObject(object);
 	}
 
 	/**
@@ -132,7 +131,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public CustomObjectCollection getGlobalObjects()
 	{
-		return globalCustomObjects;
+		return this.globalCustomObjects;
 	}
 
 	/**
@@ -142,7 +141,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public Map<String, CustomObjectLoader> getObjectLoaders()
 	{
-		return Collections.unmodifiableMap(loaders);
+		return Collections.unmodifiableMap(this.loaders);
 	}	
 	
 	/**
@@ -151,10 +150,10 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public void shutdown()
 	{
-		for (CustomObjectLoader loader : loaders.values())
+		for (CustomObjectLoader loader : this.loaders.values())
 		{
 			loader.onShutdown();
 		}
-		loaders.clear();
+		this.loaders.clear();
 	}  
 }

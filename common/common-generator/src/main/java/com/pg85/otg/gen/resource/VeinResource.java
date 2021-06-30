@@ -66,7 +66,7 @@ public class VeinResource extends BiomeResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		// Find all veins that reach this chunk, and spawn them
 		int searchRadius = (this.maxSizeInBlocks + 15) / 16;

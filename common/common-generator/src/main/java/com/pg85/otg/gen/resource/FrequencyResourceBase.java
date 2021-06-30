@@ -21,7 +21,7 @@ public abstract class FrequencyResourceBase extends BiomeResourceBase implements
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		int blockX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
 		int blockZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();		
@@ -34,9 +34,9 @@ public abstract class FrequencyResourceBase extends BiomeResourceBase implements
 			}
 			int x = blockX + random.nextInt(Constants.CHUNK_SIZE);
 			int z = blockZ + random.nextInt(Constants.CHUNK_SIZE);
-			spawn(worldGenRegion, random, false, x, z);
+			spawn(worldGenRegion, random, x, z);
 		}
 	}
 
-	public abstract void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z);	
+	public abstract void spawn(IWorldGenRegion world, Random random, int x, int z);	
 }

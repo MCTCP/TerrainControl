@@ -33,7 +33,7 @@ public class BoulderResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int z)
 	{
 		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		if (y < this.minAltitude || y > this.maxAltitude)

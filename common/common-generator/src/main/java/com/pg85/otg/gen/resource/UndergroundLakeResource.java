@@ -34,7 +34,7 @@ public class UndergroundLakeResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 		if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z))

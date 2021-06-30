@@ -41,7 +41,7 @@ public class CustomObjectResource extends BiomeResourceBase implements ICustomOb
 	}
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (CustomObject object : getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 		{

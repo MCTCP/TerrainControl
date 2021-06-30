@@ -47,7 +47,7 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 	}	
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		loadTrees(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 

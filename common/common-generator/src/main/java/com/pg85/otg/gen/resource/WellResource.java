@@ -37,7 +37,7 @@ public class WellResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int z)
 	{
 		int y = random.nextInt(this.maxAltitude - this.minAltitude) + this.minAltitude;
 

@@ -2192,7 +2192,7 @@ public class BO4CustomStructure extends CustomStructure
 	* Checks if this structure or any of its branches are inside the given
 	* chunk and spawns all objects that are including their smoothing areas (if any)
 	*/
-	void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{		
 		if (
 			!this.objectsToSpawn.containsKey(chunkCoordinate) && 
@@ -2215,7 +2215,7 @@ public class BO4CustomStructure extends CustomStructure
 			}
 
 			// Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.
-			smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, logger, materialReader);
+			this.smoothingAreaManager.spawnSmoothAreas(config, chunkCoordinate, this.start, structureCache, worldGenRegion, logger, materialReader);
 			
 			// Spawn ReplaceAbove / ReplaceBelow before bo4 blocks.
 			for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
@@ -2233,7 +2233,6 @@ public class BO4CustomStructure extends CustomStructure
 					!bo4.trySpawnAt(
 						worldGenRegion.getPresetFolderName(),
 						otgRootFolder,
-						developerMode,
 						logger,
 						customObjectManager,
 						materialReader,
@@ -2290,7 +2289,6 @@ public class BO4CustomStructure extends CustomStructure
 					!bo4.trySpawnAt(
 						worldGenRegion.getPresetFolderName(),
 						otgRootFolder,
-						developerMode,
 						logger,
 						customObjectManager,
 						materialReader,

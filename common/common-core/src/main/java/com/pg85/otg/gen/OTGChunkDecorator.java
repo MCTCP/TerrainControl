@@ -123,22 +123,19 @@ public class OTGChunkDecorator implements IChunkDecorator
 		CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
 		IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 
-		boolean developerMode = worldGenRegion.getPluginConfig().getDeveloperModeEnabled();
-		boolean isBO4Enabled = worldGenRegion.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4;	
-
 		if (!this.processing)
 		{
 			this.processing = true;
-			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
+			doDecorate(chunkCoord, worldGenRegion, biomeConfig, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
 			this.processing = false;
 		} else {			
 			logger.log(LogLevel.ERROR, LogCategory.MAIN, "Cascading chunk generation detected, this is likely caused by other mods. Enable developermode in OTG.ini to log a stack trace.");
 			
-			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
+			doDecorate(chunkCoord, worldGenRegion, biomeConfig, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 
 			// If developer mode is enabled in OTG.ini, log the stack trace
 			// so users can figure out which mod is causing the cascade.
-			if(developerMode)
+			if(worldGenRegion.getPluginConfig().getDeveloperModeEnabled())
 			{
 				logger.log(LogLevel.ERROR, LogCategory.MAIN, Arrays.toString(Thread.currentThread().getStackTrace()));
 			}
@@ -157,7 +154,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 	}
 
 	// TODO: Fire decoration events.
-	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled, boolean developerMode, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{		
 		if (biomeConfig == null)
 		{
@@ -184,17 +181,15 @@ public class OTGChunkDecorator implements IChunkDecorator
 		long l2 = this.rand.nextLong() / 2L * 2L + 1L;
 		this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
-		boolean hasVillage = false;
-
 		// Use BO4 logic for BO4 worlds
-		if(isBO4Enabled)
+		if(worldGenRegion.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4)
 		{
 			// BO4 Plotting cannot currently be done in a thread-safe/non-blocking way,
 			// Paper may try to do async chunkgen, so lock here. This will ofcourse 
 			// slow down any multithreaded chunk decoration implementation.
 			synchronized(asynChunkDecorationLock)
 			{
-				plotAndSpawnBO4s(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord, otgRootFolder, developerMode, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				plotAndSpawnBO4s(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 			}
 		}
 
@@ -203,15 +198,15 @@ public class OTGChunkDecorator implements IChunkDecorator
 		{
 			if (res instanceof ICustomObjectResource)
 			{
-				((ICustomObjectResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, hasVillage, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				((ICustomObjectResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 			}
 			else if (res instanceof ICustomStructureResource)
 			{
-				((ICustomStructureResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, hasVillage, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				((ICustomStructureResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 			}			
 			else if (res instanceof IBasicResource)
 			{
-				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, hasVillage, logger, materialReader);
+				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, logger, materialReader);
 			}
 			else if(res instanceof ErroredFunction)
 			{
@@ -238,8 +233,8 @@ public class OTGChunkDecorator implements IChunkDecorator
 		// freezing is done during the correct decoration step.
 		FrozenSurfaceHelper.freezeChunk(worldGenRegion, chunkCoord);
 	}
-	
-	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+
+	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingDecorated, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{
 		// Plot and spawn BO4's for all chunks that may have blocks spawned on them while decorating this chunk, 
 		// so we can be sure those chunks have had a chance to plot+spawn bo4's before other resources.
@@ -249,14 +244,14 @@ public class OTGChunkDecorator implements IChunkDecorator
 		structureCache.plotBo4Structures(worldGenRegion, this.rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() , chunkCoord.getChunkZ() + 1), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);			
 		structureCache.plotBo4Structures(worldGenRegion, this.rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);	
 
-		spawnBO4(structureCache, worldGenRegion, chunkCoord, otgRootFolder, developerMode, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
-		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), otgRootFolder, developerMode, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);	
-		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), otgRootFolder, developerMode, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
-		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), otgRootFolder, developerMode, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);		
+		spawnBO4(structureCache, worldGenRegion, chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);	
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);		
 	}
 
-	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean developerMode, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, otgRootFolder, developerMode, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 }
