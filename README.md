@@ -27,13 +27,10 @@ To learn more, check out <a href="https://biomebundle.wixsite.com/openterraingen
 * [CurseForge](https://minecraft.curseforge.com/projects/open-terrain-generator)
 * [Wiki](http://openterraingen.wikia.com/wiki/Open_Terrain_Generator_Wiki)
 * [OTGEdit](https://minecraft.curseforge.com/projects/otgedit-gui-for-openterraingenerator-terraincontrol-and-minecraft-worlds-mod)
-* [Old Wiki](https://github.com/MCTCP/TerrainControl/wiki/)
-* [Old Forum](http://forum.mctcp.com/)
 * [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) for Spigot and Forge
-* [Compilation](./COMPILING.md) instructions for command-line, Eclipse and IntelliJ
 * [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
 
-## Original TerrainControl developers and maintainers
+## Original TerrainControl developers
 * <a href="https://github.com/rutgerkok">Rutgerkok</a>
 * <a href="https://github.com/Timethor">Timethor</a>
 * <a href="https://github.com/oloflarsson">Oloflarsson</a>
