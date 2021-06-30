@@ -11,6 +11,7 @@ import com.pg85.otg.util.logging.LogLevel;
 import net.minecraft.server.v1_16_R3.*;
 
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.Map;
 
 public class SpigotNBTHelper extends LocalNBTHelper
@@ -152,8 +153,8 @@ public class SpigotNBTHelper extends LocalNBTHelper
 						OTG.getEngine().getLogger().log(
 							LogLevel.ERROR,
 							LogCategory.CUSTOM_OBJECTS,
-							String.format(
-								"Cannot convert list subtype {} from it's NMS value",
+							MessageFormat.format(
+								"Cannot convert list subtype {0} from it's NMS value",
 								listType
 							)
 						);

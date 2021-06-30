@@ -13,6 +13,7 @@ import com.pg85.otg.util.minecraft.EntityCategory;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -125,12 +126,10 @@ public final class BiomeConfigFinder
 				logger.log(
 					LogLevel.ERROR,
 					LogCategory.CONFIGS,
-					String.format(
-						"Failed to rename biome file {} to {}",
-						new Object[] {
-							toRename.getAbsolutePath(), 
-							newFile.getAbsolutePath()
-						}
+					MessageFormat.format(
+						"Failed to rename biome file {0} to {1}",
+						toRename.getAbsolutePath(), 
+						newFile.getAbsolutePath()
 					)
 				);
 			}

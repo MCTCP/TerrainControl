@@ -3,6 +3,7 @@ package com.pg85.otg.presets;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -171,8 +172,8 @@ public abstract class LocalPresetLoader
 			logger.log(
 				LogLevel.INFO,
 				LogCategory.CONFIGS,
-				String.format(
-					"{} biomes Loaded", 
+				MessageFormat.format(
+					"{0} biomes Loaded", 
 					biomeConfigs.size()
 				)
 			);
@@ -274,10 +275,7 @@ public abstract class LocalPresetLoader
 							logger.log(
 								LogLevel.ERROR,
 								LogCategory.MOBS,
-								String.format(
-									"The biome {} tried to inherit mobs from itself.", 
-									new Object[] { biomeConfigStub.getBiomeName()}
-								)
+								MessageFormat.format("The biome {0} tried to inherit mobs from itself.", biomeConfigStub.getBiomeName())
 							);
 						}
 						continue;
@@ -292,12 +290,10 @@ public abstract class LocalPresetLoader
 						logger.log(
 							LogLevel.ERROR,
 							LogCategory.MOBS,
-							String.format(
-								"The biome {} cannot inherit mobs from biome {} - too many configs processed already! Cyclical inheritance?", 
-								new Object[] { 
-									biomeConfigStub.getPath().toFile().getName(), 
-									inheritMobsBiomeConfig.getPath().toFile().getName()
-								}
+							MessageFormat.format(
+								"The biome {0} cannot inherit mobs from biome {1} - too many configs processed already! Cyclical inheritance?", 
+								biomeConfigStub.getPath().toFile().getName(), 
+								inheritMobsBiomeConfig.getPath().toFile().getName()
 							)
 						);
 					}

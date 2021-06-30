@@ -12,6 +12,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
+import java.text.MessageFormat;
 import java.util.Set;
 
 public class ForgeNBTHelper extends LocalNBTHelper
@@ -159,8 +160,8 @@ public class ForgeNBTHelper extends LocalNBTHelper
 						OTG.getEngine().getLogger().log(
 							LogLevel.ERROR,
 							LogCategory.CUSTOM_OBJECTS,
-							String.format(
-								"Cannot convert list subtype {} from it's NMS value", 
+							MessageFormat.format(
+								"Cannot convert list subtype {0} from it's NMS value", 
 								listType
 							)
 						);

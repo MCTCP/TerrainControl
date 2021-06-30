@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.gen;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
@@ -406,8 +407,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					this.logger.log(
 						LogLevel.ERROR,
 						LogCategory.CUSTOM_OBJECTS,
-						String.format(
-							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
+						MessageFormat.format(
+							"Badly formatted json for tile entity with id '{0}' at {1},{2},{3}", 
 							nms.getString("id"), 
 							x, y, z
 						)
@@ -420,8 +421,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				this.logger.log(
 					LogLevel.ERROR,
 					LogCategory.CUSTOM_OBJECTS,
-					String.format(
-						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 
+					MessageFormat.format(
+						"Skipping tile entity with id {0}, cannot be placed at {1},{2},{3}", 
 						nms.getString("id"), 
 						x, y, z
 					)

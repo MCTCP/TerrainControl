@@ -11,6 +11,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -116,7 +117,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 				// Invalid biome name, remove
 				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
-					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Invalid biome name {} in biome group {}", biomeName, this.name));
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, MessageFormat.format("Invalid biome name {0} in biome group {1}", biomeName, this.name));
 				}
 			}
 			it.remove();

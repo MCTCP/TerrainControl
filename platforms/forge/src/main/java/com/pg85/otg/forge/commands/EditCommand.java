@@ -152,8 +152,8 @@ public class EditCommand
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check the logs"), false);
-			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("", (Object[])e.getStackTrace()));
+			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check the logs."), false);
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Edit command encountered an error: ", (Object[])e.getStackTrace()));
 		}
 
 		return 0;
@@ -203,8 +203,8 @@ public class EditCommand
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("", (Object[])e.getStackTrace()));
+			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check logs."), false);
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Edit command encountered an error: ", (Object[])e.getStackTrace()));
 		}
 		return 0;
 	}
