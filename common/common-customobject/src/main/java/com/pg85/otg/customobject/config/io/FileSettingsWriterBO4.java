@@ -14,6 +14,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 public class FileSettingsWriterBO4 implements SettingsWriterBO4
 {
@@ -126,8 +127,8 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 			logger.log(
 				LogLevel.ERROR,
 				LogCategory.CONFIGS,
-				String.format(
-					"Failed to close file {} ({})", 
+				MessageFormat.format(
+					"Failed to close file {0} ({1})", 
 					file.getAbsolutePath(), 
 					e.getMessage()
 				)

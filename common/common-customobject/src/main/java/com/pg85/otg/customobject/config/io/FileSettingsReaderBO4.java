@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -153,8 +154,8 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 				logger.log(
 					LogLevel.ERROR,
 					LogCategory.CONFIGS,
-					String.format(
-						"Invalid resource {} in {} on line {}: {}", 
+					MessageFormat.format(
+						"Invalid resource {0} in {1} on line {2}: {3}", 
 						functionName, 
 						this.name, 
 						configFunctionLine.line, 
@@ -215,8 +216,8 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 					logger.log(
 						LogLevel.ERROR, 
 						LogCategory.CONFIGS,
-						String.format(
-							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
+						MessageFormat.format(
+							"The value \"{0}\" is not valid for the setting {1} in {2} on line {3}: {4}", 
 							stringValue, 
 							setting, 
 							this.name, 

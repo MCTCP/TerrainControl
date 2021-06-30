@@ -23,6 +23,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -163,8 +164,8 @@ public class OTGChunkDecorator implements IChunkDecorator
 				logger.log(
 					LogLevel.ERROR,
 					LogCategory.DECORATION,
-					String.format(
-						"Unknown biome at {},{}  (chunk {}). Could not decorate chunk.", 
+					MessageFormat.format(
+						"Unknown biome at {0},{1}  (chunk {2}). Could not decorate chunk.", 
 						chunkCoord.getChunkX(), 
 						chunkCoord.getChunkZ(), 
 						chunkCoord

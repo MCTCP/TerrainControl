@@ -23,6 +23,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,7 +105,7 @@ public class BO3Loader implements CustomObjectLoader
 			// File not found
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, String.format("NBT file {} not found", (Object)path));
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, MessageFormat.format("NBT file {0} not found", path));
 			}
 			return null;
 		} catch (IOException e)

@@ -11,6 +11,7 @@ import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -93,8 +94,8 @@ public final class SimpleSettingsMap implements SettingsMap
 				logger.log(
 					LogLevel.ERROR,
 					LogCategory.CONFIGS,
-					String.format(
-						"Invalid resource {} in {} on line {}: {}", 
+					MessageFormat.format(
+						"Invalid resource {0} in {1} on line {2}: {3}", 
 						functionName, 
 						this.name, 
 						configFunctionLine.getLineNumber(), 
@@ -156,12 +157,13 @@ public final class SimpleSettingsMap implements SettingsMap
 					logger.log(
 						LogLevel.ERROR,
 						LogCategory.CONFIGS,
-						String.format(
-							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
+						MessageFormat.format(
+							"The value \"{0}\" is not valid for the setting {1} in {2} on line {3}: {4}", 
 							stringValue, 
 							setting, 
 							name, 
-							stringWithLineNumber.getLineNumber(), e.getMessage()
+							stringWithLineNumber.getLineNumber(), 
+							e.getMessage()
 						)
 					);
 				}

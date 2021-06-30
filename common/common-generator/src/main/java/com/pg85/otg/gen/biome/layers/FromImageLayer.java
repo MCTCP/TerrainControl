@@ -3,7 +3,6 @@ package com.pg85.otg.gen.biome.layers;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
