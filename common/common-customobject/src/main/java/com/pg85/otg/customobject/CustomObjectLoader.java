@@ -2,7 +2,7 @@ package com.pg85.otg.customobject;
 
 import java.io.File;
 
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 
 public interface CustomObjectLoader
 {

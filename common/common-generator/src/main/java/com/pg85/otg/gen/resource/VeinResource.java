@@ -1,12 +1,12 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -15,7 +15,7 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
-public class VeinResource extends ResourceBase implements IBasicResource
+public class VeinResource extends BiomeResourceBase implements IBasicResource
 {
 	final LocalMaterialData material;
 	final int maxAltitude;

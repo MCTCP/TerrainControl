@@ -1,8 +1,8 @@
 package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.util.List;

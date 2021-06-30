@@ -3,7 +3,7 @@ package com.pg85.otg.config.io;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.config.settingType.Setting;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.util.Collection;

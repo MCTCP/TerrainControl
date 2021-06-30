@@ -1,16 +1,16 @@
 package com.pg85.otg.customobject.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TreeResource extends ResourceBase implements ICustomObjectResource
+public class TreeResource extends BiomeResourceBase implements ICustomObjectResource
 {
 	private final int frequency;
 	private final List<Integer> treeChances;

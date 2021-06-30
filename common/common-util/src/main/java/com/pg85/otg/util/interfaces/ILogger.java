@@ -1,4 +1,7 @@
-package com.pg85.otg.logging;
+package com.pg85.otg.util.interfaces;
+
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogMarker;
 
 public interface ILogger
 {

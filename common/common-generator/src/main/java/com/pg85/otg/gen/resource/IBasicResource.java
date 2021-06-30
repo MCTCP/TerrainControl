@@ -2,7 +2,7 @@ package com.pg85.otg.gen.resource;
 
 import java.util.Random;
 
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 

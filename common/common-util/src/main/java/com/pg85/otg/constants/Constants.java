@@ -10,7 +10,7 @@ public class Constants
 	public static final int CHUNK_Y_SIZE = 256;
 
 	// Files
-	
+
 	// Main Plugin Config
 	public static final String PluginConfigFilename = "OTG.ini";
 	

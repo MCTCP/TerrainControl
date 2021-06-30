@@ -3,14 +3,14 @@ package com.pg85.otg.gen.resource;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
-public abstract class FrequencyResourceBase extends ResourceBase implements IBasicResource
+public abstract class FrequencyResourceBase extends BiomeResourceBase implements IBasicResource
 {
 	protected int frequency;
 	protected double rarity;

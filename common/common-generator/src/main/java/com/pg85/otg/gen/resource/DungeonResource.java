@@ -1,18 +1,18 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.util.List;
 import java.util.Random;
 
-public class DungeonResource extends ResourceBase implements IBasicResource
+public class DungeonResource extends BiomeResourceBase implements IBasicResource
 {
 	private final int range;
 	private final int count;

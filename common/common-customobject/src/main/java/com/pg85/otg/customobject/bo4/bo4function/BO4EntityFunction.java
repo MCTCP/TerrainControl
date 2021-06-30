@@ -7,9 +7,9 @@ import java.nio.ByteBuffer;
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bofunctions.EntityFunction;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.StreamHelper;
+import com.pg85.otg.util.interfaces.ILogger;
 
 /**
  * Represents an entity in a BO3.

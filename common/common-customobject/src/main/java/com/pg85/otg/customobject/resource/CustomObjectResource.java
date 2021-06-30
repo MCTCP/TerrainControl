@@ -1,14 +1,14 @@
 package com.pg85.otg.customobject.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class CustomObjectResource extends ResourceBase implements ICustomObjectResource
+public class CustomObjectResource extends BiomeResourceBase implements ICustomObjectResource
 {	
 	private final List<CustomObject> objects;
 	private final List<String> objectNames;

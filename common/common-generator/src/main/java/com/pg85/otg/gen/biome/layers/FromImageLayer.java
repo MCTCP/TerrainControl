@@ -10,9 +10,9 @@ import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.interfaces.ILogger;
 
 public class FromImageLayer implements ParentedLayer
 {

@@ -1,16 +1,16 @@
 package com.pg85.otg.customobject.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomStructureResource extends ResourceBase implements ICustomStructureResource, ICustomStructureGen
+public class CustomStructureResource extends BiomeResourceBase implements ICustomStructureResource, ICustomStructureGen
 {
 	private final List<Double> objectChances;
 	public final List<String> objectNames;

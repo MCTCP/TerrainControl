@@ -1,8 +1,9 @@
 package com.pg85.otg.config.biome;
 
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.interfaces.ILogger;
+
 import java.util.*;
 
 /**

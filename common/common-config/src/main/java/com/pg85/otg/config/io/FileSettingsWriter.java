@@ -1,9 +1,9 @@
 package com.pg85.otg.config.io;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.BufferedWriter;
 import java.io.File;

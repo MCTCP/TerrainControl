@@ -3,7 +3,7 @@ package com.pg85.otg.config;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
