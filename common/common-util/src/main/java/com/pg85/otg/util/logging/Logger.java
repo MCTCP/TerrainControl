@@ -1,4 +1,4 @@
-package com.pg85.otg.logging;
+package com.pg85.otg.util.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

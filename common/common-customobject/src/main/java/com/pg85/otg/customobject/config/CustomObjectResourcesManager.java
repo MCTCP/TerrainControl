@@ -1,7 +1,7 @@
 package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.config.ErroredFunction;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;

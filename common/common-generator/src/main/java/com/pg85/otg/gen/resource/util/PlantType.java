@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;

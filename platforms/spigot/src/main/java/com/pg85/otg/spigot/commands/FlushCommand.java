@@ -1,8 +1,8 @@
 package com.pg85.otg.spigot.commands;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

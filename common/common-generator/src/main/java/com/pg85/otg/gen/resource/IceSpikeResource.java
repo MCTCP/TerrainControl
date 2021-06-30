@@ -2,7 +2,7 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;

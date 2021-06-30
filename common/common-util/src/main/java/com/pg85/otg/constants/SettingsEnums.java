@@ -1,6 +1,6 @@
 package com.pg85.otg.constants;
 
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogLevel;
 
 public class SettingsEnums
 {

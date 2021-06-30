@@ -3,7 +3,7 @@ package com.pg85.otg.gen.resource;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;

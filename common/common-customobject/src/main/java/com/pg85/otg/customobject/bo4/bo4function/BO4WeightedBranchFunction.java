@@ -5,7 +5,7 @@ import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;

@@ -2,7 +2,7 @@ package com.pg85.otg.customobject.bo3.checks;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.bo3.BO3Config;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;

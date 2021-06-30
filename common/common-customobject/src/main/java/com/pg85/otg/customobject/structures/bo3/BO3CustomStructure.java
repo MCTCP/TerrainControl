@@ -16,11 +16,11 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.IStructuredCustomObject;
 import com.pg85.otg.interfaces.IWorldGenRegion;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import java.nio.file.Path;
 import java.util.*;

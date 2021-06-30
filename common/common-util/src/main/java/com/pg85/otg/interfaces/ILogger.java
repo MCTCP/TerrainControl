@@ -1,7 +1,7 @@
 package com.pg85.otg.interfaces;
 
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 public interface ILogger
 {

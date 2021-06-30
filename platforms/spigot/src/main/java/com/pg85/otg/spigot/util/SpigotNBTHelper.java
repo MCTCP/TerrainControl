@@ -1,12 +1,13 @@
 package com.pg85.otg.spigot.util;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
+
 import net.minecraft.server.v1_16_R3.*;
 
 import java.lang.reflect.Field;

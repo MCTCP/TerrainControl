@@ -1,8 +1,8 @@
 package com.pg85.otg.util.bo3;
 
-import com.pg85.otg.exception.InvalidConfigException;
-
 import java.util.Random;
+
+import com.pg85.otg.exceptions.InvalidConfigException;
 
 /**
  * An enum to help with CustomObject rotation.

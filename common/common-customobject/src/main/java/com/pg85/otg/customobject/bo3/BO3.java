@@ -28,7 +28,7 @@ import com.pg85.otg.customobject.structures.bo3.BO3CustomStructureCoordinate;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.BO3Enums.OutsideSourceBlock;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;

@@ -11,8 +11,8 @@ import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 import com.pg85.otg.interfaces.ILogger;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 public class FromImageLayer implements ParentedLayer
 {

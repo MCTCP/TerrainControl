@@ -2,11 +2,11 @@ package com.pg85.otg.customobject.bofunctions;
 
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
-import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import java.io.BufferedReader;
 import java.io.File;
