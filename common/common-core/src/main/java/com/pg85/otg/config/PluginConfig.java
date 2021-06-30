@@ -118,9 +118,8 @@ public final class PluginConfig extends PluginConfigBase
 		);
 		
 		writer.putSetting(PluginConfigStandardValues.DEVELOPER_MODE, this.developerMode,
-			"Changes the behaviour of some features to speed up development: Clears the",
-			"BO2/BO3 cache whenever a world or dimension is unloaded (similar to using",
-			"/otg unloadbo3s and recreating a world).",
+			"Clears the BO2/BO3 cache and reloads WorldConfig/BiomeConfigs on exit/rejoin.",
+			"Use this if you're creating a preset and want to do trial/error quickly.",
 			"Defaults to: false"
 		);
 	}

@@ -278,7 +278,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 						block == Blocks.ACACIA_LEAVES ||
 						block == Blocks.BIRCH_LEAVES ||
 						block == Blocks.DARK_OAK_LEAVES ||
-						block == Blocks.JUNGLE_LEAVES ||						
+						block == Blocks.JUNGLE_LEAVES ||
 						block == Blocks.OAK_LEAVES ||
 						block == Blocks.SPRUCE_LEAVES
 					)
