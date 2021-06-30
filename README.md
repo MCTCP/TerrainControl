@@ -26,9 +26,7 @@ To learn more, check out <a href="https://biomebundle.wixsite.com/openterraingen
 * [Project home](https://biomebundle.wixsite.com/openterraingen)
 * [CurseForge](https://minecraft.curseforge.com/projects/open-terrain-generator)
 * [Wiki](http://openterraingen.wikia.com/wiki/Open_Terrain_Generator_Wiki)
-* [OTGEdit](https://minecraft.curseforge.com/projects/otgedit-gui-for-openterraingenerator-terraincontrol-and-minecraft-worlds-mod)
-* [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) for Spigot and Forge
-* [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
+* [Installation](https://openterraingen.fandom.com/wiki/Installing_OTG) for Spigot and Forge
 
 ## Original TerrainControl developers
 * <a href="https://github.com/rutgerkok">Rutgerkok</a>
