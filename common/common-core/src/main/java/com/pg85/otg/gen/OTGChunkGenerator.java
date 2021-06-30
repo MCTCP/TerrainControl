@@ -15,13 +15,14 @@ import com.pg85.otg.gen.carver.RavineCarver;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
+
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;

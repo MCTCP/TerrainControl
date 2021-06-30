@@ -15,11 +15,11 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 /**

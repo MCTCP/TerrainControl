@@ -5,10 +5,11 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.interfaces.ICustomObjectManager;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.ICustomObjectManager;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+
 import java.io.*;
 import java.nio.file.Path;
 

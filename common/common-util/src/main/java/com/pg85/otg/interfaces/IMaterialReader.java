@@ -1,4 +1,4 @@
-package com.pg85.otg.util.interfaces;
+package com.pg85.otg.interfaces;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.materials.LocalMaterialData;

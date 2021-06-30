@@ -1,11 +1,11 @@
 package com.pg85.otg.util.gen;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IPluginConfig;
+import com.pg85.otg.interfaces.IWorldConfig;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IPluginConfig;
-import com.pg85.otg.util.interfaces.IWorldConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public abstract class LocalWorldGenRegion implements IWorldGenRegion
 {

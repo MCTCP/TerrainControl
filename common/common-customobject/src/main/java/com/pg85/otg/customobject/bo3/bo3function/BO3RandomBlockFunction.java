@@ -6,11 +6,11 @@ import java.util.Random;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 public class BO3RandomBlockFunction extends BO3BlockFunction

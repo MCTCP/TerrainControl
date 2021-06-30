@@ -1,4 +1,4 @@
-package com.pg85.otg.util.interfaces;
+package com.pg85.otg.interfaces;
 
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;

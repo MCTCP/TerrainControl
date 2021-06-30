@@ -1,10 +1,10 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 

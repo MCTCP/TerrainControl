@@ -10,10 +10,10 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;

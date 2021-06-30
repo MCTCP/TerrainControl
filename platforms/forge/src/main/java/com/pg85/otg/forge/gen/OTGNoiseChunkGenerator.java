@@ -23,11 +23,11 @@ import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkDecorator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

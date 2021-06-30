@@ -1,8 +1,8 @@
 package com.pg85.otg.customobject;
 
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.util.Random;
 

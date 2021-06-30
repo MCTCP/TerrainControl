@@ -1,11 +1,11 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.DecorationArea;
-import com.pg85.otg.util.interfaces.IBiome;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.materials.MaterialProperties;

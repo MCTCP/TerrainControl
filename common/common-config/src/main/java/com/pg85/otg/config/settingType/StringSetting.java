@@ -1,7 +1,7 @@
 package com.pg85.otg.config.settingType;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IMaterialReader;
 
 /**
  * Reads and writes a string. Surrounding whitespace is stripped using

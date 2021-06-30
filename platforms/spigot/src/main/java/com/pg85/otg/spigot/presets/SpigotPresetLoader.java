@@ -11,6 +11,8 @@ import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.LocalPresetLoader;
@@ -19,8 +21,6 @@ import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialReader;
 import com.pg85.otg.spigot.util.MobSpawnGroupHelper;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.EntityCategory;
 
 import net.minecraft.server.v1_16_R3.*;

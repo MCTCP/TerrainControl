@@ -2,7 +2,7 @@ package com.pg85.otg.customobject.bo3.bo3function;
 
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.bofunctions.EntityFunction;
-import com.pg85.otg.util.interfaces.IEntityFunction;
+import com.pg85.otg.interfaces.IEntityFunction;
 
 /**
  * Represents an entity in a BO3.

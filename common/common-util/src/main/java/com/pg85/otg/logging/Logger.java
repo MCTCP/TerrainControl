@@ -3,7 +3,7 @@ package com.pg85.otg.logging;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.pg85.otg.util.interfaces.ILogger;
+import com.pg85.otg.interfaces.ILogger;
 
 public abstract class Logger implements ILogger
 {

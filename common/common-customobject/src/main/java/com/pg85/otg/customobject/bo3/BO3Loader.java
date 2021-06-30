@@ -17,10 +17,10 @@ import com.pg85.otg.customobject.bo3.checks.LightCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheckNot;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.*;
 import java.util.HashMap;

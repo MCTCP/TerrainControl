@@ -1,8 +1,8 @@
 package com.pg85.otg.util.materials;
 
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.MaterialSetEntry;
 
 import java.util.Arrays;

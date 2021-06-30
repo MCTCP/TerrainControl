@@ -3,7 +3,7 @@ package com.pg85.otg.customobject.bo3.checks;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this

@@ -3,10 +3,6 @@ package com.pg85.otg.customobject.structures.bo3;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.DecorationArea;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IStructuredCustomObject;
 
 import java.nio.file.Path;
 
@@ -15,6 +11,10 @@ import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
+import com.pg85.otg.interfaces.IStructuredCustomObject;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 

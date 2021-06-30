@@ -3,12 +3,12 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.MaterialSet;
 

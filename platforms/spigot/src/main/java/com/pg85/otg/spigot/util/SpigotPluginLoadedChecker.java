@@ -1,7 +1,8 @@
 package com.pg85.otg.spigot.util;
 
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import org.bukkit.Bukkit;
+
+import com.pg85.otg.interfaces.IModLoadedChecker;
 
 public class SpigotPluginLoadedChecker implements IModLoadedChecker
 {

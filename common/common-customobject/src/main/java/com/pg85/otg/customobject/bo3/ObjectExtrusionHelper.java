@@ -2,8 +2,8 @@ package com.pg85.otg.customobject.bo3;
 
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.util.BO3Enums.ExtrudeMode;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;

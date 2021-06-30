@@ -5,10 +5,10 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.io.BufferedWriter;
 import java.io.File;

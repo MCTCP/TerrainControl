@@ -1,7 +1,7 @@
 package com.pg85.otg.customobject.structures;
 
 import com.pg85.otg.customobject.CustomObject;
-import com.pg85.otg.util.interfaces.IStructuredCustomObject;
+import com.pg85.otg.interfaces.IStructuredCustomObject;
 
 /**
  * Represents CustomObjects that can have other objects attached

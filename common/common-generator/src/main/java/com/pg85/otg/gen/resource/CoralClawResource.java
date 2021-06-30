@@ -3,11 +3,11 @@ package com.pg85.otg.gen.resource;
 import com.google.common.collect.Lists;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.OTGDirection;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import java.util.Collections;

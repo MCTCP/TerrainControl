@@ -2,9 +2,9 @@ package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.config.ErroredFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.ICustomObjectResourcesManager;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;

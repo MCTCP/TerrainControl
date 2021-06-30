@@ -1,8 +1,8 @@
 package com.pg85.otg.util.gen;
 
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.util.interfaces.IBiome;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 
 public class DecorationBiomeCache
 {

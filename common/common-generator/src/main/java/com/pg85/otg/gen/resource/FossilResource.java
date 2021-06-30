@@ -3,11 +3,11 @@ package com.pg85.otg.gen.resource;
 import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.util.List;
 import java.util.Random;

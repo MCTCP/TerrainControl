@@ -6,7 +6,7 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import com.pg85.otg.util.interfaces.ILogger;
+import com.pg85.otg.interfaces.ILogger;
 
 public class CompressionUtils
 {

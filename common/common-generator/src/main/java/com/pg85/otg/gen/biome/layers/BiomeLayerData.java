@@ -13,8 +13,8 @@ import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.gen.biome.BiomeData;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldConfig;
 
 /**
  * Class to hold biome layer data until world configs are working. This class will eventually be removed.

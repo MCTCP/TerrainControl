@@ -6,12 +6,13 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
-import com.pg85.otg.util.interfaces.IBiome;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
+
 import net.minecraft.server.v1_16_R3.*;
 
 import java.util.List;

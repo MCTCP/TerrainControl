@@ -1,8 +1,8 @@
 package com.pg85.otg.gen.biome;
 
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
 
 /**
  * Interpolates the given biome from biome coords (pos >> 2) to real coords.

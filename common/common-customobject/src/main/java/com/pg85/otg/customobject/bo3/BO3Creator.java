@@ -10,13 +10,13 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 

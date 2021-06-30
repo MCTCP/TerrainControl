@@ -1,6 +1,6 @@
 package com.pg85.otg.util.biome;
 
-import com.pg85.otg.util.interfaces.IBiomeResourceLocation;
+import com.pg85.otg.interfaces.IBiomeResourceLocation;
 
 public class MCBiomeResourceLocation implements IBiomeResourceLocation
 {	

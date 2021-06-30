@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 /**

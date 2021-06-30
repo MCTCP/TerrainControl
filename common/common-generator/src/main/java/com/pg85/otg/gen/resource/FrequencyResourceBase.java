@@ -5,10 +5,10 @@ import java.util.Random;
 
 import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.ILogger;
-import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 
 public abstract class FrequencyResourceBase extends BiomeResourceBase implements IBasicResource
 {
