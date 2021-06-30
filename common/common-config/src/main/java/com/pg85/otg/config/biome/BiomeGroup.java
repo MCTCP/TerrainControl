@@ -1,14 +1,12 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiome;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IBiomeRegistryProvider;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
@@ -29,7 +27,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	private String name;
 	private int groupRarity;
 	private int generationDepth = 0;
-	private float avgTemp = 0;
 	public Map<String, IBiome> biomes = new LinkedHashMap<String, IBiome>(32);
 
 	/**
@@ -72,35 +69,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		}
 	}
 
-	/**
-	 * Does general post-initialization bookkeeping, like adding the
-	 * LocalBiome instances and initializing the average temperature and
-	 * group rarity.
-	 * @param biomeProvider Used to look up biomes.
-	 */
-	void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
-	{
-		float totalTemp = 0;
-		for (Iterator<Entry<String, IBiome>> it = this.biomes.entrySet().iterator(); it.hasNext();)
-		{
-			Entry<String, IBiome> entry = it.next();
-			String biomeName = entry.getKey();
-
-			IBiome localBiome = biomeProvider.getBiomeByNameOrNull(biomeName);
-			entry.setValue(localBiome);
-
-			if(localBiome == null)
-			{
-				logger.log(LogMarker.FATAL, "Could not find biome with name '"+ biomeName +"' from biome group "+ this.name);
-				throw new RuntimeException("Could not find biome with name '"+ biomeName +"' from biome group "+ this.name);
-			}
-
-			IBiomeConfig biomeConfig = localBiome.getBiomeConfig();
-			totalTemp += biomeConfig.getBiomeTemperature();
-		}
-		this.avgTemp = totalTemp / this.biomes.size();
-	}
-
 	@Override
 	public String toString()
 	{
@@ -111,11 +79,9 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	 * Reads all biomes from the start position until the end of the
 	 * list.
 	 * @param strings The input strings.
-	 * @param start	The position to start. The first element in the list
-	 *				has index 0, the last one size() - 1.
+	 * @param start	The position to start. The first element in the list has index 0, the last one size() - 1.
 	 * @return All biome names.
-	 * @throws InvalidConfigException If one of the elements in the list is
-	 *								not a valid block id.
+	 * @throws InvalidConfigException If one of the elements in the list is not a valid block id.
 	 */
 	private List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
 	{
@@ -136,7 +102,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	 * unrecognized name.
 	 * @param customBiomeNames Set of known custom biomes.
 	 */
-	void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger)
+	void filterBiomes(ArrayList<String> customBiomeNames, ILogger logger)
 	{
 		for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
 		{
@@ -148,9 +114,9 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 					continue;
 				}
 				// Invalid biome name, remove
-				if(logWarnings)
+				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
-					logger.log(LogMarker.WARN, "Invalid biome name {} in biome group {}", biomeName, this.name);
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Invalid biome name {} in biome group {}", biomeName, this.name));
 				}
 			}
 			it.remove();
@@ -194,16 +160,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	public int getGroupId()
 	{
 		return this.groupId;
-	}
-
-	/**
-	 * Gets whether this group is considered cold. This is based on the
-	 * average temperatures of the biomes in the group.
-	 * @return True if the group is cold, false otherwise.
-	 */
-	public boolean isColdGroup()
-	{
-		return this.avgTemp < Constants.ICE_GROUP_MAX_TEMP;
 	}
 
 	private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, IBiome>>();

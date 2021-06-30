@@ -4,7 +4,8 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotChunkBuffer;
@@ -384,8 +385,7 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 		}
 		catch (CommandSyntaxException e)
 		{
-			OTG.log(LogMarker.ERROR, "Command syntax error");
-			e.printStackTrace();
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Command syntax error: ", (Object[])e.getStackTrace()));
 		}
 
 		return argsMap;

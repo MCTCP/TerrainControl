@@ -8,7 +8,8 @@ import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
@@ -129,9 +130,15 @@ public class ExportCommand
 			.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
 
 		// Initialize the settings
-		template.onEnable(preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-			OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-			OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+		template.onEnable(
+			preset.getFolderName(), 
+			OTG.getEngine().getOTGRootFolder(),
+			OTG.getEngine().getLogger(), 
+			OTG.getEngine().getCustomObjectManager(), 
+			OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+			OTG.getEngine().getCustomObjectResourcesManager(), 
+			OTG.getEngine().getModLoadedChecker()
+		);
 
 		BO3 bo3;
 
@@ -139,28 +146,53 @@ public class ExportCommand
 		{
 			try
 			{
-				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, genRegion,
-					nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				bo3 = BO3Creator.createStructure(
+					lowCorner, 
+					highCorner, 
+					center, 
+					objectName, 
+					includeAir, 
+					objectPath, 
+					genRegion,
+					nbtHelper, 
+					null, 
+					template.getSettings(), 
+					preset.getFolderName(), 
+					OTG.getEngine().getOTGRootFolder(),
+					OTG.getEngine().getLogger(), 
+					OTG.getEngine().getCustomObjectManager(), 
+					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()
+				);
 			}
 			catch (Exception e)
 			{
-				OTG.log(LogMarker.INFO, e.toString());
-				for (StackTraceElement s : e.getStackTrace())
-				{
-					OTG.log(LogMarker.INFO, s.toString());
-				}
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 				return true;
 			}
 		} else {
 			// Create a new BO3 from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : SpigotMaterialData.ofBlockData(centerBlockState);
-			bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-				objectPath, genRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
-				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+			bo3 = BO3Creator.create(
+				lowCorner, 
+				highCorner, 
+				center, 
+				centerBlock, 
+				objectName, 
+				includeAir,
+				objectPath, 
+				genRegion, 
+				nbtHelper, 
+				null, 
+				template.getSettings(), 
+				preset.getFolderName(),
+				OTG.getEngine().getOTGRootFolder(), 
+				OTG.getEngine().getLogger(), 
+				OTG.getEngine().getCustomObjectManager(), 
+				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+				OTG.getEngine().getCustomObjectResourcesManager(), 
+				OTG.getEngine().getModLoadedChecker()
+			);
 		}
 
 		// Send feedback, and register the BO3 for immediate use

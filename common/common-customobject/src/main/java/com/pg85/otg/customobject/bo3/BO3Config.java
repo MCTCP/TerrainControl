@@ -31,8 +31,8 @@ import com.pg85.otg.customobject.util.BO3Enums.ExtrudeMode;
 import com.pg85.otg.customobject.util.BO3Enums.OutsideSourceBlock;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -103,10 +103,10 @@ public class BO3Config extends CustomObjectConfigFile
 	/*
 	 * Creates a BO3Config from a file.
 	 */
-	protected BO3Config(SettingsReaderBO4 reader, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	protected BO3Config(SettingsReaderBO4 reader, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		super(reader);
-		init(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		init(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
 	private BO3Config(SettingsReaderBO4 reader)
@@ -156,19 +156,19 @@ public class BO3Config extends CustomObjectConfigFile
 		return clone;
 	}
 
-	private void init(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	private void init(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		this.isOTGPlus = false;
 		// Init settings
-		readConfigSettings(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		readConfigSettings(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		// Read the resources
-		readResources(spawnLog, logger, materialReader, manager);
+		readResources(logger, materialReader, manager);
 
 		this.reader.flushCache();
-		rotateBlocksAndChecks(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		rotateBlocksAndChecks(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
-	private void readResources(boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws InvalidConfigException
+	private void readResources(ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws InvalidConfigException
 	{
 		List<BO3BlockFunction> tempBlocksList = new ArrayList<BO3BlockFunction>();
 		List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
@@ -180,7 +180,7 @@ public class BO3Config extends CustomObjectConfigFile
 
 		BoundingBox box = BoundingBox.newEmptyBox();
 
-		for (CustomObjectConfigFunction<BO3Config> res : this.reader.getConfigFunctions(this, true, spawnLog, logger, materialReader, manager))
+		for (CustomObjectConfigFunction<BO3Config> res : this.reader.getConfigFunctions(this, true, logger, materialReader, manager))
 		{
 			if (res.isValid())
 			{
@@ -352,7 +352,7 @@ public class BO3Config extends CustomObjectConfigFile
 	}
 
 	@Override
-	protected void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	protected void writeConfigSettings(SettingsWriterBO4 writer, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		// The object
 		writer.bigTitle("BO3 object");
@@ -460,38 +460,38 @@ public class BO3Config extends CustomObjectConfigFile
 	}
 
 	@Override	
-	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
-		this.isOTGPlus = readSettings(BO3Settings.IS_OTG_PLUS, spawnLog, logger, materialReader, manager);
+		this.isOTGPlus = readSettings(BO3Settings.IS_OTG_PLUS, logger, materialReader, manager);
 
 		if (this.isOTGPlus)
 		{
 			throw new InvalidConfigException("isOTGPlus: true for a .bo3 file, file must be .bo4.");
 		}
 
-		this.author = readSettings(BO3Settings.AUTHOR, spawnLog, logger, null, null);
-		this.description = readSettings(BO3Settings.DESCRIPTION, spawnLog, logger, null, null);
-		this.settingsMode = readSettings(WorldStandardValues.SETTINGS_MODE_BO3, spawnLog, logger, null, null);
+		this.author = readSettings(BO3Settings.AUTHOR, logger, null, null);
+		this.description = readSettings(BO3Settings.DESCRIPTION, logger, null, null);
+		this.settingsMode = readSettings(WorldStandardValues.SETTINGS_MODE_BO3, logger, null, null);
 
-		this.tree = readSettings(BO3Settings.TREE, spawnLog, logger, null, null);
-		this.frequency = readSettings(BO3Settings.FREQUENCY, spawnLog, logger, null, null);
-		this.rarity = readSettings(BO3Settings.RARITY, spawnLog, logger, null, null);
-		this.rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY, spawnLog, logger, null, null);
-		this.spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT, spawnLog, logger, null, null);
-		this.spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET, spawnLog, logger, null, null);
-		this.spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnLog, logger, null, null);
-		this.extrudeMode = readSettings(BO3Settings.EXTRUDE_MODE, spawnLog, logger, null, null);
-		this.extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS, spawnLog, logger, materialReader, manager);
-		this.minHeight = readSettings(BO3Settings.MIN_HEIGHT, spawnLog, logger, null, null);
-		this.maxHeight = readSettings(BO3Settings.MAX_HEIGHT, spawnLog, logger, null, null);
+		this.tree = readSettings(BO3Settings.TREE, logger, null, null);
+		this.frequency = readSettings(BO3Settings.FREQUENCY, logger, null, null);
+		this.rarity = readSettings(BO3Settings.RARITY, logger, null, null);
+		this.rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY, logger, null, null);
+		this.spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT, logger, null, null);
+		this.spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET, logger, null, null);
+		this.spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE, logger, null, null);
+		this.extrudeMode = readSettings(BO3Settings.EXTRUDE_MODE, logger, null, null);
+		this.extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS, logger, materialReader, manager);
+		this.minHeight = readSettings(BO3Settings.MIN_HEIGHT, logger, null, null);
+		this.maxHeight = readSettings(BO3Settings.MAX_HEIGHT, logger, null, null);
 		this.maxHeight = this.maxHeight < this.minHeight ? this.minHeight : this.maxHeight;
-		this.maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH, spawnLog, logger, null, null);
-		this.excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES, spawnLog, logger, null, null));
+		this.maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH, logger, null, null);
+		this.excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES, logger, null, null));
 
-		this.sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS, spawnLog, logger, materialReader, manager);
-		this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, spawnLog, logger, null, null);
-		this.outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK, spawnLog, logger, null, null);
-		this.doReplaceBlocks = readSettings(BO3Settings.DO_REPLACE_BLOCKS, spawnLog, logger, null, null);
+		this.sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS, logger, materialReader, manager);
+		this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, logger, null, null);
+		this.outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK, logger, null, null);
+		this.doReplaceBlocks = readSettings(BO3Settings.DO_REPLACE_BLOCKS, logger, null, null);
 	}
 
 	private void writeResources(SettingsWriterBO4 writer) throws IOException
@@ -750,7 +750,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/**
 	 * Rotates all the blocks and all the checks
 	 */
-	protected void rotateBlocksAndChecks(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	protected void rotateBlocksAndChecks(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (int i = 1; i < 4; i++)
 		{
@@ -793,7 +793,7 @@ public class BO3Config extends CustomObjectConfigFile
 			this.branches[i] = new BO3BranchFunction[this.branches[i - 1].length];
 			for (int j = 0; j < this.branches[i].length; j++)
 			{
-				this.branches[i][j] = this.branches[i - 1][j].rotate(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				this.branches[i][j] = this.branches[i - 1][j].rotate(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			}
 			// Bounding box
 			this.boundingBoxes[i] = this.boundingBoxes[i - 1].rotate();

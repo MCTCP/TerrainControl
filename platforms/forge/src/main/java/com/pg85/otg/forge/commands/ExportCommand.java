@@ -12,7 +12,8 @@ import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
@@ -124,41 +125,79 @@ public class ExportCommand
 			BOCreator.Corner center = new BOCreator.Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
 
 			// Fetch template or default settings
-			BO3 template = (BO3) OTG.getEngine().getCustomObjectManager().getObjectLoaders().get("bo3")
-				.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
+			BO3 template = 
+				(BO3) OTG.getEngine().getCustomObjectManager().getObjectLoaders().get("bo3")
+				.loadFromFile(
+					templateName, 
+					new File(objectPath.toFile(), 
+					templateName + ".BO3Template"), 
+					OTG.getEngine().getLogger()
+				)
+			;
 
 			// Initialize the settings
-			template.onEnable(preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+			template.onEnable(
+				preset.getFolderName(), 
+				OTG.getEngine().getOTGRootFolder(),
+				OTG.getEngine().getLogger(), 
+				OTG.getEngine().getCustomObjectManager(), 
+				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+				OTG.getEngine().getCustomObjectResourcesManager(), 
+				OTG.getEngine().getModLoadedChecker()
+			);
 			BO3 bo3;
 
 			if (branching)
 			{
 				try
 				{
-					bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, genRegion,
-						nbtHelper, null, template.getSettings(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-						OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-						OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+					bo3 = BO3Creator.createStructure(
+						lowCorner, 
+						highCorner, 
+						center, 
+						objectName, 
+						includeAir, 
+						objectPath, 
+						genRegion,
+						nbtHelper, 
+						null, 
+						template.getSettings(), 
+						preset.getFolderName(), 
+						OTG.getEngine().getOTGRootFolder(), 
+						OTG.getEngine().getLogger(), 
+						OTG.getEngine().getCustomObjectManager(), 
+						OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+						OTG.getEngine().getCustomObjectResourcesManager(), 
+						OTG.getEngine().getModLoadedChecker()
+					);
 				}
 				catch (Exception e)
 				{
-					OTG.log(LogMarker.INFO, e.toString());
-					for (StackTraceElement s : e.getStackTrace())
-					{
-						OTG.log(LogMarker.INFO, s.toString());
-					}
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 					return 0;
 				}
 			} else {
 				// Create a new BO3 from our settings
 				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
-				bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
-					objectPath, genRegion, nbtHelper, null, template.getSettings(), preset.getFolderName(),
-					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				bo3 = BO3Creator.create(
+					lowCorner, 
+					highCorner, 
+					center, 
+					centerBlock, 
+					objectName, 
+					includeAir,
+					objectPath, 
+					genRegion, 
+					nbtHelper, 
+					null, 
+					template.getSettings(), 
+					preset.getFolderName(),
+					OTG.getEngine().getOTGRootFolder(), 
+					OTG.getEngine().getLogger(), 
+					OTG.getEngine().getCustomObjectManager(), 
+					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()
+				);
 			}
 
 			// Send feedback, and register the BO3 for immediate use
@@ -176,11 +215,7 @@ public class ExportCommand
 			}
 		} catch (Exception e) {
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.log(LogMarker.INFO, e.toString());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.log(LogMarker.INFO, s.toString());
-			}
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 		}
 
 		return 0;

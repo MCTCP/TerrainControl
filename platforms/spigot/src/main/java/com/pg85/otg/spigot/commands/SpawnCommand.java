@@ -5,7 +5,8 @@ import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
@@ -95,7 +96,7 @@ public class SpawnCommand
 
         	// Try spawning the structure in available chunks around the player
             int maxRadius = 1000;  
-            OTG.getEngine().getLogger().log(LogMarker.INFO, "Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."); 
+            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."); 
             sender.sendMessage("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while.");
             int playerX = block.getX();
             int playerZ = block.getZ();
@@ -125,8 +126,7 @@ public class SpawnCommand
                     					(BO4)objectToSpawn, 
                     					new ArrayList<String>(), 
                     					chunkCoord, 
-                    					OTG.getEngine().getOTGRootFolder(), 
-                    					OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), 
+                    					OTG.getEngine().getOTGRootFolder(),
                     					OTG.getEngine().getLogger(), 
                     					OTG.getEngine().getCustomObjectManager(), 
                     					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), 
@@ -138,7 +138,7 @@ public class SpawnCommand
                             	
                             	if(chunkCoordSpawned != null)
                             	{
-                                    OTG.getEngine().getLogger().log(LogMarker.INFO, objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
+                                    OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
                             		sender.sendMessage(objectToSpawn.getName() + " was spawned at " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ());
                             		return true;
                             	}
@@ -147,7 +147,7 @@ public class SpawnCommand
                     }
                 }
             }
-            OTG.getEngine().getLogger().log(LogMarker.INFO, objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
+            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
             sender.sendMessage(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information.");
         	return true;        	
 		} else {
@@ -207,7 +207,6 @@ public class SpawnCommand
 			objectName,
 			presetFolderName,
 			OTG.getEngine().getOTGRootFolder(),
-			false,
 			OTG.getEngine().getLogger(),
 			OTG.getEngine().getCustomObjectManager(),
 			OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),

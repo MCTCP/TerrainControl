@@ -7,9 +7,9 @@ import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -25,7 +25,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 	public String nbtName;
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(4, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
@@ -43,7 +43,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 
 		if (args.size() == 5)
 		{
-			nbt = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), spawnLog, logger);
+			nbt = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), logger);
 			if (nbt != null)
 			{
 				nbtName = args.get(4);

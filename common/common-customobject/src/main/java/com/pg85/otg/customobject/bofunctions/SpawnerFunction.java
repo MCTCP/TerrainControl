@@ -3,8 +3,9 @@ package com.pg85.otg.customobject.bofunctions;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.io.BufferedReader;
@@ -48,7 +49,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 	protected boolean metaDataProcessed = false;
 	
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(8, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
@@ -169,22 +170,22 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 		{
 			if(args.size() > 13)
 			{
-				pitch = (float)readDouble(args.get(13), 0, Integer.MAX_VALUE);
+				this.pitch = (float)readDouble(args.get(13), 0, Integer.MAX_VALUE);
 			}
 		} else {
 			if(args.size() > 14)
 			{
-				pitch = (float)readDouble(args.get(14), 0, Integer.MAX_VALUE);
+				this.pitch = (float)readDouble(args.get(14), 0, Integer.MAX_VALUE);
 			}
 		}
 	}
 
-	public String getMetaData(boolean spawnLog, ILogger logger)
+	public String getMetaData(ILogger logger)
 	{
-		if(nbtFileName != null && nbtFileName.length() > 0 && metaDataTag == null && !metaDataProcessed)
+		if(this.nbtFileName != null && this.nbtFileName.length() > 0 && this.metaDataTag == null && !this.metaDataProcessed)
 		{
-			metaDataProcessed = true;
-			File metaDataFile = new File(nbtFileName);
+			this.metaDataProcessed = true;
+			File metaDataFile = new File(this.nbtFileName);
 			StringBuilder stringbuilder = new StringBuilder();
 			if(metaDataFile.exists())
 			{
@@ -193,7 +194,8 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 					try {
 						String line = reader.readLine();
 
-						while (line != null) {
+						while (line != null)
+						{
 							stringbuilder.append(line);
 							line = reader.readLine();
 						}
@@ -201,31 +203,28 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 						reader.close();
 					}
 				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
-				catch (IOException e1) {
-					// TODO Auto-generated catch block
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			} else {
-				if(spawnLog)
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, "Could not find file \"" + nbtFileName  + "\" for Spawner: " + this.makeString());
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find file \"" + this.nbtFileName  + "\" for Spawner: " + this.makeString());
 				}
 			}
 
-			metaDataTag = stringbuilder.length() > 0 ? stringbuilder.toString() : null;
+			this.metaDataTag = stringbuilder.length() > 0 ? stringbuilder.toString() : null;
 		}
 		
-		metaDataProcessed = true;		
-		return metaDataTag;
+		this.metaDataProcessed = true;		
+		return this.metaDataTag;
 	}
 
 	@Override
 	public String makeString()
 	{
-		return "Spawner(" + x + ',' + y + ',' + z + ',' + mobName + (originalnbtFileName != null && originalnbtFileName.length() > 0 ? "," + originalnbtFileName : "") + ',' + groupSize + ',' + interval + ',' + spawnChance + ',' + maxCount + ',' + despawnTime + ',' + velocityX + ',' + velocityY + ',' + velocityZ + ',' + yaw + ',' + pitch + ')';
+		return "Spawner(" + x + ',' + y + ',' + z + ',' + this.mobName + (this.originalnbtFileName != null && this.originalnbtFileName.length() > 0 ? "," + this.originalnbtFileName : "") + ',' + this.groupSize + ',' + this.interval + ',' + this.spawnChance + ',' + this.maxCount + ',' + this.despawnTime + ',' + this.velocityX + ',' + this.velocityY + ',' + this.velocityZ + ',' + this.yaw + ',' + this.pitch + ')';
 	}
 
 	@Override
@@ -236,7 +235,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 			return false;
 		}
 		SpawnerFunction<T> block = (SpawnerFunction<T>) other;
-		return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(mobName) && block.originalnbtFileName.equalsIgnoreCase(originalnbtFileName) && block.groupSize == groupSize && block.interval == interval && block.spawnChance == spawnChance && block.maxCount == maxCount && block.despawnTime == despawnTime && block.velocityX == velocityX && block.velocityY == velocityY && block.velocityZ == velocityZ && block.yaw == yaw && block.pitch == pitch;
+		return block.x == this.x && block.y == this.y && block.z == this.z && block.mobName.equalsIgnoreCase(this.mobName) && block.originalnbtFileName.equalsIgnoreCase(this.originalnbtFileName) && block.groupSize == this.groupSize && block.interval == this.interval && block.spawnChance == this.spawnChance && block.maxCount == this.maxCount && block.despawnTime == this.despawnTime && block.velocityX == this.velocityX && block.velocityY == this.velocityY && block.velocityZ == this.velocityZ && block.yaw == this.yaw && block.pitch == this.pitch;
 	}
 	
 	public abstract SpawnerFunction<T> getNewInstance();

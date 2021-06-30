@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.biome.BiomeGroupManager;
@@ -16,9 +15,9 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
-import com.pg85.otg.constants.SettingsEnums.TerrainMode;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
@@ -44,7 +43,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Not used atm, implement these.
 
 	private boolean frozenOcean;
-	private TerrainMode modeTerrain;
 	private String bo3AtSpawn;
 
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
@@ -57,14 +55,14 @@ public class WorldConfig extends WorldConfigBase
 	private int worldHeightScaleBits;
 	private int worldHeightCapBits;
 	
-	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		super(settingsReader.getName());
 
 		this.worldBiomes.addAll(biomes);
 		this.renameOldSettings(settingsReader, logger, materialReader);
-		this.readConfigSettings(settingsReader, biomeResourcesManager, spawnLog, logger, materialReader);
-		this.validateAndCorrectSettings(settingsDir, true, OTG.getEngine().getLogger());		 
+		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader);
+		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
 	public BiomeGroupManager getBiomeGroupManager()
@@ -112,14 +110,14 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	@Override
-	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger)
+	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger)
 	{
 		this.landSize = lowerThanOrEqualTo(this.landSize, this.generationDepth);
 		this.landFuzzy = lowerThanOrEqualTo(this.landFuzzy, this.generationDepth - this.landSize);
 		this.riverRarity = lowerThanOrEqualTo(this.riverRarity, this.generationDepth);
 		this.riverSize = lowerThanOrEqualTo(this.riverSize, this.generationDepth - this.riverRarity);
 
-		this.biomeGroupManager.filterBiomes(this.worldBiomes, logWarnings, logger);
+		this.biomeGroupManager.filterBiomes(this.worldBiomes, logger);
 		this.isleBiomes = filterBiomes(this.isleBiomes, this.worldBiomes);
 		this.borderBiomes = filterBiomes(this.borderBiomes, this.worldBiomes);
 
@@ -128,7 +126,7 @@ public class WorldConfig extends WorldConfigBase
 			File mapFile = new File(settingsDir.toString(), this.imageFile);
 			if (!mapFile.exists())
 			{
-				OTG.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
+				logger.log(LogLevel.ERROR, LogCategory.MAIN, "Biome map file not found. Switching BiomeMode to Normal");
 				this.biomeMode = BiomeMode.Normal;
 			}
 		}
@@ -142,7 +140,7 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		// Misc
 
@@ -200,7 +198,7 @@ public class WorldConfig extends WorldConfigBase
 		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger);
 
 		// BiomeGroups requires that values like genDepth are initialized
-		readBiomeGroups(reader, biomeResourcesManager, spawnLog, logger, materialReader);
+		readBiomeGroups(reader, biomeResourcesManager, logger, materialReader);
 
 		// Terrain settings
 
@@ -281,16 +279,15 @@ public class WorldConfig extends WorldConfigBase
 
 		// TODO: Re-implement these and clean up
 
-		this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger);
 		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger);
 		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
 		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger);
 	}
 
-	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeGroupManager = new BiomeGroupManager();
-		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, biomeResourcesManager, spawnLog, logger, materialReader))
+		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, biomeResourcesManager, logger, materialReader))
 		{
 			if (res != null)
 			{
@@ -352,20 +349,13 @@ public class WorldConfig extends WorldConfigBase
 			"Color of the distance fog, can be overridden per biome."
 		);
 
-		writer.header2("Biome & Terrain Modes");
+		writer.header2("Biome Modes");
 
 		writer.putSetting(WorldStandardValues.BIOME_MODE, this.biomeMode,
 			"Possible biome modes:",
 			"	Normal - standard random generation with biome groups, uses all features.",
 			"	FromImage - biome layout defined by an image file.",
 			"	NoGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes."
-		);
-
-		writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.modeTerrain,
-			"Possible terrain modes:",
-			"	Normal - standard generation, uses all features",
-			"	TerrainTest - generate only terrain without any resources (useful for testing purposes)",
-			"	NotGenerate - generate empty chunks"
 		);
 		
 		writer.header1("Settings for BiomeMode: Normal/NoGroups");

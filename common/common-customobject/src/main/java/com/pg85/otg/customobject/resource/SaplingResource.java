@@ -6,10 +6,11 @@ import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -56,7 +57,10 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 			try {
 				this.saplingMaterial = materialReader.readMaterial(args.get(1));
 			} catch (InvalidConfigException e) {
-				logger.log(LogMarker.ERROR, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
+				if(logger.getLogCategoryEnabled(LogCategory.DECORATION))
+				{
+					logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
+				}
 			}
 		}
 		if (this.saplingType == null && this.saplingMaterial == null)
@@ -92,9 +96,9 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 		}
 	}
 
-	private static CustomObject getTreeObject(String objectName, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	private static CustomObject getTreeObject(String objectName, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
-		CustomObject maybeTree = customObjectManager.getGlobalObjects().getObjectByName(objectName, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		CustomObject maybeTree = customObjectManager.getGlobalObjects().getObjectByName(objectName, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if (maybeTree == null)
 		{
 			throw new InvalidConfigException("Unknown object " + objectName);
@@ -117,9 +121,9 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 	 *					the trunk.
 	 * @return Whether a tree was grown.
 	 */
-	public boolean growSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean isWideTree, int x, int y, int z, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public boolean growSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean isWideTree, int x, int y, int z, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		loadTreeObjects(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		loadTreeObjects(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		
 		CustomObject tree;
 		Rotation rotation;
@@ -153,7 +157,7 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 		return false;
 	}
 
-	private void loadTreeObjects(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void loadTreeObjects(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(!this.treesLoaded)
 		{
@@ -163,11 +167,14 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 			{
 				CustomObject tree;
 				try {
-					tree = getTreeObject(treeName, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					tree = getTreeObject(treeName, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					this.trees.add(tree);
 				} catch (InvalidConfigException e) {
 					this.trees.add(null);
-					logger.log(LogMarker.WARN, "Could not find Object " + treeName + " for Sapling() resource in biome " + this.biomeName);
+					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find Object " + treeName + " for Sapling() resource in biome " + this.biomeName);
+					}
 				}
 			}
 			

@@ -2,8 +2,8 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -33,7 +33,7 @@ public class BoulderResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int z)
 	{
 		int y = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		if (y < this.minAltitude || y > this.maxAltitude)

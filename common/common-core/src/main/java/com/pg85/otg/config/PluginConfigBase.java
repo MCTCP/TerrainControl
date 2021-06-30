@@ -1,7 +1,7 @@
 package com.pg85.otg.config;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.logging.Logger.LogLevels;
+import com.pg85.otg.constants.SettingsEnums.LogLevels;
 import com.pg85.otg.util.interfaces.IPluginConfig;
 
 /**
@@ -17,11 +17,17 @@ import com.pg85.otg.util.interfaces.IPluginConfig;
 public abstract class PluginConfigBase extends ConfigFile implements IPluginConfig
 {
 	protected LogLevels logLevel;
-	protected boolean developerMode;
-	protected int workerThreads;
-	protected boolean spawnLog;
 	protected ConfigMode settingsMode;
-
+	protected int workerThreads;
+	protected boolean developerMode;
+	protected boolean logCustomObjects;
+	protected boolean logStructurePlotting;
+	protected boolean logConfigs;
+	protected boolean logDecoration;
+	protected boolean logBiomeRegistry;
+	protected boolean decorationEnabled;
+	protected boolean logMobs;
+	
 	public PluginConfigBase(String configName)
 	{
 		super(configName);
@@ -46,11 +52,47 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	}
 	
 	@Override
-	public boolean getSpawnLogEnabled()
+	public boolean logCustomObjects()
 	{
-		return this.spawnLog;
+		return this.logCustomObjects;
+	}
+	
+	@Override
+	public boolean logStructurePlotting()
+	{
+		return this.logStructurePlotting;
+	}
+	
+	@Override
+	public boolean logConfigs()
+	{
+		return this.logConfigs;
+	}	
+
+	@Override
+	public boolean logDecoration()
+	{
+		return this.logDecoration;
 	}
 
+	@Override
+	public boolean logBiomeRegistry()
+	{
+		return this.logBiomeRegistry;
+	}
+	
+	@Override
+	public boolean getDecorationEnabled()
+	{
+		return this.decorationEnabled;
+	}
+
+	@Override
+	public boolean logMobs()
+	{
+		return this.logMobs;
+	}
+	
 	@Override
 	public ConfigMode getSettingsMode()
 	{

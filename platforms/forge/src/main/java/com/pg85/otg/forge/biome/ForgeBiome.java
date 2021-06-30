@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.biome;
 
+import java.util.List;
 import java.util.Optional;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.standard.BiomeStandardValues;
@@ -9,7 +10,8 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
@@ -183,7 +185,10 @@ public class ForgeBiome implements IBiome
 		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
 		if (category == null)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse biome category " + biomeConfig.getBiomeCategory());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category " + biomeConfig.getBiomeCategory());
+			}
 		}
 		
 		return biomeBuilder.build().setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()));
@@ -192,71 +197,33 @@ public class ForgeBiome implements IBiome
 	private static MobSpawnInfo.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
 	{
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = new MobSpawnInfo.Builder();
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMonsters())
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		mobSpawnInfoBuilder.setPlayerCanSpawn(); // Default biomes do this, not sure if needed?
+		return mobSpawnInfoBuilder;
+	}
+
+	private static void addMobGroup(MobSpawnInfo.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	{
+		for(WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
 			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeName);
+				}
 			}
 		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getCreatures())
-		{
-			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
-			if(entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-			}
-		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterCreatures())
-		{
-			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
-			if(entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.WATER_CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-			}
-		}		
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getAmbientCreatures())
-		{
-			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
-			if(entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-			}
-		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterAmbientCreatures())
-		{
-			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
-			if(entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.WATER_AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-			}
-		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMiscCreatures())
-		{
-			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
-			if(entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.MISC, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-			}
-		}
-		
-		mobSpawnInfoBuilder.setPlayerCanSpawn(); // Default biomes do this, not sure if needed?
-		return mobSpawnInfoBuilder;
-	}
-
+	}	
+	
 	private static void addVanillaStructures(Builder biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// TODO: Currently we can only enable/disable structures per biome and use any configuration options exposed by the vanilla structure 

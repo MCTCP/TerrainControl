@@ -8,7 +8,8 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
@@ -114,8 +115,7 @@ public class SpawnCommand
 	                            			(BO4)objectToSpawn, 
 	                            			new ArrayList<String>(), 
 	                            			chunkCoord, 
-	                            			OTG.getEngine().getOTGRootFolder(), 
-	                            			OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), 
+	                            			OTG.getEngine().getOTGRootFolder(),
 	                            			OTG.getEngine().getLogger(), 
 	                            			OTG.getEngine().getCustomObjectManager(), 
 	                            			OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), 
@@ -166,11 +166,7 @@ public class SpawnCommand
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.log(LogMarker.INFO, e.toString());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.log(LogMarker.INFO, s.toString());
-			}
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during spawn command: ", (Object[])e.getStackTrace()));
 		}
 		return 0;
 	}
@@ -185,7 +181,6 @@ public class SpawnCommand
 			objectName,
 			presetFolderName,
 			OTG.getEngine().getOTGRootFolder(),
-			false,
 			OTG.getEngine().getLogger(),
 			OTG.getEngine().getCustomObjectManager(),
 			OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),

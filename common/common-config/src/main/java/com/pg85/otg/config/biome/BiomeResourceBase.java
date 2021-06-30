@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 /**
  * Represents a BiomeConfig ResourceQueue resource.
  */
-public abstract class ResourceBase extends ConfigFunction<IBiomeConfig>
+public abstract class BiomeResourceBase extends ConfigFunction<IBiomeConfig>
 {
-	static ResourceBase createResource(IBiomeConfig config, ILogger logger, IMaterialReader materialReader, Class<? extends ResourceBase> clazz, Object... args)
+	static BiomeResourceBase createResource(IBiomeConfig config, ILogger logger, IMaterialReader materialReader, Class<? extends BiomeResourceBase> clazz, Object... args)
 	{
 		List<String> stringArgs = new ArrayList<String>(args.length);
 		for (Object arg : args)
@@ -30,5 +30,5 @@ public abstract class ResourceBase extends ConfigFunction<IBiomeConfig>
 	}
 	
 	// Children must implement this constructor, or createResource will fail
-	public ResourceBase(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) { }
+	public BiomeResourceBase(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) { }
 }

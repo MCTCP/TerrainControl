@@ -3,7 +3,7 @@ package com.pg85.otg.customobject.bofunctions;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public abstract class ParticleFunction<T extends CustomObjectConfigFile> extends
 	public boolean velocityZSet = false;
 
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it

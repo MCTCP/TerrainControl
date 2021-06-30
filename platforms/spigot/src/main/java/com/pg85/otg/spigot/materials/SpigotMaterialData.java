@@ -1,12 +1,6 @@
 package com.pg85.otg.spigot.materials;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.pg85.otg.OTG;
-import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.OTGDirection;
-import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.materials.MaterialProperties;
@@ -24,7 +18,7 @@ import java.util.Objects;
  */
 public class SpigotMaterialData extends LocalMaterialData
 {
-	private static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
+	static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
 	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
 
 	private final IBlockData blockData;
@@ -40,125 +34,6 @@ public class SpigotMaterialData extends LocalMaterialData
 		this.blockData = blockData;
 		this.rawEntry = raw;
 		this.isBlank = isBlank;
-	}
-
-	public static LocalMaterialData ofString(String input) throws InvalidConfigException
-	{
-		if (input == null || input.trim().isEmpty())
-		{
-			return null;
-		}
-
-		// Try parsing as an internal Minecraft name
-		// This is so that things like "minecraft:stone" aren't parsed
-		// as the block "minecraft" with data "stone", but instead as the
-		// block "minecraft:stone" with no block data.
-
-		// Used in BO4's as placeholder/detector block.
-		if (input.equalsIgnoreCase("blank"))
-		{
-			return SpigotMaterialData.blank;
-		}
-
-		IBlockData blockState;
-		String blockNameCorrected = input.trim().toLowerCase();
-		// Try parsing as legacy block name / id
-		if (!blockNameCorrected.contains(":"))
-		{
-			blockState = SpigotLegacyMaterials.fromLegacyBlockName(blockNameCorrected);
-			if (blockState != null)
-			{
-				return ofBlockData(blockState, input);
-			}
-			try
-			{
-				// Deal with pesky accidental floats that parseInt won't recognize
-				if (blockNameCorrected.endsWith(".0"))
-				{
-					blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length() - 2);
-				}
-				int blockId = Integer.parseInt(blockNameCorrected);
-				String fromLegacyIdName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-				if (fromLegacyIdName != null)
-				{
-					blockNameCorrected = fromLegacyIdName;
-				}
-			}
-			catch (NumberFormatException ignored) { }
-		}
-
-		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
-
-		// Use mc /setblock command logic to parse block string for us <3
-		IBlockData blockdata = null;
-		try
-		{
-			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
-			blockdata = new ArgumentBlock(new StringReader(newInput), true).a(true).getBlockData();
-		}
-		catch (CommandSyntaxException ignored) { }
-		if (blockdata != null)
-		{
-			// For leaves, add DISTANCE 1 to make them not decay.
-			if (blockdata.getMaterial().equals(Material.LEAVES))
-			{
-				return ofBlockData(blockdata.set(BlockLeaves.DISTANCE, 1), input);
-			}
-			return ofBlockData(blockdata, input);
-		}
-
-		// Try legacy block with data (fe SAND:1 or 12:1)
-		if (blockNameCorrected.contains(":"))
-		{
-			// Try parsing data argument as int.
-			String blockNameOrId = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
-			try
-			{
-				int blockId = Integer.parseInt(blockNameOrId);
-				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-			} catch (NumberFormatException ignored) { }
-
-			try
-			{
-				int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
-				blockState = SpigotLegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
-				if (blockState != null)
-				{
-					return ofBlockData(blockState, input);
-				}
-				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
-				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
-			} catch (NumberFormatException ignored) { }
-		}
-
-		// Try without data
-		Block block;
-
-		try
-		{
-			// This returns AIR if block is not found ><. ----Does it for spigot too?
-			block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
-			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
-			{
-				// For leaves, add DISTANCE 1 to make them not decay.
-				if (block.getBlockData().getMaterial().equals(Material.LEAVES))
-				{
-					return ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
-				}
-				return ofBlockData(block.getBlockData(), input);
-			}
-		} catch(ResourceKeyInvalidException ignored) { }
-
-		// Try legacy name again, without data.
-		blockState = SpigotLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
-		if (blockState != null)
-		{
-			return ofBlockData(blockState, input);
-		}
-
-		OTG.log(LogMarker.INFO, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
-
-		return ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);
 	}
 
 	public static LocalMaterialData ofBlockData(IBlockData blockData)

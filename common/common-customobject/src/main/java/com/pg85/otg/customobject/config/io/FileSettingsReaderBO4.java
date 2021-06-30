@@ -4,9 +4,10 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.io.BufferedReader;
@@ -131,7 +132,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 	}
 
 	@Override
-	public <T> List<CustomObjectConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public <T> List<CustomObjectConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		List<CustomObjectConfigFunction<T>> result = new ArrayList<CustomObjectConfigFunction<T>>(configFunctions.size());
 		for (StringOnLine configFunctionLine : configFunctions)
@@ -141,22 +142,32 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 			String functionName = configFunctionString.substring(0, bracketIndex);
 			String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
 			List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
-			CustomObjectConfigFunction<T> function = manager.getConfigFunction(functionName, holder, args, spawnLog, logger, materialReader);
+			CustomObjectConfigFunction<T> function = manager.getConfigFunction(functionName, holder, args, logger, materialReader);
 			if(function == null)
 			{
-				function = manager.getConfigFunction(functionName, holder, args, spawnLog, logger, materialReader);	
+				function = manager.getConfigFunction(functionName, holder, args, logger, materialReader);	
 			}
 			result.add(function);
-			if (!function.isValid() && spawnLog)
+			if (!function.isValid() && logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
-				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.line, function.getError());
+				logger.log(
+					LogLevel.ERROR,
+					LogCategory.CONFIGS,
+					String.format(
+						"Invalid resource {} in {} on line {}: {}", 
+						functionName, 
+						this.name, 
+						configFunctionLine.line, 
+						function.getError()
+					)
+				);
 			}
 		}
 
 		// Add inherited functions
 		if (useFallback && fallback != null)
 		{
-			return FileSettingsReaderBO4.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, spawnLog, logger, materialReader, manager));
+			return FileSettingsReaderBO4.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, logger, materialReader, manager));
 		}
 
 		return result;
@@ -186,7 +197,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 	}
 
 	@Override
-	public <S> S getSetting(Setting<S> setting, S defaultValue, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		// Try reading the setting from the file
 		StringOnLine stringWithLineNumber = this.settingsCache.get(setting.getName().toLowerCase());
@@ -199,14 +210,28 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 			}
 			catch (InvalidConfigException e)
 			{
-				logger.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}", stringValue, setting, name, stringWithLineNumber.line, e.getMessage());
+				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+				{
+					logger.log(
+						LogLevel.ERROR, 
+						LogCategory.CONFIGS,
+						String.format(
+							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
+							stringValue, 
+							setting, 
+							this.name, 
+							stringWithLineNumber.line, 
+							e.getMessage()
+						)
+					);
+				}
 			}
 		}
 
 		// Try the fallback
-		if (fallback != null)
+		if (this.fallback != null)
 		{
-			return fallback.getSetting(setting, defaultValue, spawnLog, logger, materialReader, manager);
+			return this.fallback.getSetting(setting, defaultValue, logger, materialReader, manager);
 		}
 
 		// Return default value
@@ -286,16 +311,17 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 		}
 		catch (IOException e)
 		{
-			logger.printStackTrace(LogMarker.FATAL, e);
+			logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Exception when reading file: ", (Object[])e.getStackTrace()));
 		} finally {
 			if (settingsReader != null)
 			{
 				try
 				{
 					settingsReader.close();
-				} catch (IOException localIOException2)
+				}
+				catch (IOException localIOException2)
 				{
-					logger.printStackTrace(LogMarker.FATAL, localIOException2);
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Exception when closing file: ", (Object[])localIOException2.getStackTrace()));
 				}
 			}
 		}

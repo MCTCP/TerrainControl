@@ -1,18 +1,18 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.util.List;
 import java.util.Random;
 
-public final class FossilResource extends ResourceBase implements IBasicResource
+public final class FossilResource extends BiomeResourceBase implements IBasicResource
 {
 	private final int chance;
 	private final int maxAltitude;
@@ -29,7 +29,7 @@ public final class FossilResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);		
 		worldGenRegion.placeFossil(random, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX(), y, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ(), this.chance);

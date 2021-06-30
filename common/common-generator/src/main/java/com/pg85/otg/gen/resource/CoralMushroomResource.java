@@ -2,8 +2,8 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -21,7 +21,7 @@ public class CoralMushroomResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion world, Random random, int x, int z)
 	{
 		int y = world.getBlockAboveSolidHeight(x, z);
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);

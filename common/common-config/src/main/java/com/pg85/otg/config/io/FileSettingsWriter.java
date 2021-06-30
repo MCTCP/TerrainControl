@@ -1,8 +1,9 @@
 package com.pg85.otg.config.io;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,16 +47,15 @@ public final class FileSettingsWriter
 		try
 		{
 			writer.write(config);
-		} catch (IOException e)
-		{
-			logIOError(e, file, logger);
 		}
-	}
-
-	private static void logIOError(IOException e, File file, ILogger logger)
-	{
-		logger.log(LogMarker.ERROR, "Failed to write to file {}", file);
-		logger.printStackTrace(LogMarker.ERROR, e);
+		catch (IOException e)
+		{
+			logger.log(
+				LogLevel.ERROR,
+				LogCategory.CONFIGS,
+				String.format("Failed to write to file " + file + ", error: ",(Object[])e.getStackTrace())
+			);
+		}
 	}
 
 	/**

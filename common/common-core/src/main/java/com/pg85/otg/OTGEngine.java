@@ -3,7 +3,6 @@ package com.pg85.otg;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.PluginConfig;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
@@ -12,9 +11,10 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.LocalPresetLoader;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IPluginConfig;
 
@@ -63,26 +63,30 @@ public abstract class OTGEngine
 		this.modLoadedChecker = modLoadedChecker;
 	}
 	
-	// Platform-specific methods
-
-	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
-
 	// Get jar file that's running OTG, where we will find our default preset
 	public abstract File getJarFile();
 	
 	// Startup / shutdown
-	
+
 	public void onStart()
 	{
 		// Load plugin config
 		
 		File pluginConfigFile = Paths.get(getOTGRootFolder().toString(), Constants.PluginConfigFilename).toFile();
 		this.pluginConfig = new PluginConfig(
-			FileSettingsReader.read(Constants.PluginConfigFilename, pluginConfigFile, this.logger), 
+			FileSettingsReader.read(Constants.PluginConfigFilename, pluginConfigFile, (ILogger)null), 
 			this.biomeResourcesManager,
 			this.logger
 		);
-		this.logger.setLevel(this.pluginConfig.getLogLevel().getLevel());
+		this.logger.init(
+			this.pluginConfig.getLogLevel().getLevel(), 
+			this.pluginConfig.logCustomObjects(), 
+			this.pluginConfig.logStructurePlotting(), 
+			this.pluginConfig.logConfigs(),
+			this.pluginConfig.logBiomeRegistry(),
+			this.pluginConfig.logDecoration(),
+			this.pluginConfig.logMobs()
+		);
 		FileSettingsWriter.writeToFile(this.pluginConfig.getSettingsAsMap(), pluginConfigFile, this.pluginConfig.getSettingsMode(), this.logger);
 
 		// Create OTG folders
@@ -99,7 +103,7 @@ public abstract class OTGEngine
 			modPacksDir.mkdirs();
 		}
 
-		File globalObjectsDir = globalObjectsFolder.toFile();
+		File globalObjectsDir = this.globalObjectsFolder.toFile();
 		if(!globalObjectsDir.exists())
 		{
 			globalObjectsDir.mkdirs();
@@ -108,15 +112,15 @@ public abstract class OTGEngine
 		unpackDefaultPreset(presetsDir);
 
 		// Create manager objects
-		
-		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
-		boolean developerMode = getPluginConfig().getDeveloperModeEnabled();
-		ILogger logger = this.logger;
-		Path otgRootFolder = this.otgRootFolder;
-		Path presetsDirectory = this.getPresetsDirectory();
 
 		this.customObjectResourcesManager = new CustomObjectResourcesManager();
-		this.customObjectManager = new CustomObjectManager(spawnLog, developerMode, logger, otgRootFolder, presetsDirectory, this.customObjectResourcesManager);
+		this.customObjectManager = new CustomObjectManager(
+			getPluginConfig().getDeveloperModeEnabled(), 
+			this.logger, 
+			this.otgRootFolder, 
+			getPresetsDirectory(), 
+			this.customObjectResourcesManager
+		);
 
 		// Create BiomeResourcesManager, pass all config resources
 
@@ -127,7 +131,7 @@ public abstract class OTGEngine
 
 		// Load presets
 		
-		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger);
+		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, this.logger);
 	}
 
 	private void unpackDefaultPreset(File presetsDir)
@@ -138,14 +142,13 @@ public abstract class OTGEngine
 			File jarFileLocation = getJarFile();
 			if(jarFileLocation == null || !jarFileLocation.exists())
 			{
-				OTG.log(LogMarker.INFO, "Could not find root jar file, skipping default preset unpack (copy it manually for development).");
+				this.logger.log(LogLevel.WARN, LogCategory.MAIN, "Could not find root jar file, skipping default preset unpack (copy it manually for development).");
 			} else {
 				jarFile = new JarFile(jarFileLocation);
 				Enumeration<JarEntry> entries = jarFile.entries();
 				// Unpack default preset if none present
 				if (new File(presetsDir.getPath() + File.separator + "Default").exists())
 				{
-					OTG.log(LogMarker.DEBUG, "Default preset already exists");
 					File wc = new File(presetsDir.getPath() + File.separator+ "Default" + File.separator + Constants.WORLD_CONFIG_FILE);
 					if (wc.exists())
 					{
@@ -173,11 +176,8 @@ public abstract class OTGEngine
 								return; // The two have the same version, cancel
 						}
 					}
-				} else {
-					OTG.log(LogMarker.DEBUG, "Default preset does not exist");
 				}
 	
-				OTG.log(LogMarker.INFO, "Unpacking default preset");
 				String rootDir = getOTGRootFolder().toString();
 				String path = "resources/Presets/Default/";
 				entries = jarFile.entries();
@@ -230,8 +230,12 @@ public abstract class OTGEngine
 		String line;
 		// Filter out the line with Version in it
 		while ((line = reader.readLine()) != null)
+		{
 			if (line.contains("Version:"))
+			{
 				break;
+			}
+		}
 
 		if (line != null)
 		{
@@ -250,24 +254,24 @@ public abstract class OTGEngine
 	public void onShutdown()
 	{
 		// Shutdown all loaders
-		customObjectManager.shutdown();
+		this.customObjectManager.shutdown();
 	}
 
 	// Managers
 
 	public BiomeResourcesManager getBiomeResourceManager()
 	{
-		return biomeResourcesManager;
+		return this.biomeResourcesManager;
 	}
 	
 	public CustomObjectResourcesManager getCustomObjectResourcesManager()
 	{
-		return customObjectResourcesManager;
+		return this.customObjectResourcesManager;
 	}
 	
 	public CustomObjectManager getCustomObjectManager()
 	{
-		return customObjectManager;
+		return this.customObjectManager;
 	}
 	
 	public LocalPresetLoader getPresetLoader()
@@ -284,7 +288,7 @@ public abstract class OTGEngine
 	
 	public IPluginConfig getPluginConfig()
 	{
-		return pluginConfig;
+		return this.pluginConfig;
 	}
 
 	// OTG dirs
@@ -305,10 +309,10 @@ public abstract class OTGEngine
 	}
 
 	// Logging
-	
+
 	public ILogger getLogger()
 	{
-		return logger;
+		return this.logger;
 	}
 		
 	// Builders/Factories
@@ -316,6 +320,18 @@ public abstract class OTGEngine
 	public CustomStructureCache createCustomStructureCache(String presetFolderName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(presetFolderName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getPresetLoader().getMaterialReader(presetFolderName), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(
+			presetFolderName, 
+			worldSavepath, 
+			dimId, 
+			worldSeed, 
+			isBo4Enabled, 
+			getOTGRootFolder(), 
+			getLogger(), 
+			getCustomObjectManager(), 
+			getPresetLoader().getMaterialReader(presetFolderName), 
+			getCustomObjectResourcesManager(), 
+			null
+		);
 	}
 }

@@ -3,7 +3,7 @@ package com.pg85.otg.config;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
@@ -54,13 +54,13 @@ public abstract class ConfigFile
 	 * {@link SettingsMap} provided to the constructor.
 	 * @param reader The settings reader.
 	 */
-	protected abstract void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader);
+	protected abstract void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader);
 
 	/**
 	 * Called directly after {@link #readConfigSettings(SettingsMap)} to fix
 	 * impossible combinations of settings.
 	 */
-	protected abstract void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger);
+	protected abstract void validateAndCorrectSettings(Path settingsDir, ILogger logger);
 
 	/**
 	 * Called before {@link #readConfigSettings(SettingsMap)} to rewrite

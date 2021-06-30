@@ -1,8 +1,9 @@
 package com.pg85.otg.customobject.structures.bo4;
 
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
@@ -46,22 +47,22 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 	 *
 	 * @return The object.
 	 */
-	public IStructuredCustomObject getObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public IStructuredCustomObject getObject(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(this.object == null)
 		{
-			CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 			if(object == null || !(object instanceof StructuredCustomObject))
 			{
 				object = null;
-				if(spawnLog)
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, "Could not find BO3/BO4 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find BO3/BO4 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
 				}
 			}
-			this.bo3Name = object != null ? object.getName() : this.bo3Name;
 
+			this.bo3Name = object != null ? object.getName() : this.bo3Name;
 			this.object = (StructuredCustomObject)object;
 			return this.object;
 		}
@@ -76,9 +77,9 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 	 *
 	 * @return The casted object.
 	*/
-	StructuredCustomObject getStructuredObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	StructuredCustomObject getStructuredObject(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		return (StructuredCustomObject)getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		return (StructuredCustomObject)getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 		
 	@Override

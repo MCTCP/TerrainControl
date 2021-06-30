@@ -6,8 +6,8 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 
@@ -60,14 +60,14 @@ public class BranchNode implements Comparable<BranchNode>
 	/**
 	 * @return the branch CustomObject
 	 */
-	public StructuredCustomObject getCustomObject(boolean lazyLoad, String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public StructuredCustomObject getCustomObject(boolean lazyLoad, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(customObject != null || !lazyLoad)
 		{
 			return customObject;
 		}
 
-		CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(customObjectName, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(customObjectName, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(customObject != null && !(customObject instanceof StructuredCustomObject))
 		{
 			customObject = null;

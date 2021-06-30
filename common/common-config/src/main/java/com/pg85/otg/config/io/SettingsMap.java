@@ -3,7 +3,7 @@ package com.pg85.otg.config.io;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.config.settingType.Setting;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.util.Collection;
@@ -42,7 +42,7 @@ public interface SettingsMap
 	 * fallback reader} must be used, false otherwise.
 	 * @return The config functions.
 	 */
-	<T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader);
+	<T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader);
 
 	/**
 	 * Gets the name of this config file. For worlds, this is the world name,

@@ -1,4 +1,4 @@
-package com.pg85.otg.spigot.biome;
+package com.pg85.otg.spigot.util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

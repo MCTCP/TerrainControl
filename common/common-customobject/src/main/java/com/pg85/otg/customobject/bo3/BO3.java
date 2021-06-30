@@ -29,13 +29,13 @@ import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.BO3Enums.OutsideSourceBlock;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -80,7 +80,7 @@ public class BO3 implements StructuredCustomObject
 	}
 
 	@Override
-	public boolean onEnable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public boolean onEnable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(this.isInvalidConfig)
 		{
@@ -92,10 +92,10 @@ public class BO3 implements StructuredCustomObject
 		}
 		try
 		{
-			this.settings = new BO3Config(new FileSettingsReaderBO4(this.name, this.file, logger), presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			this.settings = new BO3Config(new FileSettingsReaderBO4(this.name, this.file, logger), presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			if (this.settings.settingsMode != ConfigMode.WriteDisable)
 			{
-				FileSettingsWriterBO4.writeToFile(this.settings, this.settings.settingsMode, spawnLog, logger, materialReader, manager);
+				FileSettingsWriterBO4.writeToFile(this.settings, this.settings.settingsMode, logger, materialReader, manager);
 			}
 		}
 		catch (InvalidConfigException ex)

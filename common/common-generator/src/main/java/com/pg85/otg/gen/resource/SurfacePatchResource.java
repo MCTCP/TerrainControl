@@ -1,12 +1,12 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorSurfacePatchOctaves;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -20,7 +20,7 @@ import java.util.Random;
  * TODO: Expose the noise weights and scale to the config
  */
 @SuppressWarnings("deprecation")
-public class SurfacePatchResource  extends ResourceBase implements IBasicResource
+public class SurfacePatchResource  extends BiomeResourceBase implements IBasicResource
 {
 	private final LocalMaterialData material;
 	private final LocalMaterialData decorationAboveReplacements;
@@ -48,7 +48,7 @@ public class SurfacePatchResource  extends ResourceBase implements IBasicResourc
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		int chunkX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
 		int chunkZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();

@@ -3,7 +3,7 @@ package com.pg85.otg.customobject.bo2;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectLoader;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
-import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.File;
 

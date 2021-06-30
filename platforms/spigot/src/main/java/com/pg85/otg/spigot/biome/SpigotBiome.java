@@ -6,13 +6,15 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import net.minecraft.server.v1_16_R3.*;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SpigotBiome implements IBiome
@@ -37,7 +39,7 @@ public class SpigotBiome implements IBiome
 		// a() == withSurfaceBuilder() in forge
 		// WorldGenSurfaceComposites.j == ConfiguredSurfaceBuilders.field_244184_p in forge		
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
-		// TODO: What if there's no grass around spawn?		
+		// TODO: What if there's no grass around spawn?
 		biomeGenerationSettingsBuilder.a(WorldGenSurfaceComposites.j);
 
 		// * Carvers are handled by OTG
@@ -54,40 +56,50 @@ public class SpigotBiome implements IBiome
 
 		// BiomeFog == BiomeAmbient in forge
 		BiomeFog.a biomeAmbienceBuilder =
-				new BiomeFog.a() // fog, water, water fog, sky -> a, b, c, d
-						.a(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
-						.b(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
-						.c(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
-						.d(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature))
-						//.e() // TODO: Sky color is normally based on temp, make a setting for that?
-				;
+			new BiomeFog.a() // fog, water, water fog, sky -> a, b, c, d
+				.a(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
+				.b(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
+				.c(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
+				.d(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature))
+				//.e() // TODO: Sky color is normally based on temp, make a setting for that?
+		;
 
 
 		Optional<Particle<?>> particleType = IRegistry.PARTICLE_TYPE.getOptional(new MinecraftKey(biomeConfig.getParticleType()));
 		if (particleType.isPresent() && particleType.get() instanceof ParticleParam)
 		{
-			biomeAmbienceBuilder.a(new BiomeParticles((ParticleParam) particleType.get(),
-					biomeConfig.getParticleProbability()));
+			biomeAmbienceBuilder.a(new BiomeParticles((ParticleParam) particleType.get(), biomeConfig.getParticleProbability()));
 		}
 
 		Optional<SoundEffect> music = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMusic()));
-		music.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new Music(soundEffect,
-				biomeConfig.getMusicMinDelay(),
-				biomeConfig.getMusicMaxDelay(),
-				biomeConfig.isReplaceCurrentMusic())));
+		music.ifPresent(soundEffect -> 
+			biomeAmbienceBuilder.a(
+				new Music(
+					soundEffect,
+					biomeConfig.getMusicMinDelay(),
+					biomeConfig.getMusicMaxDelay(),
+					biomeConfig.isReplaceCurrentMusic()
+				)
+			)
+		);
 
 		Optional<SoundEffect> ambientSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAmbientSound()));
 		ambientSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(ambientSound.get()));
 
 		Optional<SoundEffect> moodSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMoodSound()));
-		moodSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSoundSettings(moodSound.get(),
-				biomeConfig.getMoodSoundDelay(),
-				biomeConfig.getMoodSearchRange(),
-				biomeConfig.getMoodOffset())));
+		moodSound.ifPresent(soundEffect -> 
+			biomeAmbienceBuilder.a(
+				new CaveSoundSettings(
+					moodSound.get(),
+					biomeConfig.getMoodSoundDelay(),
+					biomeConfig.getMoodSearchRange(),
+					biomeConfig.getMoodOffset()
+				)
+			)
+		);
 
 		Optional<SoundEffect> additionsSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAdditionsSound()));
-		additionsSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSound(additionsSound.get(),
-				biomeConfig.getAdditionsTickChance())));
+		additionsSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSound(additionsSound.get(), biomeConfig.getAdditionsTickChance())));
 
 		if (biomeConfig.getFoliageColor() != 0xffffff)
 		{
@@ -112,27 +124,30 @@ public class SpigotBiome implements IBiome
 		}
 
 		BiomeBase.a builder = new BiomeBase.a()
-				// Precipitation
-				.a(biomeConfig.getBiomeWetness() <= 0.0001 ? BiomeBase.Precipitation.NONE :
-					biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
-					BiomeBase.Precipitation.SNOW)
-				// depth
-				.a(biomeConfig.getBiomeHeight())
-				.b(biomeConfig.getBiomeVolatility())
-				.c(safeTemperature)
-				.d(biomeConfig.getBiomeWetness())
-				// Ambience (colours/sounds)
-				.a(biomeAmbienceBuilder.a())
-				// Mob spawning
-				.a(mobSpawnInfoBuilder.b())
-				// All other biome settings...
-				.a(biomeGenerationSettingsBuilder.a());
+			// Precipitation
+			.a(biomeConfig.getBiomeWetness() <= 0.0001 ? BiomeBase.Precipitation.NONE :
+				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
+				BiomeBase.Precipitation.SNOW)
+			// depth
+			.a(biomeConfig.getBiomeHeight())
+			.b(biomeConfig.getBiomeVolatility())
+			.c(safeTemperature)
+			.d(biomeConfig.getBiomeWetness())
+			// Ambience (colours/sounds)
+			.a(biomeAmbienceBuilder.a())
+			// Mob spawning
+			.a(mobSpawnInfoBuilder.b())
+			// All other biome settings...
+			.a(biomeGenerationSettingsBuilder.a());
 
 		BiomeBase.Geography category = BiomeBase.Geography.a(biomeConfig.getBiomeCategory());
 		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS);
 		if (category == null)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+			}
 		}
 
 		return builder.a();
@@ -165,31 +180,30 @@ public class SpigotBiome implements IBiome
 			int villageSize = biomeConfig.getVillageSize();
 			SettingsEnums.VillageType villageType = biomeConfig.getVillageType();
 			StructureFeature<WorldGenFeatureVillageConfiguration, ? extends StructureGenerator<WorldGenFeatureVillageConfiguration>> customVillage = register(
-					((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
-					StructureGenerator.VILLAGE.a(
-							new WorldGenFeatureVillageConfiguration(
-									() ->
-									{
-										switch (villageType)
-										{
-											case sandstone:
-												return WorldGenFeatureDesertVillage.a;
-											case savanna:
-												return WorldGenFeatureVillageSavanna.a;
-											case taiga:
-												return WorldGenFeatureVillageTaiga.a;
-											case wood:
-												return WorldGenFeatureVillagePlain.a;
-											case snowy:
-												return WorldGenFeatureVillageSnowy.a;
-											case disabled: // Should never happen
-												break;
-										}
-										return WorldGenFeatureVillagePlain.a;
-									},
-									villageSize
-							)
+				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
+				StructureGenerator.VILLAGE.a(
+					new WorldGenFeatureVillageConfiguration(
+						() -> {
+							switch (villageType)
+							{
+								case sandstone:
+									return WorldGenFeatureDesertVillage.a;
+								case savanna:
+									return WorldGenFeatureVillageSavanna.a;
+								case taiga:
+									return WorldGenFeatureVillageTaiga.a;
+								case wood:
+									return WorldGenFeatureVillagePlain.a;
+								case snowy:
+									return WorldGenFeatureVillageSnowy.a;
+								case disabled: // Should never happen
+									break;
+							}
+							return WorldGenFeatureVillagePlain.a;
+						},
+						villageSize
 					)
+				)
 			);
 			// a() == withStructure() in forge
 			biomeGenerationSettingsBuilder.a(customVillage);
@@ -387,12 +401,26 @@ public class SpigotBiome implements IBiome
 		// f == CONFIGURED_STRUCTURE_FEATURE
 		return RegistryGeneration.a(RegistryGeneration.f, name, structure);
 	}
-
+	
 	private static BiomeSettingsMobs.a createMobSpawnInfo (BiomeConfig biomeConfig)
 	{
-		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() in forge
+		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() for forge
 		BiomeSettingsMobs.a mobSpawnInfoBuilder = new BiomeSettingsMobs.a();
-		for (WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMonsters())
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+
+		// a() == isValidSpawnBiomeForPlayer()
+		mobSpawnInfoBuilder.a(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
+		return mobSpawnInfoBuilder;
+	}
+
+	private static void addMobGroup(BiomeSettingsMobs.a mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	{
+		for (WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
 			// a() == byKey() in forge
 			Optional<EntityTypes<?>> entityType = EntityTypes.a(mobSpawnGroup.getInternalName());
@@ -401,58 +429,14 @@ public class SpigotBiome implements IBiome
 				// a() == withSpawner() in forge
 				mobSpawnInfoBuilder.a(EnumCreatureType.MONSTER, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeName);
 				}
 			}
 		}
-		for (WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getCreatures())
-		{
-			Optional<EntityTypes<?>> entityType = EntityTypes.a(mobSpawnGroup.getInternalName());
-			if (entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.a(EnumCreatureType.CREATURE, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
-				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-				}
-			}
-		}
-		for (WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterCreatures())
-		{
-			Optional<EntityTypes<?>> entityType = EntityTypes.a(mobSpawnGroup.getInternalName());
-			if (entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.a(EnumCreatureType.WATER_CREATURE, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
-				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-				}
-			}
-		}
-		for (WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getAmbientCreatures())
-		{
-			Optional<EntityTypes<?>> entityType = EntityTypes.a(mobSpawnGroup.getInternalName());
-			if (entityType.isPresent())
-			{
-				mobSpawnInfoBuilder.a(EnumCreatureType.AMBIENT, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
-			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
-				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
-				}
-			}
-		}
-
-		// TODO: EnumCreatureType.WATER_AMBIENT / EnumCreatureType.MISC ?
-		// a() == isValidSpawnBiomeForPlayer()
-		mobSpawnInfoBuilder.a(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
-		return mobSpawnInfoBuilder;
-	}
-
+	}	
+	
 	@Override
 	public IBiomeConfig getBiomeConfig ()
 	{

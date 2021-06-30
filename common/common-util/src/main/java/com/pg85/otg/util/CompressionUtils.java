@@ -6,12 +6,11 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.interfaces.ILogger;
 
 public class CompressionUtils
 {
-	public static byte[] compress(byte[] data, boolean spawnLog, ILogger logger) throws IOException
+	public static byte[] compress(byte[] data, ILogger logger) throws IOException
 	{  
 		Deflater deflater = new Deflater();  
 		deflater.setInput(data);  
@@ -25,12 +24,12 @@ public class CompressionUtils
 		}  
 		outputStream.close();  
 		byte[] output = outputStream.toByteArray();
-		if(spawnLog)
-		{
-			logger.log(LogMarker.INFO, "Original: " + data.length / 1024 + " Kb");  
-			logger.log(LogMarker.INFO, "Compressed: " + output.length / 1024 + " Kb");
-		}
-		return output;  
+		//if(logger.getLogCategoryEnabled())
+		//{
+			//logger.log(LogMarker.INFO, "Original: " + data.length / 1024 + " Kb");  
+			//logger.log(LogMarker.INFO, "Compressed: " + output.length / 1024 + " Kb");
+		//}
+		return output;
 	}
 
 	public static byte[] decompress(byte[] data) throws IOException, DataFormatException

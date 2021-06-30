@@ -11,10 +11,10 @@ import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -36,7 +36,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 	}
 	
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		x = readInt(args.get(0), -100, 100);
@@ -98,7 +98,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 				// Maybe it's a NBT file?
 
 				// Get the file
-				NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile(), spawnLog, logger);
+				NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile(), logger);
 				if (metaData != null)
 				{
 					metaDataNames[blockCount] = args.get(i);
@@ -282,7 +282,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 		}
 	}
 	
-	public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer, boolean spawnLog, ILogger logger) throws IOException
+	public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer, ILogger logger) throws IOException
 	{		
 		BO4RandomBlockFunction rbf = new BO4RandomBlockFunction(holder);
 		
@@ -321,7 +321,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 			if(rbf.metaDataNames[i] != null)
 			{
 				// Get the file
-				NamedBinaryTag metaData = BO3Loader.loadMetadata(rbf.metaDataNames[i], file, spawnLog, logger);
+				NamedBinaryTag metaData = BO3Loader.loadMetadata(rbf.metaDataNames[i], file, logger);
 						
 				if (metaData != null)
 				{

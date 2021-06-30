@@ -171,7 +171,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
 		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkDecorator);
+			this.structureCache.saveToDisk(OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
 	}
 
@@ -325,6 +325,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@SuppressWarnings("deprecation")	
 	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
+		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
+		{
+			return;
+		}
+
 		int chunkX = worldGenRegion.getCenterX();
 		int chunkZ = worldGenRegion.getCenterZ();
 		int blockX = chunkX * Constants.CHUNK_SIZE;

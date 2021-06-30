@@ -3,10 +3,11 @@ package com.pg85.otg.customobject.bofunctions;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.interfaces.IEntityFunction;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.minecraft.EntityNames;
 
@@ -19,7 +20,6 @@ import java.util.List;
 public abstract class EntityFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T> implements IEntityFunction<T>
 {
 	public int y;
-
 	public String name = "";
 	public int groupSize = 1;
 	public String nameTagOrNBTFileName = "";
@@ -27,22 +27,23 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 	public String resourceLocation = "";
 	public NamedBinaryTag namedBinaryTag = null;
 	public int rotation = 0;
-
+	private String metaDataTag;
+	
 	@Override
-	public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		assureSize(5, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
 		// correctly based on what chunks can be accessed
-		x = readInt(args.get(0), -100, 100);
-		y = readInt(args.get(1), -1000, 1000);
-		z = readInt(args.get(2), -100, 100);
+		this.x = readInt(args.get(0), -100, 100);
+		this.y = readInt(args.get(1), -1000, 1000);
+		this.z = readInt(args.get(2), -100, 100);
 		processEntityName(args.get(3), logger);
-		groupSize = readInt(args.get(4), 0, Integer.MAX_VALUE);
+		this.groupSize = readInt(args.get(4), 0, Integer.MAX_VALUE);
 
 		if(args.size() > 5)
 		{
-			processNameTagOrFileName(args.get(5), spawnLog, logger);
+			processNameTagOrFileName(args.get(5), logger);
 		}
 	}
 
@@ -57,64 +58,65 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 		}
 		if (name.contains(":"))
 		{
-			resourceLocation = name.toLowerCase().trim();
+			this.resourceLocation = name.toLowerCase().trim();
 		} else {
-			resourceLocation = EntityNames.toInternalName(name);
-			if (!resourceLocation.contains(":"))
+			this.resourceLocation = EntityNames.toInternalName(name);
+			if (!this.resourceLocation.contains(":"))
 			{
-				logger.log(LogMarker.ERROR, "Could not find entity '"+name+"', are you sure you spelled it correctly?");
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find entity '" + name + "', are you sure you spelled it correctly?");
+				}
 			}
 		}
-		this.name = resourceLocation.split(":")[1];
+		this.name = this.resourceLocation.split(":")[1];
 	}
 
-	public void processNameTagOrFileName(String s, boolean spawnLog, ILogger logger)
+	public void processNameTagOrFileName(String s, ILogger logger)
 	{
-		originalNameTagOrNBTFileName = s;
+		this.originalNameTagOrNBTFileName = s;
 
-		if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
+		if(this.originalNameTagOrNBTFileName != null && this.originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
 		{
-			nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
+			this.nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + this.originalNameTagOrNBTFileName;
 		}
-		else if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+		else if(this.originalNameTagOrNBTFileName != null && this.originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
 		{
-			nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
-			if (namedBinaryTag == null)
+			this.nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + this.originalNameTagOrNBTFileName;
+			if (this.namedBinaryTag == null)
 			{
 				// load NBT data from .nbt file
 				try {
-					FileInputStream stream = new FileInputStream(nameTagOrNBTFileName);
-					namedBinaryTag = NamedBinaryTag.readFrom(stream, true);
+					FileInputStream stream = new FileInputStream(this.nameTagOrNBTFileName);
+					this.namedBinaryTag = NamedBinaryTag.readFrom(stream, true);
 				} catch (FileNotFoundException e) {
-					if(spawnLog)
+					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						logger.log(LogMarker.WARN, "Could not find file: "+nameTagOrNBTFileName);
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find file: " + this.nameTagOrNBTFileName);
 					}
 					// Set it to null so we don't go looking for this later
-					nameTagOrNBTFileName = null;
+					this.nameTagOrNBTFileName = null;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-
 			}
 		} else {
 			// It's a name tag
-			nameTagOrNBTFileName = originalNameTagOrNBTFileName;
+			this.nameTagOrNBTFileName = this.originalNameTagOrNBTFileName;
 		}
 	}
 
 	@Override
 	public String makeString()
 	{
-		return "Entity(" + x + ',' + y + ',' + z + ',' + resourceLocation + ',' + groupSize + (originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.length() > 0 ? ',' + originalNameTagOrNBTFileName : "") + ')';
+		return "Entity(" + x + ',' + y + ',' + z + ',' + this.resourceLocation + ',' + this.groupSize + (this.originalNameTagOrNBTFileName != null && this.originalNameTagOrNBTFileName.length() > 0 ? ',' + this.originalNameTagOrNBTFileName : "") + ')';
 	}
 
-	private String metaDataTag;
 	public String getMetaData()
 	{
-		if(nameTagOrNBTFileName != null && nameTagOrNBTFileName.length() > 0 && metaDataTag == null)
+		if(this.nameTagOrNBTFileName != null && this.nameTagOrNBTFileName.length() > 0 && this.metaDataTag == null)
 		{
-			File metaDataFile = new File(nameTagOrNBTFileName);
+			File metaDataFile = new File(this.nameTagOrNBTFileName);
 			StringBuilder stringbuilder = new StringBuilder();
 			if(metaDataFile.exists())
 			{
@@ -139,9 +141,9 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 				}
 			}
 
-			metaDataTag = stringbuilder.toString();
+			this.metaDataTag = stringbuilder.toString();
 		}
-		return metaDataTag;
+		return this.metaDataTag;
 	}
 
 	@Override
@@ -152,7 +154,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 			return false;
 		}
 		EntityFunction<T> block = (EntityFunction<T>) other;
-		return block.x == x && block.y == y && block.z == z && block.resourceLocation.equalsIgnoreCase(resourceLocation) && block.groupSize == groupSize && block.originalNameTagOrNBTFileName.equalsIgnoreCase(originalNameTagOrNBTFileName);
+		return block.x == this.x && block.y == this.y && block.z == this.z && block.resourceLocation.equalsIgnoreCase(this.resourceLocation) && block.groupSize == this.groupSize && block.originalNameTagOrNBTFileName.equalsIgnoreCase(this.originalNameTagOrNBTFileName);
 	}
 
 	public abstract EntityFunction<T> createNewInstance();

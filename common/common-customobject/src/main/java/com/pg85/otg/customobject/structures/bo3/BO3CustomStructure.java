@@ -10,12 +10,13 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.ICustomObject;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
@@ -41,9 +42,9 @@ public class BO3CustomStructure extends CustomStructure
 		this.start = start;
 	}
 	
-	public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		StructuredCustomObject object = (StructuredCustomObject)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		StructuredCustomObject object = (StructuredCustomObject)start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 		if(object == null)
 		{
@@ -51,9 +52,9 @@ public class BO3CustomStructure extends CustomStructure
 		}
 		if(!(object instanceof BO3))
 		{
-			if(spawnLog)
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "BO3CustomStructure loaded with non-BO3 object " + object.getName());
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "BO3CustomStructure loaded with non-BO3 object " + object.getName());
 			}
 			return;
 		}
@@ -66,20 +67,20 @@ public class BO3CustomStructure extends CustomStructure
 		// Calculate all branches and add them to a list
 		this.objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomStructureCoordinate>>();
 
-		addToSpawnList((BO3CustomStructureCoordinate)start, object, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker); // Add the object itself
-		addBranches((BO3CustomStructureCoordinate)start, 1, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		addToSpawnList((BO3CustomStructureCoordinate)start, object, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker); // Add the object itself
+		addBranches((BO3CustomStructureCoordinate)start, 1, worldGenRegion, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
-	private void addBranches(BO3CustomStructureCoordinate coordObject, int depth, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void addBranches(BO3CustomStructureCoordinate coordObject, int depth, IWorldGenRegion worldGenRegion, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		IStructuredCustomObject object = coordObject.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		IStructuredCustomObject object = coordObject.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 		if(object != null)
 		{
 			for (Branch branch : getBranches(object, coordObject.getRotation()))
 			{
 				// TODO: Does passing null as startbo3name work?
-				BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getPresetFolderName(), this.random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 				// Don't add null objects
 				if (childCoordObject == null)
@@ -88,12 +89,12 @@ public class BO3CustomStructure extends CustomStructure
 				}
 
 				// Add this object to the chunk
-				addToSpawnList(childCoordObject, object, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				addToSpawnList(childCoordObject, object, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				
 				// Also add the branches of this object
 				if (depth < this.maxBranchDepth)
 				{
-					addBranches(childCoordObject, depth + 1, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					addBranches(childCoordObject, depth + 1, worldGenRegion, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				}
 			}
 		}
@@ -109,9 +110,9 @@ public class BO3CustomStructure extends CustomStructure
 	 * touches.
 	 * @param coordObject The object.
 	 */
-	private void addToSpawnList(BO3CustomStructureCoordinate coordObject, ICustomObject parent, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void addToSpawnList(BO3CustomStructureCoordinate coordObject, ICustomObject parent, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		ChunkCoordinate chunkCoordinate = coordObject.getDecoratingChunk(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		ChunkCoordinate chunkCoordinate = coordObject.getDecoratingChunk(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(chunkCoordinate != null)
 		{
 			Set<CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);
@@ -122,21 +123,21 @@ public class BO3CustomStructure extends CustomStructure
 			}
 			objectsInChunk.add(coordObject);
 		} else {
-			if(spawnLog)
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "Error reading branch in BO3 " + parent.getName()  + " Could not find BO3: " + coordObject.bo3Name);
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error reading branch in BO3 " + parent.getName()  + " Could not find BO3: " + coordObject.bo3Name);
 			}
 		}
 	}
 
-	public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		Set<CustomStructureCoordinate> objectsInChunk = this.objectsToSpawn.get(worldGenRegion.getDecorationArea().getChunkBeingDecorated());
 		if (objectsInChunk != null)
 		{
 			for (CustomStructureCoordinate coordObject : objectsInChunk)
 			{
-				BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
+				BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker));
 				bo3.trySpawnAt(this, structureCache, worldGenRegion, this.random, coordObject.rotation, coordObject.x, getCorrectY(worldGenRegion, coordObject.x, coordObject.y, coordObject.z), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y);
 			}
 		}

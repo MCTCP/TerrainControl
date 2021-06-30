@@ -15,12 +15,12 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -408,32 +408,32 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	}
 
 	@Override
-	protected void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	protected void writeConfigSettings(SettingsWriterBO4 writer, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		// It doesn't write.
 	}
 
 	@Override
-	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE, spawnLog, logger, materialReader, manager);
-		this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE, spawnLog, logger, materialReader, manager);
-		this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT, spawnLog, logger, materialReader, manager);
-		this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS, spawnLog, logger, materialReader, manager);
-		this.spawnWater = readSettings(BO2Settings.SPAWN_WATER, spawnLog, logger, materialReader, manager);
-		this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA, spawnLog, logger, materialReader, manager);
-		this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND, spawnLog, logger, materialReader, manager);
-		this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND, spawnLog, logger, materialReader, manager);
-		this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION, spawnLog, logger, materialReader, manager);
-		this.dig = readSettings(BO2Settings.DIG, spawnLog, logger, materialReader, manager);
-		this.tree = readSettings(BO2Settings.TREE, spawnLog, logger, materialReader, manager);
-		this.branch = readSettings(BO2Settings.BRANCH, spawnLog, logger, materialReader, manager);
-		this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION, spawnLog, logger, materialReader, manager);
-		this.doReplaceBlocks = readSettings(BO2Settings.DO_REPLACE_BLOCKS, spawnLog, logger, materialReader, manager);
-		this.rarity = readSettings(BO2Settings.RARITY, spawnLog, logger, materialReader, manager);
-		this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE, spawnLog, logger, materialReader, manager);
-		this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN, spawnLog, logger, materialReader, manager);
-		this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX, spawnLog, logger, materialReader, manager);
+		this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE, logger, materialReader, manager);
+		this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE, logger, materialReader, manager);
+		this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT, logger, materialReader, manager);
+		this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS, logger, materialReader, manager);
+		this.spawnWater = readSettings(BO2Settings.SPAWN_WATER, logger, materialReader, manager);
+		this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA, logger, materialReader, manager);
+		this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND, logger, materialReader, manager);
+		this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND, logger, materialReader, manager);
+		this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION, logger, materialReader, manager);
+		this.dig = readSettings(BO2Settings.DIG, logger, materialReader, manager);
+		this.tree = readSettings(BO2Settings.TREE, logger, materialReader, manager);
+		this.branch = readSettings(BO2Settings.BRANCH, logger, materialReader, manager);
+		this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION, logger, materialReader, manager);
+		this.doReplaceBlocks = readSettings(BO2Settings.DO_REPLACE_BLOCKS, logger, materialReader, manager);
+		this.rarity = readSettings(BO2Settings.RARITY, logger, materialReader, manager);
+		this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE, logger, materialReader, manager);
+		this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN, logger, materialReader, manager);
+		this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX, logger, materialReader, manager);
 		this.readCoordinates(materialReader);
 	}
 
@@ -485,19 +485,19 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	}
 	
 	@Override
-	public boolean onEnable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public boolean onEnable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(!this.isEnabled)
 		{
 			this.isEnabled = true;
-			enable(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			enable(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		}
 		return true;
 	}
 
-	private void enable(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void enable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		readConfigSettings(presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		readConfigSettings(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		correctSettings();
 	}
 

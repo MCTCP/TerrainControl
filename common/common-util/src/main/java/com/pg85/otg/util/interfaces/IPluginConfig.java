@@ -1,7 +1,7 @@
 package com.pg85.otg.util.interfaces;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.logging.Logger.LogLevels;
+import com.pg85.otg.constants.SettingsEnums.LogLevels;
 
 /**
  * OTG.ini / PluginConfig classes
@@ -18,6 +18,12 @@ public interface IPluginConfig
 	public LogLevels getLogLevel();
 	public int getMaxWorkerThreads();
 	public boolean getDeveloperModeEnabled();
-	public boolean getSpawnLogEnabled();
+	public boolean logCustomObjects();
+	public boolean logStructurePlotting();
+	public boolean logConfigs();
+	public boolean logDecoration();	
+	public boolean logBiomeRegistry();
+	public boolean getDecorationEnabled();
+	public boolean logMobs();
 	public ConfigMode getSettingsMode();
 }

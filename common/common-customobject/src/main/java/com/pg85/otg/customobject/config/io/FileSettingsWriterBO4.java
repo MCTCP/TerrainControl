@@ -5,8 +5,9 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 import java.io.BufferedWriter;
@@ -34,9 +35,9 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static final void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
-		writeToFile(config, config.getFile(), configMode, spawnLog, logger, materialReader, manager);
+		writeToFile(config, config.getFile(), configMode, logger, materialReader, manager);
 	}
 
 	/**
@@ -48,7 +49,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		if (configMode == ConfigMode.WriteDisable)
 		{
@@ -58,17 +59,14 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 		try
 		{
 			SettingsWriterBO4 writer = new FileSettingsWriterBO4(file);
-			config.write(writer, configMode, spawnLog, logger, materialReader, manager);
-		} catch (IOException e)
-		{
-			logIOError(e, file, logger);
+			config.write(writer, configMode, logger, materialReader, manager);
+		} catch (IOException e) {
+			logger.log(
+				LogLevel.ERROR,
+				LogCategory.CONFIGS,
+				String.format("Failed to write to file " + file + ", error: ",(Object[])e.getStackTrace())
+			);
 		}
-	}
-
-	private static void logIOError(IOException e, File file, ILogger logger)
-	{
-		logger.log(LogMarker.ERROR, "Failed to write to file {}", file);
-		logger.printStackTrace(LogMarker.ERROR, e);
 	}
 
 	@Override
@@ -125,7 +123,15 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 		}
 		catch (IOException e)
 		{
-			logger.log(LogMarker.WARN, "Failed to close file {} ({})", file.getAbsolutePath(), e.getMessage());
+			logger.log(
+				LogLevel.ERROR,
+				LogCategory.CONFIGS,
+				String.format(
+					"Failed to close file {} ({})", 
+					file.getAbsolutePath(), 
+					e.getMessage()
+				)
+			);
 		}
 		writer = null;
 	}

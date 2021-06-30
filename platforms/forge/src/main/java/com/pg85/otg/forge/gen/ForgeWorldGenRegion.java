@@ -11,7 +11,8 @@ import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -57,7 +58,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig, worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -65,7 +66,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -73,11 +74,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = null;
 	}
-		
+	
 	@Override
 	public long getSeed()
 	{
@@ -277,7 +278,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 						block == Blocks.ACACIA_LEAVES ||
 						block == Blocks.BIRCH_LEAVES ||
 						block == Blocks.DARK_OAK_LEAVES ||
-						block == Blocks.JUNGLE_LEAVES ||						
+						block == Blocks.JUNGLE_LEAVES ||
 						block == Blocks.OAK_LEAVES ||
 						block == Blocks.SPRUCE_LEAVES
 					)
@@ -399,14 +400,32 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			try {
 				tileEntity.deserializeNBT(state, nms);
-			} catch (JsonSyntaxException e)
-			{
-				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+			} catch (JsonSyntaxException e) {
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{				
+					this.logger.log(
+						LogLevel.ERROR,
+						LogCategory.CUSTOM_OBJECTS,
+						String.format(
+							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
+							nms.getString("id"), 
+							x, y, z
+						)
+					);
+				}
 			}
 		} else {
-			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(
+					LogLevel.ERROR,
+					LogCategory.CUSTOM_OBJECTS,
+					String.format(
+						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 
+						nms.getString("id"), 
+						x, y, z
+					)
+				);
 			}
 		}
 	}
@@ -511,12 +530,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		catch(NullPointerException ex)
 		{
-			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
-			ex.printStackTrace();
+			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, String.format("Treegen caused an error: ", (Object[])ex.getStackTrace()));
+			}
 			// Return true to prevent further attempts.
-			return true; 
+			return true;
 		}
-	}	
+	}
 	
 	@Override
 	public void spawnEntity(IEntityFunction<?> newEntityData)
@@ -544,10 +565,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
 
-		if (feature.isPresent()) {
+		if (feature.isPresent())
+		{
 			feature.get().place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
-			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
+			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
+			}
 		}
 	}
 	

@@ -1,15 +1,16 @@
 package com.pg85.otg.customobject.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TreeResource extends ResourceBase implements ICustomObjectResource
+public class TreeResource extends BiomeResourceBase implements ICustomObjectResource
 {
 	private final int frequency;
 	private final List<Integer> treeChances;
@@ -46,9 +47,9 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 	}	
 	
 	@Override
-	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		loadTrees(worldGenRegion.getPresetFolderName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		loadTrees(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 		int x;
 		int z;
@@ -76,7 +77,7 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 	}
 	
 	// TODO: Could this cause problems for developer mode / flushcache, trees not updating during a session?
-	private void loadTrees(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void loadTrees(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(!this.treesLoaded)
 		{
@@ -107,16 +108,16 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 				{
 					params = treeName.replace(")", "").split("\\(");
 					treeName = params[0];
-					tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+					tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					this.treeObjects[treeNumber] = tree;				
 					if(tree == null)
 					{
-						if(spawnLog)
+						if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
+							logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
 						}
 						continue;
-					}					
+					}
 					
 					params = params[1].split(";");
 					sMinHeight = params[0].toLowerCase().replace("minheight=", "");
@@ -129,13 +130,13 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 						this.treeObjectMaxChances[treeNumber] = maxHeight;					
 					} catch(NumberFormatException ex) {  }
 				} else {
-					tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetFolderName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);				
+					tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);				
 					this.treeObjects[treeNumber] = tree;
 					if(tree == null)
 					{
-						if(spawnLog)
+						if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
+							logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
 						}
 						continue;
 					}

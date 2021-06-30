@@ -1,8 +1,9 @@
 package com.pg85.otg.config.io;
 
 import com.pg85.otg.config.io.RawSettingValue.ValueType;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -97,19 +98,18 @@ public class FileSettingsReader
 		{
 			settingsReader = new BufferedReader(new FileReader(file));
 			readIntoMap(settings, settingsReader);
-		} catch (IOException e)
-		{
-			logger.printStackTrace(LogMarker.FATAL, e);
-		} finally
-		{
+		} catch (IOException e) {
+			logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Could not read file, exception: ", (Object[])e.getStackTrace()));
+		} finally {
 			if (settingsReader != null)
 			{
 				try
 				{
 					settingsReader.close();
-				} catch (IOException localIOException2)
+				}
+				catch (IOException localIOException2)
 				{
-					logger.printStackTrace(LogMarker.FATAL, localIOException2);
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Could not close file, exception: ", (Object[])localIOException2.getStackTrace()));
 				}
 			}
 		}

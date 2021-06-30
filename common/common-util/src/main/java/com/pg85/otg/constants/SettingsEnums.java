@@ -1,14 +1,28 @@
 package com.pg85.otg.constants;
 
+import com.pg85.otg.logging.LogLevel;
+
 public class SettingsEnums
 {
-	public enum TerrainMode
+	public enum LogLevels
 	{
-		Normal,
-		TerrainTest,
-		NotGenerate
-	}
+		Off(LogLevel.ERROR),
+		Quiet(LogLevel.WARN),
+		Standard(LogLevel.INFO);
 
+		private final LogLevel marker;
+
+		LogLevels(LogLevel marker)
+		{
+			this.marker = marker;
+		}
+
+		public LogLevel getLevel()
+		{
+			return this.marker;
+		}
+	}
+	
 	public enum BiomeMode
 	{
 		Normal,

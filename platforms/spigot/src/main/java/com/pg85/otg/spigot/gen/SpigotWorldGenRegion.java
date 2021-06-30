@@ -3,7 +3,8 @@ package com.pg85.otg.spigot.gen;
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.presets.SpigotPresetLoader;
@@ -36,7 +37,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig, worldGenRegion.a(), worldGenRegion.b());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.a(), worldGenRegion.b());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -44,7 +45,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -52,7 +53,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion)
 	{
-		super(presetFolderName, worldConfig);
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = null;
 	}
@@ -378,14 +379,34 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		{
 			try {
 				tileEntity.load(state, nms);
-			} catch (JsonSyntaxException e)
+			}
+			catch (JsonSyntaxException e)
 			{
-				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					this.logger.log(
+						LogLevel.ERROR,
+						LogCategory.CUSTOM_OBJECTS,
+						String.format(
+							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
+							nms.getString("id"), 
+							x, y, z
+						)
+					);
+				}
 			}
 		} else {
-			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(
+					LogLevel.ERROR,
+					LogCategory.CUSTOM_OBJECTS,
+					String.format(
+						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 
+						nms.getString("id"), 
+						x, y, z
+					)
+				);
 			}
 		}
 	}
@@ -489,8 +510,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		}
 		catch (NullPointerException ex)
 		{
-			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
-			ex.printStackTrace();
+			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, String.format("Treegen caused an error: ", (Object[])ex.getStackTrace()));
+			}
 			// Return true to prevent further attempts.
 			return true;
 		}
@@ -525,7 +548,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		{
 			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
-			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
+			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
+			}
 		}
 	}
 

@@ -3,14 +3,14 @@ package com.pg85.otg.gen.resource;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
-public class RegistryResource  extends ResourceBase implements IBasicResource
+public class RegistryResource  extends BiomeResourceBase implements IBasicResource
 {
 	private final String id;
 
@@ -23,7 +23,7 @@ public class RegistryResource  extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		worldGenRegion.placeFromRegistry(random, worldGenRegion.getDecorationArea().getChunkBeingDecorated(), this.id);
 	}

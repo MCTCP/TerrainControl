@@ -17,9 +17,10 @@ import com.pg85.otg.customobject.bo3.checks.LightCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheckNot;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.*;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class BO3Loader implements CustomObjectLoader
 			return new BO3(objectName, file);
 	}
 
-	public static NamedBinaryTag loadMetadata(String name, File bo3Folder, boolean spawnLog, ILogger logger)
+	public static NamedBinaryTag loadMetadata(String name, File bo3Folder, ILogger logger)
 	{
 		String path = bo3Folder.getParent() + File.separator + name;
 
@@ -83,12 +84,12 @@ public class BO3Loader implements CustomObjectLoader
 			return LoadedTags.get(path);
 		}
 
-		NamedBinaryTag tag = loadTileEntityFromNBT(path, spawnLog, logger);
+		NamedBinaryTag tag = loadTileEntityFromNBT(path, logger);
 		registerMetadata(path, tag);
 		return tag;
 	}
 
-	private static NamedBinaryTag loadTileEntityFromNBT(String path, boolean spawnLog, ILogger logger)
+	private static NamedBinaryTag loadTileEntityFromNBT(String path, ILogger logger)
 	{
 		// Load from file
 		NamedBinaryTag metadata;
@@ -99,12 +100,11 @@ public class BO3Loader implements CustomObjectLoader
 			stream = new FileInputStream(path);
 			// Get the tag
 			metadata = NamedBinaryTag.readFrom(stream, true);
-		} catch (FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 			// File not found
-			if(spawnLog)
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, String.format("NBT file {} not found", (Object)path));
 			}
 			return null;
 		} catch (IOException e)
@@ -122,19 +122,19 @@ public class BO3Loader implements CustomObjectLoader
 			}			 
 			catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
 			{
-				if(spawnLog)
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
-					logger.printStackTrace(LogMarker.ERROR, corruptFile);
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT meta file: " + e.getMessage());
+					logger.printStackTrace(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, corruptFile);
 				}
 				return null;
 			}
 			catch (IOException corruptFile)
 			{
-				if(spawnLog)
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
-					logger.printStackTrace(LogMarker.ERROR, corruptFile);
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT meta file: " + e.getMessage());
+					logger.printStackTrace(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, corruptFile);
 				}
 				return null;
 			} finally
@@ -170,7 +170,10 @@ public class BO3Loader implements CustomObjectLoader
 			}
 		}
 		// Unknown/bad structure
-		logger.log(LogMarker.WARN, "Structure of NBT file is incorrect: " + path);
+		if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+		{
+			logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Structure of NBT file is incorrect: " + path);
+		}
 		return null;
 	}
 

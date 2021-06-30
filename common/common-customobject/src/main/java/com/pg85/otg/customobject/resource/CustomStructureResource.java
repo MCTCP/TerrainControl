@@ -1,16 +1,16 @@
 package com.pg85.otg.customobject.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomStructureResource extends ResourceBase implements ICustomStructureResource, ICustomStructureGen
+public class CustomStructureResource extends BiomeResourceBase implements ICustomStructureResource, ICustomStructureGen
 {
 	private final List<Double> objectChances;
 	public final List<String> objectNames;
@@ -56,7 +56,7 @@ public class CustomStructureResource extends ResourceBase implements ICustomStru
 	}
 	
 	@Override
-	public List<IStructuredCustomObject> getObjects(String presetFolderName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public List<IStructuredCustomObject> getObjects(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		List<IStructuredCustomObject> objects = new ArrayList<>();
 		if(!this.objectNames.isEmpty())
@@ -66,7 +66,7 @@ public class CustomStructureResource extends ResourceBase implements ICustomStru
 			{
 				// TODO: Refactor this so we don't have to cast CustomObjectManager/CustomObjectResourcesManager :(
 				// TODO: Remove any dependency on common-customobjects, interfaces only?
-				object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), presetFolderName, otgRootFolder, spawnLog, logger, (CustomObjectManager)customObjectManager, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
+				object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), presetFolderName, otgRootFolder, logger, (CustomObjectManager)customObjectManager, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
 				objects.add((StructuredCustomObject) object);
 			}
 		}

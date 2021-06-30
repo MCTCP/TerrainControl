@@ -1,12 +1,12 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.ResourceBase;
+import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Generates an ore structure by placing multiple spheres along a line.
  */
-public class OreResource extends ResourceBase implements IBasicResource
+public class OreResource extends BiomeResourceBase implements IBasicResource
 {
 	private final int frequency;
 	private final double rarity;
@@ -43,7 +43,7 @@ public class OreResource extends ResourceBase implements IBasicResource
 	}
 
 	@Override
-	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ILogger logger, IMaterialReader materialReader)
+	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
 		// Override spawnForChunkDecoration so we can add a cache.
 		

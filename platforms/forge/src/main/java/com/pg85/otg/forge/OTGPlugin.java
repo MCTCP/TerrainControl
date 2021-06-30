@@ -43,7 +43,7 @@ public class OTGPlugin
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
 	}
-	
+
 	// OTG World Type MP: Register the OTG world type. 
 	// For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent

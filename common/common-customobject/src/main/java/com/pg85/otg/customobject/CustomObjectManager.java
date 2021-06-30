@@ -4,9 +4,10 @@ import com.pg85.otg.customobject.bo2.BO2Loader;
 import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Loader;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogCategory;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
+import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -44,11 +45,10 @@ import java.util.Map;
  */
 public class CustomObjectManager implements ICustomObjectManager
 {
-	private final Map<String, CustomObjectLoader> loaders;
-	
+	private final Map<String, CustomObjectLoader> loaders;	
 	private final CustomObjectCollection globalCustomObjects;
 
-	public CustomObjectManager(boolean spawnLog, boolean developerMode, ILogger logger, Path otgRootFolder, Path otgPresetsFolder, CustomObjectResourcesManager manager)
+	public CustomObjectManager(boolean developerMode, ILogger logger, Path otgRootFolder, Path otgPresetsFolder, CustomObjectResourcesManager manager)
 	{
 		// These are the actual lists, not just a copy.
 		this.loaders = new HashMap<String, CustomObjectLoader>();
@@ -69,17 +69,20 @@ public class CustomObjectManager implements ICustomObjectManager
 			new Thread() { 
 				public void run()
 				{
-					globalCustomObjects.indexGlobalObjectsFolder(spawnLog, logger, otgRootFolder);
+					globalCustomObjects.indexGlobalObjectsFolder(logger, otgRootFolder);
 					
 					for(File file : otgPresetsFolder.toFile().listFiles())
 					{
 						if(file.isDirectory())
 						{
 							String presetFolderName = file.getName();
-							globalCustomObjects.indexPresetObjectsFolder(presetFolderName, spawnLog, logger, otgRootFolder);
+							globalCustomObjects.indexPresetObjectsFolder(presetFolderName, logger, otgRootFolder);
 						}
 					}
-					logger.log(LogMarker.INFO, "All CustomObject files indexed.");
+					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						logger.log(LogLevel.INFO, LogCategory.CUSTOM_OBJECTS, "All CustomObject files indexed.");
+					}
 				}
 			}.start();
 		}
@@ -110,7 +113,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public void registerGlobalObject(CustomObject object)
 	{
-		globalCustomObjects.addLoadedGlobalObject(object);
+		this.globalCustomObjects.addLoadedGlobalObject(object);
 	}
 
 	/**
@@ -128,7 +131,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public CustomObjectCollection getGlobalObjects()
 	{
-		return globalCustomObjects;
+		return this.globalCustomObjects;
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public Map<String, CustomObjectLoader> getObjectLoaders()
 	{
-		return Collections.unmodifiableMap(loaders);
+		return Collections.unmodifiableMap(this.loaders);
 	}	
 	
 	/**
@@ -147,10 +150,10 @@ public class CustomObjectManager implements ICustomObjectManager
 	 */
 	public void shutdown()
 	{
-		for (CustomObjectLoader loader : loaders.values())
+		for (CustomObjectLoader loader : this.loaders.values())
 		{
 			loader.onShutdown();
 		}
-		loaders.clear();
+		this.loaders.clear();
 	}  
 }

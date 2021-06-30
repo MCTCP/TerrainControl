@@ -1,8 +1,8 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -33,7 +33,7 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 	}
 
 	@Override
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z)
+	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z) - 1;
 		if (worldGenRegion.getBlockAboveLiquidHeight(x, z) < firstSolidBlock || firstSolidBlock == -1)
