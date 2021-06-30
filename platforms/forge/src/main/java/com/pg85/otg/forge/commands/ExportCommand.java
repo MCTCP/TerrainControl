@@ -13,7 +13,7 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
@@ -173,7 +173,7 @@ public class ExportCommand
 				}
 				catch (Exception e)
 				{
-					OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Error during export command: ", (Object[])e.getStackTrace()));
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 					return 0;
 				}
 			} else {
@@ -215,7 +215,7 @@ public class ExportCommand
 			}
 		} catch (Exception e) {
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Error during export command: ", (Object[])e.getStackTrace()));
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 		}
 
 		return 0;

@@ -7,7 +7,7 @@ import com.pg85.otg.util.interfaces.ILogger;
 
 public abstract class Logger implements ILogger
 {
-	protected LogMarker minimumLevel = LogMarker.INFO;
+	protected LogLevel minimumLevel = LogLevel.INFO;
 	private boolean logCustomObjects;
 	private boolean logStructurePlotting;
 	private boolean logConfigs;
@@ -15,7 +15,7 @@ public abstract class Logger implements ILogger
 	private boolean logDecoration;
 	private boolean logMobs;
 
-	public void init(LogMarker level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logDecoration, boolean logMobs)
+	public void init(LogLevel level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logDecoration, boolean logMobs)
 	{
 		this.minimumLevel = level;
 		this.logCustomObjects = logCustomObjects; 
@@ -31,7 +31,7 @@ public abstract class Logger implements ILogger
 	{
 		switch(category)
 		{
-			case PUBLIC:
+			case MAIN:
 				return true;			
 			case CUSTOM_OBJECTS:
 				return this.logCustomObjects;
@@ -51,7 +51,7 @@ public abstract class Logger implements ILogger
 	}
 	
 	@Override
-	public void printStackTrace(LogMarker level, LogCategory categoy, Exception e)
+	public void printStackTrace(LogLevel level, LogCategory categoy, Exception e)
 	{
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(stringWriter);

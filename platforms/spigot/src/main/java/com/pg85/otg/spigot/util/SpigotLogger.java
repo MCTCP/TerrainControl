@@ -2,7 +2,7 @@ package com.pg85.otg.spigot.util;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -11,7 +11,7 @@ public class SpigotLogger extends Logger
 	private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(Constants.MOD_ID_SHORT);
 
 	@Override
-	public void log (LogMarker level, LogCategory category, String message)
+	public void log (LogLevel level, LogCategory category, String message)
 	{
 		if (this.minimumLevel.compareTo(level) < 0)
 		{
@@ -25,24 +25,18 @@ public class SpigotLogger extends Logger
 		switch (level)
 		{
 			case FATAL:
-				this.logger.fatal(message);
+				this.logger.fatal(category.getLogTag() + " " + message);
 				break;
 			case ERROR:
-				this.logger.error(message);
+				this.logger.error(category.getLogTag() + " " + message);
 				break;
 			case WARN:
-				this.logger.warn(message);
+				this.logger.warn(category.getLogTag() + " " + message);
 				break;
 			case INFO:
-				this.logger.info(message);
+				this.logger.info(category.getLogTag() + " " + message);
 				break;
-			case DEBUG:
-				// DEBUG only shows up in debug logs
-				this.logger.info("DEBUG: " + message);
-				break;
-			case TRACE:
-				// TRACE only shows up in debug logs, also doesn't show up in Eclipse console.
-				this.logger.info("TRACE: " + message);
+			default:
 				break;
 		}
 	}

@@ -18,7 +18,7 @@ import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -315,7 +315,7 @@ public class BiomeConfig extends BiomeConfigBase
 						{
 							if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 							{
-								logger.log(LogMarker.WARN, LogCategory.CONFIGS, "Unrecognized sapling type in biome "+ this.getName());
+								logger.log(LogLevel.ERROR, LogCategory.CONFIGS, "Unrecognized sapling type in biome "+ this.getName());
 							}
 						}
 					} else {

@@ -1,7 +1,7 @@
 package com.pg85.otg.customobject.structures;
 
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.ILogger;
@@ -68,7 +68,7 @@ public abstract class CustomStructureCoordinate
 	 */
 	public IStructuredCustomObject getObject(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		if(object == null)
+		if(this.object == null)
 		{
 			CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
@@ -77,11 +77,11 @@ public abstract class CustomStructureCoordinate
 				object = null;
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not find BO3/BO4 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find BO3/BO4 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
 				}
 			}
-			this.bo3Name = object != null ? object.getName() : this.bo3Name;
 
+			this.bo3Name = object != null ? object.getName() : this.bo3Name;
 			this.object = (StructuredCustomObject)object;
 			return this.object;
 		}

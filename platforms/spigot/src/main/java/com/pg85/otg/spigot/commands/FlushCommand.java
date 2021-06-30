@@ -2,7 +2,7 @@ package com.pg85.otg.spigot.commands;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class FlushCommand
 			return true;
 		}
 	
-		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Unloading BO2/BO3/BO4 files");
+		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Unloading BO2/BO3/BO4 files");
 		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
 		sender.sendMessage("Objects unloaded.");
 		return true;

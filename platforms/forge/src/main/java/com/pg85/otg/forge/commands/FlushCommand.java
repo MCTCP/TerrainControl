@@ -3,7 +3,7 @@ package com.pg85.otg.forge.commands;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -17,7 +17,7 @@ public class FlushCommand
 			return 0;
 		}
 
-		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Unloading BO2/BO3/BO4 files");
+		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Unloading BO2/BO3/BO4 files");
 		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
 		source.sendSuccess(new StringTextComponent("Objects unloaded."), false);
 		return 0;

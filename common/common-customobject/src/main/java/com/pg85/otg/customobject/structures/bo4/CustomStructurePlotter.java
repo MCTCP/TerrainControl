@@ -19,7 +19,7 @@ import com.pg85.otg.customobject.structures.PlottedChunksRegion;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.Rotation;
@@ -285,7 +285,7 @@ public class CustomStructurePlotter
 								}
 								else if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
 								{
-									logger.log(LogMarker.WARN, LogCategory.STRUCTURE_PLOTTING, "CustomStructure " + structure.getName() + " in biome " + biomeConfig.getName() + " has IsOTGPlus:false and/or is not a BO4, ignoring.");
+									logger.log(LogLevel.ERROR, LogCategory.STRUCTURE_PLOTTING, "CustomStructure " + structure.getName() + " in biome " + biomeConfig.getName() + " has IsOTGPlus:false and/or is not a BO4, ignoring.");
 								}
 							}
 						}
@@ -891,7 +891,7 @@ public class CustomStructurePlotter
 												structureCoordConfig.getConfig().timesSpawned += 1;
 												if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
 												{
-													logger.log(LogMarker.INFO, LogCategory.STRUCTURE_PLOTTING, "Plotted structure " + structureCoordConfig.getName() + " at chunk " + spawnCoordX + " " + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
+													logger.log(LogLevel.INFO, LogCategory.STRUCTURE_PLOTTING, "Plotted structure " + structureCoordConfig.getName() + " at chunk " + spawnCoordX + " " + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 												}
 
 												if(((BO4)currentStructureSpawning[0]).getConfig().frequency > 0 || ((BO4)currentStructureSpawning[0]).getConfig().bo4Groups.size() > 0)

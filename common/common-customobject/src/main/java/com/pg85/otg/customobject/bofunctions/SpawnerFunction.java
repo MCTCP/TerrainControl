@@ -4,7 +4,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
@@ -210,7 +210,7 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
 			} else {
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not find file \"" + this.nbtFileName  + "\" for Spawner: " + this.makeString());
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find file \"" + this.nbtFileName  + "\" for Spawner: " + this.makeString());
 				}
 			}
 

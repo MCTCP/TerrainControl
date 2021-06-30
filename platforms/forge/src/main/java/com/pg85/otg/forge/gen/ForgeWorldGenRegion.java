@@ -12,7 +12,7 @@ import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -404,7 +404,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{				
 					this.logger.log(
-						LogMarker.WARN,
+						LogLevel.ERROR,
 						LogCategory.CUSTOM_OBJECTS,
 						String.format(
 							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
@@ -418,7 +418,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
 				this.logger.log(
-					LogMarker.WARN,
+					LogLevel.ERROR,
 					LogCategory.CUSTOM_OBJECTS,
 					String.format(
 						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 
@@ -532,7 +532,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
 			{
-				this.logger.log(LogMarker.WARN, LogCategory.DECORATION, String.format("Treegen caused a non-fatal exception: ", (Object[])ex.getStackTrace()));
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, String.format("Treegen caused an error: ", (Object[])ex.getStackTrace()));
 			}
 			// Return true to prevent further attempts.
 			return true;
@@ -571,7 +571,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		} else {
 			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
 			{
-				this.logger.log(LogMarker.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
 			}
 		}
 	}

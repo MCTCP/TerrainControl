@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LegacyMaterials;
@@ -55,8 +55,7 @@ public class SpigotMaterialReader implements IMaterialReader
 			// Happens when a non existing block name is used.
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
-				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.CONFIGS, "Invalid config: " + ex.getMessage());
-				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.CONFIGS, "Replacing with blank");
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Invalid material " + material + ". Exception: " + ex.getMessage() + ". Replacing with blank.");
 			}
 		}
 
@@ -200,7 +199,7 @@ public class SpigotMaterialReader implements IMaterialReader
 
 		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 		{
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
 		}
 
 		return SpigotMaterialData.ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);

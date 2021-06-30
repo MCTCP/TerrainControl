@@ -5,7 +5,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -151,7 +151,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 			if (!function.isValid() && logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
 				logger.log(
-					LogMarker.WARN,
+					LogLevel.ERROR,
 					LogCategory.CONFIGS,
 					String.format(
 						"Invalid resource {} in {} on line {}: {}", 
@@ -213,7 +213,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
 					logger.log(
-						LogMarker.WARN, 
+						LogLevel.ERROR, 
 						LogCategory.CONFIGS,
 						String.format(
 							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
@@ -311,7 +311,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 		}
 		catch (IOException e)
 		{
-			logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Exception when reading file: ", (Object[])e.getStackTrace()));
+			logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Exception when reading file: ", (Object[])e.getStackTrace()));
 		} finally {
 			if (settingsReader != null)
 			{
@@ -321,7 +321,7 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 				}
 				catch (IOException localIOException2)
 				{
-					logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Exception when reading file: ", (Object[])localIOException2.getStackTrace()));
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Exception when closing file: ", (Object[])localIOException2.getStackTrace()));
 				}
 			}
 		}

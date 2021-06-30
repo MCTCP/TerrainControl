@@ -2,7 +2,7 @@ package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -68,18 +68,15 @@ public abstract class CustomObjectConfigFunction<T>
 		try
 		{
 			configFunction.load(stringArgs, logger, materialReader);
-		} catch (InvalidConfigException e)
-		{
+		} catch (InvalidConfigException e) {
 			logger.log(
-				LogMarker.FATAL,
+				LogLevel.ERROR,
 				LogCategory.CUSTOM_OBJECTS,
 				String.format(
-					"Invalid default config function! Please report! {}: {}",
-					clazz.getName(), 
-					e.getMessage()
+					"Invalid default config function, please report this to team OTG. Class: " + clazz.getName() + ". Error: ", 
+					(Object[])e.getStackTrace()
 				)
 			);
-			logger.printStackTrace(LogMarker.FATAL, LogCategory.CUSTOM_OBJECTS, e);
 		}
 
 		return configFunction;

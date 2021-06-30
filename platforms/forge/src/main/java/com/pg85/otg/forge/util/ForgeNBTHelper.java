@@ -3,7 +3,7 @@ package com.pg85.otg.forge.util;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
@@ -65,7 +65,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 			{
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT property " + key + " from tag " + compoundNBT.getId());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT property " + key + " from tag " + compoundNBT.getId());
 				}
 				continue;
 			}
@@ -156,7 +156,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
 						OTG.getEngine().getLogger().log(
-							LogMarker.DEBUG,
+							LogLevel.ERROR,
 							LogCategory.CUSTOM_OBJECTS,
 							String.format(
 								"Cannot convert list subtype {} from it's NMS value", 

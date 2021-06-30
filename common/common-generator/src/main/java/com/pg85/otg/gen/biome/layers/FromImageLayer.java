@@ -11,7 +11,7 @@ import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 
 public class FromImageLayer implements ParentedLayer
@@ -107,7 +107,7 @@ public class FromImageLayer implements ParentedLayer
 		}
 		catch (IOException ioexception)
 		{
-			logger.log(LogMarker.FATAL, LogCategory.PUBLIC, String.format("FromImageLayer encountered a critical error: ", (Object[])ioexception.getStackTrace()));
+			logger.log(LogLevel.FATAL, LogCategory.CONFIGS, String.format("FromImageLayer encountered a critical error: ", (Object[])ioexception.getStackTrace()));
 			throw new RuntimeException(String.format("FromImageLayer encountered a critical error: ", (Object[])ioexception.getStackTrace()));
 		}
 	}

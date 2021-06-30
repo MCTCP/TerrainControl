@@ -12,7 +12,7 @@ import com.pg85.otg.customobject.structures.bo3.BO3CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.customobject.structures.bo4.CustomStructurePlotter;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.helpers.RandomHelper;
@@ -212,7 +212,7 @@ public class CustomStructureCache
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
 						IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
-						logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
 					}
 				}
 			}
@@ -273,7 +273,7 @@ public class CustomStructureCache
 
 	public void saveToDisk(ILogger logger, IChunkDecorator chunkPopulator)
 	{
-		logger.log(LogMarker.INFO, LogCategory.PUBLIC, "Saving structure and pregenerator data.");
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Saving structure and pregenerator data.");
 		boolean firstLog = false;
 		long starTime = System.currentTimeMillis();
 		while(true)
@@ -289,16 +289,16 @@ public class CustomStructureCache
 			}
 			if(firstLog)
 			{
-				logger.log(LogMarker.WARN, LogCategory.PUBLIC, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+				logger.log(LogLevel.WARN, LogCategory.MAIN, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
 				firstLog = false;
 			}
 			int interval = 300;
 			if(System.currentTimeMillis() - starTime > (interval * 1000))
 			{
-				logger.log(LogMarker.FATAL, LogCategory.PUBLIC, "SaveToDisk waited on decorate longer than " + interval + " seconds, something went wrong!");
+				logger.log(LogLevel.FATAL, LogCategory.MAIN, "SaveToDisk waited on decorate longer than " + interval + " seconds, something went wrong!");
 				throw new RuntimeException("SaveToDisk waited on decorate longer than " + interval + " seconds, something went wrong!");
 			}
-		}		
+		}
 
 		saveStructureCache(logger);
 
@@ -306,7 +306,7 @@ public class CustomStructureCache
 		{
 			chunkPopulator.endSave();
 		}
-		logger.log(LogMarker.INFO, LogCategory.PUBLIC, "Structure and pregenerator data saved.");
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Structure and pregenerator data saved.");
 	}
 
 	private void saveStructureCache(ILogger logger)
@@ -321,7 +321,7 @@ public class CustomStructureCache
 
 	private void loadStructureCache(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{		
-		logger.log(LogMarker.INFO, LogCategory.PUBLIC, "Loading structures and pre-generator data");
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Loading structures and pre-generator data");
 
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
@@ -362,6 +362,6 @@ public class CustomStructureCache
 			}
 		}
 
-		logger.log(LogMarker.INFO, LogCategory.PUBLIC, "Loading done");
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Loading done");
 	}
 }

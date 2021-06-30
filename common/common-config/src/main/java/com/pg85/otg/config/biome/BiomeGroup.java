@@ -3,7 +3,7 @@ package com.pg85.otg.config.biome;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.ILogger;
@@ -116,7 +116,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 				// Invalid biome name, remove
 				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CONFIGS, String.format("Invalid biome name {} in biome group {}", biomeName, this.name));
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Invalid biome name {} in biome group {}", biomeName, this.name));
 				}
 			}
 			it.remove();

@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LegacyMaterials;
@@ -52,7 +52,10 @@ public class ForgeMaterialReader implements IMaterialReader
 		catch(InvalidConfigException ex)
 		{
 			// Happens when a non existing block name is used.
-			String breakpoint = "";
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Invalid material " + material + ". Exception: " + ex.getMessage() + ". Replacing with blank.");
+			}
 		}
 
 		this.cachedMaterials.put(material, localMaterial);
@@ -191,7 +194,7 @@ public class ForgeMaterialReader implements IMaterialReader
 		
 		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 		{
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse block: " + input + ", substituting AIR.");
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse block: " + input + ", substituting AIR.");
 		}
 		
 		return ForgeMaterialData.ofBlock(Blocks.AIR, input);

@@ -6,7 +6,7 @@ import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -91,7 +91,7 @@ public final class SimpleSettingsMap implements SettingsMap
 			if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction)
 			{
 				logger.log(
-					LogMarker.WARN,
+					LogLevel.ERROR,
 					LogCategory.CONFIGS,
 					String.format(
 						"Invalid resource {} in {} on line {}: {}", 
@@ -154,7 +154,7 @@ public final class SimpleSettingsMap implements SettingsMap
 				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
 					logger.log(
-						LogMarker.WARN,
+						LogLevel.ERROR,
 						LogCategory.CONFIGS,
 						String.format(
 							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 

@@ -5,7 +5,7 @@ import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Loader;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.ILogger;
 
@@ -82,7 +82,7 @@ public class CustomObjectManager implements ICustomObjectManager
 					}
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "All CustomObject files indexed.");
+						logger.log(LogLevel.INFO, LogCategory.CUSTOM_OBJECTS, "All CustomObject files indexed.");
 					}
 				}
 			}.start();

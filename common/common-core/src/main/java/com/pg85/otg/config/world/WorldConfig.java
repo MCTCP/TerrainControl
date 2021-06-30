@@ -16,7 +16,7 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -126,7 +126,7 @@ public class WorldConfig extends WorldConfigBase
 			File mapFile = new File(settingsDir.toString(), this.imageFile);
 			if (!mapFile.exists())
 			{
-				logger.log(LogMarker.WARN, LogCategory.PUBLIC, "Biome map file not found. Switching BiomeMode to Normal");
+				logger.log(LogLevel.ERROR, LogCategory.MAIN, "Biome map file not found. Switching BiomeMode to Normal");
 				this.biomeMode = BiomeMode.Normal;
 			}
 		}

@@ -5,7 +5,7 @@ import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -123,7 +123,7 @@ public final class BiomeConfigFinder
 			if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
 				logger.log(
-					LogMarker.ERROR,
+					LogLevel.ERROR,
 					LogCategory.CONFIGS,
 					String.format(
 						"Failed to rename biome file {} to {}",

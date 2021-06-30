@@ -4,7 +4,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.interfaces.IEntityFunction;
 import com.pg85.otg.util.interfaces.ILogger;
@@ -65,7 +65,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 			{
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find entity '" + name + "', are you sure you spelled it correctly?");
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find entity '" + name + "', are you sure you spelled it correctly?");
 				}
 			}
 		}
@@ -92,7 +92,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 				} catch (FileNotFoundException e) {
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not find file: " + this.nameTagOrNBTFileName);
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not find file: " + this.nameTagOrNBTFileName);
 					}
 					// Set it to null so we don't go looking for this later
 					this.nameTagOrNBTFileName = null;

@@ -73,11 +73,9 @@ public final class PluginConfig extends PluginConfigBase
 
 		writer.putSetting(PluginConfigStandardValues.LOG_LEVEL, this.logLevel,
 			"Possible Log Levels",
-			"	Off			- Bare logging; This will only show FATAL and ERROR logs",
-			"	Quiet		- Minimal logging; This will show FATAL, ERROR, and WARN logs",
-			"	Standard	- Default logging; Logging for normal users. Quiet + INFO logs",
-			"	Debug		- Above Normal logging; Standard logs + DEBUG logs",
-			"	Trace		- Verbose logging; This gets very messy, Debug logs + TRACE logs",
+			"	Off			- Shows FATAL and ERROR logs.",
+			"	Quiet		- Shows FATAL, ERROR and WARNING logs.",
+			"	Standard	- Shows FATAL, ERROR, WARNING and INFO logs.",
 			"",
 			"Defaults to: Standard"
 		);

@@ -18,7 +18,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -94,7 +94,7 @@ public class BO4 implements StructuredCustomObject
 		{
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, ex.getMessage());
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error occurred while enabling BO4 " + this.getName() + ": " + ex.getMessage());
 			}
 			isInvalidConfig = true;
 			return false;
@@ -169,8 +169,8 @@ public class BO4 implements StructuredCustomObject
 
 		if(config == null)
 		{
-			logger.log(LogMarker.FATAL, LogCategory.CUSTOM_OBJECTS, "Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact the developer.");
-			throw new RuntimeException("Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact the developer.");
+			logger.log(LogLevel.FATAL, LogCategory.CUSTOM_OBJECTS, "Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact team OTG about this crash.");
+			throw new RuntimeException("Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact team OTG about this crash.");
 		}
 
 		try {
@@ -179,7 +179,7 @@ public class BO4 implements StructuredCustomObject
 			bo3SurfaceBlock = LocalMaterials.GRASS;
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO4 " + this.getName() + " was not recognised. Using GRASS instead.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO4 " + this.getName() + " was not recognised. Using GRASS instead.");
 			}
 		}
 		try {
@@ -188,7 +188,7 @@ public class BO4 implements StructuredCustomObject
 			bo3GroundBlock = LocalMaterials.DIRT;
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
 		}
 		try {
@@ -197,7 +197,7 @@ public class BO4 implements StructuredCustomObject
 			bo3StoneBlock = LocalMaterials.STONE;
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithStoneBlock + " for replaceWithStoneBlock in BO4 " + this.getName() + " was not recognised. Using STONE instead.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Value " + replaceWithStoneBlock + " for replaceWithStoneBlock in BO4 " + this.getName() + " was not recognised. Using STONE instead.");
 			}
 		}
 		
@@ -207,7 +207,7 @@ public class BO4 implements StructuredCustomObject
 			replaceBelowMaterial = LocalMaterials.DIRT;
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "Value " + config.replaceBelow + " for replaceBelow in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Value " + config.replaceBelow + " for replaceBelow in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
 		}
 		try {
@@ -216,7 +216,7 @@ public class BO4 implements StructuredCustomObject
 			replaceAboveMaterial = LocalMaterials.AIR;
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "Value " + config.replaceAbove + " for replaceAbove in BO4 " + this.getName() + " was not recognised. Using AIR instead.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Value " + config.replaceAbove + " for replaceAbove in BO4 " + this.getName() + " was not recognised. Using AIR instead.");
 			}
 		}
 
@@ -733,13 +733,13 @@ public class BO4 implements StructuredCustomObject
 			{
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being decorated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being decorated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
 				}
 			}
 	
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 			}
 		}
 

@@ -17,7 +17,7 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -169,7 +169,7 @@ public abstract class LocalPresetLoader
 		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 		{
 			logger.log(
-				LogMarker.DEBUG,
+				LogLevel.INFO,
 				LogCategory.CONFIGS,
 				String.format(
 					"{} biomes Loaded", 
@@ -177,7 +177,7 @@ public abstract class LocalPresetLoader
 				)
 			);
 			logger.log(
-				LogMarker.DEBUG, 
+				LogLevel.INFO, 
 				LogCategory.CONFIGS,
 				biomeConfigs.stream().map(
 					item -> item.getName()
@@ -272,7 +272,7 @@ public abstract class LocalPresetLoader
 						if(logger.getLogCategoryEnabled(LogCategory.MOBS))
 						{
 							logger.log(
-								LogMarker.WARN,
+								LogLevel.ERROR,
 								LogCategory.MOBS,
 								String.format(
 									"The biome {} tried to inherit mobs from itself.", 
@@ -290,7 +290,7 @@ public abstract class LocalPresetLoader
 					if(logger.getLogCategoryEnabled(LogCategory.MOBS))
 					{
 						logger.log(
-							LogMarker.ERROR,
+							LogLevel.ERROR,
 							LogCategory.MOBS,
 							String.format(
 								"The biome {} cannot inherit mobs from biome {} - too many configs processed already! Cyclical inheritance?", 

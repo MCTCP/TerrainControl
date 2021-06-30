@@ -2,7 +2,7 @@ package com.pg85.otg.config.io;
 
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.BufferedWriter;
@@ -51,8 +51,8 @@ public final class FileSettingsWriter
 		catch (IOException e)
 		{
 			logger.log(
-				LogMarker.ERROR,
-				LogCategory.PUBLIC,
+				LogLevel.ERROR,
+				LogCategory.CONFIGS,
 				String.format("Failed to write to file " + file + ", error: ",(Object[])e.getStackTrace())
 			);
 		}

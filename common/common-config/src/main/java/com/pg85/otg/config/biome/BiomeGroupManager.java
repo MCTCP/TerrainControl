@@ -1,7 +1,7 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 
 import java.util.*;
@@ -33,7 +33,7 @@ public final class BiomeGroupManager
 			{
 				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CONFIGS, String.format("Two biome groups have the same name \"{}\". Removing the second one.", newGroup.getName()));
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Two biome groups have the same name \"{}\". Removing the second one.", newGroup.getName()));
 				}
 			} else {
 				int newGroupId = getNextGroupId();
@@ -45,7 +45,7 @@ public final class BiomeGroupManager
 		} else {
 			if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
-				logger.log(LogMarker.WARN, LogCategory.CONFIGS, String.format("Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName()));
+				logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName()));
 			}
 		}
 	}

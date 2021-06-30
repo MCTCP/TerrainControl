@@ -7,7 +7,7 @@ import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
@@ -135,7 +135,7 @@ public class SpigotBiome implements IBiome
 		{
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
-				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category "+biomeConfig.getBiomeCategory());
 			}
 		}
 
@@ -407,7 +407,7 @@ public class SpigotBiome implements IBiome
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -420,7 +420,7 @@ public class SpigotBiome implements IBiome
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -433,7 +433,7 @@ public class SpigotBiome implements IBiome
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -446,7 +446,7 @@ public class SpigotBiome implements IBiome
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}

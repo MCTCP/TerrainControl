@@ -12,7 +12,7 @@ import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.util.interfaces.ILogger;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
@@ -142,7 +142,7 @@ public abstract class OTGEngine
 			File jarFileLocation = getJarFile();
 			if(jarFileLocation == null || !jarFileLocation.exists())
 			{
-				this.logger.log(LogMarker.WARN, LogCategory.PUBLIC, "Could not find root jar file, skipping default preset unpack (copy it manually for development).");
+				this.logger.log(LogLevel.WARN, LogCategory.MAIN, "Could not find root jar file, skipping default preset unpack (copy it manually for development).");
 			} else {
 				jarFile = new JarFile(jarFileLocation);
 				Enumeration<JarEntry> entries = jarFile.entries();

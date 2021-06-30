@@ -4,7 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
@@ -62,13 +62,13 @@ public class OTGPlugin extends JavaPlugin implements Listener
 
 		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 		{
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "Registered biomes:");
+			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
+			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Registered biomes:");
 			for (BiomeBase biomeBase : biome_registry)
 			{
-				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, (i++) + ": " + biomeBase.toString());
+				OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, (i++) + ": " + biomeBase.toString());
 			}
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
+			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
 		}
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 	}
@@ -83,7 +83,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(id);
 		if (preset == null)
 		{
-			OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.PUBLIC, "Could not find preset '" + id + "', did you install it correctly?");
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Could not find preset '" + id + "', did you install it correctly?");
 			return null;
 		}
 		worlds.put(worldName, id);
@@ -109,17 +109,17 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			return;
 		}
 
-		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Taking over world " + world.getName());
+		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Taking over world " + world.getName());
 
 		net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) world).getHandle().getChunkProvider().getChunkGenerator();
 		if (!(generator instanceof CustomChunkGenerator))
 		{
-			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Mission failed, we'll get them next time");
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Mission failed, we'll get them next time");
 			return;
 		}
 		if (!(world.getGenerator() instanceof OTGSpigotChunkGen))
 		{
-			OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.PUBLIC, "World generator was not an OTG generator, cannot take over, something has gone wrong");
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
 			return;
 		}
 		// We have a CustomChunkGenerator and a NoiseChunkGenerator
@@ -149,7 +149,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 
 		// Spigot may have started generating - we gotta regen if so
 
-		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Success!");
+		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Success!");
 
 		processedWorlds.add(world.getName());
 

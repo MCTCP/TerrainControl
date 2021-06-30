@@ -10,7 +10,7 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -161,7 +161,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
 					this.logger.log(
-						LogMarker.WARN,
+						LogLevel.ERROR,
 						LogCategory.CUSTOM_OBJECTS,
 						String.format(
 							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
@@ -175,7 +175,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
 				this.logger.log(
-					LogMarker.WARN,
+					LogLevel.ERROR,
 					LogCategory.CUSTOM_OBJECTS,
 					String.format(
 						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 

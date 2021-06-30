@@ -2,7 +2,7 @@ package com.pg85.otg.config.io;
 
 import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.interfaces.ILogger;
 
 import java.io.BufferedReader;
@@ -99,7 +99,7 @@ public class FileSettingsReader
 			settingsReader = new BufferedReader(new FileReader(file));
 			readIntoMap(settings, settingsReader);
 		} catch (IOException e) {
-			logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Could not read file, exception: ", (Object[])e.getStackTrace()));
+			logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Could not read file, exception: ", (Object[])e.getStackTrace()));
 		} finally {
 			if (settingsReader != null)
 			{
@@ -109,7 +109,7 @@ public class FileSettingsReader
 				}
 				catch (IOException localIOException2)
 				{
-					logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Could not read file, exception: ", (Object[])localIOException2.getStackTrace()));
+					logger.log(LogLevel.ERROR, LogCategory.CONFIGS, String.format("Could not close file, exception: ", (Object[])localIOException2.getStackTrace()));
 				}
 			}
 		}

@@ -24,7 +24,7 @@ import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.StreamHelper;
@@ -299,7 +299,7 @@ public class BO4Config extends CustomObjectConfigFile
 				{
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, e.getMessage());
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error fetching smoothing heightmap for BO4 " + start.getName() + ": " + e.getMessage());
 					}
 				}
 				if(bo4Config != null)
@@ -309,7 +309,7 @@ public class BO4Config extends CustomObjectConfigFile
 					} catch (InvalidConfigException e) {
 						if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, e.getMessage());
+							logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error fetching smoothing heightmap for BO4Data " + start.getName() + ": " + e.getMessage());
 						}
 						this.heightMap = new BO4BlockFunction[16][16];
 						return this.heightMap;
@@ -420,7 +420,7 @@ public class BO4Config extends CustomObjectConfigFile
 			{
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, e.getMessage());
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, " Error fetching blocks for BO4 " + this.getName() + ": " + e.getMessage());
 				}
 			}
 			if(bo4Config != null)
@@ -430,7 +430,7 @@ public class BO4Config extends CustomObjectConfigFile
 				} catch (InvalidConfigException e) {
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, e.getMessage());
+						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, " Error fetching blocks for BO4Data " + this.getName() + ": " + e.getMessage());
 					}
 					return null;
 				}
@@ -664,7 +664,7 @@ public class BO4Config extends CustomObjectConfigFile
 			{
 				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "could not load BO3 parent for InheritBO3: " + this.inheritBO3 + " in BO3 " + this.getName());
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "could not load BO4 parent for InheritBO3: " + this.inheritBO3 + " in BO4 " + this.getName());
 				}
 			}
 		}
@@ -723,7 +723,7 @@ public class BO4Config extends CustomObjectConfigFile
 		{
 			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "BO4 " + this.getName() + " was too large (" + xSize + "x" + zSize + "), BO4's can be max 16x16 blocks.");
+				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "BO4 " + this.getName() + " was too large (" + xSize + "x" + zSize + "), BO4's can be max 16x16 blocks.");
 			}
 			throw new InvalidConfigException("BO4 " + this.getName() + " was too large, BO4's can be max 16x16 blocks.");
 		}
@@ -1000,23 +1000,23 @@ public class BO4Config extends CustomObjectConfigFile
 		{
 			if(illegalBlock)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalModData)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalSpawnerData)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalParticleData)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalEntityData)
 			{
-				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
+				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 		}
 
@@ -2071,7 +2071,7 @@ public class BO4Config extends CustomObjectConfigFile
 						} catch (InvalidConfigException e) {
 							if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 							{
-								logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not read material \"" + materialName + "\" for BO4 \"" + this.getName() + "\"");
+								logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not read material \"" + materialName + "\" for BO4 \"" + this.getName() + "\"");
 								e.printStackTrace();
 							}
 						}

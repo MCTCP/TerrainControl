@@ -8,7 +8,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogCategory;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.logging.LogLevel;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -116,7 +116,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 					{
 						branchString += ", " + arg;
 					}
-					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "isRequired:true branches cannot have multiple BO4's with a rarity, only one BO4 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
 				}
 				this.branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), this.isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
 				break;
