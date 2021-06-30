@@ -20,12 +20,13 @@ OpenTerrainGenerator is an advanced world generator for Minecraft. Through vario
 <li>Add particles and invisible entity spawners (for spawning mobs, projectiles or minecarts etc) to custom structures (BO3, Forge only atm). </li>
 <li>Custom dimensions with their own terrain, game rules and settings. Settings include gravity, block protect, no block placing, add/remove items on join/leave/respawn (Forge only atm).</li>
 </ul>
-To learn more, check out <a href="https://biomebundle.wixsite.com/openterraingen"><strong>all of OpenTerrainGenerator's features</strong></a>.
+To learn more, check out the OTG Wiki and/or join us on the Discord.
 
 ## Links
 * [Project home](https://biomebundle.wixsite.com/openterraingen)
 * [CurseForge](https://minecraft.curseforge.com/projects/open-terrain-generator)
 * [Wiki](http://openterraingen.wikia.com/wiki/Open_Terrain_Generator_Wiki)
+* [Discord](https://discord.com/invite/UXzdVTH)
 * [Installation](https://openterraingen.fandom.com/wiki/Installing_OTG) for Spigot and Forge
 
 ## Original TerrainControl developers
