@@ -304,7 +304,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Carves caves and ravines
-	// TODO: Allow non-OTG carvers?
 	@Override
 	public void applyCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{

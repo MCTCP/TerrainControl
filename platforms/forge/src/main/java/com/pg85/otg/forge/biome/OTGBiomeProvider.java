@@ -116,7 +116,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 
 	public RegistryKey<Biome> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
 	{
-		return keyLookup.get(this.layer.get().sample(biomeX, biomeZ));
+		return this.keyLookup.get(this.layer.get().sample(biomeX, biomeZ));
 	}
 
 	@Override
@@ -127,13 +127,13 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 
 	public RegistryKey<Biome> lookupKey(int index)
 	{
-		return keyLookup.get(index);
+		return this.keyLookup.get(index);
 	}
 
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		return registry.get(keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
+		return this.registry.get(this.keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
 	}
 
 	@Override
@@ -146,7 +146,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public BiomeConfig getConfig(int biomeX, int biomeZ)
 	{
 		int biomeId = this.layer.get().sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? configLookup[biomeId] : null;
+		return this.configLookup.length > biomeId ? this.configLookup[biomeId] : null;
 	}
 	
 	// TODO: May have to override this for spawn?
