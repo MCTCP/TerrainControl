@@ -2,11 +2,9 @@ package com.pg85.otg.logging;
 
 public interface ILogger
 {
-	public void log(LogMarker level, String message, Object... params);
+	public void init(LogMarker level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logDecoration, boolean logMobs);
 
-	public void printStackTrace(LogMarker fatal, Exception e);
-
-	public void init(LogMarker level, boolean spawnLogEnabled, boolean logBO4Plotting, boolean logConfigErrors, boolean logDecorationErrors);
-	
-	public boolean getSpawnLogEnabled();
+	public boolean getLogCategoryEnabled(LogCategory category);	
+	public void log(LogMarker level, LogCategory category, String message);
+	public void printStackTrace(LogMarker marker, LogCategory category, Exception e);	
 }

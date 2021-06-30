@@ -8,6 +8,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -111,12 +112,12 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 					this.treeObjects[treeNumber] = tree;				
 					if(tree == null)
 					{
-						if(logger.getSpawnLogEnabled())
+						if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
+							logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
 						}
 						continue;
-					}					
+					}
 					
 					params = params[1].split(";");
 					sMinHeight = params[0].toLowerCase().replace("minheight=", "");
@@ -133,9 +134,9 @@ public class TreeResource extends ResourceBase implements ICustomObjectResource
 					this.treeObjects[treeNumber] = tree;
 					if(tree == null)
 					{
-						if(logger.getSpawnLogEnabled())
+						if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
+							logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for Tree, BO3: " + this.treeNames.get(treeNumber));
 						}
 						continue;
 					}

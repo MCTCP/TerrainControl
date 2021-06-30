@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.materials.LegacyMaterials;
@@ -156,7 +157,10 @@ public class SpigotMaterialData extends LocalMaterialData
 			return ofBlockData(blockState, input);
 		}
 
-		OTG.log(LogMarker.INFO, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
+		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+		{
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
+		}
 
 		return ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);
 	}

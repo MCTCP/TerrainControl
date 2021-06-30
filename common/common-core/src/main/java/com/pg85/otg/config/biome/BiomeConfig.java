@@ -1,6 +1,5 @@
 package com.pg85.otg.config.biome;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -19,6 +18,7 @@ import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
@@ -145,7 +145,7 @@ public class BiomeConfig extends BiomeConfigBase
 
 		this.renameOldSettings(settings, logger, materialReader);
 		this.readConfigSettings(settings, biomeResourcesManager, logger, materialReader);
-		this.validateAndCorrectSettings(presetFolder, true, logger);
+		this.validateAndCorrectSettings(presetFolder, logger);
 
 		// Set water level
 		if (this.useWorldWaterLevel)
@@ -313,7 +313,10 @@ public class BiomeConfig extends BiomeConfigBase
 						}
 						catch (NullPointerException e)
 						{
-							logger.log(LogMarker.WARN, "Unrecognized sapling type in biome "+ this.getName());
+							if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+							{
+								logger.log(LogMarker.WARN, LogCategory.CONFIGS, "Unrecognized sapling type in biome "+ this.getName());
+							}
 						}
 					} else {
 						this.saplingGrowers.put(sapling.saplingType, sapling);
@@ -958,7 +961,7 @@ public class BiomeConfig extends BiomeConfigBase
 	}
 
 	@Override
-	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger)
+	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger)
 	{
 		this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.getGenerationDepth());
 		this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.getGenerationDepth());

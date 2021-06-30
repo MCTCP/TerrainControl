@@ -11,6 +11,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
@@ -51,9 +52,9 @@ public class BO3CustomStructure extends CustomStructure
 		}
 		if(!(object instanceof BO3))
 		{
-			if(logger.getSpawnLogEnabled())
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "BO3CustomStructure loaded with non-BO3 object " + object.getName());
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "BO3CustomStructure loaded with non-BO3 object " + object.getName());
 			}
 			return;
 		}
@@ -122,9 +123,9 @@ public class BO3CustomStructure extends CustomStructure
 			}
 			objectsInChunk.add(coordObject);
 		} else {
-			if(logger.getSpawnLogEnabled())
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "Error reading branch in BO3 " + parent.getName()  + " Could not find BO3: " + coordObject.bo3Name);
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Error reading branch in BO3 " + parent.getName()  + " Could not find BO3: " + coordObject.bo3Name);
 			}
 		}
 	}

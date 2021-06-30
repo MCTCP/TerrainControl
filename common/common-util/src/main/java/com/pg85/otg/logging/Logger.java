@@ -1,88 +1,59 @@
 package com.pg85.otg.logging;
 
-import com.pg85.otg.util.helpers.StringHelper;
-
-import java.util.List;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public abstract class Logger implements ILogger
 {
-	public enum LogLevels
-	{
-		Off(LogMarker.ERROR),
-		Quiet(LogMarker.WARN),
-		Standard(LogMarker.INFO),
-		Debug(LogMarker.DEBUG),
-		Trace(LogMarker.TRACE);
-		private final LogMarker marker;
-
-		LogLevels(LogMarker marker)
-		{
-			this.marker = marker;
-		}
-
-		public LogMarker getLevel()
-		{
-			return marker;
-		}
-	}
-	
 	protected LogMarker minimumLevel = LogMarker.INFO;
-	private boolean spawnLogEnabled;
-	private boolean logBO4Plotting;
-	private boolean logConfigErrors;
-	private boolean logDecorationErrors;
+	private boolean logCustomObjects;
+	private boolean logStructurePlotting;
+	private boolean logConfigs;
+	private boolean logBiomeRegistry;
+	private boolean logDecoration;
+	private boolean logMobs;
 
-	public void init(LogMarker level, boolean spawnLogEnabled, boolean logBO4Plotting, boolean logConfigErrors, boolean logDecorationErrors)
+	public void init(LogMarker level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logDecoration, boolean logMobs)
 	{
 		this.minimumLevel = level;
-		this.spawnLogEnabled = spawnLogEnabled; 
-		this.logBO4Plotting = logBO4Plotting;
-		this.logConfigErrors = logConfigErrors;
-		this.logDecorationErrors = logDecorationErrors;
-	}
-	
-	public boolean getSpawnLogEnabled()
-	{
-		return spawnLogEnabled;
-	}
-	
-	public boolean getLogBO4Plotting()
-	{
-		return logBO4Plotting;
-	}
-	
-	public boolean getLogConfigErrors()
-	{
-		return logConfigErrors;
-	}
-	
-	public boolean getLogDecorationErrors()
-	{
-		return logDecorationErrors;
+		this.logCustomObjects = logCustomObjects; 
+		this.logStructurePlotting = logStructurePlotting;
+		this.logConfigs = logConfigs;
+		this.logBiomeRegistry = logBiomeRegistry;
+		this.logDecoration = logDecoration;
+		this.logMobs = logMobs;
 	}
 
-	/**
-	 * Logs the message(s) with the given importance. Message will be prefixed
-	 * with [OpenTerrainGenerator], so don't do that yourself.
-	 *
-	 * @param level	The severity of the message
-	 * @param message The messages to log
-	 */
-	public void log(LogMarker level, List<String> message)
+	@Override
+	public boolean getLogCategoryEnabled(LogCategory category)
 	{
-		log(level, "{}", (Object) StringHelper.join(message, " "));
+		switch(category)
+		{
+			case PUBLIC:
+				return true;			
+			case CUSTOM_OBJECTS:
+				return this.logCustomObjects;
+			case STRUCTURE_PLOTTING:
+				return this.logStructurePlotting;
+			case CONFIGS:
+				return this.logConfigs;
+			case BIOME_REGISTRY:
+				return this.logBiomeRegistry;
+			case DECORATION:
+				return this.logDecoration;
+			case MOBS:
+				return this.logMobs;				
+			default:
+				return false;
+		}
 	}
-
-	/**
-	 * Logs a format string message with the given importance. Message will be
-	 * prefixed with [OpenTerrainGenerator], so don't do that yourself.
-	 *
-	 * @param level	The severity of the message
-	 * @param message The messages to log formatted similar to Logger.log() with
-	 *				the same args.
-	 * @param params  The parameters belonging to {0...} in the message string
-	 */
-	public abstract void log(LogMarker level, String message, Object... params);
-
-	public abstract void log(LogMarker level, Throwable e, int maxDepth);
+	
+	@Override
+	public void printStackTrace(LogMarker level, LogCategory categoy, Exception e)
+	{
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		e.printStackTrace(printWriter);
+		log(level, categoy, stringWriter.toString());
+	}
 }

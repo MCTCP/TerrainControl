@@ -8,6 +8,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.StreamHelper;
@@ -96,34 +97,34 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 		// assureSize only returns false if size() < size
 		assureSize(8, args);
 
-		x = readInt(args.get(0), -10000, 10000);
-		y = readInt(args.get(1), -255, 255);
-		z = readInt(args.get(2), -10000, 10000);
-		isRequiredBranch = readBoolean(args.get(3));
+		this.x = readInt(args.get(0), -10000, 10000);
+		this.y = readInt(args.get(1), -255, 255);
+		this.z = readInt(args.get(2), -10000, 10000);
+		this.isRequiredBranch = readBoolean(args.get(3));
 
 		int i;
 		// This for loop allows multiple branches to be defined in a single Branch(x,x,x,x,etc) line in a BO3 file.
 		for (i = 4; i < args.size() - 3; i += 4)
 		{
 			double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
-			if(isRequiredBranch && args.size() > 9)
+			if(this.isRequiredBranch && args.size() > 9)
 			{
-				if(logger.getSpawnLogEnabled())
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
 					String branchString = "";
 					for(String arg : args)
 					{
 						branchString += ", " + arg;
 					}
-					logger.log(LogMarker.WARN, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
+					logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
 				}
-				branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
+				this.branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), this.isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
 				break;
 			} else {
-				branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
+				this.branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), this.isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
 			}
 		}
-		if(!isRequiredBranch)
+		if(!this.isRequiredBranch)
 		{
 			if (i < args.size())
 			{
@@ -133,8 +134,8 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 					try
 					{
 						Double.parseDouble(totalChanceOrBranchGroup);
-						totalChanceSet = true;
-						totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+						this.totalChanceSet = true;
+						this.totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
 						i++;
 					}
 					catch(NumberFormatException ex) { }
@@ -146,11 +147,11 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 			String totalChanceOrBranchGroup = args.get(i);
 			if(totalChanceOrBranchGroup != null && totalChanceOrBranchGroup.length() > 0)
 			{
-				branchGroup = args.get(i);
+				this.branchGroup = args.get(i);
 
-				for(BO4BranchNode branch : branchesBO4)
+				for(BO4BranchNode branch : this.branchesBO4)
 				{
-					branch.branchGroup = branchGroup;
+					branch.branchGroup = this.branchGroup;
 				}
 			}
 		}
@@ -162,22 +163,22 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 	{
 		StringBuilder output = new StringBuilder(getConfigName())
 			.append('(')
-			.append(x).append(',')
-			.append(y).append(',')
-			.append(z).append(',');
+			.append(this.x).append(',')
+			.append(this.y).append(',')
+			.append(this.z).append(',');
 
-		output.append(isRequiredBranch);
-		for (Iterator<BO4BranchNode> it = branchesBO4.iterator(); it.hasNext();)
+		output.append(this.isRequiredBranch);
+		for (Iterator<BO4BranchNode> it = this.branchesBO4.iterator(); it.hasNext();)
 		{
 			output.append(it.next().toBranchString());
 		}
-		if (totalChanceSet)
+		if (this.totalChanceSet)
 		{
-			output.append(',').append(totalChance);
+			output.append(',').append(this.totalChance);
 		}
-		if(branchGroup != null && branchGroup.trim().length() > 0)
+		if(this.branchGroup != null && this.branchGroup.trim().length() > 0)
 		{
-			output.append(',').append(branchGroup);
+			output.append(',').append(this.branchGroup);
 		}
 		return output.append(')').toString();
 	}
@@ -190,11 +191,11 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 	@Override
 	public CustomStructureCoordinate toCustomObjectCoordinate(String presetFolderName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		for (Iterator<BO4BranchNode> it = branchesBO4.iterator(); it.hasNext();)
+		for (Iterator<BO4BranchNode> it = this.branchesBO4.iterator(); it.hasNext();)
 		{
 			BO4BranchNode branch = it.next();
 
-			double randomChance = random.nextDouble() * totalChance;
+			double randomChance = random.nextDouble() * this.totalChance;
 			if (randomChance <= branch.getChance())
 			{
 				BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
@@ -210,7 +211,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 	{
 		return BO4Config.class;
 	}
-	
+
 	public void writeToStream(DataOutput stream) throws IOException
 	{
 		StreamHelper.writeStringToStream(stream, makeString());

@@ -9,6 +9,7 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
@@ -183,7 +184,10 @@ public class ForgeBiome implements IBiome
 		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
 		if (category == null)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse biome category " + biomeConfig.getBiomeCategory());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse biome category " + biomeConfig.getBiomeCategory());
+			}
 		}
 		
 		return biomeBuilder.build().setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()));
@@ -199,7 +203,10 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}
 		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getCreatures())
@@ -209,7 +216,10 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}
 		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterCreatures())
@@ -219,7 +229,10 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.WATER_CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}		
 		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getAmbientCreatures())
@@ -229,7 +242,10 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}
 		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterAmbientCreatures())
@@ -239,7 +255,10 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.WATER_AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}
 		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMiscCreatures())
@@ -249,10 +268,13 @@ public class ForgeBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.addSpawn(EntityClassification.MISC, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+				}
 			}
 		}
-		
+
 		mobSpawnInfoBuilder.setPlayerCanSpawn(); // Default biomes do this, not sure if needed?
 		return mobSpawnInfoBuilder;
 	}

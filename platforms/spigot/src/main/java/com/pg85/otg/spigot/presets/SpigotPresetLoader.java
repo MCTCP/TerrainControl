@@ -11,6 +11,7 @@ import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
@@ -177,7 +178,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				// Index BiomeColor for FromImageMode and /otg map
 				biomeColorMap.put(biomeConfig.getBiomeColor(), otgBiomeId);
 
-				OTG.log(LogMarker.DEBUG, "Registered biome " + biomeConfig.getName() + " with OTG id " + otgBiomeId);
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "Registered biome " + biomeConfig.getName() + " with OTG id " + otgBiomeId);
+				}
 
 				currentId += isOceanBiome ? 0 : 1;
 			}
@@ -356,9 +360,9 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				return;
 			}
 		}
-		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 		{
-			OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
+			OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
 		}
-	}	
+	}
 }

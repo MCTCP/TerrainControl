@@ -10,6 +10,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
@@ -90,9 +91,9 @@ class BranchDataItem
 						!childCoordObject.isRequiredBranch
 					)
 					{
-						if(logger.getSpawnLogEnabled())
+						if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
 						{
-							logger.log(LogMarker.WARN, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + this.branch.bo3Name);
+							logger.log(LogMarker.WARN, LogCategory.STRUCTURE_PLOTTING, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + this.branch.bo3Name);
 						}
 						continue;
 					}

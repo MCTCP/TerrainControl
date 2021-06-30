@@ -60,7 +60,7 @@ public abstract class ConfigFile
 	 * Called directly after {@link #readConfigSettings(SettingsMap)} to fix
 	 * impossible combinations of settings.
 	 */
-	protected abstract void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger);
+	protected abstract void validateAndCorrectSettings(Path settingsDir, ILogger logger);
 
 	/**
 	 * Called before {@link #readConfigSettings(SettingsMap)} to rewrite

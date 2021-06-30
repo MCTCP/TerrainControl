@@ -9,6 +9,7 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -156,14 +157,32 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 		{
 			try {
 				tileEntity.deserializeNBT(state, nms);
-			} catch (JsonSyntaxException e)
-			{
-				this.logger.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+			} catch (JsonSyntaxException e) {
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					this.logger.log(
+						LogMarker.WARN,
+						LogCategory.CUSTOM_OBJECTS,
+						String.format(
+							"Badly formatted json for tile entity with id '{}' at {},{},{}", 
+							nms.getString("id"), 
+							x, y, z
+						)
+					);
+				}
 			}
 		} else {
-			if(this.logger.getSpawnLogEnabled())
+			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				this.logger.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+				this.logger.log(
+					LogMarker.WARN,
+					LogCategory.CUSTOM_OBJECTS,
+					String.format(
+						"Skipping tile entity with id {}, cannot be placed at {},{},{}", 
+						nms.getString("id"), 
+						x, y, z
+					)
+				);
 			}
 		}
 	}

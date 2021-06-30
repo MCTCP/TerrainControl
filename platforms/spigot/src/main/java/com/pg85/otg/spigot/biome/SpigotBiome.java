@@ -6,6 +6,7 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
@@ -132,7 +133,10 @@ public class SpigotBiome implements IBiome
 		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS);
 		if (category == null)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+			}
 		}
 
 		return builder.a();
@@ -401,9 +405,9 @@ public class SpigotBiome implements IBiome
 				// a() == withSpawner() in forge
 				mobSpawnInfoBuilder.a(EnumCreatureType.MONSTER, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -414,9 +418,9 @@ public class SpigotBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.a(EnumCreatureType.CREATURE, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -427,9 +431,9 @@ public class SpigotBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.a(EnumCreatureType.WATER_CREATURE, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}
@@ -440,9 +444,9 @@ public class SpigotBiome implements IBiome
 			{
 				mobSpawnInfoBuilder.a(EnumCreatureType.AMBIENT, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
-				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
-					OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+					OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 				}
 			}
 		}

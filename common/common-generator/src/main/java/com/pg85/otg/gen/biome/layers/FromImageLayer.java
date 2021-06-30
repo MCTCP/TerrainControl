@@ -3,7 +3,6 @@ package com.pg85.otg.gen.biome.layers;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -12,6 +11,7 @@ import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 
 public class FromImageLayer implements ParentedLayer
@@ -107,7 +107,8 @@ public class FromImageLayer implements ParentedLayer
 		}
 		catch (IOException ioexception)
 		{
-			logger.log(LogMarker.FATAL, Arrays.toString(ioexception.getStackTrace()));
+			logger.log(LogMarker.FATAL, LogCategory.PUBLIC, String.format("FromImageLayer encountered a critical error: ", (Object[])ioexception.getStackTrace()));
+			throw new RuntimeException(String.format("FromImageLayer encountered a critical error: ", (Object[])ioexception.getStackTrace()));
 		}
 	}
 

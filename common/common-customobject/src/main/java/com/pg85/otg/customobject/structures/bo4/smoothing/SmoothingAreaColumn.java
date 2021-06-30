@@ -6,6 +6,7 @@ import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.structures.bo4.smoothing.SmoothingAreaBlock.enumSmoothingBlockType;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -75,9 +76,9 @@ class SmoothingAreaColumn
 		try {
 			replaceAboveMaterial = materialReader.readMaterial(bo4Config.replaceAbove);
 		} catch (InvalidConfigException e) {
-			if(logger.getSpawnLogEnabled())
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "ReplaceAbove: " + bo4Config.replaceAbove + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "ReplaceAbove: " + bo4Config.replaceAbove + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}
 		}
 
@@ -86,17 +87,17 @@ class SmoothingAreaColumn
 		try {
 			smoothingSurfaceBlock = materialReader.readMaterial(bo4Config.smoothingSurfaceBlock);
 		} catch (InvalidConfigException e) {
-			if(logger.getSpawnLogEnabled())
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "SmoothingSurfaceBlock: " + bo4Config.smoothingSurfaceBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "SmoothingSurfaceBlock: " + bo4Config.smoothingSurfaceBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}
 		}
 		try {
 			smoothingGroundBlock = materialReader.readMaterial(bo4Config.smoothingGroundBlock);
 		} catch (InvalidConfigException e) {
-			if(logger.getSpawnLogEnabled())
+			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "SmoothingGroundBlock: " + bo4Config.smoothingGroundBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "SmoothingGroundBlock: " + bo4Config.smoothingGroundBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
 			}
 		}
 		boolean needsReplaceBlocks;

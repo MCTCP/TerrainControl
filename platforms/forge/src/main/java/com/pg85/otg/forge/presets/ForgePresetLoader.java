@@ -34,6 +34,7 @@ import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.entity.EntityClassification;
@@ -103,7 +104,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry, boolean developerMode)
+	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
@@ -116,7 +117,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
 							this.materialReaderByPresetFolderName.put(presetFolderName, new ForgeMaterialReader());							
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger, developerMode);
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger);
 							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
 							break;
@@ -288,7 +289,10 @@ public class ForgePresetLoader extends LocalPresetLoader
  				// Index BiomeColor for FromImageMode and /otg map
 				biomeColorMap.put(biomeConfig.getBiomeColor(), otgBiomeId);
  				
- 				OTG.log(LogMarker.INFO, "Registered biome " + resourceLocation.toString() + " | " + biomeConfig.getName() + " with OTG id " + otgBiomeId);
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+				{
+					OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "Registered biome " + resourceLocation.toString() + " | " + biomeConfig.getName() + " with OTG id " + otgBiomeId);
+				}
  				
  				currentId += isOceanBiome ? 0 : 1;
 			}
@@ -415,9 +419,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
 			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
 		} else {
-			if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 			{
-				OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
+				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.MOBS, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
 			}
 		}
 	}	

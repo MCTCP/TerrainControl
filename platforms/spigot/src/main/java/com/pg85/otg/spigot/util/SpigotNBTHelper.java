@@ -1,6 +1,7 @@
 package com.pg85.otg.spigot.util;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
@@ -55,8 +56,11 @@ public class SpigotNBTHelper extends LocalNBTHelper
 			nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
 		}
 		catch (Exception e)
-		{
-			OTG.log(LogMarker.FATAL, "", (Object[]) e.getStackTrace());
+		{			
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.CUSTOM_OBJECTS, String.format("SpigotNBTHelper: ", (Object[]) e.getStackTrace()));	
+			}
 		}
 
 		if (nmsChildTags == null)
@@ -142,8 +146,17 @@ public class SpigotNBTHelper extends LocalNBTHelper
 					listTag.addTag(getNBTFromNMSTagCompound(null, (NBTTagCompound) nmsListTag.get(i)));
 					break;
 				default:
-					OTG.log(LogMarker.DEBUG, "Cannot convert list subtype {} from it's NMS value",
-						listType);
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						OTG.getEngine().getLogger().log(
+							LogMarker.DEBUG,
+							LogCategory.CUSTOM_OBJECTS,
+							String.format(
+								"Cannot convert list subtype {} from it's NMS value",
+								listType
+							)
+						);
+					}
 					break;
 			}
 		}

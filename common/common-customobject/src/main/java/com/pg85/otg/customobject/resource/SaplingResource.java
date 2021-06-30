@@ -7,6 +7,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -56,7 +57,10 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 			try {
 				this.saplingMaterial = materialReader.readMaterial(args.get(1));
 			} catch (InvalidConfigException e) {
-				logger.log(LogMarker.ERROR, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
+				if(logger.getLogCategoryEnabled(LogCategory.DECORATION))
+				{
+					logger.log(LogMarker.WARN, LogCategory.DECORATION, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
+				}
 			}
 		}
 		if (this.saplingType == null && this.saplingMaterial == null)
@@ -167,7 +171,10 @@ public class SaplingResource extends ConfigFunction<IBiomeConfig>
 					this.trees.add(tree);
 				} catch (InvalidConfigException e) {
 					this.trees.add(null);
-					logger.log(LogMarker.WARN, "Could not find Object " + treeName + " for Sapling() resource in biome " + this.biomeName);
+					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not find Object " + treeName + " for Sapling() resource in biome " + this.biomeName);
+					}
 				}
 			}
 			

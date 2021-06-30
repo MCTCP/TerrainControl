@@ -37,7 +37,7 @@ public class ForgeEngine extends OTGEngine
 
 	public void reloadPreset(String presetFolderName, MutableRegistry<Biome> biomeRegistry)
 	{
-		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, this.logger, biomeRegistry, getPluginConfig().getDeveloperModeEnabled());
+		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, this.logger, biomeRegistry);
 	}
 	
 	public void onSave(IWorld world)

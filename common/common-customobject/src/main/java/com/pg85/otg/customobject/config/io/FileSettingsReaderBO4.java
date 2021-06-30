@@ -5,6 +5,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -147,9 +148,19 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 				function = manager.getConfigFunction(functionName, holder, args, logger, materialReader);	
 			}
 			result.add(function);
-			if (!function.isValid() && logger.getSpawnLogEnabled())
+			if (!function.isValid() && logger.getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
-				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.line, function.getError());
+				logger.log(
+					LogMarker.WARN,
+					LogCategory.CONFIGS,
+					String.format(
+						"Invalid resource {} in {} on line {}: {}", 
+						functionName, 
+						this.name, 
+						configFunctionLine.line, 
+						function.getError()
+					)
+				);
 			}
 		}
 
@@ -199,14 +210,28 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 			}
 			catch (InvalidConfigException e)
 			{
-				logger.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}", stringValue, setting, name, stringWithLineNumber.line, e.getMessage());
+				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+				{
+					logger.log(
+						LogMarker.WARN, 
+						LogCategory.CONFIGS,
+						String.format(
+							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
+							stringValue, 
+							setting, 
+							this.name, 
+							stringWithLineNumber.line, 
+							e.getMessage()
+						)
+					);
+				}
 			}
 		}
 
 		// Try the fallback
-		if (fallback != null)
+		if (this.fallback != null)
 		{
-			return fallback.getSetting(setting, defaultValue, logger, materialReader, manager);
+			return this.fallback.getSetting(setting, defaultValue, logger, materialReader, manager);
 		}
 
 		// Return default value
@@ -286,16 +311,17 @@ public class FileSettingsReaderBO4 implements SettingsReaderBO4
 		}
 		catch (IOException e)
 		{
-			logger.printStackTrace(LogMarker.FATAL, e);
+			logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Exception when reading file: ", (Object[])e.getStackTrace()));
 		} finally {
 			if (settingsReader != null)
 			{
 				try
 				{
 					settingsReader.close();
-				} catch (IOException localIOException2)
+				}
+				catch (IOException localIOException2)
 				{
-					logger.printStackTrace(LogMarker.FATAL, localIOException2);
+					logger.log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Exception when reading file: ", (Object[])localIOException2.getStackTrace()));
 				}
 			}
 		}

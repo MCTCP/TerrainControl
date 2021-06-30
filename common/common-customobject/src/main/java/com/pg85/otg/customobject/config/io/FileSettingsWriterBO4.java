@@ -6,6 +6,7 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
@@ -61,14 +62,12 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 			config.write(writer, configMode, logger, materialReader, manager);
 		} catch (IOException e)
 		{
-			logIOError(e, file, logger);
+			logger.log(
+				LogMarker.ERROR,
+				LogCategory.PUBLIC,
+				String.format("Failed to write to file " + file + ", error: ",(Object[])e.getStackTrace())
+			);
 		}
-	}
-
-	private static void logIOError(IOException e, File file, ILogger logger)
-	{
-		logger.log(LogMarker.ERROR, "Failed to write to file {}", file);
-		logger.printStackTrace(LogMarker.ERROR, e);
 	}
 
 	@Override
@@ -125,7 +124,15 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 		}
 		catch (IOException e)
 		{
-			logger.log(LogMarker.WARN, "Failed to close file {} ({})", file.getAbsolutePath(), e.getMessage());
+			logger.log(
+				LogMarker.ERROR,
+				LogCategory.PUBLIC,
+				String.format(
+					"Failed to close file {} ({})", 
+					file.getAbsolutePath(), 
+					e.getMessage()
+				)
+			);
 		}
 		writer = null;
 	}

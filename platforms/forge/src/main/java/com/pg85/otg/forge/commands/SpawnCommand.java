@@ -8,6 +8,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -165,11 +166,7 @@ public class SpawnCommand
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.log(LogMarker.INFO, e.toString());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.log(LogMarker.INFO, s.toString());
-			}
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, String.format("Error during spawn command: ", (Object[])e.getStackTrace()));
 		}
 		return 0;
 	}

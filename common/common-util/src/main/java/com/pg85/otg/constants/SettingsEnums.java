@@ -1,7 +1,30 @@
 package com.pg85.otg.constants;
 
+import com.pg85.otg.logging.LogMarker;
+
 public class SettingsEnums
 {
+	public enum LogLevels
+	{
+		Off(LogMarker.ERROR),
+		Quiet(LogMarker.WARN),
+		Standard(LogMarker.INFO),
+		Debug(LogMarker.DEBUG),
+		Trace(LogMarker.TRACE);
+
+		private final LogMarker marker;
+
+		LogLevels(LogMarker marker)
+		{
+			this.marker = marker;
+		}
+
+		public LogMarker getLevel()
+		{
+			return this.marker;
+		}
+	}
+	
 	public enum BiomeMode
 	{
 		Normal,

@@ -31,17 +31,19 @@ public final class PluginConfig extends PluginConfigBase
 	protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader) { }
 
 	@Override
-	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger) { }
+	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger) { }
 
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);
 		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger);
-		this.spawnLog = reader.getSetting(PluginConfigStandardValues.SPAWN_LOG, logger);
-		this.logBO4Plotting = reader.getSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, logger);
-		this.logConfigErrors = reader.getSetting(PluginConfigStandardValues.LOG_CONFIG_ERRORS, logger);
-		this.logDecorationErrors = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION_ERRORS, logger);
+		this.logCustomObjects = reader.getSetting(PluginConfigStandardValues.LOG_CUSTOM_OBJECTS, logger);
+		this.logStructurePlotting = reader.getSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, logger);
+		this.logConfigs = reader.getSetting(PluginConfigStandardValues.LOG_CONFIGS, logger);
+		this.logBiomeRegistry = reader.getSetting(PluginConfigStandardValues.LOG_BIOME_REGISTRY, logger);
+		this.logDecoration = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION, logger);
+		this.logMobs = reader.getSetting(PluginConfigStandardValues.LOG_MOBS, logger);
 		this.decorationEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
 		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
 		this.workerThreads = reader.getSetting(PluginConfigStandardValues.WORKER_THREADS, logger);
@@ -80,28 +82,36 @@ public final class PluginConfig extends PluginConfigBase
 			"Defaults to: Standard"
 		);
 
-		writer.putSetting(PluginConfigStandardValues.SPAWN_LOG, this.spawnLog,
-			"Shows detailed debugging information about BO3 and mob/entity spawning",
-			"that is useful for OTG world devs. Use higher log levels to see more",
-			"information (TRACE is the highest).",
+		writer.putSetting(PluginConfigStandardValues.LOG_CUSTOM_OBJECTS, this.logCustomObjects,
+			"Shows information about BO2/BO3/BO4 config errors and spawning.",
 			"Defaults to: false"
 		);
-		
-		writer.putSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, this.logBO4Plotting,
+
+		writer.putSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, this.logStructurePlotting,
 			"Logs information about BO4 customstructures plotting branches.",
 			"Defaults to: false"
 		);		
 
-		writer.putSetting(PluginConfigStandardValues.LOG_CONFIG_ERRORS, this.logConfigErrors,
+		writer.putSetting(PluginConfigStandardValues.LOG_CONFIGS, this.logConfigs,
 			"Logs information about invalid settings in configs.",
 			"Defaults to: false"
 		);
-		
-		writer.putSetting(PluginConfigStandardValues.LOG_DECORATION_ERRORS, this.logDecorationErrors,
-			"Logs information about any problems spawning resources during decoration.",
+
+		writer.putSetting(PluginConfigStandardValues.LOG_BIOME_REGISTRY, this.logBiomeRegistry,
+			"Logs information about biome registration.",
+			"Defaults to: false"
+		);		
+
+		writer.putSetting(PluginConfigStandardValues.LOG_DECORATION, this.logDecoration,
+			"Logs information about resources spawned during decoration.",
 			"Defaults to: false"
 		);
-		
+
+		writer.putSetting(PluginConfigStandardValues.LOG_MOBS, this.logMobs,
+			"Logs information about mob config errors and spawning.",
+			"Defaults to: false"
+		);
+
 		writer.header2("Developer settings");
 
 		writer.putSetting(PluginConfigStandardValues.DECORATION_ENABLED, this.decorationEnabled,

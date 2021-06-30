@@ -2,6 +2,7 @@ package com.pg85.otg.spigot.materials;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -39,8 +40,11 @@ public class SpigotMaterialReader implements IMaterialReader
 		catch (InvalidConfigException ex)
 		{
 			// Happens when a non existing block name is used.
-			OTG.log(LogMarker.WARN, "Invalid config: " + ex.getMessage());
-			OTG.log(LogMarker.WARN, "Replacing with blank");
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.CONFIGS, "Invalid config: " + ex.getMessage());
+				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.CONFIGS, "Replacing with blank");
+			}
 		}
 
 		this.cachedMaterials.put(material, localMaterial);

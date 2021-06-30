@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.biome.BiomeGroupManager;
@@ -17,6 +16,7 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -62,7 +62,7 @@ public class WorldConfig extends WorldConfigBase
 		this.worldBiomes.addAll(biomes);
 		this.renameOldSettings(settingsReader, logger, materialReader);
 		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader);
-		this.validateAndCorrectSettings(settingsDir, true, logger);		 
+		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
 	public BiomeGroupManager getBiomeGroupManager()
@@ -110,14 +110,14 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	@Override
-	protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger)
+	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger)
 	{
 		this.landSize = lowerThanOrEqualTo(this.landSize, this.generationDepth);
 		this.landFuzzy = lowerThanOrEqualTo(this.landFuzzy, this.generationDepth - this.landSize);
 		this.riverRarity = lowerThanOrEqualTo(this.riverRarity, this.generationDepth);
 		this.riverSize = lowerThanOrEqualTo(this.riverSize, this.generationDepth - this.riverRarity);
 
-		this.biomeGroupManager.filterBiomes(this.worldBiomes, logWarnings, logger);
+		this.biomeGroupManager.filterBiomes(this.worldBiomes, logger);
 		this.isleBiomes = filterBiomes(this.isleBiomes, this.worldBiomes);
 		this.borderBiomes = filterBiomes(this.borderBiomes, this.worldBiomes);
 
@@ -126,7 +126,7 @@ public class WorldConfig extends WorldConfigBase
 			File mapFile = new File(settingsDir.toString(), this.imageFile);
 			if (!mapFile.exists())
 			{
-				logger.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
+				logger.log(LogMarker.WARN, LogCategory.PUBLIC, "Biome map file not found. Switching BiomeMode to Normal");
 				this.biomeMode = BiomeMode.Normal;
 			}
 		}

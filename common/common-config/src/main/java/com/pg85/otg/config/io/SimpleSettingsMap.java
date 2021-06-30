@@ -6,6 +6,7 @@ import com.pg85.otg.config.io.RawSettingValue.ValueType;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
@@ -82,14 +83,24 @@ public final class SimpleSettingsMap implements SettingsMap
 			ConfigFunction<T> function = biomeResourcesManager.getConfigFunction(functionName, holder, args, logger, materialReader);
 			if (function == null)
 			{
-				// Function is in wrong config file, allowed for config file
-				// inheritance
+				// Function is in wrong config file, 
+				// allowed for config file inheritance.
 				continue;
 			}
 			result.add(function);
-			if (logger.getSpawnLogEnabled() && function instanceof ErroredFunction)
+			if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction)
 			{
-				logger.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
+				logger.log(
+					LogMarker.WARN,
+					LogCategory.CONFIGS,
+					String.format(
+						"Invalid resource {} in {} on line {}: {}", 
+						functionName, 
+						this.name, 
+						configFunctionLine.getLineNumber(), 
+						((ErroredFunction<?>)function).error
+					)
+				);
 			}
 		}
 
@@ -140,7 +151,20 @@ public final class SimpleSettingsMap implements SettingsMap
 			}
 			catch (InvalidConfigException e)
 			{
-				logger.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}", stringValue, setting, name, stringWithLineNumber.getLineNumber(), e.getMessage());
+				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+				{
+					logger.log(
+						LogMarker.WARN,
+						LogCategory.CONFIGS,
+						String.format(
+							"The value \"{}\" is not valid for the setting {} in {} on line {}: {}", 
+							stringValue, 
+							setting, 
+							name, 
+							stringWithLineNumber.getLineNumber(), e.getMessage()
+						)
+					);
+				}
 			}
 		}
 

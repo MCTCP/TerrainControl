@@ -1,8 +1,8 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.interfaces.IBiomeRegistryProvider;
 import java.util.*;
 
 /**
@@ -30,8 +30,10 @@ public final class BiomeGroupManager
 			BiomeGroup existingWithSameName = nameToGroup.get(newGroup.getName());
 			if (existingWithSameName != null)
 			{
-				logger.log(LogMarker.WARN, "Two biome groups have the same name \"{}\". Removing the second one.", newGroup.getName());
-				logger.printStackTrace(LogMarker.WARN, new Exception());
+				if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+				{
+					logger.log(LogMarker.WARN, LogCategory.CONFIGS, String.format("Two biome groups have the same name \"{}\". Removing the second one.", newGroup.getName()));
+				}
 			} else {
 				int newGroupId = getNextGroupId();
 				newGroup.setGroupId(newGroupId);
@@ -40,7 +42,10 @@ public final class BiomeGroupManager
 				idToGroup.put(newGroupId, newGroup);
 			}
 		} else {
-			logger.log(LogMarker.WARN, "Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName());
+			if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				logger.log(LogMarker.WARN, LogCategory.CONFIGS, String.format("Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName()));
+			}
 		}
 	}
 
@@ -162,25 +167,17 @@ public final class BiomeGroupManager
 		return totalRarity[totalRarity.length - 1];
 	}
 
-	public void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
-	{
-		for (BiomeGroup entry : idToGroup.values())
-		{
-			entry.processBiomeData(biomeProvider, logger);
-		}
-	}
-
 	/**
 	 * Filters all biome names in the groups. Invalid biomes names will be
 	 * removed.
 	 * @param customBiomeNames Set of all custom biomes in the world.
 	 */
-	public void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger)
+	public void filterBiomes(ArrayList<String> customBiomeNames, ILogger logger)
 	{
-		for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
+		for (Iterator<BiomeGroup> it = this.idToGroup.values().iterator(); it.hasNext();)
 		{
 			BiomeGroup group = it.next();
-			group.filterBiomes(customBiomeNames, logWarnings, logger);
+			group.filterBiomes(customBiomeNames, logger);
 			if (group.hasNoBiomes())
 			{
 				it.remove();

@@ -19,6 +19,7 @@ import com.pg85.otg.customobject.structures.PlottedChunksRegion;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -282,9 +283,9 @@ public class CustomStructurePlotter
 									structuredCustomObjects.put(structure, structureGen.getObjectChance(i));
 									i += 1;
 								}
-								else if(logger.getSpawnLogEnabled())
+								else if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
 								{
-									logger.log(LogMarker.WARN, "CustomStructure " + structure.getName() + " in biome " + biomeConfig.getName() + " has IsOTGPlus:false, ignoring.");
+									logger.log(LogMarker.WARN, LogCategory.STRUCTURE_PLOTTING, "CustomStructure " + structure.getName() + " in biome " + biomeConfig.getName() + " has IsOTGPlus:false and/or is not a BO4, ignoring.");
 								}
 							}
 						}
@@ -888,9 +889,9 @@ public class CustomStructurePlotter
 												BO4 structureCoordConfig = ((BO4)structureCoord.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker));
 												
 												structureCoordConfig.getConfig().timesSpawned += 1;
-												if(logger.getSpawnLogEnabled())
+												if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
 												{
-													logger.log(LogMarker.INFO, "Plotted structure " + structureCoordConfig.getName() + " at chunk " + spawnCoordX + " " + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
+													logger.log(LogMarker.INFO, LogCategory.STRUCTURE_PLOTTING, "Plotted structure " + structureCoordConfig.getName() + " at chunk " + spawnCoordX + " " + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 												}
 
 												if(((BO4)currentStructureSpawning[0]).getConfig().frequency > 0 || ((BO4)currentStructureSpawning[0]).getConfig().bo4Groups.size() > 0)
@@ -1107,6 +1108,5 @@ public class CustomStructurePlotter
 				setChunkOccupied(chunkCoord);
 			}
 		}
-		logger.log(LogMarker.DEBUG, "Loading done");
 	}	
 }

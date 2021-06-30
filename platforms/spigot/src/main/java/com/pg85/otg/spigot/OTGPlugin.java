@@ -3,6 +3,7 @@ package com.pg85.otg.spigot;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
@@ -42,7 +43,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	public void onDisable ()
 	{
 		// Experimental test to stop crash on server stop for spigot
-//		OTG.stopEngine();
+		// OTG.stopEngine();
 	}
 
 	@Override
@@ -59,15 +60,17 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		IRegistryWritable<BiomeBase> biome_registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay);
 		int i = 0;
 
-		OTG.log(LogMarker.TRACE, "-----------------");
-		OTG.log(LogMarker.TRACE, "Registered biomes:");
-		for (BiomeBase biomeBase : biome_registry)
+		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 		{
-			OTG.log(LogMarker.TRACE, (i++) + ": " + biomeBase.toString());
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "Registered biomes:");
+			for (BiomeBase biomeBase : biome_registry)
+			{
+				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, (i++) + ": " + biomeBase.toString());
+			}
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
 		}
-		OTG.log(LogMarker.TRACE, "-----------------");
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
-
 	}
 
 	@Override
@@ -80,7 +83,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(id);
 		if (preset == null)
 		{
-			OTG.log(LogMarker.WARN, "Could not find preset '"+id+"', did you install it correctly?");
+			OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.PUBLIC, "Could not find preset '" + id + "', did you install it correctly?");
 			return null;
 		}
 		worlds.put(worldName, id);
@@ -97,24 +100,26 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		}
 	}
 
-	public static void injectInternalGenerator(World world) {
+	public static void injectInternalGenerator(World world)
+	{
 		initLock.lock();
-		if (processedWorlds.contains(world.getName())) {
+		if (processedWorlds.contains(world.getName()))
+		{
 			// We have already processed this world, return
 			return;
 		}
 
-		OTG.log(LogMarker.INFO, "Taking over world " + world.getName());
+		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Taking over world " + world.getName());
 
 		net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) world).getHandle().getChunkProvider().getChunkGenerator();
 		if (!(generator instanceof CustomChunkGenerator))
 		{
-			OTG.log(LogMarker.INFO, "Mission failed, we'll get them next time");
+			OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Mission failed, we'll get them next time");
 			return;
 		}
 		if (!(world.getGenerator() instanceof OTGSpigotChunkGen))
 		{
-			OTG.log(LogMarker.WARN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
+			OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.PUBLIC, "World generator was not an OTG generator, cannot take over, something has gone wrong");
 			return;
 		}
 		// We have a CustomChunkGenerator and a NoiseChunkGenerator
@@ -137,13 +142,14 @@ public class OTGPlugin extends JavaPlugin implements Listener
 
 		UnsafeUtil.setDelegate(generator, OTGDelegate);
 
-		if (OTGGen.generator == null) {
+		if (OTGGen.generator == null)
+		{
 			OTGGen.generator = OTGDelegate;
 		}
 
 		// Spigot may have started generating - we gotta regen if so
 
-		OTG.log(LogMarker.INFO, "Success!");
+		OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.PUBLIC, "Success!");
 
 		processedWorlds.add(world.getName());
 

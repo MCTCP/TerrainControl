@@ -3,6 +3,7 @@ package com.pg85.otg.customobject;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
@@ -106,7 +107,7 @@ public class CustomObjectCollection
 					}
 				}
 			} else {
-				logger.log(LogMarker.FATAL, "Given path does not exist: " + file.getAbsolutePath());
+				logger.log(LogMarker.FATAL, LogCategory.CUSTOM_OBJECTS, "Given path does not exist: " + file.getAbsolutePath());
 				throw new RuntimeException("Given path does not exist: " + file.getAbsolutePath());
 			}
 			return object;
@@ -247,7 +248,10 @@ public class CustomObjectCollection
 		{
 			if (customObjectFilesGlobalObjects == null)
 			{
-				logger.log(LogMarker.INFO, "Indexing GlobalObjects folder.");
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "Indexing GlobalObjects folder.");
+				}
 				customObjectFilesGlobalObjects = new HashMap<String, File>();
 				globalTemplates = new HashMap<>();
 				if (new File(otgRootFolder + File.separator + Constants.GLOBAL_OBJECTS_FOLDER).exists())
@@ -260,7 +264,10 @@ public class CustomObjectCollection
 				{
 					addLoadedGlobalObject(new TreeObject(type));
 				}
-				logger.log(LogMarker.INFO, "GlobalObjects folder indexed.");
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "GlobalObjects folder indexed.");
+				}
 			}
 		}
 	}
@@ -271,7 +278,10 @@ public class CustomObjectCollection
 		{
 			if (presetFolderName != null && !customObjectFilesPerPreset.containsKey(presetFolderName))
 			{
-				logger.log(LogMarker.INFO, "Indexing Objects folder for preset " + presetFolderName);
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "Indexing Objects folder for preset " + presetFolderName);
+				}
 				HashMap<String, File> presetCustomObjectFiles = new HashMap<String, File>();
 				customObjectFilesPerPreset.put(presetFolderName, presetCustomObjectFiles);
 				HashMap<String, File> templateFiles = new HashMap<String, File>();
@@ -290,7 +300,10 @@ public class CustomObjectCollection
 						presetCustomObjectFiles, templateFiles, logger);
 					}
 				}
-				logger.log(LogMarker.INFO, "Objects folder for preset " + presetFolderName + " indexed.");
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogMarker.INFO, LogCategory.CUSTOM_OBJECTS, "Objects folder for preset " + presetFolderName + " indexed.");
+				}
 			}
 		}
 	}
@@ -395,9 +408,9 @@ public class CustomObjectCollection
 							presetObjectsByName.put(name.toLowerCase(), object);
 							return object;
 						} else {
-							if (logger.getSpawnLogEnabled())
+							if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 							{
-								logger.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+								logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not load BO2/BO3, it likely contains errors: " + searchForFile);
 							}
 							return null;
 						}
@@ -436,9 +449,9 @@ public class CustomObjectCollection
 						this.objectsByNameGlobalObjects.put(name.toLowerCase(), object);
 						return object;
 					} else {
-						if (logger.getSpawnLogEnabled())
+						if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+							logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
 						}
 						return null;
 					}
@@ -448,9 +461,9 @@ public class CustomObjectCollection
 				this.objectsNotFoundGlobalObjects.add(name.toLowerCase());
 			}
 	
-			if (logger.getSpawnLogEnabled())
+			if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
-				logger.log(LogMarker.WARN, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (presetFolderName != null ? "and Objects" : "") + " directory " + (presetFolderName != null ? "for preset " + presetFolderName : "") + ".");
+				logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (presetFolderName != null ? "and Objects" : "") + " directory " + (presetFolderName != null ? "for preset " + presetFolderName : "") + ".");
 			}
 	
 			return null;
@@ -485,9 +498,9 @@ public class CustomObjectCollection
 												"").replace(".bo3", "").replace(".bo2", ""),
 										fileInDir);
 							} else {
-								if (logger.getSpawnLogEnabled())
+								if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 								{
-									logger.log(LogMarker.WARN, "Duplicate file found: " + fileInDir.getName() + ".");
+									logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Duplicate file found: " + fileInDir.getName() + ".");
 								}
 							}
 						}
@@ -512,9 +525,9 @@ public class CustomObjectCollection
 										".bo3", "").replace(".bo2", ""),
 								searchDir);
 					} else {
-						if (logger.getSpawnLogEnabled())
+						if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
-							logger.log(LogMarker.WARN, "Duplicate file found: " + searchDir.getName() + ".");
+							logger.log(LogMarker.WARN, LogCategory.CUSTOM_OBJECTS, "Duplicate file found: " + searchDir.getName() + ".");
 						}
 					}
 				}

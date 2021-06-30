@@ -13,6 +13,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.resource.IBasicResource;
 import com.pg85.otg.gen.surface.FrozenSurfaceHelper;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
@@ -105,7 +106,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 				} else {
 					if(firstLog)
 					{
-						logger.log(LogMarker.WARN, "Decorate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+						logger.log(LogMarker.WARN, LogCategory.PUBLIC, "Decorate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
 						firstLog = false;
 					}
 				}
@@ -131,15 +132,15 @@ public class OTGChunkDecorator implements IChunkDecorator
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
 			this.processing = false;
 		} else {			
-			logger.log(LogMarker.INFO, "Cascading chunk generation detected.");
+			logger.log(LogMarker.INFO, LogCategory.PUBLIC, "Cascading chunk generation detected.");
 			
 			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 
 			// If developer mode is enabled in OTG.ini, log the stack trace
 			// so users can figure out which mod is causing the cascade.
 			if(developerMode)
-			{			
-				logger.log(LogMarker.INFO, Arrays.toString(Thread.currentThread().getStackTrace()));
+			{
+				logger.log(LogMarker.INFO, LogCategory.PUBLIC, Arrays.toString(Thread.currentThread().getStackTrace()));
 			}
 		}
 		
@@ -160,7 +161,19 @@ public class OTGChunkDecorator implements IChunkDecorator
 	{		
 		if (biomeConfig == null)
 		{
-			logger.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not decorate chunk.", chunkCoord.getChunkX(), chunkCoord.getChunkZ(), chunkCoord);
+			if(logger.getLogCategoryEnabled(LogCategory.DECORATION))
+			{
+				logger.log(
+					LogMarker.WARN,
+					LogCategory.DECORATION,
+					String.format(
+						"Unknown biome at {},{}  (chunk {}). Could not decorate chunk.", 
+						chunkCoord.getChunkX(), 
+						chunkCoord.getChunkZ(), 
+						chunkCoord
+					)
+				);
+			}
 			return;
 		}
 
@@ -202,9 +215,16 @@ public class OTGChunkDecorator implements IChunkDecorator
 			}
 			else if(res instanceof ErroredFunction)
 			{
-				if(developerMode)
+				if(logger.getLogCategoryEnabled(LogCategory.DECORATION))
 				{
-					((ErroredFunction<IBiomeConfig>)res).log(logger, biomeConfig.getName());
+					if(!((ErroredFunction<IBiomeConfig>)res).isLogged)
+					{
+						((ErroredFunction<IBiomeConfig>)res).isLogged = true;
+						if(logger.getLogCategoryEnabled(LogCategory.DECORATION))
+						{
+							logger.log(LogMarker.WARN, LogCategory.DECORATION, "Errored setting ignored for biome " + biomeConfig.getName() + " : " + toString());
+						}
+					}					
 				}
 			}
 		}

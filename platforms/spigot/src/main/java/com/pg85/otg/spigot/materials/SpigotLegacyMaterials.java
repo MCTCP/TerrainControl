@@ -1,6 +1,7 @@
 package com.pg85.otg.spigot.materials;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 
@@ -751,11 +752,17 @@ public class SpigotLegacyMaterials
 		}
 		catch (IllegalArgumentException ex)
 		{
-			OTG.log(LogMarker.INFO, "Could not parse block with data, illegal data: " + blockName + ":" + data + ". Exception: " + ex.getMessage());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.INFO, LogCategory.CONFIGS, "Could not parse block with data, illegal data: " + blockName + ":" + data + ". Exception: " + ex.getMessage());
+			}
 		}
 		catch (NullPointerException ex)
 		{
-			OTG.log(LogMarker.WARN, "Encountered a null pointer trying to parse " + blockName + ":" + data + ". Exception: " + ex.getMessage());
+			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+			{
+				OTG.getEngine().getLogger().log(LogMarker.WARN, LogCategory.CONFIGS, "Encountered a null pointer trying to parse " + blockName + ":" + data + ". Exception: " + ex.getMessage());
+			}
 		}
 		return null;
 	}

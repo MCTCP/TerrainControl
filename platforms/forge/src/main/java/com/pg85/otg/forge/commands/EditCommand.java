@@ -14,6 +14,7 @@ import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -151,12 +152,8 @@ public class EditCommand
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.log(LogMarker.INFO, e.toString());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.log(LogMarker.INFO, s.toString());
-			}
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check the logs"), false);
+			OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("", (Object[])e.getStackTrace()));
 		}
 
 		return 0;
@@ -207,11 +204,7 @@ public class EditCommand
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
-			OTG.log(LogMarker.INFO, e.toString());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.log(LogMarker.INFO, s.toString());
-			}
+			OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("", (Object[])e.getStackTrace()));
 		}
 		return 0;
 	}

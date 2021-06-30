@@ -8,6 +8,7 @@ import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.logging.LogCategory;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
@@ -166,11 +167,7 @@ public class ExportCommand
 			}
 			catch (Exception e)
 			{
-				OTG.log(LogMarker.INFO, e.toString());
-				for (StackTraceElement s : e.getStackTrace())
-				{
-					OTG.log(LogMarker.INFO, s.toString());
-				}
+				OTG.getEngine().getLogger().log(LogMarker.ERROR, LogCategory.PUBLIC, String.format("Error during export command: ", (Object[])e.getStackTrace()));
 				return true;
 			}
 		} else {
