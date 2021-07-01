@@ -24,7 +24,6 @@ import com.pg85.otg.util.logging.LogLevel;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -40,8 +39,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 	// or when the world is waiting for an opportunity to save.
 	// TODO: Is this still required for 1.16?
 	private final Object lockingObject = new Object();
-	private boolean decorating;
-	private boolean processing = false;
+	private int decorating = 0;
 	private boolean saving;
 	private boolean saveRequired;
 	private Object asynChunkDecorationLock = new Object();
@@ -60,7 +58,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 	@Override
 	public boolean isDecorating()
 	{
-		return this.decorating;
+		return this.decorating != 0;
 	}
 
 	@Override
@@ -86,7 +84,6 @@ public class OTGChunkDecorator implements IChunkDecorator
 	{
 		ILogger logger = OTG.getEngine().getLogger();
 		
-		boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
 		boolean firstLog = false;
 		while(true)
@@ -95,14 +92,8 @@ public class OTGChunkDecorator implements IChunkDecorator
 			{
 				if(!this.saving)
 				{
-					// If decorating then this method is being called recursively (indicating cascading chunk-gen).
-					// This method can be called recursively, but should never be called by two threads at once.
-					// TODO: Make sure that's the case.
-					if(!this.decorating)
-					{
-						this.decorating = true;
-						unlockWhenDone = true;
-					}
+					this.decorating++;
+					this.saveRequired = true;
 					break;
 				} else {
 					if(firstLog)
@@ -113,10 +104,6 @@ public class OTGChunkDecorator implements IChunkDecorator
 				}
 			}
 		}
-		synchronized(this.lockingObject)
-		{
-			this.saveRequired = true;
-		}
 
 		Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
 		CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
@@ -124,33 +111,12 @@ public class OTGChunkDecorator implements IChunkDecorator
 		CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
 		IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 
-		if (!this.processing)
-		{
-			this.processing = true;
-			doDecorate(chunkCoord, worldGenRegion, biomeConfig, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
-			this.processing = false;
-		} else {			
-			logger.log(LogLevel.ERROR, LogCategory.MAIN, "Cascading chunk generation detected, this is likely caused by other mods. Enable developermode in OTG.ini to log a stack trace.");
-			
-			doDecorate(chunkCoord, worldGenRegion, biomeConfig, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
-
-			// If developer mode is enabled in OTG.ini, log the stack trace
-			// so users can figure out which mod is causing the cascade.
-			if(worldGenRegion.getPluginConfig().getDeveloperModeEnabled())
-			{
-				logger.log(LogLevel.ERROR, LogCategory.MAIN, Arrays.toString(Thread.currentThread().getStackTrace()));
-			}
-		}
+		doDecorate(chunkCoord, worldGenRegion, biomeConfig, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);			
 		
 		// Release the lock
 		synchronized(this.lockingObject)
 		{
-			// This assumes that this method can only be called alone or recursively, never by multiple threads at once.
-			// TODO: Make sure that's the case.
-			if(unlockWhenDone)
-			{
-				this.decorating = false;
-			}
+			this.decorating--;
 		}
 	}
 
