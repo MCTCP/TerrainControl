@@ -23,6 +23,7 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	protected boolean logCustomObjects;
 	protected boolean logStructurePlotting;
 	protected boolean logConfigs;
+	protected boolean logBaseTerrain;	
 	protected boolean logDecoration;
 	protected boolean logBiomeRegistry;
 	protected boolean decorationEnabled;
@@ -82,6 +83,12 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	}
 	
 	@Override
+	public boolean logBaseTerrain()
+	{
+		return this.logBaseTerrain;
+	}	
+	
+	@Override
 	public boolean getDecorationEnabled()
 	{
 		return this.decorationEnabled;
@@ -92,7 +99,7 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	{
 		return this.logMobs;
 	}
-	
+
 	@Override
 	public ConfigMode getSettingsMode()
 	{

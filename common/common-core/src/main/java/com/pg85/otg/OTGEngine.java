@@ -71,7 +71,7 @@ public abstract class OTGEngine
 	public void onStart()
 	{
 		// Load plugin config
-		
+
 		File pluginConfigFile = Paths.get(getOTGRootFolder().toString(), Constants.PluginConfigFilename).toFile();
 		this.pluginConfig = new PluginConfig(
 			FileSettingsReader.read(Constants.PluginConfigFilename, pluginConfigFile, (ILogger)null), 
@@ -84,6 +84,7 @@ public abstract class OTGEngine
 			this.pluginConfig.logStructurePlotting(), 
 			this.pluginConfig.logConfigs(),
 			this.pluginConfig.logBiomeRegistry(),
+			this.pluginConfig.logBaseTerrain(),
 			this.pluginConfig.logDecoration(),
 			this.pluginConfig.logMobs()
 		);

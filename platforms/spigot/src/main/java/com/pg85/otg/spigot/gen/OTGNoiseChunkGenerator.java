@@ -70,7 +70,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
-{
+{	
 	// Create a codec to serialise/deserialise OTGNoiseChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
 		(p_236091_0_) -> p_236091_0_

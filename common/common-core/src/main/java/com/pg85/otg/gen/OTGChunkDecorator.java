@@ -194,20 +194,34 @@ public class OTGChunkDecorator implements IChunkDecorator
 			}
 		}
 
+		long startTimeAll = System.currentTimeMillis();
 		// Resource sequence
 		for (ConfigFunction<IBiomeConfig> res : biomeConfig.getResourceQueue())
 		{
+			long startTime = System.currentTimeMillis();
 			if (res instanceof ICustomObjectResource)
 			{
 				((ICustomObjectResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
+				{
+					logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Processing resource " + res.toString() + " in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+				}
 			}
 			else if (res instanceof ICustomStructureResource)
 			{
 				((ICustomStructureResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
-			}			
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
+				{
+					logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Processing resource " + res.toString() + " in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+				}
+			}
 			else if (res instanceof IBasicResource)
 			{
 				((IBasicResource)res).processForChunkDecoration(worldGenRegion, this.rand, logger, materialReader);
+				if(logger.getLogCategoryEnabled(LogCategory.DECORATION) && (System.currentTimeMillis() - startTime) > 50)
+				{
+					logger.log(LogLevel.WARN, LogCategory.DECORATION, "Warning: Processing resource " + res.toString() + " in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+				}				
 			}
 			else if(res instanceof ErroredFunction)
 			{
@@ -223,6 +237,10 @@ public class OTGChunkDecorator implements IChunkDecorator
 					}					
 				}
 			}
+		}
+		if(logger.getLogCategoryEnabled(LogCategory.DECORATION) && (System.currentTimeMillis() - startTimeAll) > 50)
+		{
+			logger.log(LogLevel.WARN, LogCategory.DECORATION, "Warning: Processing resources in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTimeAll) + " Ms.");
 		}
 	}
 

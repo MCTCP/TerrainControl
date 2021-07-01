@@ -12,16 +12,18 @@ public abstract class Logger implements ILogger
 	private boolean logStructurePlotting;
 	private boolean logConfigs;
 	private boolean logBiomeRegistry;
+	private boolean logBaseTerrain;
 	private boolean logDecoration;
 	private boolean logMobs;
 
-	public void init(LogLevel level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logDecoration, boolean logMobs)
+	public void init(LogLevel level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logBaseTerrain, boolean logDecoration, boolean logMobs)
 	{
 		this.minimumLevel = level;
 		this.logCustomObjects = logCustomObjects; 
 		this.logStructurePlotting = logStructurePlotting;
 		this.logConfigs = logConfigs;
 		this.logBiomeRegistry = logBiomeRegistry;
+		this.logBaseTerrain = logBaseTerrain;
 		this.logDecoration = logDecoration;
 		this.logMobs = logMobs;
 	}
@@ -41,6 +43,8 @@ public abstract class Logger implements ILogger
 				return this.logConfigs;
 			case BIOME_REGISTRY:
 				return this.logBiomeRegistry;
+			case BASE_TERRAIN:
+				return this.logBaseTerrain;				
 			case DECORATION:
 				return this.logDecoration;
 			case MOBS:

@@ -21,6 +21,7 @@ public interface IPluginConfig
 	public boolean logCustomObjects();
 	public boolean logStructurePlotting();
 	public boolean logConfigs();
+	public boolean logBaseTerrain();	
 	public boolean logDecoration();	
 	public boolean logBiomeRegistry();
 	public boolean getDecorationEnabled();
