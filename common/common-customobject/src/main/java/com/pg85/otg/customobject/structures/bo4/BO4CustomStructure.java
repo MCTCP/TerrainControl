@@ -222,6 +222,11 @@ public class BO4CustomStructure extends CustomStructure
 			logger.log(LogLevel.FATAL, LogCategory.STRUCTURE_PLOTTING, "An unknown error occurred while calculating branches for BO4 " + this.start.bo3Name + ". This is probably an error in the BO4's branch configuration, not a bug. If you can track this down, please tell us what caused it!");
 			throw new RuntimeException("An unknown error occurred while calculating branches for BO4 " + this.start.bo3Name + ". This is probably an error in the BO4's branch configuration, not a bug. If you can track this down, please tell us what caused it!");
 		}
+		
+		if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING) && (System.currentTimeMillis() - startTime) > 50)
+		{
+			logger.log(LogLevel.WARN, LogCategory.STRUCTURE_PLOTTING, "Warning: Plotting branches for BO4 " +  this.start.bo3Name + " at " + (chunkBeingDecorated.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkBeingDecorated.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+		}
 
 		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : this.objectsToSpawn.entrySet())
 		{

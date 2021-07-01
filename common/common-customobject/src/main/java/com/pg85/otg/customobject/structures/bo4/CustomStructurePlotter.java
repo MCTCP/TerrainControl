@@ -223,7 +223,7 @@ public class CustomStructurePlotter
 		// When called by /otg spawn, skip this attempt to spawn and let chunk generation complete first.
 		// This method should never be called recursively.
 		// TODO: Make sure this never gets stuck, or abort and log a warning.
-		// TODO: Can this thread be paused without issues, or for how long?
+		// TODO: Can this thread be paused without issues, for how long?
 		while(true)
 		{
 			synchronized(this.processingLock)
@@ -246,8 +246,9 @@ public class CustomStructurePlotter
 				e.printStackTrace();
 				throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord or file an issue on the OTG github.");
 			}
-		}			
-		
+		}
+
+		long startTime = System.currentTimeMillis();
 		if (!isBo4ChunkPlotted(chunkCoord))
 		{
 			IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);		  
@@ -947,6 +948,14 @@ public class CustomStructurePlotter
 												// spawn more structures.
 												// If we're plotting a target structure via /otg spawn, then the chunk isn't being decorated
 												// so it's okay if the structure didn't get plotted on this chunk.
+												
+												if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING) && (System.currentTimeMillis() - startTime) > 50)
+												{
+													IBiomeConfig biomeConfig4 = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);
+													logger.log(LogLevel.WARN, LogCategory.STRUCTURE_PLOTTING, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+													startTime = System.currentTimeMillis(); 
+												}
+												
 												if(structureCacheContainsKey(chunkCoord) || targetStructure != null)
 												{
 													this.processing = false;
@@ -974,6 +983,12 @@ public class CustomStructurePlotter
 		
 		this.processing = false;
 		
+		if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
+		{
+			IBiomeConfig biomeConfig4 = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);
+			logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+		}
+
 		return null;
 	}
 

@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
@@ -16,12 +17,16 @@ import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -446,9 +451,13 @@ public class OTGChunkGenerator
 
 	public void populateNoise(int worldHeightCap, Random random, ChunkBuffer buffer, ChunkCoordinate pos, ObjectList<JigsawStructureData> structures, ObjectList<JigsawStructureData> junctions)
 	{
+		ILogger logger = OTG.getEngine().getLogger();
+
 		ObjectListIterator<JigsawStructureData> structureIterator = structures.iterator();
 		ObjectListIterator<JigsawStructureData> junctionsIterator = junctions.iterator();
 
+		long startTime = System.currentTimeMillis();
+		
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
 		int[] waterLevel = new int[256];
 
@@ -512,7 +521,6 @@ public class OTGChunkGenerator
 			// [0, 4] -> z noise chunks
 			for (noiseZ = 0; noiseZ < this.noiseSizeZ; ++noiseZ)
 			{
-
 				// [0, 32] -> y noise chunks
 				for (int noiseY = this.noiseSizeY - 1; noiseY >= 0; --noiseY)
 				{
@@ -609,6 +617,11 @@ public class OTGChunkGenerator
 		}
 
 		doSurfaceAndGroundControl(biomes, random, worldHeightCap, this.seed, buffer, waterLevel);
+		
+		if(logger.getLogCategoryEnabled(LogCategory.BASE_TERRAIN) && (System.currentTimeMillis() - startTime) > 50)
+		{
+			logger.log(LogLevel.WARN, LogCategory.BASE_TERRAIN, "Warning: Terrain generation for chunk at " + (pos.getBlockX() + DecorationArea.DECORATION_OFFSET) + " ~ " + (pos.getBlockZ() + DecorationArea.DECORATION_OFFSET) + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+		}
 	}
 
 	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)

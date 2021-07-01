@@ -73,31 +73,40 @@ class SmoothingAreaColumn
 		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfigForDecoration(this.x, this.z);
 
 		LocalMaterialData replaceAboveMaterial = null;
-		try {
-			replaceAboveMaterial = materialReader.readMaterial(bo4Config.replaceAbove);
-		} catch (InvalidConfigException e) {
-			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-			{
-				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "ReplaceAbove: " + bo4Config.replaceAbove + " could not be parsed as a material for BO4 " + bo4Config.getName());
+		if(bo4Config.replaceAbove != null && !bo4Config.replaceAbove.trim().isEmpty())
+		{
+			try {
+				replaceAboveMaterial = materialReader.readMaterial(bo4Config.replaceAbove);
+			} catch (InvalidConfigException e) {
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "ReplaceAbove: " + bo4Config.replaceAbove + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				}
 			}
 		}
 
 		LocalMaterialData smoothingSurfaceBlock = null;
 		LocalMaterialData smoothingGroundBlock = null;
-		try {
-			smoothingSurfaceBlock = materialReader.readMaterial(bo4Config.smoothingSurfaceBlock);
-		} catch (InvalidConfigException e) {
-			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-			{
-				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "SmoothingSurfaceBlock: " + bo4Config.smoothingSurfaceBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+		if(bo4Config.smoothingSurfaceBlock != null && !bo4Config.smoothingSurfaceBlock.trim().isEmpty())
+		{
+			try {
+				smoothingSurfaceBlock = materialReader.readMaterial(bo4Config.smoothingSurfaceBlock);
+			} catch (InvalidConfigException e) {
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "SmoothingSurfaceBlock: " + bo4Config.smoothingSurfaceBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				}
 			}
 		}
-		try {
-			smoothingGroundBlock = materialReader.readMaterial(bo4Config.smoothingGroundBlock);
-		} catch (InvalidConfigException e) {
-			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-			{
-				logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "SmoothingGroundBlock: " + bo4Config.smoothingGroundBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+		if(bo4Config.smoothingGroundBlock != null && !bo4Config.smoothingGroundBlock.trim().isEmpty())
+		{
+			try {
+				smoothingGroundBlock = materialReader.readMaterial(bo4Config.smoothingGroundBlock);
+			} catch (InvalidConfigException e) {
+				if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "SmoothingGroundBlock: " + bo4Config.smoothingGroundBlock + " could not be parsed as a material for BO4 " + bo4Config.getName());
+				}
 			}
 		}
 		boolean needsReplaceBlocks;

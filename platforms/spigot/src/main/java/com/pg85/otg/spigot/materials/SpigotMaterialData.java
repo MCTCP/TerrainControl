@@ -55,7 +55,7 @@ public class SpigotMaterialData extends LocalMaterialData
 
 	public static LocalMaterialData ofSpigotMaterial(org.bukkit.Material type)
 	{
-		return ofBlockData(((CraftBlockData) type.createBlockData()).getState(), null);
+		return ofBlockData(((CraftBlockData)type.createBlockData()).getState(), null);
 	}
 
 	public IBlockData internalBlock()
