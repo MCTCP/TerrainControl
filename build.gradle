@@ -8,7 +8,7 @@ defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
-    version = "1.16.5-0.0.14"
+    version = "1.16.5-0.0.15"
     group = "com.pg85.otg"
 
     // Version of the shadow plugin
