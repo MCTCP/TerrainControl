@@ -68,7 +68,7 @@ public class OTGChunkGenerator
 
 	});
 
-	// TODO: ThreadLocal is used mostly as a crutch here, ideally these classes wouldn't maintain any state.
+	// TODO: ThreadLocal is used mostly as a crutch here, ideally these classes wouldn't maintain state.
 	// ThreadLocal may have some overhead for the gets/sets, even when used on a single thread.
 	// Some of these classes may not be thread-safe (tho testing seems ok), need to check all the internal state.
 	
@@ -179,13 +179,12 @@ public class OTGChunkGenerator
 		} else if (delta > volatilityWeight2)
 		{
 			return getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2;
-		} else
-		{
+		} else {
 			// TODO: should probably use clamping here to prevent weird artifacts
 			return MathHelper.lerp(
-					delta,
-					getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
-					getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
+				delta,
+				getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
+				getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
 		}
 	}
 
