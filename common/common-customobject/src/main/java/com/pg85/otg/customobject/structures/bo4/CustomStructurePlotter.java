@@ -949,10 +949,10 @@ public class CustomStructurePlotter
 												// If we're plotting a target structure via /otg spawn, then the chunk isn't being decorated
 												// so it's okay if the structure didn't get plotted on this chunk.
 												
-												if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING) && (System.currentTimeMillis() - startTime) > 50)
+												if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 												{
 													IBiomeConfig biomeConfig4 = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);
-													logger.log(LogLevel.WARN, LogCategory.STRUCTURE_PLOTTING, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+													logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 													startTime = System.currentTimeMillis(); 
 												}
 												
@@ -983,10 +983,10 @@ public class CustomStructurePlotter
 		
 		this.processing = false;
 		
-		if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
+		if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 		{
 			IBiomeConfig biomeConfig4 = worldGenRegion.getBiomeConfig(chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X, chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z);
-			logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+			logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Plotting BO4's for biome " +  biomeConfig4.getName() + " at " + (chunkCoord.getBlockX() + DecorationArea.BO_CHUNK_CENTER_X) + " ~ " + (chunkCoord.getBlockZ() + DecorationArea.BO_CHUNK_CENTER_Z)  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 		}
 
 		return null;

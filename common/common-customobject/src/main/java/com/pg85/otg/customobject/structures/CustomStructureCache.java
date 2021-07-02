@@ -205,9 +205,9 @@ public class CustomStructureCache
 			if (random.nextDouble() * 100.0 < structureGen.getObjectChance(objectNumber))
 			{
 				IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
-				if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
+				if(object != null && object instanceof BO3)
 				{
-					return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), random, chunkX, chunkZ);
+					return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), worldGenRegion.getWorldConfig().getUseOldBO3StructureRarity(), random, chunkX, chunkZ);
 				} else {
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{

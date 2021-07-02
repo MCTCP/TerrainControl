@@ -123,6 +123,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	// OTG Custom structures
 	
 	protected CustomStructureType customStructureType;
+	protected boolean useOldBO3StructureRarity;
 	protected boolean decorationBoundsCheck;
 	protected int maximumCustomStructureRadius;
 	
@@ -323,6 +324,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public CustomStructureType getCustomStructureType()
 	{
 		return this.customStructureType;
+	}
+
+	@Override
+	public boolean getUseOldBO3StructureRarity()
+	{
+		return this.useOldBO3StructureRarity;
 	}
 
 	@Override

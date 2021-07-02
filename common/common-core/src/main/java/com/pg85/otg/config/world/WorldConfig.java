@@ -252,6 +252,7 @@ public class WorldConfig extends WorldConfigBase
 		} else {
 			this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger);	
 		}
+		this.useOldBO3StructureRarity = reader.getSetting(WorldStandardValues.USE_OLD_BO3_STRUCTURE_RARITY, logger);
 		this.decorationBoundsCheck = reader.getSetting(WorldStandardValues.DECORATION_BOUNDS_CHECK, logger);
 		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger);		
 
@@ -631,13 +632,20 @@ public class WorldConfig extends WorldConfigBase
 			"procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
 			"with surrounding terrain, etc. BO3's are simpler, seed based CustomStructures, more like vanilla mc structures.",
 			"Worlds currently can only use one type of structure."
-		);
+		);			
 		
 		writer.putSetting(WorldStandardValues.BO3_AT_SPAWN, this.bo3AtSpawn,
 			"This BO3 will be spawned at the world's spawn point as a CustomObject (Max size 32x32)."
 		);
 
 		writer.header2("BO3 Custom structures");
+		
+		writer.putSetting(WorldStandardValues.USE_OLD_BO3_STRUCTURE_RARITY, this.useOldBO3StructureRarity,
+			"For 1.12.2 v9.0_r11 and earlier, BO3 customstructures used 2 rarity rolls,",
+			"one for the rarity in the CustomStructure() tag, one for the rarity in the BO3 itself.",
+			"For 1.16, we use only the rarity roll from the CustomStructure() tag. Set this to true",
+			"to use the old system."
+		);
 		
 		writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
 			"Maximum radius of custom structures in chunks. Custom structures are spawned by",

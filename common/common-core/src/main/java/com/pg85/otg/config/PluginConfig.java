@@ -42,7 +42,7 @@ public final class PluginConfig extends PluginConfigBase
 		this.logStructurePlotting = reader.getSetting(PluginConfigStandardValues.LOG_BO4_PLOTTING, logger);
 		this.logConfigs = reader.getSetting(PluginConfigStandardValues.LOG_CONFIGS, logger);
 		this.logBiomeRegistry = reader.getSetting(PluginConfigStandardValues.LOG_BIOME_REGISTRY, logger);
-		this.logBaseTerrain = reader.getSetting(PluginConfigStandardValues.LOG_BASE_TERRAIN, logger);		
+		this.logPerformance = reader.getSetting(PluginConfigStandardValues.LOG_PERFORMANCE, logger);		
 		this.logDecoration = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION, logger);
 		this.logMobs = reader.getSetting(PluginConfigStandardValues.LOG_MOBS, logger);
 		this.decorationEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
@@ -99,11 +99,6 @@ public final class PluginConfig extends PluginConfigBase
 		writer.putSetting(PluginConfigStandardValues.LOG_BIOME_REGISTRY, this.logBiomeRegistry,
 			"Logs information about biome registration.",
 			"Defaults to: false"
-		);
-		
-		writer.putSetting(PluginConfigStandardValues.LOG_BASE_TERRAIN, this.logBaseTerrain,
-			"Logs information about base terrain generation.",
-			"Defaults to: false"
 		);		
 
 		writer.putSetting(PluginConfigStandardValues.LOG_DECORATION, this.logDecoration,
@@ -115,6 +110,13 @@ public final class PluginConfig extends PluginConfigBase
 			"Logs information about mob config errors and spawning.",
 			"Defaults to: false"
 		);
+		
+		writer.putSetting(PluginConfigStandardValues.LOG_PERFORMANCE, this.logPerformance,
+			"Logs information about any feature that is taking more than 50 milliseconds.",
+			"Includes: base terrain gen, decoration, resources, bo4 plotting, bo3/bo4 spawning.",
+			"Use this to find performance bottlenecks and optimise your world.",
+			"Defaults to: false"
+		);		
 		
 		writer.header2("Developer settings");
 

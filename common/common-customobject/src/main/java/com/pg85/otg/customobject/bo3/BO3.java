@@ -588,11 +588,18 @@ public class BO3 implements StructuredCustomObject
 		return MathHelper.clamp(offset + variance, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
 	}
 	
-	public CustomStructureCoordinate makeCustomStructureCoordinate(String presetFolderName, Random random, int chunkX, int chunkZ)
+	public CustomStructureCoordinate makeCustomStructureCoordinate(String presetFolderName, boolean useOldBO3StructureRarity, Random random, int chunkX, int chunkZ)
 	{
-		Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-		int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
-		return new BO3CustomStructureCoordinate(presetFolderName, this, this.getName(), rotation, chunkX * 16 + DecorationArea.BO_CHUNK_CENTER_X + random.nextInt(16), (short)height, chunkZ * 16 + DecorationArea.BO_CHUNK_CENTER_Z + random.nextInt(16));
+		// For 1.12.2 v9.0_r11 and earlier, BO3 customstructures used 2 rarity rolls,
+		// one for the rarity in the CustomStructure() tag, one for the rarity in the BO3 itself.
+		// TODO: Remove oldBO3StructureRarity after presets have updated. 
+        if (!useOldBO3StructureRarity || this.settings.rarity > random.nextDouble() * 100.0)
+        {
+    		Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+    		int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
+    		return new BO3CustomStructureCoordinate(presetFolderName, this, this.getName(), rotation, chunkX * 16 + DecorationArea.BO_CHUNK_CENTER_X + random.nextInt(16), (short)height, chunkZ * 16 + DecorationArea.BO_CHUNK_CENTER_Z + random.nextInt(16));
+        }
+        return null;
 	}
 
 	@Override

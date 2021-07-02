@@ -123,6 +123,7 @@ public interface IWorldConfig
 	// OTG Custom structures
 
 	public CustomStructureType getCustomStructureType();
+	public boolean getUseOldBO3StructureRarity();
 	// TODO: Reimplement this, or forbid any spawning outside of decoration for 1.16.
 	public boolean doPopulationBoundsCheck();
 	public int getMaximumCustomStructureRadius();
