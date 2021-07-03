@@ -16,10 +16,9 @@ class BiomeGroupLayer implements ParentedLayer
 {
 	// The sorted map of rarities to biome groups
 	private final TreeMap<Integer, NewBiomeGroup> rarityMap = new TreeMap<>();
-	private final boolean freezeGroups;
 	private final int maxRarity;
 
-	BiomeGroupLayer(BiomeLayerData data, int depth, boolean freezeGroups)
+	BiomeGroupLayer(BiomeLayerData data, int depth)
 	{
 		List<NewBiomeGroup> groups = data.groups.get(depth);
 		if (data.oldGroupRarity)
@@ -37,7 +36,6 @@ class BiomeGroupLayer implements ParentedLayer
 			cumulativeRarity += group.rarity;
 			this.rarityMap.put(cumulativeRarity, group);
 		}
-		this.freezeGroups = freezeGroups;
 	}
 
 	@Override
@@ -55,10 +53,7 @@ class BiomeGroupLayer implements ParentedLayer
 			if(biomeGroup != null)
 			{
 				// Encode the biome group id into the sample for later use
-				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) |
-					//>>	If the average temp of the group is cold
-					((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
-				;
+				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) | 0;
 			}
 		}
 

@@ -73,7 +73,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String defaultFrozenOceanBiome;
 	protected BiomeMode biomeMode;
 	protected double frozenOceanTemperature;
-	protected boolean freezeAllColdGroupBiomes;
 	protected List<String> isleBiomes = new ArrayList<String>();
 	protected List<String> borderBiomes = new ArrayList<String>();	
 	protected boolean randomRivers;
@@ -638,13 +637,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.frozenOceanTemperature;
 	}
-	
-	@Override
-	public boolean getIsFreezeGroups()
-	{
-		return this.freezeAllColdGroupBiomes;
-	}
-	
+
 	@Override
 	public List<String> getIsleBiomes()
 	{

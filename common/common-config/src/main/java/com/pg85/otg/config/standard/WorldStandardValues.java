@@ -86,7 +86,6 @@ public class WorldStandardValues extends Settings
 	
 	public static final Setting<Boolean>
 		RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
-		GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),
 		RANDOM_RIVERS = booleanSetting("RandomRivers", false),
 		FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
 		BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),

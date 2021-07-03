@@ -113,7 +113,7 @@ public class BiomeLayers
 				{
 					if (data.groups.containsKey(depth))
 					{
-						factory = new BiomeGroupLayer(data, depth, data.freezeGroups).create(contextProvider.apply(depth), factory);
+						factory = new BiomeGroupLayer(data, depth).create(contextProvider.apply(depth), factory);
 					}
 		
 					if (data.biomeDepths.contains(depth))

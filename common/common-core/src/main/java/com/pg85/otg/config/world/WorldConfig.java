@@ -188,7 +188,6 @@ public class WorldConfig extends WorldConfigBase
 		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
 		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger);
 		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger);
-		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger);
 		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger);
 		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger);
 		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger);
@@ -451,13 +450,6 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.frozenOceanTemperature,
 			"This is the maximum biome temperature when a biome is still considered cold. Water in oceans nearby cold biomes freezes if FrozenOcean is set to true.",
 			"Temperature reference from vanilla Minecraft: < 0.15 for snow, 0.15 - 0.95 for rain, or > 1.0 for dry."
-		);
-
-		writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.freezeAllColdGroupBiomes,
-			"If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
-			" - When this setting is true, all biomes in the group will have frozen oceans",
-			" - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
-			"Default: false"
 		);
 		
 		writer.header2("Rivers");

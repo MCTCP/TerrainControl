@@ -71,7 +71,6 @@ public interface IWorldConfig
 	public String getDefaultFrozenOceanBiome();
 	public BiomeMode getBiomeMode();
 	double getFrozenOceanTemperature();
-	public boolean getIsFreezeGroups();
 	public List<String> getIsleBiomes();
 	public List<String> getBorderBiomes();
 	public boolean getIsRandomRivers();

@@ -40,7 +40,6 @@ public class BiomeLayerData
 	public final Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
 	public final Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 	public int[] riverBiomes;
-	public final boolean freezeGroups;
 	public final boolean riversEnabled;
 	public final boolean randomRivers;
 	public final int riverDepth;
@@ -88,7 +87,6 @@ public class BiomeLayerData
 		this.oceanBiomeSize = data.oceanBiomeSize;
 		this.frozenOceanTemperature = data.frozenOceanTemperature;
 		this.biomeRarityScale = data.biomeRarityScale;
-		this.freezeGroups = data.freezeGroups;
 		this.randomRivers = data.randomRivers;
 		this.riverDepth = data.riverDepth;
 		this.riverSize = data.riverSize;
@@ -191,7 +189,6 @@ public class BiomeLayerData
 
 		this.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
 		this.biomeRarityScale = worldConfig.getBiomeRarityScale();
-		this.freezeGroups = worldConfig.getIsFreezeGroups();
 		this.randomRivers = worldConfig.getIsRandomRivers();
 		this.riverDepth = worldConfig.getRiverRarity();
 		this.riverSize = worldConfig.getRiverSize();
