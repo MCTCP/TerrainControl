@@ -68,23 +68,24 @@ public class BiomeBorderLayer implements ParentedLayer
 		int southCheck;
 		int eastCheck;
 		int westCheck;
-		int nwCheck;
-		int neCheck;
-		int swCheck;
-		int seCheck;
+		int nwCheck = 0;
+		int neCheck = 0;
+		int swCheck = 0;
+		int seCheck = 0;
 		
 		// Check if there are border biomes for the biome in the center
 		if (this.borderedBiomes[cCheck] != null)
 		{
+			// Check in a + formation for edges
+			northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
+			southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
+			eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));
+			westCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z));			
+			boolean bDiagonalCheckDone = false;
+			
 			// For each bordered biome, loop through border biomes untill we can place one.
 			for(BorderBiome borderBiome : this.borderedBiomes[cCheck].biomeBorders)
 			{
-				// Check in a + formation for edges
-				northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
-				southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
-				eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));
-				westCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z));
-
 				if (
 					borderBiome.allowedNearBiomes[northCheck] && 
 					borderBiome.allowedNearBiomes[eastCheck] && 
@@ -113,11 +114,15 @@ public class BiomeBorderLayer implements ParentedLayer
 							| borderBiome.id
 						;
 					} else {
-						// if it's not suitable, try again but sample in an X formation to make sure we didn't miss any potential edge
-						nwCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z - 1));
-						neCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z - 1));
-						swCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z + 1));
-						seCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z + 1));
+						if(!bDiagonalCheckDone)
+						{
+							// if it's not suitable, try again but sample in an X formation to make sure we didn't miss any potential edge
+							nwCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z - 1));
+							neCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z - 1));
+							swCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z + 1));
+							seCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z + 1));
+							bDiagonalCheckDone = true;
+						}
 
 						if (
 							borderBiome.allowedNearBiomes[nwCheck] && 
