@@ -198,7 +198,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.isleInBiome = reader.getSetting(BiomeStandardValues.ISLE_IN_BIOME, logger);
 		this.biomeSizeWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, logger);
 		this.biomeIsBorder = reader.getSetting(BiomeStandardValues.BIOME_IS_BORDER, logger);
-		this.borderNear = reader.getSetting(BiomeStandardValues.BORDER_NEAR, logger);
+		this.onlyBorderNear = reader.getSetting(BiomeStandardValues.ONLY_BORDER_NEAR, logger);
 		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
 		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
 		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
@@ -438,14 +438,14 @@ public class BiomeConfig extends BiomeConfigBase
 			"it can spawn anywhere on the border of an ocean."
 		);
 		
-		writer.putSetting(BiomeStandardValues.BORDER_NEAR, this.borderNear,
+		writer.putSetting(BiomeStandardValues.ONLY_BORDER_NEAR, this.onlyBorderNear,
 			"Whitelist of neighouring biomes that allow this border biome to spawn."
 		);
 
 		writer.putSetting(BiomeStandardValues.NOT_BORDER_NEAR, this.notBorderNear,
 			"Blacklist of neighbouring biomes that do not allow this border biome to spawn.",
 			"For example, the Beach biome will never spawn next to an Extreme Hills biome.",			
-			"Only use when BorderNear is empty / not used."
+			"Only used when OnlyBorderNear is empty / not used."
 		);
 
 		writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, this.biomeSizeWhenBorder,
@@ -976,7 +976,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.getBiomeRarityScale());
 		this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.getWorldBiomes());
 		this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.getWorldBiomes());
-		this.borderNear = filterBiomes(this.borderNear, this.worldConfig.getWorldBiomes());
+		this.onlyBorderNear = filterBiomes(this.onlyBorderNear, this.worldConfig.getWorldBiomes());
 		this.notBorderNear = filterBiomes(this.notBorderNear, this.worldConfig.getWorldBiomes());
 		this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
 		this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;

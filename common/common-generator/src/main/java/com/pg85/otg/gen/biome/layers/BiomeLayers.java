@@ -192,7 +192,7 @@ public class BiomeLayers
 					{
 						for(int targetBiomeId : biome.borderInBiomes)
 						{
-							bordersAtCurrentDepth.addBorder(biome.id, targetBiomeId, biome.borderNearBiomes, biome.notBorderNearBiomes);						
+							bordersAtCurrentDepth.addBorder(biome.id, targetBiomeId, biome.onlyBorderNearBiomes, biome.notBorderNearBiomes);						
 						}
 					}
 					factory = new BiomeBorderLayer(bordersAtCurrentDepth).create(contextProvider.apply(depth), factory);				
