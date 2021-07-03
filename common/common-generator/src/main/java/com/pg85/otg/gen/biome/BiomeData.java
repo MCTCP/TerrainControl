@@ -13,12 +13,14 @@ public class BiomeData
 	public float biomeTemperature;
 	private final List<String> configIsleInBiomes;
 	private final List<String> configBorderInBiomes;
+	private final List<String> configBorderNearBiomes;	
 	private final List<String> configNotBorderNearBiomes;
 	public final List<Integer> isleInBiomes = new ArrayList<Integer>();
 	public final List<Integer> borderInBiomes = new ArrayList<Integer>();
+	public final List<Integer> borderNearBiomes = new ArrayList<Integer>();
 	public final List<Integer> notBorderNearBiomes = new ArrayList<Integer>();
 
-	public BiomeData(int id, String name, int rarity, int biomeSize, float biomeTemperature, List<String> configIsleInBiomes, List<String> configBorderInBiomes, List<String> configNotBorderNearBiomes)
+	public BiomeData(int id, String name, int rarity, int biomeSize, float biomeTemperature, List<String> configIsleInBiomes, List<String> configBorderInBiomes, List<String> configBorderNearBiomes, List<String> configNotBorderNearBiomes)
 	{
 		this.id = id;
 		this.name = name;
@@ -27,6 +29,7 @@ public class BiomeData
 		this.biomeTemperature = biomeTemperature;
 		this.configIsleInBiomes = configIsleInBiomes;
 		this.configBorderInBiomes = configBorderInBiomes;
+		this.configBorderNearBiomes = configBorderNearBiomes;
 		this.configNotBorderNearBiomes = configNotBorderNearBiomes;
 	}
 	
@@ -48,6 +51,14 @@ public class BiomeData
 				this.borderInBiomes.add(borderBiome.intValue());
 			}
 		}
+		for(String borderNearBiomeName : this.configBorderNearBiomes)
+		{
+			Integer borderNearBiome = worldBiomes.get(borderNearBiomeName);
+			if(borderNearBiome != null)
+			{
+				this.borderNearBiomes.add(borderNearBiome.intValue());
+			}
+		}		
 		for(String notBorderNearBiomeName : this.configNotBorderNearBiomes)
 		{
 			Integer notBorderNearBiome = worldBiomes.get(notBorderNearBiomeName);
@@ -60,7 +71,7 @@ public class BiomeData
 
 	public BiomeData clone()
 	{
-		BiomeData clone = new BiomeData(this.id, this.name, this.rarity, this.biomeSize, this.biomeTemperature, new ArrayList<>(this.configIsleInBiomes), new ArrayList<>(this.configBorderInBiomes), new ArrayList<>(this.configNotBorderNearBiomes));		
+		BiomeData clone = new BiomeData(this.id, this.name, this.rarity, this.biomeSize, this.biomeTemperature, new ArrayList<>(this.configIsleInBiomes), new ArrayList<>(this.configBorderInBiomes), new ArrayList<>(this.configBorderNearBiomes), new ArrayList<>(this.configNotBorderNearBiomes));		
 		for(Integer integer : this.isleInBiomes)
 		{
 			clone.isleInBiomes.add(integer.intValue());
@@ -69,6 +80,10 @@ public class BiomeData
 		{
 			clone.borderInBiomes.add(integer.intValue());
 		}
+		for(Integer integer : this.borderNearBiomes)
+		{
+			clone.borderNearBiomes.add(integer.intValue());
+		}		
 		for(Integer integer : this.notBorderNearBiomes)
 		{
 			clone.notBorderNearBiomes.add(integer.intValue());

@@ -92,6 +92,7 @@ public class BiomeStandardValues extends Settings
 		BIOME_DICT_TAGS = stringListSetting("BiomeDictTags", ""),
 		ISLE_IN_BIOME = stringListSetting("IsleInBiome", "Ocean"),
 		BIOME_IS_BORDER = stringListSetting("BiomeIsBorder"),
+		BORDER_NEAR = stringListSetting("BorderNear"),
 		NOT_BORDER_NEAR = stringListSetting("NotBorderNear")
 	;
 

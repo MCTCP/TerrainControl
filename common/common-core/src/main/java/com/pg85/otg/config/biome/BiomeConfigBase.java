@@ -64,6 +64,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int biomeSizeWhenIsle;
 	protected int biomeRarityWhenIsle;
 	protected List<String> biomeIsBorder;
+	protected List<String> borderNear;
 	protected List<String> notBorderNear;
 	protected int biomeSizeWhenBorder;
 
@@ -871,6 +872,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.biomeIsBorder;
 	}
+	
+	@Override
+	public List<String> getBorderNearBiomes()
+	{
+		return this.borderNear;
+	}	
 	
 	@Override
 	public List<String> getNotBorderNearBiomes()

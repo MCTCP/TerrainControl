@@ -168,15 +168,25 @@ public class BiomeLayerData
 		this.oceanBiomeSize = worldConfig.getOceanBiomeSize();
 		this.oceanTemperatures = oceanTemperatures;
 
-		this.cumulativeGroupRarities = new int[this.generationDepth+1];
-		this.groupMaxRarityPerDepth = new int[this.generationDepth+1];
+		this.cumulativeGroupRarities = new int[this.generationDepth + 1];
+		this.groupMaxRarityPerDepth = new int[this.generationDepth + 1];
 		this.oldGroupRarity = worldConfig.getOldGroupRarity();
 
 		if (oceanBiomeConfig == null)
 		{
-			this.oceanBiomeData = new BiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+			this.oceanBiomeData = new BiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
 		} else {
-			this.oceanBiomeData = new BiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
+			this.oceanBiomeData = new BiomeData(
+				0, 
+				oceanBiomeConfig.getName(), 
+				oceanBiomeConfig.getBiomeRarity(), 
+				oceanBiomeConfig.getBiomeSize(), 
+				oceanBiomeConfig.getBiomeTemperature(), 
+				oceanBiomeConfig.getIsleInBiomes(), 
+				oceanBiomeConfig.getBorderInBiomes(), 
+				oceanBiomeConfig.getBorderNearBiomes(), 
+				oceanBiomeConfig.getNotBorderNearBiomes()
+			);
 		}
 
 		this.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();

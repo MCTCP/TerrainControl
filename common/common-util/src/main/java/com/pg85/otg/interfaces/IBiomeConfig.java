@@ -60,6 +60,7 @@ public interface IBiomeConfig
 	int getBiomeRarityWhenIsle();
 	boolean isBorderBiome();
 	List<String> getBorderInBiomes();
+	List<String> getBorderNearBiomes();
 	List<String> getNotBorderNearBiomes();
 	int getBiomeSizeWhenBorder();
 	

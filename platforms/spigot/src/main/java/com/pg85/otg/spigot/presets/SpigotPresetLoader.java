@@ -148,6 +148,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 							biomeConfig.getBiomeTemperature(),
 							biomeConfig.getIsleInBiomes(),
 							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getBorderNearBiomes(),
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
@@ -168,6 +169,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 							biomeConfig.getBiomeTemperature(),
 							biomeConfig.getIsleInBiomes(),
 							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getBorderNearBiomes(),
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
@@ -235,7 +237,9 @@ public class SpigotPresetLoader extends LocalPresetLoader
 						config.getBiomeTemperature(),
 						config.getIsleInBiomes(),
 						config.getBorderInBiomes(),
-						config.getNotBorderNearBiomes());
+						config.getBorderNearBiomes(),
+						config.getNotBorderNearBiomes()
+					);
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done
