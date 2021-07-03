@@ -8,7 +8,7 @@ public enum LogCategory
 	CONFIGS,
 	BIOME_REGISTRY,
 	DECORATION,
-	BASE_TERRAIN,
+	PERFORMANCE,
 	MOBS;
 	
 	public String getLogTag()
@@ -34,8 +34,8 @@ public enum LogCategory
 			case MOBS:
 				categoryTag = "[Mobs]";
 				break;
-			case BASE_TERRAIN:
-				categoryTag = "[BaseTerrain]";
+			case PERFORMANCE:
+				categoryTag = "[Performance]";
 				break;				
 			case STRUCTURE_PLOTTING:
 				categoryTag = "[StructurePlotting]";

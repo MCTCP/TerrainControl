@@ -737,9 +737,9 @@ public class BO4 implements StructuredCustomObject
 				}
 			}
 	
-			if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS) && (System.currentTimeMillis() - startTime) > 50)
+			if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 			{
-				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+				logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 			}
 		}
 

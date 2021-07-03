@@ -261,7 +261,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
-							biomeConfig.getBorderInBiomes(), 
+							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getOnlyBorderNearBiomes(),
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
@@ -280,7 +281,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
-							biomeConfig.getBorderInBiomes(), 
+							biomeConfig.getBorderInBiomes(),
+							biomeConfig.getOnlyBorderNearBiomes(),
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
@@ -344,7 +346,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 							config.getBiomeTemperature(),
 							config.getIsleInBiomes(),
 							config.getBorderInBiomes(),
-							config.getNotBorderNearBiomes());
+							config.getOnlyBorderNearBiomes(),
+							config.getNotBorderNearBiomes()
+						);
 						bg.biomes.add(newBiomeData);
 	
 						// Add the biome size- if it's already there, nothing is done

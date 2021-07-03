@@ -95,6 +95,7 @@ public class WorldStandardValues extends Settings
 		CEILING_BEDROCK = booleanSetting("CeilingBedrock", false),
 		FLAT_BEDROCK = booleanSetting("FlatBedrock", false),
 		REMOVE_SURFACE_STONE = booleanSetting("RemoveSurfaceStone", false),
+		USE_OLD_BO3_STRUCTURE_RARITY = booleanSetting("UseOldBO3StructureRarity", true),				
 		DECORATION_BOUNDS_CHECK = booleanSetting("DecorationBoundsCheck", true),
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 

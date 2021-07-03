@@ -617,9 +617,9 @@ public class OTGChunkGenerator
 
 		doSurfaceAndGroundControl(biomes, random, worldHeightCap, this.seed, buffer, waterLevel);
 		
-		if(logger.getLogCategoryEnabled(LogCategory.BASE_TERRAIN) && (System.currentTimeMillis() - startTime) > 50)
+		if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 		{
-			logger.log(LogLevel.WARN, LogCategory.BASE_TERRAIN, "Warning: Terrain generation for chunk at " + (pos.getBlockX() + DecorationArea.DECORATION_OFFSET) + " ~ " + (pos.getBlockZ() + DecorationArea.DECORATION_OFFSET) + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+			logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Terrain generation for chunk at " + (pos.getBlockX() + DecorationArea.DECORATION_OFFSET) + " ~ " + (pos.getBlockZ() + DecorationArea.DECORATION_OFFSET) + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
 		}
 	}
 

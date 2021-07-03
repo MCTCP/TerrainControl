@@ -84,7 +84,7 @@ public abstract class OTGEngine
 			this.pluginConfig.logStructurePlotting(), 
 			this.pluginConfig.logConfigs(),
 			this.pluginConfig.logBiomeRegistry(),
-			this.pluginConfig.logBaseTerrain(),
+			this.pluginConfig.logPerformance(),
 			this.pluginConfig.logDecoration(),
 			this.pluginConfig.logMobs()
 		);
