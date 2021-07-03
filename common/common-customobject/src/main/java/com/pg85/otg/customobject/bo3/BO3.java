@@ -189,6 +189,17 @@ public class BO3 implements StructuredCustomObject
 		return true;
 	}
 
+	public int getXOffset(Rotation rotation)
+	{
+		
+		return -(this.settings.boundingBoxes[rotation.ordinal()].getMinX() + (int)Math.floor((this.settings.boundingBoxes[rotation.ordinal()].getWidth() / 2f)));
+	}
+	
+	public int getZOffset(Rotation rotation)
+	{
+		return -(this.settings.boundingBoxes[rotation.ordinal()].getMinZ() + (int)Math.floor((this.settings.boundingBoxes[rotation.ordinal()].getDepth() / 2f)));
+	}
+	
 	// Force spawns a BO3 object. Used by /otg spawn and bo3AtSpawn.
 	// This method ignores the maxPercentageOutsideBlock setting
 	@Override
@@ -273,21 +284,21 @@ public class BO3 implements StructuredCustomObject
 		Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 		int offsetY = 0;
 		int baseY = 0;
-		if (this.settings.spawnHeight == SpawnHeightEnum.randomY)
+		if (this.settings.getSpawnHeight() == SpawnHeightEnum.randomY)
 		{
 			baseY = minY == maxY ? minY : RandomHelper.numberInRange(random, minY, maxY);
 		}
-		if (this.settings.spawnHeight == SpawnHeightEnum.highestBlock)
+		if (this.settings.getSpawnHeight() == SpawnHeightEnum.highestBlock)
 		{
 			baseY = worldGenRegion.getHighestBlockAboveYAt(x, z);
 		}
-		if (this.settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
+		if (this.settings.getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
 		{
 			baseY = worldGenRegion.getBlockAboveSolidHeight(x, z);
 		}
 		// Offset by static and random settings values
 		// TODO: This is pointless used with randomY?
-		offsetY = baseY + this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
+		offsetY = baseY + this.getOffsetAndVariance(random, this.settings.getSpawnHeightOffset(), this.settings.spawnHeightVariance);
 		return trySpawnAt(null, structureCache, worldGenRegion, random, rotation, x, offsetY, z, minY, maxY, baseY);
 	}
 	
@@ -551,7 +562,7 @@ public class BO3 implements StructuredCustomObject
 	
 	public SpawnHeightEnum getStructurePartSpawnHeight()
 	{
-		return this.settings.spawnHeight;
+		return this.settings.getSpawnHeight();
 	}
 
 	// TODO: Use BoundingBox for BO4's?
