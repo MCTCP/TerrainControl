@@ -64,25 +64,22 @@ public class BiomeBorderLayer implements ParentedLayer
 	{
 		int center = parent.sample(x, z);
 		int cCheck = BiomeLayers.getBiomeFromLayer(center);
-		int northCheck;
-		int southCheck;
-		int eastCheck;
-		int westCheck;
-		int nwCheck = 0;
-		int neCheck = 0;
-		int swCheck = 0;
-		int seCheck = 0;
-		
+	
 		// Check if there are border biomes for the biome in the center
 		if (this.borderedBiomes[cCheck] != null)
 		{
 			// Check in a + formation for edges
-			northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
-			southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
-			eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));
-			westCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z));			
+			int northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
+			int southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
+			int eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));
+			int westCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z));			
+
+			int nwCheck = 0;
+			int neCheck = 0;
+			int swCheck = 0;
+			int seCheck = 0;			
 			boolean bDiagonalCheckDone = false;
-			
+
 			// For each bordered biome, loop through border biomes untill we can place one.
 			for(BorderBiome borderBiome : this.borderedBiomes[cCheck].biomeBorders)
 			{
