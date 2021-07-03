@@ -53,6 +53,8 @@ public class BiomeBorderLayer implements ParentedLayer
 			if(borderNearBiomes != null && borderNearBiomes.size() > 0)
 			{
 				Arrays.fill(allowedNearBiomes, false);
+				allowedNearBiomes[biomeId] = true;
+				allowedNearBiomes[borderedBiomeId] = true;
 				for (int borderNearBiome : borderNearBiomes)
 				{			
 					allowedNearBiomes[borderNearBiome] = true;
@@ -91,7 +93,7 @@ public class BiomeBorderLayer implements ParentedLayer
 			int seCheck = 0;			
 			boolean bDiagonalCheckDone = false;
 
-			// For each bordered biome, loop through border biomes untill we can place one.
+			// For each bordered biome, loop through border biomes until we can place one.
 			for(BorderBiome borderBiome : this.borderedBiomes[cCheck].biomeBorders)
 			{
 				if (
