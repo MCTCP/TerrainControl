@@ -43,14 +43,13 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Not used atm, implement these.
 
 	private boolean frozenOcean;
-	private String bo3AtSpawn;
 
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
 
 	// TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
 	private BiomeGroupManager biomeGroupManager;
 	
-	// Private fields, only used when loading/saving
+	// Private fields, only used when reading/writing
 	
 	private int worldHeightScaleBits;
 	private int worldHeightCapBits;

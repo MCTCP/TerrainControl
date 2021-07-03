@@ -122,6 +122,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 
 	// OTG Custom structures
 	
+	protected String bo3AtSpawn;
 	protected CustomStructureType customStructureType;
 	protected boolean useOldBO3StructureRarity;
 	protected boolean decorationBoundsCheck;
@@ -318,6 +319,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public boolean isBetterSnowFall()
 	{
 		return this.betterSnowFall;
+	}
+	
+	@Override
+	public String getBO3AtSpawn()
+	{
+		return this.bo3AtSpawn;
 	}
 	
 	@Override

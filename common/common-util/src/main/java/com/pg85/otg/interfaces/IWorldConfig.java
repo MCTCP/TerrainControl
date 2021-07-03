@@ -122,6 +122,7 @@ public interface IWorldConfig
 
 	// OTG Custom structures
 
+	public String getBO3AtSpawn();
 	public CustomStructureType getCustomStructureType();
 	public boolean getUseOldBO3StructureRarity();
 	// TODO: Reimplement this, or forbid any spawning outside of decoration for 1.16.

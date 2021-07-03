@@ -84,12 +84,19 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public long getSeed()
 	{
 		return this.worldGenRegion.getSeed();
-	}
-	
+	}	
+
 	@Override
 	public Random getWorldRandom()
 	{
 		return this.worldGenRegion.getRandom();
+	}
+
+	@Override
+	public ChunkCoordinate getSpawnChunk()
+	{
+		BlockPos spawnPos = this.worldGenRegion.getLevel().getSharedSpawnPos();
+		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 	}
 	
 	public ISeedReader getInternal()

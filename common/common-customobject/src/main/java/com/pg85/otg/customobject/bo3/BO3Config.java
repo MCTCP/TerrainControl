@@ -55,9 +55,9 @@ public class BO3Config extends CustomObjectConfigFile
 	int frequency;
 	double rarity;
 	protected boolean rotateRandomly;
-	SpawnHeightEnum spawnHeight;
+	private SpawnHeightEnum spawnHeight;
 	// Extra spawn height settings
-	int spawnHeightOffset;
+	private int spawnHeightOffset;
 	int spawnHeightVariance;
 
 	// Extrusion
@@ -289,6 +289,16 @@ public class BO3Config extends CustomObjectConfigFile
 		return this.reader.getFile();
 	}
 
+	public SpawnHeightEnum getSpawnHeight()
+	{
+		return this.spawnHeight;
+	}
+
+	public int getSpawnHeightOffset()
+	{
+		return this.spawnHeightOffset;
+	}
+	
 	public BO3BlockFunction[] getBlocks(int rotation)
 	{
 		BO3BlockFunction[] blocksOTGPlus = new BO3BlockFunction[this.blocksX[rotation].length];

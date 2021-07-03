@@ -16,6 +16,7 @@ public interface IWorldGenRegion
 	public String getPresetFolderName();
 	public long getSeed();
 	public Random getWorldRandom();
+	public ChunkCoordinate getSpawnChunk();
 	
 	// Any getBiome/getBiomeConfig requests done as a part
 	// of chunk decoration should call getBiomeForDecoration(),

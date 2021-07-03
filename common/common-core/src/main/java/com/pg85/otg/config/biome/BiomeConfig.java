@@ -93,7 +93,7 @@ public class BiomeConfig extends BiomeConfigBase
 	private Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
 	private Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();	
 
-	// Private fields, only used when loading/saving
+	// Private fields, only used when reading/writing
 	
 	private int configWaterLevelMax;
 	private int configWaterLevelMin;

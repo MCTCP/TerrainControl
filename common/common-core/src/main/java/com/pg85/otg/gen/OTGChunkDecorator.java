@@ -5,11 +5,14 @@ import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.ErroredFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
+import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
+import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.resource.ICustomObjectResource;
 import com.pg85.otg.customobject.resource.ICustomStructureResource;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.gen.resource.IBasicResource;
 import com.pg85.otg.gen.surface.FrozenSurfaceHelper;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -19,6 +22,7 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
@@ -160,6 +164,15 @@ public class OTGChunkDecorator implements IChunkDecorator
 			}
 		}
 
+		if(
+			worldGenRegion.getSpawnChunk().equals(chunkCoord) &&
+			worldGenRegion.getWorldConfig().getBO3AtSpawn() != null && 
+			worldGenRegion.getWorldConfig().getBO3AtSpawn().trim().length() > 0
+		)
+		{
+			handleBO3AtSpawn(worldGenRegion, chunkCoord, worldGenRegion.getWorldConfig().getBO3AtSpawn(), worldGenRegion.getPresetFolderName(), otgRootFolder, logger, structureCache, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+		}
+		
 		long startTimeAll = System.currentTimeMillis();
 		// Resource sequence
 		for (ConfigFunction<IBiomeConfig> res : biomeConfig.getResourceQueue())
@@ -238,5 +251,52 @@ public class OTGChunkDecorator implements IChunkDecorator
 	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+	}
+	
+	private void handleBO3AtSpawn(IWorldGenRegion worldGenRegion, ChunkCoordinate targetChunk, String bo3AtSpawn, String presetFolderName, Path otgRootFolder, ILogger logger, CustomStructureCache structureCache, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	{	
+        // If a BO3AtSpawn has been defined, spawn it.
+    	CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(
+			bo3AtSpawn,
+			presetFolderName,
+			otgRootFolder,
+			logger,
+			customObjectManager,
+			materialReader,
+			customObjectResourcesManager,
+			modLoadedChecker    			
+		);
+    	if(customObject != null)
+    	{
+    		if(customObject instanceof BO3)
+    		{
+    			int y = 1;
+    			if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.highestBlock)
+    			{
+    				 y = worldGenRegion.getHighestBlockAboveYAt(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
+    			}
+    			else if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
+    			{
+    				y = worldGenRegion.getBlockAboveSolidHeight(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
+    			}
+    			else if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.randomY)
+    			{
+					y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+    			}
+
+    			y += ((BO3)customObject).getSettings().getSpawnHeightOffset();
+    			// This may spawn the structure across chunk borders.
+    			((BO3)customObject).spawnForced(
+					structureCache, 
+					worldGenRegion, 
+					this.rand, 
+					Rotation.NORTH, 
+					targetChunk.getBlockX() + 16 + ((BO3)customObject).getXOffset(Rotation.NORTH), 
+					y, 
+					targetChunk.getBlockZ() + 16 + ((BO3)customObject).getZOffset(Rotation.NORTH), 
+					true
+				);
+    		}
+    	}		
 	}
 }
