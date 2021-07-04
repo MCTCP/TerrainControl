@@ -23,6 +23,8 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
+import com.pg85.otg.forge.network.BiomeSettingWrapper;
+import com.pg85.otg.forge.network.OTGPacketHandler;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
@@ -50,6 +52,7 @@ import com.pg85.otg.gen.biome.BiomeData;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
@@ -214,6 +217,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
  				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
+ 				
+ 				// Populate our map for syncing
+ 				OTGPacketHandler.getSyncedmap().put(resourceLocation.toString(), new BiomeSettingWrapper(biomeConfig));
  				
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				
