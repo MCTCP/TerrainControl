@@ -54,6 +54,7 @@ session.lock
 *.dat
 *.mca
 /platforms/bukkit/logs
+/platforms/forge/.factorypath
 /platforms/forge/banned-players.txt
 /platforms/forge/banned-ips.txt
 /platforms/forge/crash-reports
