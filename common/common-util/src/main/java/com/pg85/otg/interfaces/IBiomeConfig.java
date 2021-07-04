@@ -115,6 +115,7 @@ public interface IBiomeConfig
 	float getBiomeTemperature();
 	float getBiomeWetness();
 	int getFogColor();
+	float getFogDensity();
 	int getWaterFogColor();
 	int getFoliageColor();
 	int getGrassColor();

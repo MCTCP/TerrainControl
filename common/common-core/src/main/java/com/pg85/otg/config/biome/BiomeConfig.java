@@ -227,6 +227,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.grassColorModifier = reader.getSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, logger);
 		this.foliageColor = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR, logger);
 		this.fogColor = reader.getSetting(BiomeStandardValues.FOG_COLOR, logger);
+		this.fogDensity = reader.getSetting(BiomeStandardValues.FOG_DENSITY, logger);
 		this.waterFogColor = reader.getSetting(BiomeStandardValues.WATER_FOG_COLOR, logger);
 		this.particleType = reader.getSetting(BiomeStandardValues.PARTICLE_TYPE, logger);
 		this.music = reader.getSetting(BiomeStandardValues.MUSIC, logger);
@@ -624,6 +625,7 @@ public class BiomeConfig extends BiomeConfigBase
 		);
 
 		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
+		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density.");
 		
 		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
 

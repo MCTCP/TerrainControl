@@ -116,6 +116,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int skyColor;
 	protected int waterColor;
 	protected int fogColor;
+	protected float fogDensity;
 	protected int waterFogColor;
 	protected String particleType;
 	protected float particleProbability;
@@ -449,6 +450,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public int getFogColor()
 	{
 		return this.fogColor;
+	}
+	
+	@Override
+	public float getFogDensity()
+	{
+		return this.fogDensity;
 	}
 	
 	@Override
