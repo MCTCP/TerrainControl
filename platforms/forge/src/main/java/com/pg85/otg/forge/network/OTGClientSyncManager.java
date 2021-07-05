@@ -11,9 +11,9 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-public class OTGPacketHandler
+public class OTGClientSyncManager
 {
-	private static final Map<String, BiomeSettingWrapper> syncedMap = new HashMap<>();
+	private static final Map<String, BiomeSettingSyncWrapper> syncedMap = new HashMap<>();
 
 	private static final String PROTOCOL_VERSION = "1";
 
@@ -24,10 +24,10 @@ public class OTGPacketHandler
 
 	public static void setup()
 	{
-		LOGIN.messageBuilder(PacketSyncSettings.class, 0, NetworkDirection.LOGIN_TO_CLIENT)
+		LOGIN.messageBuilder(PacketSyncBiomeSettings.class, 0, NetworkDirection.LOGIN_TO_CLIENT)
 				.loginIndex(OTGLoginMessage::getLoginIndex, OTGLoginMessage::setLoginIndex)
-				.encoder(PacketSyncSettings::encode).decoder(PacketSyncSettings::decode).markAsLoginPacket()
-				.consumer(FMLHandshakeHandler.biConsumerFor((__, msg, ctx) -> PacketSyncSettings.handleLogin(msg, ctx)))
+				.encoder(PacketSyncBiomeSettings::encode).decoder(PacketSyncBiomeSettings::decode).markAsLoginPacket()
+				.consumer(FMLHandshakeHandler.biConsumerFor((__, msg, ctx) -> PacketSyncBiomeSettings.handleLogin(msg, ctx)))
 				.add();
 
 		LOGIN.messageBuilder(AcknowledgeOTGMessage.class, 99, NetworkDirection.LOGIN_TO_SERVER)
@@ -37,7 +37,7 @@ public class OTGPacketHandler
 				.consumer(FMLHandshakeHandler.indexFirst(AcknowledgeOTGMessage::handle)).add();
 	}
 
-	public static Map<String, BiomeSettingWrapper> getSyncedmap()
+	public static Map<String, BiomeSettingSyncWrapper> getSyncedmap()
 	{
 		return syncedMap;
 	}
