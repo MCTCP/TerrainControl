@@ -3,11 +3,12 @@ package com.pg85.otg.forge;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gen.OTGWorldType;
 import com.pg85.otg.forge.gui.OTGGui;
-import com.pg85.otg.forge.network.OTGPacketHandler;
+import com.pg85.otg.forge.network.OTGClientSyncManager;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -72,7 +73,8 @@ public class OTGPlugin
 		// Register all biomes
 		OTG.getEngine().getPresetLoader().registerBiomes();
 		
-		OTGPacketHandler.setup();
+		OTGClientSyncManager.setup();
+		MultipleColorHandler.setup();
 	}
 
 	@SubscribeEvent

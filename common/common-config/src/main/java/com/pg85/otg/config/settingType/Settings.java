@@ -1,12 +1,13 @@
 package com.pg85.otg.config.settingType;
 
-import com.pg85.otg.util.biome.ReplaceBlocks;
+import java.util.List;
+
+import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
+import com.pg85.otg.util.biome.ReplaceBlocks;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
-
-import java.util.List;
 
 /**
  * Acts as a factory for creating settings. Classes holding settings must
@@ -121,6 +122,11 @@ public abstract class Settings
 	protected static final Setting<MaterialSet> materialSetSetting(String name, String... defaultValues)
 	{
 		return new MaterialSetSetting(name, defaultValues);
+	}
+	
+	protected static final Setting<ColorSet> colorSetSetting(String name)
+	{
+		return new ColorSetSetting(name);
 	}
 
 	/**

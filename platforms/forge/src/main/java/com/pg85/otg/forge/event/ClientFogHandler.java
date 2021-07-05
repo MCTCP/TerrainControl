@@ -5,8 +5,8 @@ import java.util.Arrays;
 import org.lwjgl.opengl.GL11;
 
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.network.BiomeSettingWrapper;
-import com.pg85.otg.forge.network.OTGPacketHandler;
+import com.pg85.otg.forge.network.BiomeSettingSyncWrapper;
+import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.util.helpers.MathHelper;
 
 import net.minecraft.client.Minecraft;
@@ -138,13 +138,10 @@ public class ClientFogHandler
 		ResourceLocation key = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)
 				.getKey(Minecraft.getInstance().level.getBiome(blockpos));
 
-		if (key == null)
-		{
-			// Not an OTG biome
-			return 0;
-		}
+		BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedmap().get(key.toString());
 
-		BiomeSettingWrapper wrapper = OTGPacketHandler.getSyncedmap().get(key.toString());
+		if (wrapper == null)
+			return 0;
 
 		fogDensityCache[x][z] = wrapper.getFogDensity();
 		return wrapper.getFogDensity();

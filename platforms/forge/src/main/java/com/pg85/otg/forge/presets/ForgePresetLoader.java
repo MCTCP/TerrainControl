@@ -23,8 +23,14 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
-import com.pg85.otg.forge.network.BiomeSettingWrapper;
-import com.pg85.otg.forge.network.OTGPacketHandler;
+import com.pg85.otg.forge.network.BiomeSettingSyncWrapper;
+import com.pg85.otg.forge.network.OTGClientSyncManager;
+import com.pg85.otg.gen.biome.BiomeData;
+import com.pg85.otg.gen.biome.layers.BiomeLayerData;
+import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.interfaces.IBiomeResourceLocation;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
@@ -33,12 +39,9 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
-import com.pg85.otg.gen.biome.layers.BiomeLayerData;
-import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
-import com.pg85.otg.interfaces.IBiomeResourceLocation;
-import com.pg85.otg.interfaces.ILogger;
-import com.pg85.otg.interfaces.IMaterialReader;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -47,12 +50,7 @@ import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
-
-import com.pg85.otg.gen.biome.BiomeData;
-import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
@@ -219,7 +217,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
  				
  				// Populate our map for syncing
- 				OTGPacketHandler.getSyncedmap().put(resourceLocation.toString(), new BiomeSettingWrapper(biomeConfig));
+ 				OTGClientSyncManager.getSyncedmap().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
  				
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				

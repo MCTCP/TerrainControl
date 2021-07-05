@@ -10,6 +10,7 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
+import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -142,6 +143,12 @@ public class BiomeStandardValues extends Settings
 		SPAWN_WATER_AMBIENT_CREATURES = mobGroupListSetting("SpawnWaterAmbientCreatures"),
 		SPAWN_MISC_CREATURES = mobGroupListSetting("SpawnMiscCreatures")
 	;
+	
+	public static final Setting<ColorSet>
+		GRASS_COLOR_CONTROL = colorSetSetting("GrassColorControl"),
+		FOLIAGE_COLOR_CONTROL = colorSetSetting("FoliageColorControl"),
+		WATER_COLOR_CONTROL = colorSetSetting("WaterColorControl");
+;
 
 	public static final Setting<VillageType> VILLAGE_TYPE = enumSetting("VillageType", VillageType.disabled);
 	public static final Setting<MineshaftType> MINESHAFT_TYPE = enumSetting("MineshaftType", MineshaftType.normal);
