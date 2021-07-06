@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ColorThreshold;
 import com.pg85.otg.util.biome.SimpleColorSet;
@@ -20,7 +21,7 @@ public class BiomeSettingSyncWrapper
 	private ColorSet foliageColorControl;
 	private ColorSet waterColorControl;
 
-	public BiomeSettingSyncWrapper(BiomeConfig config)
+	public BiomeSettingSyncWrapper(IBiomeConfig config)
 	{
 		this.grassColor = config.getGrassColor();
 		this.foliageColor = config.getFoliageColor();
