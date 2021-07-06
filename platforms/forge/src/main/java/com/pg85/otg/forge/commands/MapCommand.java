@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.commands;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.gen.ForgeChunkBuffer;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
@@ -236,12 +237,12 @@ public class MapCommand
 		{
 			// mapBiomes uses biome coords, so 1 pixel for every 
 			// 4 blocks, not 1 pixel per block like mapTerrain.
-			for (int internalX = 0; internalX < 4; internalX++)
+			for (int internalX = 0; internalX < Constants.CHUNK_SIZE; internalX++)
 			{
-				for (int internalZ = 0; internalZ < 4; internalZ += 4)
+				for (int internalZ = 0; internalZ < Constants.CHUNK_SIZE; internalZ++)
 				{
-					int noiseX = chunkCoords.x * 4 + internalX;
-					int noiseZ = chunkCoords.z * 4 + internalZ;
+					int noiseX = chunkCoords.x * Constants.CHUNK_SIZE + internalX;
+					int noiseZ = chunkCoords.z * Constants.CHUNK_SIZE + internalZ;
 					if(noiseX < this.width && noiseZ < this.height)
 					{
 						// TODO: Fetch biome data per chunk, not per column, probably very slow atm.

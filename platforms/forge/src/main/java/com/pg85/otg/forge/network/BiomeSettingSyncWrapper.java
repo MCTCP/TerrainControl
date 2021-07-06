@@ -3,7 +3,6 @@ package com.pg85.otg.forge.network;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ColorThreshold;
@@ -129,5 +128,4 @@ public class BiomeSettingSyncWrapper
 			buffer.writeFloat(color.getMaxNoise());
 		}
 	}
-
 }
