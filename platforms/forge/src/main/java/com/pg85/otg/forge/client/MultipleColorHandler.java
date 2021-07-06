@@ -29,7 +29,7 @@ public class MultipleColorHandler
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 
-				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedmap().get(key.toString());
+				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{
@@ -48,7 +48,7 @@ public class MultipleColorHandler
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 
-				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedmap().get(key.toString());
+				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{
@@ -67,7 +67,7 @@ public class MultipleColorHandler
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 
-				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedmap().get(key.toString());
+				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{

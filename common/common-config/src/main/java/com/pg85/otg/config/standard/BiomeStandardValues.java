@@ -57,7 +57,9 @@ public class BiomeStandardValues extends Settings
 		AMBIENT_SOUND = stringSetting("AmbientSound", ""),
 		MOOD_SOUND = stringSetting("MoodSound", "minecraft:ambient.cave"),
 		ADDITIONS_SOUND = stringSetting("AdditionsSound", ""),
-		BIOME_CATEGORY = stringSetting("BiomeCategory", "plains")
+		BIOME_CATEGORY = stringSetting("BiomeCategory", "plains"),
+		LEGACY_GRASS_COLOR2 = stringSetting("GrassColor2", "#FFFFFF"),
+		LEGACY_FOLIAGE_COLOR2 = stringSetting("FoliageColor2", "#FFFFFF")
 	;
 
 	public static final Setting<Integer>

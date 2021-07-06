@@ -15,7 +15,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 
 	public PacketSyncBiomeSettings()
 	{
-		this(OTGClientSyncManager.getSyncedmap());
+		this(OTGClientSyncManager.getSyncedData());
 	}
 
 	public PacketSyncBiomeSettings(Map<String, BiomeSettingSyncWrapper> syncMap)
@@ -47,7 +47,9 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 
 	public static void handleLogin(PacketSyncBiomeSettings packet, Supplier<NetworkEvent.Context> context)
 	{
-		context.get().enqueueWork(() -> OTGClientSyncManager.getSyncedmap().putAll(packet.syncMap));
+		context.get().enqueueWork(() -> OTGClientSyncManager.getSyncedData().putAll(packet.syncMap));
+		
+		// We need to send something as a reply, or the client will hang on login forever.
 		OTGClientSyncManager.LOGIN.reply(new AcknowledgeOTGMessage(), context.get());
 		context.get().setPacketHandled(true);
 	}

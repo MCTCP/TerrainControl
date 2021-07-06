@@ -13,12 +13,12 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class OTGClientSyncManager
 {
-	private static final Map<String, BiomeSettingSyncWrapper> syncedMap = new HashMap<>();
+	private static final Map<String, BiomeSettingSyncWrapper> syncedData = new HashMap<>();
 
 	private static final String PROTOCOL_VERSION = "1";
 
 	public static final SimpleChannel LOGIN = NetworkRegistry.ChannelBuilder
-			.named(new ResourceLocation(Constants.MOD_ID_LOWER_CASE, "login"))
+			.named(new ResourceLocation(Constants.MOD_ID_SHORT, "login"))
 			.networkProtocolVersion(() -> PROTOCOL_VERSION).clientAcceptedVersions(PROTOCOL_VERSION::equals)
 			.serverAcceptedVersions(PROTOCOL_VERSION::equals).simpleChannel();
 
@@ -37,8 +37,8 @@ public class OTGClientSyncManager
 				.consumer(FMLHandshakeHandler.indexFirst(AcknowledgeOTGMessage::handle)).add();
 	}
 
-	public static Map<String, BiomeSettingSyncWrapper> getSyncedmap()
+	public static Map<String, BiomeSettingSyncWrapper> getSyncedData()
 	{
-		return syncedMap;
+		return syncedData;
 	}
 }

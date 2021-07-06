@@ -218,7 +218,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
  				
  				// Populate our map for syncing
- 				OTGClientSyncManager.getSyncedmap().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
+ 				OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
  				
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				
