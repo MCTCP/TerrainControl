@@ -1,13 +1,12 @@
 package com.pg85.otg.spigot.biome;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
@@ -29,7 +28,18 @@ public class SpigotBiome implements IBiome
 		this.biomeConfig = biomeConfig;
 	}
 
-	public static BiomeBase createOTGBiome (boolean isOceanBiome, WorldConfig worldConfig, BiomeConfig biomeConfig)
+	public BiomeBase getBiomeBase()
+	{
+		return this.biomeBase;
+	}	
+
+	@Override
+	public IBiomeConfig getBiomeConfig()
+	{
+		return this.biomeConfig;
+	}	
+	
+	public static BiomeBase createOTGBiome (boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// BiomeSettingsGeneration.a == BiomeGenerationSettings.Builder in forge
 		BiomeSettingsGeneration.a biomeGenerationSettingsBuilder = new BiomeSettingsGeneration.a();
@@ -163,7 +173,7 @@ public class SpigotBiome implements IBiome
 		return MathHelper.f(0.62222224F - lvt_1_1_ * 0.05F, 0.5F + lvt_1_1_ * 0.1F, 1.0F);
 	}
 
-	private static void addVanillaStructures (BiomeSettingsGeneration.a biomeGenerationSettingsBuilder, WorldConfig worldConfig, BiomeConfig biomeConfig)
+	private static void addVanillaStructures (BiomeSettingsGeneration.a biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// TODO: Currently we can only enable/disable structures per biome and use any configuration options exposed by the vanilla structure 
 		// classes (size for villages fe). If we want to be able to customise more, we'll need to implement our own structure classes.
@@ -403,7 +413,7 @@ public class SpigotBiome implements IBiome
 		return RegistryGeneration.a(RegistryGeneration.f, name, structure);
 	}
 	
-	private static BiomeSettingsMobs.a createMobSpawnInfo (BiomeConfig biomeConfig)
+	private static BiomeSettingsMobs.a createMobSpawnInfo (IBiomeConfig biomeConfig)
 	{
 		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() for forge
 		BiomeSettingsMobs.a mobSpawnInfoBuilder = new BiomeSettingsMobs.a();
@@ -436,12 +446,6 @@ public class SpigotBiome implements IBiome
 				}
 			}
 		}
-	}
-	
-	@Override
-	public IBiomeConfig getBiomeConfig ()
-	{
-		return this.biomeConfig;
 	}
 
 	@Override

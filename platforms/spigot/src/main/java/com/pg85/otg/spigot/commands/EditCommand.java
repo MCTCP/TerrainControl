@@ -300,7 +300,8 @@ public class EditCommand
 				bo3.doReplaceBlocks() && 
 				(lastX != x + block.x || lastZ != z + block.z))
 			{
-				replaceBlocks = worldGenRegion.getBiomeConfig(x + block.x, z + block.z).getReplaceBlocks();
+				// TODO: Calculate area required and fetch biome data for whole chunks instead of per column.
+				replaceBlocks = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x + block.x, z + block.z, true).getReplaceBlocks();
 				lastX = x + block.x;
 				lastZ = z + block.z;
 			}

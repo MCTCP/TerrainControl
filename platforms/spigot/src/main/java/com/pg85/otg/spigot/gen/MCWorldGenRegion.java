@@ -29,18 +29,6 @@ public class MCWorldGenRegion extends SpigotWorldGenRegion
 	}
 
 	@Override
-	public IBiome getBiome(int x, int z)
-	{
-		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");		
-	}
-
-	@Override
-	public IBiomeConfig getBiomeConfig(int x, int z)
-	{
-		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");		
-	}
-
-	@Override
 	public IBiome getBiomeForDecoration(int worldX, int worldZ)
 	{
 		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");		

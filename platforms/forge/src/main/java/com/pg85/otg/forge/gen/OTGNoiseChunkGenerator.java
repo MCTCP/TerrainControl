@@ -342,14 +342,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
 		
 		// Taken from vanilla
-		int k = worldGenRegion.getCenterX() * 16;
-		int l = worldGenRegion.getCenterZ() * 16;
-		BlockPos blockpos = new BlockPos(k, 0, l);
+		int worldX = worldGenRegion.getCenterX() * Constants.CHUNK_SIZE;
+		int worldZ = worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE;
+		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), k, l);	      
+		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	      
 		//	
 
-		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(k, l);		
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
 		ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);		
 		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 2, (worldGenRegion.getCenterZ() << 2) + 2);
 		// World save folder name may not be identical to level name, fetch it.
@@ -362,7 +362,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
-			crashreport.addCategory("Generation").setDetail("CenterX", k).setDetail("CenterZ", l).setDetail("Seed", decorationSeed);
+			crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
 	}
@@ -376,7 +376,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			int chunkX = worldGenRegion.getCenterX();
 			int chunkZ = worldGenRegion.getCenterZ();
-			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(worldGenRegion.getCenterX() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET); 
+			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, chunkZ * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);
 			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
 			WorldEntitySpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);
