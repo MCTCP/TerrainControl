@@ -108,6 +108,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
 	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry)
 	{
+		clearCaches(biomeRegistry);
+		
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
 			for(File presetDir : this.presetsDir.listFiles())
@@ -128,10 +130,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 				}
 			}
 		}
-		refreshConfigs(biomeRegistry);
+		registerBiomes(true, biomeRegistry);
 	}
 
-	protected void refreshConfigs(MutableRegistry<Biome> biomeRegistry)
+	protected void clearCaches(MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping = new HashMap<>();
 		this.reverseIdMapping = new HashMap<>();
@@ -139,7 +141,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
 		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
-		registerBiomes(true, biomeRegistry);
 	}
 	
 	@Override
