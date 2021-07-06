@@ -4,10 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
-import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 
 // Spigot name: WorldChunkManager
 // Forge name: BiomeProvider
-public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
+public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 {
 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
@@ -31,7 +32,6 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 			RegistryLookupCodec.a(IRegistry.ay).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
-	public final BiomeConfig[] configLookup;
 	private final long seed;
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
@@ -54,10 +54,10 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		// Default to let us know if we did anything wrong
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
-		this.configLookup = ((SpigotPresetLoader) OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
-		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
+		IBiome[] biomeLookup = ((SpigotPresetLoader) OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
+		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
 		{
-			BiomeConfig config = this.configLookup[biomeId];
+			IBiomeConfig config = biomeLookup[biomeId].getBiomeConfig();
 
 			// Forge method: RegistryKey.getOrCreateKey()
 			// Spigot method: ResourceKey.a()
@@ -91,21 +91,8 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		return CODEC;
 	}
 
-	public ResourceKey<BiomeBase> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
-	{
-		return keyLookup.get(this.layer.get().sample(biomeX, biomeZ));
-	}
-
-	public String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ)
-	{
-		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).a().toString();
-	}
-
-	public ResourceKey<BiomeBase> lookupKey (int index)
-	{
-		return keyLookup.get(index);
-	}
-
+	// TODO: This is only used by MC internally, OTG fetches all biomes via CachedBiomeProvider.
+	// Could make this use the cache too?
 	@Override
 	public BiomeBase getBiome (int biomeX, int biomeY, int biomeZ)
 	{
@@ -118,12 +105,5 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 	public CachingLayerSampler getSampler ()
 	{
 		return this.layer.get();
-	}
-
-	@Override
-	public BiomeConfig getConfig (int biomeX, int biomeZ)
-	{
-		int biomeId = this.layer.get().sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? configLookup[biomeId] : null;
 	}
 }

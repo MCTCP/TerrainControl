@@ -64,6 +64,7 @@ public class WorldConfig extends WorldConfigBase
 		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
+	// TODO: Refactor to IBiomeGroupManager?
 	public BiomeGroupManager getBiomeGroupManager()
 	{
 		return this.biomeGroupManager;
@@ -166,9 +167,11 @@ public class WorldConfig extends WorldConfigBase
 		this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK, logger, materialReader);		
 		this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 		this.iceBlock = reader.getSetting(WorldStandardValues.ICE_BLOCK, logger, materialReader);
+		this.carverLavaBlock = reader.getSetting(WorldStandardValues.CARVER_LAVA_BLOCK, logger, materialReader);
 
 		// Bedrock
 
+		this.carverLavaBlockHeight = reader.getSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, logger);
 		this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK, logger);
 		this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK, logger);
 
@@ -188,7 +191,6 @@ public class WorldConfig extends WorldConfigBase
 		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
 		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger);
 		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger);
-		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger);
 		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger);
 		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger);
 		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger);
@@ -452,13 +454,6 @@ public class WorldConfig extends WorldConfigBase
 			"This is the maximum biome temperature when a biome is still considered cold. Water in oceans nearby cold biomes freezes if FrozenOcean is set to true.",
 			"Temperature reference from vanilla Minecraft: < 0.15 for snow, 0.15 - 0.95 for rain, or > 1.0 for dry."
 		);
-
-		writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.freezeAllColdGroupBiomes,
-			"If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
-			" - When this setting is true, all biomes in the group will have frozen oceans",
-			" - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
-			"Default: false"
-		);
 		
 		writer.header2("Rivers");
 		
@@ -469,7 +464,6 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
 			"When this setting is false, rivers follow the biome borders most of the time. Set this setting to true to disable this behavior."
 		);		
-		
 		writer.putSetting(WorldStandardValues.RIVER_RARITY, this.riverRarity,
 			"Controls the rarity of rivers. Must be from 0 to GenerationDepth. A higher number means more rivers. To define which rivers flow through which biomes see the individual biome configs."
 		);
@@ -562,7 +556,7 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock,
 			"Make a single flat layer of bedrock."
 		);
-
+		
 		writer.header2("Water / Lava / Frozen States");
 		
 		writer.putSetting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax,
@@ -575,6 +569,18 @@ public class WorldConfig extends WorldConfigBase
 			"Block used as water in WaterLevel."
 		);
 
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK, this.carverLavaBlock,
+			"Block that replaces all air blocks from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: LAVA"
+		);
+
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, this.carverLavaBlockHeight,
+			"All air blocks are replaced to CarverLavaBlock from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: 10"
+		);
+		
 		writer.putSetting(WorldStandardValues.ICE_BLOCK, this.iceBlock,
 			"Block used as ice."
 		);

@@ -25,6 +25,7 @@ public class LocalMaterials
 	// the forge/spigot classes extending this class.
 
 	public static LocalMaterialData AIR;
+	public static LocalMaterialData CAVE_AIR;
 
 	// Block of grass
 	public static LocalMaterialData GRASS;

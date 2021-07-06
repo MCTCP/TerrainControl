@@ -5,11 +5,10 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.IEntityFunction;
 import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
-import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -38,7 +37,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public SpigotWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.a(), worldGenRegion.b());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.a(), worldGenRegion.b(), chunkGenerator.getCachedBiomeProvider());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -70,7 +69,13 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	{
 		return this.worldGenRegion.getRandom();
 	}
-
+	
+	@Override
+	public ICachedBiomeProvider getCachedBiomeProvider()
+	{
+		return this.chunkGenerator.getCachedBiomeProvider();
+	}
+	
 	@Override
 	public ChunkCoordinate getSpawnChunk()
 	{
@@ -81,49 +86,18 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public GeneratorAccessSeed getInternal()
 	{
 		return this.worldGenRegion;
-	}	
-	
-	@Override
-	public IBiome getBiome(int x, int z)
-	{
-		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
-		// to do magnification correctly by itself? Test and verify.
-		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
-		IBiomeConfig biomeConfig = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome);
-		if (biomeConfig != null)
-		{
-			return new SpigotBiome(biome, biomeConfig);
-		}
-		return null;
 	}
 
 	@Override
-	public IBiomeConfig getBiomeConfig(int x, int z)
+	public IBiome getBiomeForDecoration(int x, int z)
 	{
-		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
-		// to do magnification correctly by itself? Test and verify.		
-		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
-		return ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome);
+		return this.decorationBiomeCache.getBiome(x, z);
 	}
 
 	@Override
-	public IBiome getBiomeForDecoration(int worldX, int worldZ)
+	public IBiomeConfig getBiomeConfigForDecoration(int x, int z)
 	{
-		if(this.decorationBiomeCache != null)
-		{
-			return this.decorationBiomeCache.getBiome(worldX, worldZ, this);
-		}
-		return this.getBiome(worldX, worldZ);
-	}
-	
-	@Override
-	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ)
-	{
-		if(this.decorationBiomeCache != null)
-		{
-			return this.decorationBiomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
-		}
-		return this.getBiome(worldX, worldZ).getBiomeConfig();
+		return this.decorationBiomeCache.getBiomeConfig(x, z);
 	}
 
 	@Override

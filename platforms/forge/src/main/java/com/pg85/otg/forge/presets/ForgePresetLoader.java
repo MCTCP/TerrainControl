@@ -14,7 +14,6 @@ import java.util.Set;
 
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -39,26 +38,13 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
-
-import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
 	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();
-	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
-	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
-	private Map<String, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	private HashMap<String, IBiome[]> globalIdMapping = new HashMap<>();
 	private Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
 	public ForgePresetLoader(Path otgRootFolder)
@@ -71,26 +57,13 @@ public class ForgePresetLoader extends LocalPresetLoader
 	{
 		return new ForgeMaterialReader();
 	}
-	
-	@Override
-	public BiomeConfig getBiomeConfig(String presetFolderName, int biomeId)
-	{
-		BiomeConfig[] biomes = this.globalIdMapping.get(presetFolderName);
-		return biomes.length > biomeId ? biomes[biomeId] : null;
-	}
-	
-	@Override
-	public BiomeConfig getBiomeConfig(String resourceLocationString)
-	{
-		return this.biomeConfigsByRegistryKey.get(resourceLocationString);
-	}
-	
+
 	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetFolderName)
 	{
 		return this.biomesByPresetFolderName.get(presetFolderName);
 	}
 
-	public BiomeConfig[] getGlobalIdMapping(String presetFolderName)
+	public IBiome[] getGlobalIdMapping(String presetFolderName)
 	{
 		return globalIdMapping.get(presetFolderName);
 	}
@@ -136,8 +109,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 	protected void clearCaches(MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping = new HashMap<>();
-		this.reverseIdMapping = new HashMap<>();
-		this.biomeConfigsByRegistryKey = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
 		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
@@ -162,21 +133,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
 			this.biomesByPresetFolderName.put(preset.getFolderName(), presetBiomes);
 
-			WorldConfig worldConfig = preset.getWorldConfig();
-			BiomeConfig oceanBiomeConfig = null;
+			IWorldConfig worldConfig = preset.getWorldConfig();
+			IBiomeConfig oceanBiomeConfig = null;
 			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
 			
-			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
-			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size()];
-			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
+			List<IBiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
+			IBiome[] presetIdMapping = new IBiome[biomeConfigs.size()];
 
 			Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
 			Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 			
 			Map<String, Integer> worldBiomes = new HashMap<>();
 
-			Map<String, BiomeConfig> biomeConfigsByName = new HashMap<>();
-			for(BiomeConfig biomeConfig : biomeConfigs)
+			Map<String, IBiomeConfig> biomeConfigsByName = new HashMap<>();
+			for(IBiomeConfig biomeConfig : biomeConfigs)
 			{				
 				boolean isOceanBiome = false;
  				// Biome id 0 is reserved for ocean, used when a land column has 
@@ -191,19 +161,23 @@ public class ForgePresetLoader extends LocalPresetLoader
  				// For normal biomes we create our own new OTG biome and apply settings from the biome config.
 				ResourceLocation resourceLocation;
  				RegistryKey<Biome> registryKey;
+ 				Biome biome;
 				if(biomeConfig.getTemplateForBiome() != null && biomeConfig.getTemplateForBiome().trim().length() > 0)
 				{
 					resourceLocation = new ResourceLocation(biomeConfig.getTemplateForBiome().replace("minecraft:", "").replace(" ", "_").toLowerCase());
 					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 					presetBiomes.add(registryKey);
+					biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 					biomeConfig.setRegistryKey(new MCBiomeResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath(), preset.getFolderName()));
+					biomeConfig.setOTGBiomeId(currentId);
 				} else {
 					IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 					biomeConfig.setRegistryKey(otgLocation);
+					biomeConfig.setOTGBiomeId(currentId);
 					resourceLocation = new ResourceLocation(otgLocation.toResourceLocationString());	
  	 				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
  					presetBiomes.add(registryKey);
-	 				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
+	 				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
 					if(!refresh)
 					{
 						ForgeRegistries.BIOMES.register(biome);
@@ -212,10 +186,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
  				}
 
-				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-				
- 				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
- 				this.biomeConfigsByRegistryKey.put(resourceLocation.toString(), biomeConfig);
+				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);			
  				
  				// Populate our map for syncing
  				OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
@@ -248,8 +219,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 				});
 
-				presetIdMapping[otgBiomeId] = biomeConfig;
-				presetReverseIdMapping.put(biomeConfig, otgBiomeId);
+				IBiome otgBiome = new ForgeBiome(biome, biomeConfig);
+				presetIdMapping[otgBiomeId] = otgBiome;
 
 				worldBiomes.put(biomeConfig.getName(), otgBiomeId);
  				
@@ -312,7 +283,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 			
 			this.globalIdMapping.put(preset.getFolderName(), presetIdMapping);
-			this.reverseIdMapping.put(preset.getFolderName(), presetReverseIdMapping);
 
 			// Set the base data
 			BiomeLayerData data = new BiomeLayerData(preset.getPresetFolder(), worldConfig, oceanBiomeConfig, oceanTemperatures);
@@ -323,7 +293,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			int genDepth = worldConfig.getGenerationDepth();
 
 			// Iterate through the groups and add it to the layer data
-			for (BiomeGroup group : worldConfig.getBiomeGroupManager().getGroups())
+			// TODO: Refactor BiomeGroupManager to IBiomeGroupManager/IBiomeGroup to avoid WorldConfig cast?
+			for (BiomeGroup group : ((WorldConfig)worldConfig).getBiomeGroupManager().getGroups())
 			{
 				// Initialize biome group data
 				NewBiomeGroup bg = new NewBiomeGroup();
@@ -339,12 +310,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{					
-					BiomeConfig config = biomeConfigsByName.get(biome);
+					IBiomeConfig config = biomeConfigsByName.get(biome);
 					if(config != null)
 					{
 						// Make and add the generation data
 						BiomeData newBiomeData = new BiomeData(
-							presetReverseIdMapping.getInt(config),
+							config.getOTGBiomeId(),
 							config.getName(),
 							config.getBiomeRarity(),
 							config.getBiomeSize(),

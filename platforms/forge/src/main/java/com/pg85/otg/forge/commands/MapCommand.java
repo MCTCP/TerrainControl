@@ -46,7 +46,7 @@ public class MapCommand
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		Instant start = Instant.now();
-		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, (OTGBiomeProvider) source.getLevel().getChunkSource().generator.getBiomeSource(), true, threads);
+		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, true, threads);
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish); // Note: This is probably the least helpful time duration helper class I've ever seen ...
 		
@@ -83,7 +83,7 @@ public class MapCommand
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		Instant start = Instant.now();
-		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, (OTGBiomeProvider) source.getLevel().getChunkSource().generator.getBiomeSource(), false, threads);
+		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, false, threads);
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish);		
 		
@@ -106,16 +106,27 @@ public class MapCommand
 		return 0;
 	}
 	
-	static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, OTGBiomeProvider provider, boolean mapBiomes, int threads)
+	static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, boolean mapBiomes, int threads)
 	{
 		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
 		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
 		List<BlockPos2D> coordsToHandle = new ArrayList<BlockPos2D>(width * height);
-		for (int chunkX = 0; chunkX < (int)Math.ceil(width / 16f); chunkX++)
+		if(mapBiomes)
 		{
-			for (int chunkZ = 0; chunkZ < (int)Math.ceil(height / 16f); chunkZ++)
+			for (int chunkX = 0; chunkX < (int)Math.ceil(width / 4f); chunkX++)
 			{
-				coordsToHandle.add(new BlockPos2D(chunkX, chunkZ));
+				for (int chunkZ = 0; chunkZ < (int)Math.ceil(height / 4f); chunkZ++)
+				{
+					coordsToHandle.add(new BlockPos2D(chunkX, chunkZ));
+				}
+			}
+		} else {
+			for (int chunkX = 0; chunkX < (int)Math.ceil(width / 16f); chunkX++)
+			{
+				for (int chunkZ = 0; chunkZ < (int)Math.ceil(height / 16f); chunkZ++)
+				{
+					coordsToHandle.add(new BlockPos2D(chunkX, chunkZ));
+				}
 			}
 		}
 
@@ -124,7 +135,7 @@ public class MapCommand
 		int totalSize = coordsToHandle.size();
 		for(int i = 0; i < threads; i++)
 		{
-			outer.new Worker(latch, source, generator, provider, img, coordsToHandle, totalSize, mapBiomes, width, height).start();
+			outer.new Worker(latch, source, generator, img, coordsToHandle, totalSize, mapBiomes, width, height).start();
 		}
 	
 		try {
@@ -157,7 +168,6 @@ public class MapCommand
 		private final List<BlockPos2D> coordsToHandle;
 		private final CountDownLatch latch;
 		private final OTGNoiseChunkGenerator generator;
-		private final OTGBiomeProvider provider;
 		private final CommandSource source;
 		private final BufferedImage img;
 		private final int progressUpdate;
@@ -165,11 +175,10 @@ public class MapCommand
 		private final int width;
 		private final int height;
 
-		public Worker(CountDownLatch latch, CommandSource source, OTGNoiseChunkGenerator generator, OTGBiomeProvider provider, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
+		public Worker(CountDownLatch latch, CommandSource source, OTGNoiseChunkGenerator generator, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
 		{
 			this.latch = latch;
 			this.generator = generator;
-			this.provider = provider;
 			this.source = source;
 			this.img = img;
 			this.progressUpdate = (int)Math.ceil(totalSize / 100f);
@@ -224,19 +233,22 @@ public class MapCommand
 		}
 
 		private void getBiomePixel(BlockPos2D chunkCoords)
-		{		
-			for (int internalX = 0; internalX < 16; internalX++)
+		{
+			// mapBiomes uses biome coords, so 1 pixel for every 
+			// 4 blocks, not 1 pixel per block like mapTerrain.
+			for (int internalX = 0; internalX < 4; internalX++)
 			{
-				for (int internalZ = 0; internalZ < 16; internalZ++)
+				for (int internalZ = 0; internalZ < 4; internalZ += 4)
 				{
-					int x = chunkCoords.x * 16 + internalX;
-					int z = chunkCoords.z * 16 + internalZ;
-					if(x < this.width && z < this.height)
+					int noiseX = chunkCoords.x * 4 + internalX;
+					int noiseZ = chunkCoords.z * 4 + internalZ;
+					if(noiseX < this.width && noiseZ < this.height)
 					{
-						int biomeId = this.provider.getSampler().sample(x, z);
+						// TODO: Fetch biome data per chunk, not per column, probably very slow atm.
+						int biomeColor = this.generator.getCachedBiomeProvider().getNoiseBiomeConfig(noiseX, noiseZ, true).getBiomeColor();
 						synchronized(imgLock)
 						{
-							this.img.setRGB(x, z, this.provider.configLookup[biomeId].getBiomeColor());
+							this.img.setRGB(noiseX, noiseZ, biomeColor);
 						}
 					}
 				}

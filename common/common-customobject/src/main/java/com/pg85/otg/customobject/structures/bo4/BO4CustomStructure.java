@@ -370,7 +370,7 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				if(config.spawnAtWaterLevel)
 				{
-					startY = (short) (worldGenRegion.getBiomeConfig(centerX, centerZ).getWaterLevelMax());
+					startY = (short) (worldGenRegion.getCachedBiomeProvider().getBiomeConfig(centerX, centerZ).getWaterLevelMax());
 				} else {
 					int highestBlock = worldGenRegion.getHighestBlockYAtWithoutLoading(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true);
 					if(highestBlock < 0)
@@ -1969,7 +1969,7 @@ public class BO4CustomStructure extends CustomStructure
 				// If targetbiomes size is 0, allow all biomes.
 				if(targetBiomes.size() > 0)
 				{
-					IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
+					IBiomeConfig biomeConfig3 = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 					if(!targetBiomes.contains(biomeConfig3.getName()))
 					{
 						return null;
@@ -1981,7 +1981,7 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				ArrayList<String> biomeStructures;
 
-				IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
+				IBiomeConfig biomeConfig3 = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + DecorationArea.BO_CHUNK_CENTER_X, branchData.chunkCoordinate.getChunkZ() * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 				// Get Bo3's for this biome
 				ArrayList<String> structuresToSpawn = new ArrayList<String>();
 				for (List<String> res : biomeConfig3.getCustomStructureNames())
@@ -2039,7 +2039,7 @@ public class BO4CustomStructure extends CustomStructure
 								// If targetbiomes size is 0, allow all biomes.
 								if(targetBiomes.size() > 0)
 								{
-									IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
+									IBiomeConfig biomeConfig3 = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 									if(!targetBiomes.contains(biomeConfig3.getName()))
 									{
 										return null;
@@ -2051,7 +2051,7 @@ public class BO4CustomStructure extends CustomStructure
 								// Check if the structure can spawn in this biome
 								ArrayList<String> biomeStructures;
 
-								IBiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
+								IBiomeConfig biomeConfig3 = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x * 16 + DecorationArea.BO_CHUNK_CENTER_X, z * 16 + DecorationArea.BO_CHUNK_CENTER_Z);
 								// Get Bo3's for this biome
 								ArrayList<String> structuresToSpawn = new ArrayList<String>();
 								for (List<String> res : biomeConfig3.getCustomStructureNames())
@@ -2216,7 +2216,7 @@ public class BO4CustomStructure extends CustomStructure
 			IBiomeConfig biomeConfig = null;
 			if(config.spawnUnderWater)
 			{
-				biomeConfig = worldGenRegion.getBiomeConfig(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z);
+				biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(this.start.getX() + DecorationArea.BO_CHUNK_CENTER_X, this.start.getZ() + DecorationArea.BO_CHUNK_CENTER_Z);
 			}
 
 			// Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.

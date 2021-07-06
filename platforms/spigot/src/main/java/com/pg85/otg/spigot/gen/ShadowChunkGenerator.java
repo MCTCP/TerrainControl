@@ -1,7 +1,9 @@
 package com.pg85.otg.spigot.gen;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -9,6 +11,9 @@ import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.OTGChunkGenerator;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
+import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -163,19 +168,20 @@ public class ShadowChunkGenerator
 	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
 
-	public boolean checkHasVanillaStructureWithoutLoading(WorldServer serverWorld, ChunkGenerator chunkGenerator, WorldChunkManager biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate)
+	public boolean checkHasVanillaStructureWithoutLoading(WorldServer serverWorld, ChunkGenerator chunkGenerator, WorldChunkManager biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 5;
 		ProtoChunk chunk;
 		ChunkCoordIntPair chunkpos;
-		BiomeBase biome;
+		IBiome biome;
 		ChunkCoordinate searchChunk;
 		Boolean result;
 		if (serverWorld.getServer().getGenerateStructures())
 		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<ChunkCoordinate>();
+			Map<ChunkCoordinate,Boolean> chunksHandled = new HashMap<ChunkCoordinate,Boolean>();			
 			synchronized(this.hasVanillaStructureChunkCache)
 			{
 				for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
@@ -211,27 +217,30 @@ public class ShadowChunkGenerator
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 				// based on biome and resource settings (distance etc). Does not plot any structure components.
 
-				biome = biomeProvider.getBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
-				for(Supplier<StructureFeature<?, ?>> supplier : biome.e().a())
+				// TODO: Optimise this for biome lookups, fetch a whole region of noise biome info at once?
+				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
+				for(Supplier<StructureFeature<?, ?>> supplier : ((SpigotBiome)biome).getBiomeBase().e().a())
 				{
 					// *TODO: Do we need to avoid any structures other than villages?
 					if(supplier.get().d instanceof WorldGenVillage)
 					{
-						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, biome))
+						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((SpigotBiome)biome).getBiomeBase()))
 						{
+							chunksHandled.put(chunkToHandle, new Boolean(true));
 							synchronized(this.hasVanillaStructureChunkCache)
 							{
-								this.hasVanillaStructureChunkCache.put(chunkToHandle, new Boolean(true));
+								this.hasVanillaStructureChunkCache.putAll(chunksHandled);
 							}
 							return true;
 						}
 					}
 				}
-				synchronized(this.hasVanillaStructureChunkCache)
-				{
-					this.hasVanillaStructureChunkCache.put(chunkToHandle, new Boolean(false));
-				}
+				chunksHandled.put(chunkToHandle, new Boolean(false));
 			}
+			synchronized(this.hasVanillaStructureChunkCache)
+			{
+				this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+			}			
 		}
 		return false;
 	}

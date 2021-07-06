@@ -113,7 +113,8 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			{
 				if(lastX != x + point.x || lastZ != z + point.z)
 				{
-					biomeConfig = worldGenRegion.getBiomeConfig(x + point.x, z + point.z);
+					// TODO: Calculate area required and fetch biome data for whole chunks instead of per column.
+					biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x + point.x, z + point.z, true);
 					lastX = x + point.x;
 					lastZ = z + point.z;
 				}
@@ -140,7 +141,8 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			{
 				if(lastX != x + point.x || lastZ != z + point.z)
 				{
-					replaceBlocks = worldGenRegion.getBiomeConfig(x + point.x, z + point.z).getReplaceBlocks();
+					// TODO: Calculate area required and fetch biome data for whole chunks instead of per column.
+					replaceBlocks = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x + point.x, z + point.z, true).getReplaceBlocks();
 					lastX = x + point.x;
 					lastZ = z + point.z;
 				}

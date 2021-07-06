@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.pg85.otg.gen.biome.BiomeData;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 /**
  * Places the biomes at a specific depth, given the biome groups.
@@ -64,7 +64,7 @@ class BeforeGroupsLayer extends BiomeLayerBase
 	}
 
 	@Override
-	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
+	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
 		
