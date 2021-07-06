@@ -4,7 +4,9 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
+import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotChunkBuffer;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
@@ -105,32 +107,33 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 				offsetX += player.getLocation().getBlockX();
 				offsetZ += player.getLocation().getBlockZ();
 			}
-		}
-		else {
+		} else {
 			sender.sendMessage("Only in-game for now");
 			return true;
 		}
-		if (!(world.getHandle().getChunkProvider().chunkGenerator.getWorldChunkManager() instanceof OTGBiomeProvider))
+		if (!(world.getHandle().getChunkProvider().chunkGenerator instanceof OTGNoiseChunkGenerator))
 		{
 			sender.sendMessage("This is not an OTG world");
 			return true;
 		}
 
-		OTGBiomeProvider provider = (OTGBiomeProvider) world.getHandle().getChunkProvider().chunkGenerator.getWorldChunkManager();
+		ICachedBiomeProvider provider = ((OTGNoiseChunkGenerator)world.getHandle().getChunkProvider().chunkGenerator).getCachedBiomeProvider();
 
 		BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 
 		int progressUpdate = img.getHeight() / 8;
 
-		for (int x = 0; x < img.getHeight(); x++)
+		for (int noiseX = 0; noiseX < img.getHeight(); noiseX++)
 		{
-			for (int z = 0; z < img.getWidth(); z++)
+			for (int noiseZ = 0; noiseZ < img.getWidth(); noiseZ++)
 			{
-				img.setRGB(x, z, provider.configLookup[provider.getSampler().sample(x+offsetX, z+offsetZ)].getBiomeColor());
+				// TODO: Fetch biome data per chunk, not per column, probably very slow atm.
+				// TODO: Forge doesn't use an offset, always starts at 0,0?
+				img.setRGB(noiseX, noiseZ, provider.getNoiseBiomeConfig(noiseX + offsetX, noiseZ + offsetZ, true).getBiomeColor());
 			}
-			if (x % progressUpdate == 0)
+			if (noiseX % progressUpdate == 0)
 			{
-				sender.sendMessage((((double) x / img.getHeight()) * 100) + "% Done mapping");
+				sender.sendMessage((((double) noiseX / img.getHeight()) * 100) + "% Done mapping");
 			}
 		}
 

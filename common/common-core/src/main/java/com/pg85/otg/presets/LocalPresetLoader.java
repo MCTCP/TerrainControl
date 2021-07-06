@@ -51,10 +51,6 @@ public abstract class LocalPresetLoader
 	
 	public abstract void registerBiomes();
 
-	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
-
-	public abstract BiomeConfig getBiomeConfig(String presetFolderName, int biomeId);	
-
 	protected abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String inheritMobsBiomeName);
 	
 	public Preset getPresetByShortNameOrFolderName(String name)

@@ -15,6 +15,11 @@ public class DecorationArea
 	public static final int CARVER_OFFSET = 8;
 	public static final int BO_CHUNK_CENTER_X = 8;
 	public static final int BO_CHUNK_CENTER_Z = 7;
+
+	private static final int WIDTH_IN_CHUNKS = 2;
+	private static final int HEIGHT_IN_CHUNKS = 2;
+	public static final int WIDTH = WIDTH_IN_CHUNKS * Constants.CHUNK_SIZE;
+	public static final int HEIGHT = HEIGHT_IN_CHUNKS * Constants.CHUNK_SIZE;
 	
 	private final int minX;
 	private final int maxX;
@@ -24,8 +29,12 @@ public class DecorationArea
 	private final int height;
 	private final ChunkCoordinate chunkBeingDecorated;
 
-	public DecorationArea(int top, int right, int bottom, int left, ChunkCoordinate chunkBeingDecorated)
+	public DecorationArea(ChunkCoordinate chunkBeingDecorated)
 	{
+		int top = 0;
+		int right = Constants.CHUNK_SIZE;
+		int bottom = Constants.CHUNK_SIZE;
+		int left = 0;
 		this.width = left + right + Constants.CHUNK_SIZE;
 		this.height = top + bottom + Constants.CHUNK_SIZE;
 		this.minX = chunkBeingDecorated.getBlockX() - left;

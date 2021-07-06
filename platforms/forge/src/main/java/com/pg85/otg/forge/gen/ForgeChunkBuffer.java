@@ -5,6 +5,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -28,15 +29,16 @@ public class ForgeChunkBuffer extends ChunkBuffer
 	}
 
 	@Override
-	public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
+	public void setBlock(int internalX, int blockY, int internalZ, LocalMaterialData material)
 	{
-		this.chunk.setBlockState(this.mutable.set(blockX, blockY, blockZ), ((ForgeMaterialData) material).internalBlock(), false);
+		this.chunk.setBlockState(this.mutable.set(internalX, blockY, internalZ), ((ForgeMaterialData) material).internalBlock(), false);
 	}
 
 	@Override
-	public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
+	public LocalMaterialData getBlock(int internalX, int blockY, int internalZ)
 	{
-		return ForgeMaterialData.ofBlockState(this.chunk.getBlockState(this.mutable.set(blockX, blockY, blockZ)));
+		BlockState blockState = this.chunk.getBlockState(this.mutable.set(internalX, blockY, internalZ));
+		return blockState == null ? null : ForgeMaterialData.ofBlockState(blockState);
 	}
 	
 	public IChunk getChunk()

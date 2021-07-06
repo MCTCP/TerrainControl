@@ -38,7 +38,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
 	// Misc
-	
+
 	private IBiomeResourceLocation registryKey;
 	private boolean replacedBlocksInited = false;
 	
@@ -50,6 +50,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	protected String templateForBiome;
 	protected String biomeCategory;
+	private int otgBiomeId;
 	
 	// Inheritance
 	
@@ -188,6 +189,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.resourceQueue;
 	}
 	
+	@Override
 	public void setRegistryKey(IBiomeResourceLocation registryKey)
 	{
 		this.registryKey = registryKey;
@@ -197,6 +199,18 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public IBiomeResourceLocation getRegistryKey()
 	{
 		return this.registryKey;
+	}
+
+	@Override
+	public void setOTGBiomeId(int id)
+	{
+		this.otgBiomeId = id;
+	}
+	
+	@Override
+	public int getOTGBiomeId()
+	{
+		return this.otgBiomeId;
 	}
 		
 	@Override

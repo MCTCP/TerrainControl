@@ -3,21 +3,23 @@ package com.pg85.otg.spigot.gen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkDecorator;
-import com.pg85.otg.gen.biome.BiomeInterpolator;
-import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
+import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.presets.Preset;
-import com.pg85.otg.spigot.biome.OTGBiomeProvider;
+import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
+import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
+import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -45,7 +47,6 @@ import net.minecraft.server.v1_16_R3.NoiseSettings;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.RegionLimitedWorldAccess;
 import net.minecraft.server.v1_16_R3.ReportedException;
-import net.minecraft.server.v1_16_R3.ResourceKey;
 import net.minecraft.server.v1_16_R3.SectionPosition;
 import net.minecraft.server.v1_16_R3.SeededRandom;
 import net.minecraft.server.v1_16_R3.SpawnerCreature;
@@ -133,7 +134,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// getStructures() -> a()
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().a(), seed);
 
-		if (!(biomeProvider1 instanceof LayerSource))
+		if (!(biomeProvider1 instanceof ILayerSource))
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
@@ -149,23 +150,21 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();
-		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
+		this.internalGenerator = new OTGChunkGenerator(preset, seed, (ILayerSource) biomeProvider1, ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(this.dimensionConfig.PresetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-	
+
+	public ICachedBiomeProvider getCachedBiomeProvider()
+	{
+		return this.internalGenerator.getCachedBiomeProvider();
+	}
+
 	public void saveStructureCache ()
 	{
 		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
 		{
 			this.structureCache.saveToDisk(OTG.getEngine().getLogger(), this.chunkDecorator);
 		}
-	}
-
-	// Used by OTGSpigotChunkGen to query biome in a given location
-	// Need this because the normal Bukkit way of checking for biomes use the Bukkit Biome enum
-	public String getBiomeRegistryName(int blockX, int blockY, int blockZ)
-	{
-		return BiomeInterpolator.getBiomeRegistryName(this.worldSeed, blockX, blockY, blockZ, (OTGBiomeProvider) this.b);
 	}
 
 	// Base terrain gen
@@ -344,31 +343,31 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			return;
 		}
 
+		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
+		
+		// Taken from vanilla
 		// getMainChunkX -> a()
 		// getMainChunkZ -> b()
-		int chunkX = worldGenRegion.a();
-		int chunkZ = worldGenRegion.b();
-		int blockX = chunkX * Constants.CHUNK_SIZE;
-		int blockZ = chunkZ * Constants.CHUNK_SIZE;
-		BlockPosition blockpos = new BlockPosition(blockX, 0, blockZ);
-
-		// Fetch the biomeConfig by registryKey
-		// this.biomeProvider -> this.b
-		ResourceKey<BiomeBase> key = ((OTGBiomeProvider) this.b).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
-		BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(key.a().toString());
-		BiomeBase biome = this.c.getBiome((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
-
+		int worldX = worldGenRegion.a() * Constants.CHUNK_SIZE;
+		int worldZ = worldGenRegion.b() * Constants.CHUNK_SIZE;
+		BlockPosition blockpos = new BlockPosition(worldX, 0, worldZ);
 		// SharedSeedRandom -> SeededRandom
 		SeededRandom sharedseedrandom = new SeededRandom();
 		// setDecorationSeed() -> a()
-		long decorationSeed = sharedseedrandom.a(worldGenRegion.getSeed(), blockX, blockZ);
+		long decorationSeed = sharedseedrandom.a(worldGenRegion.getSeed(), worldX, worldZ);
+		//
+		
+		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
+		SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
+		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.a() << 2) + 2, (worldGenRegion.b() << 2) + 2);		
+		IBiomeConfig biomeConfig = biome.getBiomeConfig();
+		// World save folder name may not be identical to level name, fetch it.
+		Path worldSaveFolder = worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath();
+		
 		try
 		{
-			// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
-			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(blockpos.getX(), blockpos.getZ());
-			SpigotWorldGenRegion spigotWorldGenRegion = new SpigotWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
-			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath()));
-			biome.a(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
+			((SpigotBiome)biome).getBiomeBase().a(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);			
 		}
 		catch (Exception exception)
@@ -377,7 +376,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			CrashReport crashreport = CrashReport.a(exception, "Biome decoration");
 			// crashReport.makeCategory() -> crashReport.a()
 			// crashReport.addDetail() -> crashReport.a()
-			crashreport.a("Generation").a("CenterX", chunkX).a("CenterZ", chunkZ).a("Seed", decorationSeed);
+			crashreport.a("Generation").a("CenterX", worldX).a("CenterZ", worldZ).a("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
 	}
@@ -399,12 +398,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// getMainChunkZ -> b()
 		int chunkX = worldGenRegion.a();
 		int chunkZ = worldGenRegion.b();
-		BiomeBase biome = worldGenRegion.getBiome((new ChunkCoordIntPair(chunkX, chunkZ)).l());
+		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, chunkZ * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);	
 		SeededRandom sharedseedrandom = new SeededRandom();
 		// setDecorationSeed() -> a()
 		sharedseedrandom.a(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
 		// performWorldGenSpawning() -> a()
-		SpawnerCreature.a(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
+		SpawnerCreature.a(worldGenRegion, ((SpigotBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);
 	}
 
 	// Mob spawning on chunk tick
@@ -492,33 +491,47 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator.getNoiseColumn(noiseData[2], xStart + 1, zStart);
 		this.internalGenerator.getNoiseColumn(noiseData[3], xStart + 1, zStart + 1);
 
+		IBiomeConfig biomeConfig = this.internalGenerator.getCachedBiomeProvider().getBiomeConfig(x, z);
+		
+		IBlockData state;
+		double x0z0y0;
+		double x0z1y0;
+		double x1z0y0;
+		double x1z1y0;
+		double x0z0y1;
+		double x0z1y1;
+		double x1z0y1;
+		double x1z1y1;
+		double yLerp;
+		double density;
+		int y;
 		// [0, 32] -> noise chunks
 		for (int noiseY = this.internalGenerator.getNoiseSizeY() - 1; noiseY >= 0; --noiseY)
 		{
 			// Gets all the noise in a 2x2x2 cube and interpolates it together.
 			// Lower pieces
-			double x0z0y0 = noiseData[0][noiseY];
-			double x0z1y0 = noiseData[1][noiseY];
-			double x1z0y0 = noiseData[2][noiseY];
-			double x1z1y0 = noiseData[3][noiseY];
+			x0z0y0 = noiseData[0][noiseY];
+			x0z1y0 = noiseData[1][noiseY];
+			x1z0y0 = noiseData[2][noiseY];
+			x1z1y0 = noiseData[3][noiseY];
 			// Upper pieces
-			double x0z0y1 = noiseData[0][noiseY + 1];
-			double x0z1y1 = noiseData[1][noiseY + 1];
-			double x1z0y1 = noiseData[2][noiseY + 1];
-			double x1z1y1 = noiseData[3][noiseY + 1];
+			x0z0y1 = noiseData[0][noiseY + 1];
+			x0z1y1 = noiseData[1][noiseY + 1];
+			x1z0y1 = noiseData[2][noiseY + 1];
+			x1z1y1 = noiseData[3][noiseY + 1];
 
 			// [0, 8] -> noise pieces
 			for (int pieceY = 7; pieceY >= 0; --pieceY)
 			{
-				double yLerp = (double) pieceY / 8.0;
+				yLerp = (double) pieceY / 8.0;
 				// Density at this position given the current y interpolation
 				// MathHelper.lerp3() -> MathHelper.a()
-				double density = MathHelper.a(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
+				density = MathHelper.a(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
 
 				// Get the real y position (translate noise chunk and noise piece)
-				int y = (noiseY * 8) + pieceY;
+				y = (noiseY * 8) + pieceY;
 
-				IBlockData state = this.getBlockState(density, y, this.internalGenerator.getBiomeAtWorldCoord(x, z));
+				state = this.getBlockState(density, y, biomeConfig);
 				if (blockStates != null)
 				{
 					blockStates[y] = state;
@@ -592,7 +605,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	public Boolean checkHasVanillaStructureWithoutLoading(WorldServer world, ChunkCoordinate chunkCoord)
 	{
-		return this.shadowChunkGenerator.checkHasVanillaStructureWithoutLoading(world, this, this.b, this.getSettings(), chunkCoord);
+		return this.shadowChunkGenerator.checkHasVanillaStructureWithoutLoading(world, this, this.b, this.getSettings(), chunkCoord, this.internalGenerator.getCachedBiomeProvider());
 	}
 
 	public int getHighestBlockYInUnloadedChunk(Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)

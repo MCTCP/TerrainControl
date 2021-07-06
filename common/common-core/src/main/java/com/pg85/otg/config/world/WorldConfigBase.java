@@ -49,12 +49,14 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected LocalMaterialData waterBlock;
 	protected LocalMaterialData bedrockBlock;
 	protected LocalMaterialData cooledLavaBlock;
-	protected LocalMaterialData iceBlock;	
+	protected LocalMaterialData iceBlock;
+	protected LocalMaterialData carverLavaBlock;
 	
 	// Bedrock
 	
 	protected boolean ceilingBedrock;
 	protected boolean flatBedrock;
+	protected int carverLavaBlockHeight;
 	
 	// Biome settings
 	
@@ -73,7 +75,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String defaultFrozenOceanBiome;
 	protected BiomeMode biomeMode;
 	protected double frozenOceanTemperature;
-	protected boolean freezeAllColdGroupBiomes;
 	protected List<String> isleBiomes = new ArrayList<String>();
 	protected List<String> borderBiomes = new ArrayList<String>();	
 	protected boolean randomRivers;
@@ -392,17 +393,29 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.iceBlock;
 	}
-	
+
+	@Override
+	public LocalMaterialData getCarverLavaBlock()
+	{
+		return this.carverLavaBlock;
+	}
+
 	@Override
 	public boolean getIsCeilingBedrock()
 	{
 		return this.ceilingBedrock;
 	}
-	
+
 	@Override
 	public boolean getIsFlatBedrock()
 	{
 		return this.flatBedrock;
+	}
+
+	@Override
+	public int getCarverLavaBlockHeight()
+	{
+		return this.carverLavaBlockHeight;
 	}
 	
 	@Override
@@ -638,13 +651,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.frozenOceanTemperature;
 	}
-	
-	@Override
-	public boolean getIsFreezeGroups()
-	{
-		return this.freezeAllColdGroupBiomes;
-	}
-	
+
 	@Override
 	public List<String> getIsleBiomes()
 	{

@@ -23,9 +23,8 @@ public interface IWorldGenRegion
 	// unless they are intentionally querying outside of
 	// the area being decorated, in which case use getBiome().
 
-	public IBiome getBiome(int x, int z);
+	public ICachedBiomeProvider getCachedBiomeProvider();
 	public IBiome getBiomeForDecoration(int x, int z);
-	public IBiomeConfig getBiomeConfig(int x, int z);
 	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ);
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z);

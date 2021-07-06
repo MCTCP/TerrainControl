@@ -30,6 +30,9 @@ public interface IBiomeConfig
 
 	String getName();
 	IBiomeResourceLocation getRegistryKey();
+	void setOTGBiomeId(int id);
+	int getOTGBiomeId();
+	void setRegistryKey(IBiomeResourceLocation registryKey);
 
 	// WorldConfig getters
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  

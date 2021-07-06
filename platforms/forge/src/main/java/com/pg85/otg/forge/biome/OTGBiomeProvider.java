@@ -21,19 +21,19 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
-import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
+import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.ILayerSource;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class OTGBiomeProvider extends BiomeProvider implements LayerSource
+public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 {
  	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
@@ -50,7 +50,6 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
 	private final ThreadLocal<CachingLayerSampler> layer;
-	public final BiomeConfig[] configLookup;
 	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
 	private final String presetFolderName;
 	
@@ -68,16 +67,18 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		// Default to let us know if we did anything wrong
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
-		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
-		if(this.configLookup == null)
+		IBiome[] biomeLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
+		if(biomeLookup == null)
 		{
 			throw new RuntimeException("No OTG preset found with name \"" + presetFolderName + "\". Install the correct preset or update your server.properties.");
 		}
-		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
+				
+		IBiome biome;
+		RegistryKey<Biome> key;
+		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
 		{
-			BiomeConfig config = this.configLookup[biomeId];
-
-			RegistryKey<Biome> key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
+			biome = biomeLookup[biomeId];
+			key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
 			this.keyLookup.put(biomeId, key);
 		}
 	}
@@ -114,22 +115,8 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
 
-	public RegistryKey<Biome> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
-	{
-		return this.keyLookup.get(this.layer.get().sample(biomeX, biomeZ));
-	}
-
-	@Override
-	public String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ)
-	{
-		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).location().toString();
-	}
-
-	public RegistryKey<Biome> lookupKey(int index)
-	{
-		return this.keyLookup.get(index);
-	}
-
+	// TODO: This is only used by MC internally, OTG fetches all biomes via CachedBiomeProvider.
+	// Could make this use the cache too?
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
@@ -140,13 +127,6 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public CachingLayerSampler getSampler()
 	{
 		return this.layer.get();
-	}
-
-	@Override
-	public BiomeConfig getConfig(int biomeX, int biomeZ)
-	{
-		int biomeId = this.layer.get().sample(biomeX, biomeZ);
-		return this.configLookup.length > biomeId ? this.configLookup[biomeId] : null;
 	}
 	
 	// TODO: May have to override this for spawn?

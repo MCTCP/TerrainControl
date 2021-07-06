@@ -1,7 +1,7 @@
 package com.pg85.otg.gen.biome.layers.type;
 
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 /**
  * The type for layers that sample in a cross/plus formation.
@@ -11,7 +11,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 public interface CrossSamplingLayer extends ParentedLayer {
 	int sample(LayerSampleContext<?> context, int x, int z, int n, int e, int s, int w, int center);
 
-	default int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z) {
+	default int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z) {
 	  return this.sample(context, x, z,
 			  parent.sample(x, z - 1), // North
 			  parent.sample(x + 1, z), // East

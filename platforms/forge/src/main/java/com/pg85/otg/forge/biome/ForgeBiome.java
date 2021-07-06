@@ -73,6 +73,11 @@ public class ForgeBiome implements IBiome
 	{
 		return this.biomeConfig;
 	}
+	
+	public Biome getBiomeBase()
+	{
+		return biomeBase;
+	}
 
 	public static Biome createOTGBiome(boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
@@ -140,8 +145,7 @@ public class ForgeBiome implements IBiome
 		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAdditionsSound()));
 		if (event != null)
 		{
-			biomeAmbienceBuilder.ambientAdditionsSound(new SoundAdditionsAmbience(event,
-				biomeConfig.getAdditionsTickChance()));
+			biomeAmbienceBuilder.ambientAdditionsSound(new SoundAdditionsAmbience(event, biomeConfig.getAdditionsTickChance()));
 		}
 
 		if(biomeConfig.getFoliageColor() != 0xffffff)

@@ -2,14 +2,14 @@ package com.pg85.otg.gen.biome.layers.type;
 
 import com.pg85.otg.gen.biome.layers.util.LayerFactory;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 /**
  * The type for layers that modify the output based on the previous layer.
  */
 public interface ParentedLayer
 {
-	default <R extends LayerSampler> LayerFactory<R> create(LayerSampleContext<R> context, LayerFactory<R> parent)
+	default <R extends ILayerSampler> LayerFactory<R> create(LayerSampleContext<R> context, LayerFactory<R> parent)
 	{
 	  return () -> {
 		 R layerSampler = parent.make();
@@ -20,5 +20,5 @@ public interface ParentedLayer
 	  };
 	}
 
-	int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z);
+	int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z);
 }

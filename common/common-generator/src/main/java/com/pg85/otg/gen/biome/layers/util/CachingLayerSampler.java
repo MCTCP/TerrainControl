@@ -2,18 +2,19 @@ package com.pg85.otg.gen.biome.layers.util;
 
 import java.util.Arrays;
 
+import com.pg85.otg.interfaces.ILayerSampler;
 import com.pg85.otg.util.helpers.MathHelper;
 
 import it.unimi.dsi.fastutil.HashCommon;
 
-public final class CachingLayerSampler implements LayerSampler
+public final class CachingLayerSampler implements ILayerSampler
 {
-	private final ThreadLocal<BiomeCache> cache;
+	private final ThreadLocal<SamplerBiomeCache> cache;
 	private final int cacheCapacity;
 
 	CachingLayerSampler(int cacheCapacity, LayerOperator operator)
 	{
-		this.cache = ThreadLocal.withInitial(() -> new BiomeCache(operator, cacheCapacity));
+		this.cache = ThreadLocal.withInitial(() -> new SamplerBiomeCache(operator, cacheCapacity));
 		this.cacheCapacity = cacheCapacity;
 	}
 
@@ -27,13 +28,13 @@ public final class CachingLayerSampler implements LayerSampler
 		return this.cacheCapacity;
 	}
 
-	private static class BiomeCache {
+	private static class SamplerBiomeCache {
 		private final long[] keys;
 		private final int[] values;
 		private final int mask;
 		private final LayerOperator operator;
 
-		private BiomeCache(LayerOperator operator, int size) {
+		private SamplerBiomeCache(LayerOperator operator, int size) {
 			this.operator = operator;
 
 			size = MathHelper.smallestEncompassingPowerOfTwo(size);

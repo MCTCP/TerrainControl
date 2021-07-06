@@ -6,8 +6,11 @@ import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
+
+import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
 
 public class SpigotChunkBuffer extends ChunkBuffer
@@ -57,9 +60,11 @@ public class SpigotChunkBuffer extends ChunkBuffer
 	{
 		if (chunkData != null)
 		{
-			return SpigotMaterialData.ofSpigotMaterial(this.chunkData.getType(blockX, blockY, blockZ));
+			Material material = this.chunkData.getType(blockX, blockY, blockZ);
+			return material == null ? null : SpigotMaterialData.ofSpigotMaterial(material);
 		}
-		return SpigotMaterialData.ofBlockData(this.chunk.getType(this.mutable.d(blockX, blockY, blockZ)));
+		IBlockData blockData = this.chunk.getType(this.mutable.d(blockX, blockY, blockZ));
+		return blockData == null ? null : SpigotMaterialData.ofBlockData(blockData);
 	}
 
 	public IChunkAccess getChunk()

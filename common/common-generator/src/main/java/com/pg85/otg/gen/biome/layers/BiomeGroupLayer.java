@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 /**
  * Places a biome group at a certain depth.
@@ -16,10 +16,9 @@ class BiomeGroupLayer implements ParentedLayer
 {
 	// The sorted map of rarities to biome groups
 	private final TreeMap<Integer, NewBiomeGroup> rarityMap = new TreeMap<>();
-	private final boolean freezeGroups;
 	private final int maxRarity;
 
-	BiomeGroupLayer(BiomeLayerData data, int depth, boolean freezeGroups)
+	BiomeGroupLayer(BiomeLayerData data, int depth)
 	{
 		List<NewBiomeGroup> groups = data.groups.get(depth);
 		if (data.oldGroupRarity)
@@ -37,11 +36,10 @@ class BiomeGroupLayer implements ParentedLayer
 			cumulativeRarity += group.rarity;
 			this.rarityMap.put(cumulativeRarity, group);
 		}
-		this.freezeGroups = freezeGroups;
 	}
 
 	@Override
-	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
+	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
 		
@@ -55,10 +53,7 @@ class BiomeGroupLayer implements ParentedLayer
 			if(biomeGroup != null)
 			{
 				// Encode the biome group id into the sample for later use
-				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) |
-					//>>	If the average temp of the group is cold
-					((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
-				;
+				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) | 0;
 			}
 		}
 
