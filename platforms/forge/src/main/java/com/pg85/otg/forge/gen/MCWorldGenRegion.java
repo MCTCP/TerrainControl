@@ -6,7 +6,6 @@ import java.util.Random;
 import org.apache.commons.lang3.NotImplementedException;
 
 import com.google.gson.JsonSyntaxException;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
@@ -39,18 +38,6 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 	public MCWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
 	{
 		super(presetFolderName, worldConfig, worldGenRegion);
-	}
-		
-	@Override
-	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
-	{
-		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
-	}
-
-	@Override
-	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
-	{
-		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
 	}
 
 	@Override

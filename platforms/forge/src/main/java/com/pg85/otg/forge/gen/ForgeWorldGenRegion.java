@@ -6,14 +6,12 @@ import java.util.Random;
 
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.IEntityFunction;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -36,7 +34,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap.Type;
@@ -59,7 +56,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
 	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.getCenterX(), worldGenRegion.getCenterZ());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.getCenterX(), worldGenRegion.getCenterZ(), chunkGenerator.getCachedBiomeProvider());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -105,46 +102,21 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	@Override
-	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
+	public ICachedBiomeProvider getCachedBiomeProvider()
 	{
-		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
-		// to do magnification correctly by itself? Test and verify.		
-		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
-		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
-		if(biomeConfig != null)
-		{
-			return new ForgeBiome(biome, biomeConfig);
-		}
-		return null;
-	}
-
-	@Override
-	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
-	{
-		// TODO: Do we need to use BiomeInterpolator here? getBiome(BlockPos()) appears
-		// to do magnification correctly by itself? Test and verify.		
-		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));
-		return ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(biome.getRegistryName().toString());
-	}
-
-	@Override
-	public IBiome getBiomeForDecoration(int worldX, int worldZ)
-	{
-		if(this.decorationBiomeCache != null)
-		{
-			return this.decorationBiomeCache.getBiome(worldX, worldZ, this);
-		}
-		return this.getBiome(worldX, worldZ);
+		return this.chunkGenerator.getCachedBiomeProvider();
 	}
 	
 	@Override
-	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ)
+	public IBiome getBiomeForDecoration(int x, int z)
 	{
-		if(this.decorationBiomeCache != null)
-		{
-			return this.decorationBiomeCache.getBiome(worldX, worldZ, this).getBiomeConfig();
-		}
-		return this.getBiome(worldX, worldZ).getBiomeConfig();
+		return this.decorationBiomeCache.getBiome(x, z);
+	}
+
+	@Override
+	public IBiomeConfig getBiomeConfigForDecoration(int x, int z)
+	{
+		return this.decorationBiomeCache.getBiomeConfig(x, z);
 	}
 
 	@Override
