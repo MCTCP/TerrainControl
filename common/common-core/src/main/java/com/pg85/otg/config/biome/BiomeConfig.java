@@ -1,5 +1,9 @@
 package com.pg85.otg.config.biome;
 
+import java.nio.file.Path;
+import java.text.MessageFormat;
+import java.util.*;
+
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -13,6 +17,7 @@ import com.pg85.otg.customobject.resource.CustomObjectResource;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.customobject.resource.TreeResource;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.gen.resource.*;
 import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
@@ -21,7 +26,9 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldConfig;
+import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
+import com.pg85.otg.util.biome.SimpleColorSet;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.logging.LogCategory;
@@ -30,9 +37,6 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.util.minecraft.SaplingType;
-
-import java.nio.file.Path;
-import java.util.*;
 
 /**
  * BiomeConfig (*.bc) classes
@@ -84,23 +88,21 @@ public class BiomeConfig extends BiomeConfigBase
 	}
 
 	// This field is only used for reading/writing,
-	// We read InheritMobsBiomeName from the raw settings when
+	// We read InheritMobsBiomeName from the raw settings when 
 	// processing mob inheritance, rather than using this field.
 	private String inheritMobsBiomeName;
 
-	// Fields used only in common-core or platform layers that aren't in
-	// IBiomeConfig
-	// TODO: Refactor, expose via IBiomeConfig?
-	private Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(
-			SaplingType.class);
+	// Fields used only in common-core or platform layers that aren't in IBiomeConfig	
+	// TODO: Refactor, expose via IBiomeConfig?	
+	private Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(SaplingType.class);
 	private Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
-	private Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();
+	private Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();	
 
 	// Private fields, only used when reading/writing
-
+	
 	private int configWaterLevelMax;
 	private int configWaterLevelMin;
-
+	
 	private LocalMaterialData configWaterBlock;
 	private LocalMaterialData configIceBlock;
 	private LocalMaterialData configCooledLavaBlock;
@@ -294,6 +296,36 @@ public class BiomeConfig extends BiomeConfigBase
 		
 		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
 		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
+	
+		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_GRASS_COLOR2, logger).ifPresent(set -> this.grassColorControl = set);
+		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_FOLIAGE_COLOR2, logger).ifPresent(set -> this.foliageColorControl = set);
+	}
+
+
+	private Optional<ColorSet> readLegacyColorSetting(SettingsMap reader, IMaterialReader materialReader, Setting<String> oldSetting, ILogger logger)
+	{
+		ColorSet colorSet = null;
+		if (reader.hasSetting(oldSetting))
+		{
+			String color = reader.getSetting(oldSetting, logger);
+			if (!color.equals(oldSetting.getDefaultValue()))
+			{
+				try
+				{
+					colorSet = new SimpleColorSet(new String[]
+					{ color, "-0.1" }, materialReader);
+				} catch (InvalidConfigException e)
+				{
+					if (logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+					{
+						logger.log(LogLevel.ERROR, LogCategory.CONFIGS, MessageFormat.format(
+								"Encountered an invalid value while reading legacy setting {0} with value {1}: {2}",
+								oldSetting.getName(), color, e.getMessage()));
+					}
+				}
+			}
+		}
+		return Optional.ofNullable(colorSet);
 	}
 
 	private void readHeightSettings(SettingsMap settings, double[] heightMatrix, Setting<double[]> setting,
@@ -581,21 +613,30 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.putSetting(BiomeStandardValues.WATER_COLOR, this.waterColor, "Biome water color.");
 		
-		writer.putSetting(BiomeStandardValues.WATER_COLOR_CONTROL, this.waterColorControl, "Biome water color control.");
+		writer.putSetting(BiomeStandardValues.WATER_COLOR_CONTROL, this.waterColorControl,
+				"Setting for biomes with more complex colors.",
+				"Each column in the world has a noise value from what appears to be -1 to 1.",
+				"Values near 0 are more common than values near -1 and 1. This setting is",
+				"used to change the water color based on the noise value for the column.",
+				"Syntax: Color,MaxNoise,[AnotherColor,MaxNoise[,...]]",
+				"Example: " + BiomeStandardValues.WATER_COLOR_CONTROL
+						+ ": #FFFFFF,-0.8,#000000,0.0",
+				"  When the noise is below -0.8, the water will be white, between -0.8 and 0",
+				"  the water will be black, and above 0 the water will be the normal " + BiomeStandardValues.WATER_COLOR + ".");
 
 		writer.putSetting(BiomeStandardValues.GRASS_COLOR, this.grassColor, "Biome grass color.");
 		
-		writer.putSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, this.grassColorControl, "Biome grass color control.");
+		writer.putSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, this.grassColorControl, "Biome grass color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
 		writer.putSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, this.grassColorModifier,
 				"Biome grass color modifier, can be None, Swamp or DarkForest.");
 
 		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor, "Biome foliage color.");
 		
-		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.foliageColorControl, "Biome foliage color control.");
+		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
 		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
-		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density.");
+		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0 to 1. 0.1 will mimic vanilla fog density.");
 
 		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
 
