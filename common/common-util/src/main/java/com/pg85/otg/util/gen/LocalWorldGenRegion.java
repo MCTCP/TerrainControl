@@ -1,6 +1,6 @@
 package com.pg85.otg.util.gen;
 
-import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IPluginConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
@@ -17,16 +17,14 @@ public abstract class LocalWorldGenRegion implements IWorldGenRegion
 	protected final DecorationArea decorationArea;
 
 	/** Creates a LocalWorldGenRegion to be used during chunk decoration */
-	protected LocalWorldGenRegion(String presetFolderName, IPluginConfig pluginConfig, IWorldConfig worldConfig, ILogger logger, int worldRegionCenterX, int worldRegionCenterZ)
+	protected LocalWorldGenRegion(String presetFolderName, IPluginConfig pluginConfig, IWorldConfig worldConfig, ILogger logger, int worldRegionCenterX, int worldRegionCenterZ, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		this.presetFolderName = presetFolderName;
 		this.pluginConfig = pluginConfig;
 		this.worldConfig = worldConfig;
 		this.logger = logger;
-		this.decorationBiomeCache = new DecorationBiomeCache(Constants.CHUNK_SIZE * 2, Constants.CHUNK_SIZE * 2, worldRegionCenterX, worldRegionCenterZ);
-		//this.biomeCache = new DecorationBiomeCache(ChunkCoordinate.CHUNK_SIZE * 3, ChunkCoordinate.CHUNK_SIZE * 3, worldRegionCenterX - ChunkCoordinate.CHUNK_SIZE, worldRegionCenterZ - ChunkCoordinate.CHUNK_SIZE);
-		this.decorationArea = new DecorationArea(0, Constants.CHUNK_SIZE, Constants.CHUNK_SIZE, 0, ChunkCoordinate.fromChunkCoords(worldRegionCenterX, worldRegionCenterZ));
-		//this.decorationArea = new DecorationArea(ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.CHUNK_SIZE, ChunkCoordinate.fromChunkCoords(worldRegionCenterX, worldRegionCenterZ));
+		this.decorationArea = new DecorationArea(ChunkCoordinate.fromChunkCoords(worldRegionCenterX, worldRegionCenterZ));
+		this.decorationBiomeCache = new DecorationBiomeCache(worldRegionCenterX, worldRegionCenterZ, cachedBiomeProvider);		
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used outside of world generation. */	

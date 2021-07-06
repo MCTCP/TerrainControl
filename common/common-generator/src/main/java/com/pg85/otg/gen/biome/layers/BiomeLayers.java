@@ -10,7 +10,7 @@ import com.pg85.otg.gen.biome.layers.util.CachingLayerContext;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.gen.biome.layers.util.LayerFactory;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 import com.pg85.otg.interfaces.ILogger;
 
 /**
@@ -62,7 +62,7 @@ public class BiomeLayers
 			0; // 0 should be the default ocean biome otg id, set by the presetloader.
 	}
 
-	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider, ILogger logger)
+	private static <T extends ILayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider, ILogger logger)
 	{
 		// Create an empty layer to start the biome generation
 		LayerFactory<T> factory = new InitializationLayer().create(contextProvider.apply(1L));

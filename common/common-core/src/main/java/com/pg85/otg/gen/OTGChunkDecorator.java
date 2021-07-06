@@ -84,7 +84,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 		return this.lockingObject;
 	}
 
-	public void decorate(String presetFolderName, ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
+	public void decorate(String presetFolderName, ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, CustomStructureCache structureCache)
 	{
 		ILogger logger = OTG.getEngine().getLogger();
 		
@@ -125,7 +125,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 	}
 
 	// TODO: Fire decoration events.
-	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{		
 		if (biomeConfig == null)
 		{
@@ -175,7 +175,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 		
 		long startTimeAll = System.currentTimeMillis();
 		// Resource sequence
-		for (ConfigFunction<IBiomeConfig> res : biomeConfig.getResourceQueue())
+		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
 		{
 			long startTime = System.currentTimeMillis();
 			if (res instanceof ICustomObjectResource)

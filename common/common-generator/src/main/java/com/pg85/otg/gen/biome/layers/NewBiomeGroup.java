@@ -17,6 +17,7 @@ public class NewBiomeGroup
 	public List<BiomeData> biomes = new ArrayList<>();	
 	
 	public float avgTemp = 0;
+	// TODO: Reimplement this?
 	public boolean isColdGroup() 
 	{
 		return this.avgTemp < Constants.ICE_GROUP_MAX_TEMP;

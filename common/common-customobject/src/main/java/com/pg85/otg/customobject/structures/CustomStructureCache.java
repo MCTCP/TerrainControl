@@ -176,7 +176,7 @@ public class CustomStructureCache
 
 		// No structure found, create one
 		Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, worldGenRegion.getSeed());
-		IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
+		IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
 		ICustomStructureGen structureGen = biomeConfig.getStructureGen();
 
 		if (structureGen != null)
@@ -211,7 +211,7 @@ public class CustomStructureCache
 				} else {
 					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
-						IBiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
+						IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
 						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
 					}
 				}

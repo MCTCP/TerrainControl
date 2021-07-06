@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 /**
  * Places a biome group at a certain depth.
@@ -39,7 +39,7 @@ class BiomeGroupLayer implements ParentedLayer
 	}
 
 	@Override
-	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
+	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
 		

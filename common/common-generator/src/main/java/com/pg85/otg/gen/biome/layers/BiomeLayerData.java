@@ -13,6 +13,7 @@ import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.gen.biome.BiomeData;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
 
@@ -195,7 +196,7 @@ public class BiomeLayerData
 		this.riversEnabled = worldConfig.getRiversEnabled();
 	}
 
-	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<BiomeData>> isleBiomesAtDepth, Map<Integer, List<BiomeData>> borderBiomesAtDepth, Map<String, Integer> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiomeConfig[] biomes)
+	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<BiomeData>> isleBiomesAtDepth, Map<Integer, List<BiomeData>> borderBiomesAtDepth, Map<String, Integer> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiome[] biomes)
 	{		
 		this.biomeDepths.addAll(biomeDepths);
 		this.groups.putAll(groupDepth);
@@ -247,9 +248,9 @@ public class BiomeLayerData
 		
 		this.biomeColorMap = biomeColorMap;		
 		this.riverBiomes = new int[biomes.length];
-		for(IBiomeConfig biomeConfig : biomes)
+		for(IBiome biome : biomes)
 		{
-			this.riverBiomes[biomeIdsByName.get(biomeConfig.getName())] = biomeIdsByName.getOrDefault(biomeConfig.getRiverBiome(), -1);
+			this.riverBiomes[biomeIdsByName.get(biome.getBiomeConfig().getName())] = biomeIdsByName.getOrDefault(biome.getBiomeConfig().getRiverBiome(), -1);
 		}
 	}
 }

@@ -2,7 +2,7 @@ package com.pg85.otg.gen.biome.layers;
 
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 
 class ScaleLayer implements ParentedLayer
 {
@@ -18,7 +18,7 @@ class ScaleLayer implements ParentedLayer
 	  return y >> 1;
 	}
 
-	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
+	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 	  // Optimized ScaleLayer implementation from zoom-layer
 

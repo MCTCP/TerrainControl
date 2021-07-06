@@ -90,7 +90,8 @@ class ObjectExtrusionHelper
 	{
 		for (BO3BlockFunction block : blocksToExtrude)
 		{
-			IBiomeConfig biomeConfig = forceSpawn ? worldGenRegion.getBiomeConfig(x + block.x, z + block.z) : worldGenRegion.getBiomeConfigForDecoration(x + block.x, z + block.z);
+			// TODO: Calculate area required and fetch biome data for whole chunks instead of per column.
+			IBiomeConfig biomeConfig = forceSpawn ? worldGenRegion.getCachedBiomeProvider().getBiomeConfig(x + block.x, z + block.z, true) : worldGenRegion.getBiomeConfigForDecoration(x + block.x, z + block.z);
 			if (extrudeMode == ExtrudeMode.BottomDown)
 			{
 				for (int yi = y + block.y - 1;

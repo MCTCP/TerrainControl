@@ -1,6 +1,8 @@
 package com.pg85.otg.gen.biome.layers.util;
 
-public interface LayerSampleContext<R extends LayerSampler> extends LayerRandomnessSource
+import com.pg85.otg.interfaces.ILayerSampler;
+
+public interface LayerSampleContext<R extends ILayerSampler> extends LayerRandomnessSource
 {
 	void initSeed(long x, long y);
 

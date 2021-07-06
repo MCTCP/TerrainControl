@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
-import com.pg85.otg.gen.biome.layers.util.LayerSampler;
+import com.pg85.otg.interfaces.ILayerSampler;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -112,7 +112,7 @@ public class FromImageLayer implements ParentedLayer
 	}
 
 	@Override
-	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
+	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 		int Buffer_x;
 		int Buffer_z;
