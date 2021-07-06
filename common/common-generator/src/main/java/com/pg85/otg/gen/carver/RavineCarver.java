@@ -3,6 +3,7 @@ package com.pg85.otg.gen.carver;
 import java.util.BitSet;
 import java.util.Random;
 
+import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
@@ -24,7 +25,7 @@ public class RavineCarver extends Carver
 			(random.nextInt(100) < this.worldConfig.getRavineRarity());
 	}
 
-	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet)
+	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet, ICachedBiomeProvider cachedBiomeProvider)
 	{
 //		int branchingFactor = (this.getBranchFactor() * 2 - 1) * 16;
 
@@ -43,11 +44,11 @@ public class RavineCarver extends Carver
 		int branchCount = RandomHelper.numberInRange(random, this.worldConfig.getRavineMinLength(), this.worldConfig.getRavineMaxLength());
 		double yawPitchRatio = worldConfig.getRavineDepth();
 
-		this.carveRavine(chunk, random.nextLong(), seaLevel, mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, yawPitchRatio, bitSet);
+		this.carveRavine(chunk, random.nextLong(), seaLevel, mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, yawPitchRatio, bitSet, cachedBiomeProvider);
 		return true;
 	}
 
-	private void carveRavine(ChunkBuffer chunk, long seed, int seaLevel, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask)
+	private void carveRavine(ChunkBuffer chunk, long seed, int seaLevel, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		Random random = new Random(seed);
 		float stretchFactor = 1.0F;
@@ -65,15 +66,18 @@ public class RavineCarver extends Carver
 
 		float yawChange = 0.0F;
 		float pitchChange = 0.0F;
-
+		double currentYaw;
+		double currentPitch;
+		float deltaXZ;
+		float deltaY;
 		for (int branchIndex = branchStartIndex; branchIndex < branchCount; ++branchIndex)
 		{
-			double currentYaw = 1.5D + (double) (MathHelper.sin((float) branchIndex * 3.1415927F / (float) branchCount) * width);
-			double currentPitch = currentYaw * yawPitchRatio;
+			currentYaw = 1.5D + (double) (MathHelper.sin((float) branchIndex * 3.1415927F / (float) branchCount) * width);
+			currentPitch = currentYaw * yawPitchRatio;
 			currentYaw *= (double) random.nextFloat() * 0.25D + 0.75D;
 			currentPitch *= (double) random.nextFloat() * 0.25D + 0.75D;
-			float deltaXZ = MathHelper.cos(pitch);
-			float deltaY = MathHelper.sin(pitch);
+			deltaXZ = MathHelper.cos(pitch);
+			deltaY = MathHelper.sin(pitch);
 			x += MathHelper.cos(yaw) * deltaXZ;
 			y += deltaY;
 			z += MathHelper.sin(yaw) * deltaXZ;
@@ -91,10 +95,9 @@ public class RavineCarver extends Carver
 					return;
 				}
 
-				this.carveRegion(chunk, seed, seaLevel, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask);
+				this.carveRegion(chunk, seed, seaLevel, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask, cachedBiomeProvider);
 			}
 		}
-
 	}
 
 	protected boolean isPositionExcluded(double scaledRelativeX, double scaledRelativeY, double scaledRelativeZ, int y)

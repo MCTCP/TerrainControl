@@ -81,7 +81,8 @@ public class WorldStandardValues extends Settings
 		RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
-		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100)
+		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
+		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255)
 	;
 	
 	public static final Setting<Boolean>
@@ -125,7 +126,8 @@ public class WorldStandardValues extends Settings
 		WATER_BLOCK = new MaterialSetting("WaterBlock", LocalMaterials.WATER_NAME),
 		ICE_BLOCK = new MaterialSetting("IceBlock", LocalMaterials.ICE_NAME),
 		COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", LocalMaterials.LAVA_NAME),
-		BEDROCK_BLOCK = new MaterialSetting("BedrockBlock", LocalMaterials.BEDROCK_NAME)
+		BEDROCK_BLOCK = new MaterialSetting("BedrockBlock", LocalMaterials.BEDROCK_NAME),
+		CARVER_LAVA_BLOCK = new MaterialSetting("CarverLavaBlock", LocalMaterials.LAVA_NAME)
 	;
 
 	public static final Setting<List<String>>

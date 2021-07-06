@@ -28,6 +28,7 @@ public class ForgeMaterials extends LocalMaterials
 		// Blocks used in OTG code
 		
 		AIR = ForgeMaterialData.ofBlockState(Blocks.AIR.defaultBlockState());
+		CAVE_AIR = ForgeMaterialData.ofBlockState(Blocks.CAVE_AIR.defaultBlockState());
 		GRASS = ForgeMaterialData.ofBlockState(Blocks.GRASS.defaultBlockState());
 		DIRT = ForgeMaterialData.ofBlockState(Blocks.DIRT.defaultBlockState());
 		CLAY = ForgeMaterialData.ofBlockState(Blocks.CLAY.defaultBlockState());

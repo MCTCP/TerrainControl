@@ -64,6 +64,7 @@ public class WorldConfig extends WorldConfigBase
 		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
+	// TODO: Refactor to IBiomeGroupManager?
 	public BiomeGroupManager getBiomeGroupManager()
 	{
 		return this.biomeGroupManager;
@@ -166,9 +167,11 @@ public class WorldConfig extends WorldConfigBase
 		this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK, logger, materialReader);		
 		this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 		this.iceBlock = reader.getSetting(WorldStandardValues.ICE_BLOCK, logger, materialReader);
+		this.carverLavaBlock = reader.getSetting(WorldStandardValues.CARVER_LAVA_BLOCK, logger, materialReader);
 
 		// Bedrock
 
+		this.carverLavaBlockHeight = reader.getSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, logger);
 		this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK, logger);
 		this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK, logger);
 
@@ -461,7 +464,6 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
 			"When this setting is false, rivers follow the biome borders most of the time. Set this setting to true to disable this behavior."
 		);		
-		
 		writer.putSetting(WorldStandardValues.RIVER_RARITY, this.riverRarity,
 			"Controls the rarity of rivers. Must be from 0 to GenerationDepth. A higher number means more rivers. To define which rivers flow through which biomes see the individual biome configs."
 		);
@@ -554,7 +556,7 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock,
 			"Make a single flat layer of bedrock."
 		);
-
+		
 		writer.header2("Water / Lava / Frozen States");
 		
 		writer.putSetting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax,
@@ -567,6 +569,18 @@ public class WorldConfig extends WorldConfigBase
 			"Block used as water in WaterLevel."
 		);
 
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK, this.carverLavaBlock,
+			"Block that replaces all air blocks from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: LAVA"
+		);
+
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, this.carverLavaBlockHeight,
+			"All air blocks are replaced to CarverLavaBlock from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: 10"
+		);
+		
 		writer.putSetting(WorldStandardValues.ICE_BLOCK, this.iceBlock,
 			"Block used as ice."
 		);

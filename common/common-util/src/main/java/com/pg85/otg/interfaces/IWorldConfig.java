@@ -48,11 +48,13 @@ public interface IWorldConfig
 	public LocalMaterialData getDefaultBedrockBlock();
 	public LocalMaterialData getCooledLavaBlock();
 	public LocalMaterialData getIceBlock();
+	public LocalMaterialData getCarverLavaBlock();
 
 	// Bedrock
 
 	public boolean getIsCeilingBedrock();
 	public boolean getIsFlatBedrock();
+	public int getCarverLavaBlockHeight();
 
 	// Biome settings
 

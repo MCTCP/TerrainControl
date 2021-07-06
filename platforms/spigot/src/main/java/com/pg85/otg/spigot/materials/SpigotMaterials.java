@@ -1,6 +1,7 @@
 package com.pg85.otg.spigot.materials;
 
 import com.pg85.otg.util.materials.LocalMaterials;
+
 import net.minecraft.server.v1_16_R3.*;
 
 import java.util.Arrays;
@@ -26,6 +27,7 @@ public class SpigotMaterials extends LocalMaterials
 		// Blocks used in OTG code
 		
 		AIR = SpigotMaterialData.ofBlockData(Blocks.AIR.getBlockData());
+		CAVE_AIR = SpigotMaterialData.ofBlockData(Blocks.CAVE_AIR.getBlockData());
 		GRASS = SpigotMaterialData.ofBlockData(Blocks.GRASS_BLOCK.getBlockData());
 		DIRT = SpigotMaterialData.ofBlockData(Blocks.DIRT.getBlockData());
 		CLAY = SpigotMaterialData.ofBlockData(Blocks.CLAY.getBlockData());
