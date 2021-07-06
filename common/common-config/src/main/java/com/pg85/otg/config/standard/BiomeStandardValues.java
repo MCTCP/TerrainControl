@@ -10,6 +10,7 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
+import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -56,7 +57,9 @@ public class BiomeStandardValues extends Settings
 		AMBIENT_SOUND = stringSetting("AmbientSound", ""),
 		MOOD_SOUND = stringSetting("MoodSound", "minecraft:ambient.cave"),
 		ADDITIONS_SOUND = stringSetting("AdditionsSound", ""),
-		BIOME_CATEGORY = stringSetting("BiomeCategory", "plains")
+		BIOME_CATEGORY = stringSetting("BiomeCategory", "plains"),
+		LEGACY_GRASS_COLOR2 = stringSetting("GrassColor2", "#FFFFFF"),
+		LEGACY_FOLIAGE_COLOR2 = stringSetting("FoliageColor2", "#FFFFFF")
 	;
 
 	public static final Setting<Integer>
@@ -130,7 +133,8 @@ public class BiomeStandardValues extends Settings
 		OCEAN_RUINS_LARGE_PROBABILITY = floatSetting("OceanRuinsLargeProbability", 0.3f, 0f, 1f),
 		OCEAN_RUINS_CLUSTER_PROBABILITY = floatSetting("OceanRuinsClusterProbability", 0.9f, 0f, 1f),
 		BURIED_TREASURE_PROBABILITY = floatSetting("BuriedTreasureProbability", 0.01f, 0f, 1f),
-		PARTICLE_PROBABILITY = floatSetting("ParticleProbability", 0f, 0, 1f)
+		PARTICLE_PROBABILITY = floatSetting("ParticleProbability", 0f, 0, 1f),
+		FOG_DENSITY = floatSetting("FogDensity", 0.1f, 0f, 1f);
 	;
 
 	public static final Setting<List<WeightedMobSpawnGroup>>
@@ -141,6 +145,12 @@ public class BiomeStandardValues extends Settings
 		SPAWN_WATER_AMBIENT_CREATURES = mobGroupListSetting("SpawnWaterAmbientCreatures"),
 		SPAWN_MISC_CREATURES = mobGroupListSetting("SpawnMiscCreatures")
 	;
+	
+	public static final Setting<ColorSet>
+		GRASS_COLOR_CONTROL = colorSetSetting("GrassColorControl"),
+		FOLIAGE_COLOR_CONTROL = colorSetSetting("FoliageColorControl"),
+		WATER_COLOR_CONTROL = colorSetSetting("WaterColorControl");
+;
 
 	public static final Setting<VillageType> VILLAGE_TYPE = enumSetting("VillageType", VillageType.disabled);
 	public static final Setting<MineshaftType> MINESHAFT_TYPE = enumSetting("MineshaftType", MineshaftType.normal);

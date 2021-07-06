@@ -19,11 +19,12 @@ import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.ICustomStructureGen;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.interfaces.IWorldGenRegion;
+import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
+import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
 /**
  * BiomeConfig (*.bc) classes
@@ -112,11 +113,15 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected float biomeTemperature;
 	protected float biomeWetness;
 	protected int grassColor;
+	protected ColorSet grassColorControl;
 	protected GrassColorModifier grassColorModifier;
 	protected int foliageColor;	
+	protected ColorSet foliageColorControl;
 	protected int skyColor;
 	protected int waterColor;
+	protected ColorSet waterColorControl;
 	protected int fogColor;
+	protected float fogDensity;
 	protected int waterFogColor;
 	protected String particleType;
 	protected float particleProbability;
@@ -466,6 +471,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
+	public float getFogDensity()
+	{
+		return this.fogDensity;
+	}
+	
+	@Override
 	public int getWaterFogColor()
 	{
 		return this.waterFogColor;
@@ -478,9 +489,21 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
+	public ColorSet getFoliageColorControl()
+	{
+		return this.foliageColorControl;
+	}
+	
+	@Override
 	public int getGrassColor()
 	{
 		return this.grassColor;
+	}
+	
+	@Override
+	public ColorSet getGrassColorControl()
+	{
+		return this.grassColorControl;
 	}
 
 	@Override
@@ -493,6 +516,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public int getWaterColor()
 	{
 		return this.waterColor;
+	}
+	
+	@Override
+	public ColorSet getWaterColorControl()
+	{
+		return this.waterColorControl;
 	}
 	
 	@Override

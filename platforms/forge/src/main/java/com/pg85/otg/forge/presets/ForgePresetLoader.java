@@ -22,6 +22,14 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
+import com.pg85.otg.forge.network.BiomeSettingSyncWrapper;
+import com.pg85.otg.forge.network.OTGClientSyncManager;
+import com.pg85.otg.gen.biome.BiomeData;
+import com.pg85.otg.gen.biome.layers.BiomeLayerData;
+import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.interfaces.IBiomeResourceLocation;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
@@ -30,25 +38,6 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
-import com.pg85.otg.gen.biome.layers.BiomeLayerData;
-import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
-import com.pg85.otg.interfaces.IBiome;
-import com.pg85.otg.interfaces.IBiomeConfig;
-import com.pg85.otg.interfaces.IBiomeResourceLocation;
-import com.pg85.otg.interfaces.ILogger;
-import com.pg85.otg.interfaces.IMaterialReader;
-import com.pg85.otg.interfaces.IWorldConfig;
-
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.MobSpawnInfo.Spawners;
-
-import com.pg85.otg.gen.biome.BiomeData;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -92,6 +81,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
 	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry)
 	{
+		clearCaches(biomeRegistry);
+		
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 		{
 			for(File presetDir : this.presetsDir.listFiles())
@@ -112,16 +103,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 				}
 			}
 		}
-		refreshConfigs(biomeRegistry);
+		registerBiomes(true, biomeRegistry);
 	}
 
-	protected void refreshConfigs(MutableRegistry<Biome> biomeRegistry)
+	protected void clearCaches(MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
 		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
-		registerBiomes(true, biomeRegistry);
 	}
 	
 	@Override
@@ -197,6 +187,9 @@ public class ForgePresetLoader extends LocalPresetLoader
  				}
 
 				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);			
+ 				
+ 				// Populate our map for syncing
+ 				OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
  				
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				

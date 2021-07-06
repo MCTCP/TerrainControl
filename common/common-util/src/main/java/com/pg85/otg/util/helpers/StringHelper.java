@@ -101,6 +101,22 @@ public abstract class StringHelper
 			}
 		}
 	}
+	
+	//TODO document
+	public static int readColor(String string) throws InvalidConfigException {
+		try
+		{
+			Integer integer = Integer.decode(string);
+			if (integer.intValue() > 0xffffff || integer.intValue() < 0)
+			{
+				throw new InvalidConfigException("Color must have 6 hexadecimal digits");
+			}
+			return integer;
+		} catch (NumberFormatException e)
+		{
+			throw new InvalidConfigException("Invalid color " + string);
+		}
+	}
 
 	/**
 	 * Parses the string and returns a number between minValue and maxValue.
