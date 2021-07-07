@@ -643,7 +643,7 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
 		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
-		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0 to 1. 0.1 will mimic vanilla fog density.");
+		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
 
 		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
 
