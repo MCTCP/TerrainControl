@@ -29,6 +29,12 @@ public class MultipleColorHandler
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 
+				// This shouldn't be null, but sometimes it is?
+				if (key == null)
+				{
+					return grassColorResolver.getColor(biome, posX, posZ);
+				}
+
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
@@ -47,6 +53,11 @@ public class MultipleColorHandler
 			{
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+				
+				if (key == null)
+				{
+					return foliageColorResolver.getColor(biome, posX, posZ);
+				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
@@ -66,6 +77,11 @@ public class MultipleColorHandler
 			{
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+				
+				if (key == null)
+				{
+					return waterColorResolver.getColor(biome, posX, posZ);
+				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
