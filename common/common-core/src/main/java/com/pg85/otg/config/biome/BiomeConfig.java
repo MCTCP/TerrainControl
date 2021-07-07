@@ -297,10 +297,17 @@ public class BiomeConfig extends BiomeConfigBase
 		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
 		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
 	
+		updateLegacySettings(reader, materialReader, logger);
+	}
+
+	private void updateLegacySettings(SettingsMap reader,IMaterialReader materialReader, ILogger logger) {
+		if (fogDensity == 0.5 && fogColor == BiomeStandardValues.FOG_COLOR.getDefaultValue()) {
+			fogDensity = 0.0f;
+		}
+		
 		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_GRASS_COLOR2, logger).ifPresent(set -> this.grassColorControl = set);
 		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_FOLIAGE_COLOR2, logger).ifPresent(set -> this.foliageColorControl = set);
 	}
-
 
 	private Optional<ColorSet> readLegacyColorSetting(SettingsMap reader, IMaterialReader materialReader, Setting<String> oldSetting, ILogger logger)
 	{

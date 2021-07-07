@@ -12,7 +12,7 @@ import com.pg85.otg.util.helpers.MathHelper;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.settings.GraphicsFanciness;
+import net.minecraft.client.renderer.FogRenderer.FogType;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -26,13 +26,10 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientFogHandler
 {
 
-	private static final int[] BLEND_RANGES =
-	{ 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34 };
-	
 	private static double lastX = Double.MIN_VALUE;
 	private static double lastZ = Double.MIN_VALUE;
 
-	private static float[][] fogDensityCache = new float[(34 * 2) + 1][(34 * 2) + 1];
+	private static float[][] fogDensityCache = new float[0][0];
 
 	private static boolean otgDidLastFogRender = false;
 
@@ -77,12 +74,16 @@ public class ClientFogHandler
 		int blockX = MathHelper.floor(posX);
 		int blockZ = MathHelper.floor(posZ);
 
-		int blendDistance = 6;
+		int blendDistance = settings.biomeBlendRadius;
+		blendDistance = blendDistance == 0 ? 1 : blendDistance;
 
-		if (settings.graphicsMode != GraphicsFanciness.FAST && settings.renderDistance >= 0
-				&& settings.renderDistance < BLEND_RANGES.length)
+		if (fogDensityCache.length < blendDistance * 2 + 1)
 		{
-			blendDistance = BLEND_RANGES[settings.renderDistance];
+			fogDensityCache = new float[(blendDistance * 2) + 1][(blendDistance * 2) + 1];
+			for (float[] row : fogDensityCache)
+			{
+				Arrays.fill(row, -1f);
+			}
 		}
 
 		boolean hasMoved = posX != lastX || posZ != lastZ;
@@ -124,7 +125,7 @@ public class ClientFogHandler
 			}
 		}
 
-		float weightMixed = (blendDistance * 2) * (blendDistance * 2);
+		float weightMixed = (blendDistance * 2f) * (blendDistance * 2f);
 		float weightDefault = weightMixed - weightBiomeFog;
 
 		if (weightDefault < 0.0f)
@@ -134,19 +135,20 @@ public class ClientFogHandler
 
 		float fogDistanceAvg = weightBiomeFog == 0.0f ? 0.0f : biomeFogDistance / weightBiomeFog;
 
-		float fogDistance = (biomeFogDistance * 240.0f + event.getFarPlaneDistance() * weightDefault) / weightMixed;
+		float fogDistance = (biomeFogDistance * 520f + event.getFarPlaneDistance() * weightDefault) / weightMixed;
 		float fogDistanceScaleBiome = (0.1f * (1.0f - fogDistanceAvg) + 0.75f * fogDistanceAvg);
-		float fogDistanceScale = (fogDistanceScaleBiome * weightBiomeFog + 0.75f * weightDefault) / weightMixed;
-		
-		float finalFogDistance = Math.min(fogDistance, event.getFarPlaneDistance());
+		float fogDistanceScale = (fogDistanceScaleBiome * weightBiomeFog + 1f * weightDefault) / weightMixed;
 
+		float finalFogDistance = Math.min(fogDistance, event.getFarPlaneDistance());
+		float fogStart = event.getType() == FogType.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
+		
 		// set cache values
 		lastX = posX;
 		lastZ = posZ;
 
 		otgDidLastFogRender = true;
-
-		GL11.glFogf(GL11.GL_FOG_START, finalFogDistance * fogDistanceScale);
+		
+		GL11.glFogf(GL11.GL_FOG_START, fogStart);
 		GL11.glFogf(GL11.GL_FOG_END, finalFogDistance);
 	}
 
