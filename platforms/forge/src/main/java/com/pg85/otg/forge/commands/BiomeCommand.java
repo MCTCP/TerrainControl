@@ -29,7 +29,7 @@ public class BiomeCommand implements BaseCommand
 		String MCBiome = source.getLevel().getBiome(new BlockPos(source.getPosition().x, source.getPosition().y, source.getPosition().z)).getRegistryName().toString();
 		String OTGBiome = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getCachedBiomeProvider().getBiomeConfig((int)source.getPosition().x, (int)source.getPosition().z).getName();
 
-		source.sendSuccess(new StringTextComponent("MC says: " + MCBiome + "\r\nOTG says:" + OTGBiome), false);
+		source.sendSuccess(new StringTextComponent("According to OTG, you are in the " + OTGBiome + " biome.\nBiome registry name: " + MCBiome), false);
 		return 0;
 	}
 }
