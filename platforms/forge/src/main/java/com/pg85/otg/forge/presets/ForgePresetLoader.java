@@ -232,6 +232,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 				});
 
 				IBiome otgBiome = new ForgeBiome(biome, biomeConfig);
+				if(otgBiomeId >= presetIdMapping.length)
+				{
+					OTG.getEngine().getLogger().log(LogLevel.FATAL, LogCategory.CONFIGS, "Fatal error while registering OTG biome id's for preset " + preset.getFolderName() + ", most likely you've assigned a DefaultOceanBiome that doesn't exist.");
+					throw new RuntimeException("Fatal error while registering OTG biome id's for preset " + preset.getFolderName() + ", most likely you've assigned a DefaultOceanBiome that doesn't exist.");
+				}
 				presetIdMapping[otgBiomeId] = otgBiome;
 
 				worldBiomes.put(biomeConfig.getName(), otgBiomeId);
