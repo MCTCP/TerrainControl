@@ -68,7 +68,7 @@ public class OTGGui
 										dimensionGeneratorSettings.generateFeatures(),
 										dimensionGeneratorSettings.generateBonusChest(),
 										dimensionGeneratorSettings.dimensions(),
-										dimensionConfig
+										dimensionConfig.PresetFolderName
 									)
 								);
 							}

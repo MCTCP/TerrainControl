@@ -739,7 +739,7 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.header1("Ravine settings");
-		
+
 		writer.putSetting(WorldStandardValues.RAVINES_ENABLED, this.ravinesEnabled,
 			"Enables/disables OTG ravines. set this to false if you're using modded ravines."
 		);

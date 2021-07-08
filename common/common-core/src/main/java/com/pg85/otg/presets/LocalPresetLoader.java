@@ -32,6 +32,7 @@ import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 public abstract class LocalPresetLoader
 {	
 	private static final int MAX_INHERITANCE_DEPTH = 15;
+	protected final Object materialReaderLock = new Object();
 	protected final File presetsDir;
 	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
 	protected final HashMap<String, String> aliasMap = new HashMap<String, String>();
@@ -44,11 +45,21 @@ public abstract class LocalPresetLoader
 
 	public IMaterialReader getMaterialReader(String presetFolderName)
 	{
-		return this.materialReaderByPresetFolderName.get(presetFolderName);
+		IMaterialReader materialReader;
+		synchronized(this.materialReaderLock)
+		{
+			materialReader = this.materialReaderByPresetFolderName.get(presetFolderName);
+			if(materialReader == null)
+			{
+				materialReader = createMaterialReader();
+				this.materialReaderByPresetFolderName.put(presetFolderName, materialReader);
+			}
+		}
+		return materialReader;
 	}
-	
+
 	protected abstract IMaterialReader createMaterialReader();
-	
+
 	public abstract void registerBiomes();
 
 	protected abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String inheritMobsBiomeName);
@@ -95,7 +106,6 @@ public abstract class LocalPresetLoader
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
-							this.materialReaderByPresetFolderName.put(presetDir.getName(), createMaterialReader());
 							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger);
 							this.presets.put(preset.getFolderName(), preset);
 							this.aliasMap.put(preset.getShortPresetName(), preset.getFolderName());

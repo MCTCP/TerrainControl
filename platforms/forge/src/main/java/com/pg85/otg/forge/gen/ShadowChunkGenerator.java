@@ -363,7 +363,7 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	private static boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DimensionStructuresSettings dimensionStructuresSettings, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
+	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DimensionStructuresSettings dimensionStructuresSettings, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
 		StructureSeparationSettings structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
