@@ -1,12 +1,32 @@
 package com.pg85.otg.forge.commands;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.forge.commands.arguments.FlagsArgument;
+import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
@@ -18,24 +38,71 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Locale;
-
-public class ExportCommand
+public class ExportCommand implements BaseCommand
 {
 	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("export")
+			.executes(this::execute).then(
+				Commands.argument("name", StringArgumentType.string()).executes(this::execute).then(
+					Commands.argument("center", BlockStateArgument.block()).executes(this::execute).then(
+						Commands.argument("preset", new PresetArgument()).executes(this::execute).then(
+							Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
+								Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(this::execute)
+							)
+						)
+					)
+				)
+			)
+		).then(
+			Commands.literal("region").then(
+				Commands.literal("mark").executes(
+					context -> mark(context.getSource())
+				)
+			).then(
+				Commands.literal("clear").executes(
+					context ->clear(context.getSource())
+				)
+			).then(
+				Commands.literal("expand").then(
+					Commands.argument("direction", new DirectionArgument(true)).then(
+						Commands.argument("value", IntegerArgumentType.integer()).executes(
+							context -> expand(context.getSource(),
+								context.getArgument("direction", String.class),
+								context.getArgument("value", Integer.class))
+						)
+					)
+				)
+			).then(
+				Commands.literal("shrink").then(
+					Commands.argument("direction", new DirectionArgument(true)).then(
+						Commands.argument("value", IntegerArgumentType.integer()).executes(
+							context -> shrink(context.getSource(),
+								context.getArgument("direction", String.class),
+								context.getArgument("value", Integer.class))
+						)
+					)
+				)
+			)	
+		);
+	}
 
-	public static int execute(CommandContext<CommandSource> context)
+	public int execute(CommandContext<CommandSource> context)
 	{
 		CommandSource source = context.getSource();
 		try
@@ -252,7 +319,7 @@ public class ExportCommand
 		}
 	}
 
-	public static int mark(CommandSource source)
+	public int mark(CommandSource source)
 	{
 		if (!init(source)) return 0;
 		playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition());
@@ -260,7 +327,7 @@ public class ExportCommand
 		return 0;
 	}
 
-	public static int clear(CommandSource source)
+	public int clear(CommandSource source)
 	{
 		if (!init(source)) return 0;
 		playerSelectionMap.get(source.getEntity()).clear();
@@ -268,7 +335,7 @@ public class ExportCommand
 		return 0;
 	}
 
-	public static int expand(CommandSource source, String direction, Integer value)
+	public int expand(CommandSource source, String direction, Integer value)
 	{
 		if (!init(source)) return 0;
 		Region region = playerSelectionMap.get(source.getEntity());
@@ -306,7 +373,7 @@ public class ExportCommand
 		return 0;
 	}
 
-	public static int shrink(CommandSource source, String direction, Integer value)
+	public int shrink(CommandSource source, String direction, Integer value)
 	{
 		if (!init(source)) return 0;
 
@@ -339,6 +406,37 @@ public class ExportCommand
 			y + box.getMinY() + box.getHeight(),
 			z + box.getMinZ() + box.getDepth()));
 		return region;
+	}
+	
+	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
+	
+	private static class TemplateArgument implements ArgumentType<String>
+	{
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			String preset = context.getArgument("preset", String.class);
+			List<String> list;
+			// Get global objects if global, else fetch based on preset
+			if (preset.equalsIgnoreCase("global"))
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getGlobalTemplates();
+			}
+			else
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplatesForPreset(preset);
+			}
+			if (list == null) list = new ArrayList<>();
+			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+			list.add("default");
+			return ISuggestionProvider.suggest(list.stream(), builder);
+		}
 	}
 
 	public static class Region
@@ -407,6 +505,30 @@ public class ExportCommand
 				Math.max(posArr[0].getY(), posArr[1].getY()),
 				Math.max(posArr[0].getZ(), posArr[1].getZ())
 			);
+		}
+	}
+	
+	private static class DirectionArgument implements ArgumentType<String>
+	{
+		private final String[] options;
+
+		public DirectionArgument(boolean vertical)
+		{
+			if (vertical) options = new String[]{"north", "south", "east", "west", "up", "down"};
+			else options = new String[]{"north", "south", "east", "west"};
+		}
+
+
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 }

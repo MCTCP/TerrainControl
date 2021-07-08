@@ -1,14 +1,24 @@
 package com.pg85.otg.forge.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-public class BiomeCommand
-{
-	protected static int showBiome(CommandSource source)
+public class BiomeCommand implements BaseCommand
+{	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("biome"))
+			.executes(context -> showBiome(context.getSource())
+		);
+	}
+	
+	private int showBiome(CommandSource source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{

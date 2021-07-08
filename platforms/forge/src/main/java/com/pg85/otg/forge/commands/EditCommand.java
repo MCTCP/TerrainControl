@@ -1,5 +1,15 @@
 package com.pg85.otg.forge.commands;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.BOCreator;
@@ -9,6 +19,9 @@ import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
+import com.pg85.otg.forge.commands.arguments.FlagsArgument;
+import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
@@ -21,24 +34,35 @@ import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterials;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-public class EditCommand
+public class EditCommand implements BaseCommand
 {
 	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("edit")
+			.executes(this::help).then(
+				Commands.argument("preset", new PresetArgument()).executes(this::execute).then(
+					Commands.argument("object", new BiomeObjectArgument()).executes(this::execute).then(
+						Commands.argument("flags", FlagsArgument.with("-nofix", "-update")).executes(this::execute)
+					)
+				)
+			)
+		);
+	}
 
-	public static int execute(CommandContext<CommandSource> context)
+	public int execute(CommandContext<CommandSource> context)
 	{
 		CommandSource source = context.getSource();
 		try {
@@ -297,7 +321,7 @@ public class EditCommand
 		}
 	}
 
-	public static int help(CommandContext<CommandSource> context)
+	public int help(CommandContext<CommandSource> context)
 	{
 		context.getSource().sendSuccess(new StringTextComponent("To use the edit command:"), false);
 		context.getSource().sendSuccess(new StringTextComponent("/otg edit <preset> <object> [-fix, -clean]"), false);
