@@ -1,13 +1,5 @@
 package com.pg85.otg.forge.commands;
 
-import com.pg85.otg.OTG;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +9,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class DataCommand
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.pg85.otg.OTG;
+import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
+
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+
+public class DataCommand implements BaseCommand
 {
 	private static final String USAGE = "Usage: /otg data <type>";
 	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
@@ -28,8 +33,20 @@ public class DataCommand
 			"particle",
 			"configured_feature"
 	));
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("data")
+			.executes(context -> execute(context.getSource(), ""))
+				.then(Commands.argument("type", StringArrayArgument.with(DATA_TYPES))
+					.executes((context -> execute(context.getSource(), context.getArgument("type", String.class)))
+				)
+			)
+		);
+	}
 
-	public static int execute(CommandSource source, String type)
+	public int execute(CommandSource source, String type)
 	{
 		// /otg data music
 		// /otg data sound
@@ -60,7 +77,6 @@ public class DataCommand
 				break;
 			default:
 				source.sendSuccess(new StringTextComponent(USAGE), false);
-				source.sendSuccess(new StringTextComponent("Data types: " + String.join(", ", DATA_TYPES)), false);
 				return 0;
 		}
 

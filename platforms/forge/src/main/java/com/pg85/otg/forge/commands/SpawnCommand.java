@@ -1,10 +1,19 @@
 package com.pg85.otg.forge.commands;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
+
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
+import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.MCWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
@@ -15,6 +24,8 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -26,12 +37,51 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.storage.FolderName;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Random;
-
-public class SpawnCommand
+public class SpawnCommand implements BaseCommand
 {
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("spawn")
+			.then(
+				Commands.argument("preset", new PresetArgument()).then(
+					Commands.argument("object", new BiomeObjectArgument()).executes(
+						context -> SpawnCommand.execute(
+							context.getSource(),
+							context.getArgument("preset", String.class),
+							context.getArgument("object", String.class),
+							Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
+							false)
+					).then(
+						Commands.argument("location", BlockPosArgument.blockPos())
+							.executes(
+								(context -> SpawnCommand.execute(
+									context.getSource(),
+									context.getArgument("preset", String.class),
+									context.getArgument("object", String.class),
+									BlockPosArgument.getLoadedBlockPos(context, "location"),
+									false
+								))
+							)
+					).then(
+						Commands.argument("force", BoolArgumentType.bool())
+							.executes(
+								(context -> SpawnCommand.execute(
+									context.getSource(),
+									context.getArgument("preset", String.class),
+									context.getArgument("object", String.class),
+									Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
+									context.getArgument("force", Boolean.class)
+								)
+							)
+						)
+					)
+				)
+			)
+		);
+	}
+	
 	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos, boolean force)
 	{
 		try

@@ -1,22 +1,5 @@
 package com.pg85.otg.forge.commands;
 
-import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.forge.gen.ForgeChunkBuffer;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.util.BlockPos2D;
-import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.materials.LocalMaterials;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-
-import javax.imageio.ImageIO;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,12 +11,72 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class MapCommand
+import javax.imageio.ImageIO;
+
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
+import com.pg85.otg.forge.gen.ForgeChunkBuffer;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
+import com.pg85.otg.util.BlockPos2D;
+import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.materials.LocalMaterials;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+
+public class MapCommand implements BaseCommand
 {
 	private static final Object queueLock = new Object();
 	private static final Object imgLock = new Object();
 	
-	protected static int mapBiomes(CommandSource source, int width, int height, int threads)
+	private static final String USAGE = "Usage: /otg map <biomes/terrain>";
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("map")
+			.executes(
+				context -> map(context.getSource(), "", 2048, 2048, 0)
+				).then(
+					Commands.argument("type", StringArrayArgument.with(new String[] {"biomes", "terrain" })).executes(
+							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0)
+					).then(
+						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
+							(context) -> map(context.getSource(), StringArgumentType.getString(context, "type"), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"), 1)
+						).then(
+							Commands.argument("height", IntegerArgumentType.integer(0)).executes(
+								(context) -> map(context.getSource(), StringArgumentType.getString(context, "type"), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), 1)
+							).then(
+								Commands.argument("threads", IntegerArgumentType.integer(0)).executes(
+									(context) -> map(context.getSource(), StringArgumentType.getString(context, "type"), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"), IntegerArgumentType.getInteger(context, "threads"))
+								)))))
+		);
+	}
+	
+	private int map(CommandSource source, String type, int width, int height, int threads)
+	{
+		switch (type.toLowerCase())
+		{
+			case "biomes":
+				return mapBiomes(source, width, height, threads);
+			case "terrain":
+				return mapTerrain(source, width, height, threads);
+			default:
+				source.sendSuccess(new StringTextComponent(USAGE), false);
+				return 0;
+		}
+	}
+	
+	private static int mapBiomes(CommandSource source, int width, int height, int threads)
 	{
 		if (
 			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
@@ -70,7 +113,7 @@ public class MapCommand
 		return 0;
 	}
 	
-	static int mapTerrain(CommandSource source, int width, int height, int threads)
+	private static int mapTerrain(CommandSource source, int width, int height, int threads)
 	{
 		if (
 			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
@@ -107,7 +150,7 @@ public class MapCommand
 		return 0;
 	}
 	
-	static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, boolean mapBiomes, int threads)
+	private static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, boolean mapBiomes, int threads)
 	{
 		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
 		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
@@ -146,7 +189,7 @@ public class MapCommand
 		}
 	}
 	
-	static int shadeColor(int rgbColor, int percent)
+	private static int shadeColor(int rgbColor, int percent)
 	{
 		int red = (rgbColor >> 16) & 0xFF;
 		int green = (rgbColor >> 8) & 0xFF;

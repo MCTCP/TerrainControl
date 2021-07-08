@@ -2,6 +2,7 @@ package com.pg85.otg.forge.commands;
 
 import java.nio.file.Path;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -16,12 +17,21 @@ import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.storage.FolderName;
 
-public class StructureCommand
+public class StructureCommand implements BaseCommand
 {
-	protected static int showStructureInfo(CommandSource source)
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("structure")
+			.executes((context -> showStructureInfo(context.getSource())))
+		);
+	}
+	
+	private int showStructureInfo(CommandSource source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{

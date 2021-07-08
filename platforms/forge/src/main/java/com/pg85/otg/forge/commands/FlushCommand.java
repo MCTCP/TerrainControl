@@ -1,16 +1,26 @@
 package com.pg85.otg.forge.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 
-public class FlushCommand
-{
-	protected static int flushCache(CommandSource source)
+public class FlushCommand implements BaseCommand
+{	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	{
+		builder.then(Commands.literal("flush")
+			.executes(context -> flushCache(context.getSource()))
+		);
+	}
+	
+	protected int flushCache(CommandSource source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
