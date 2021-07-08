@@ -26,6 +26,8 @@ public class ForgeMaterials extends LocalMaterials
 	public static void init()
 	{
 		// Tags used for OTG configs
+		// TODO: We should be including these via datapack and make sure we don't use tags before datapacks are loaded.
+		
 		// "WATER", new Block[] { Blocks.FLOWING_WATER , Blocks.STATIONARY_WATER }); // TODO: is this spigot-only, or no longer needed?
 
 		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"stone"), new HashSet<Supplier<Block>>()

@@ -750,23 +750,60 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
 		writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
 		writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
-		
+
 		writer.header1("Dimension settings (Forge)");
-		
-		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? -1 : this.fixedTime.getAsLong());		
-		writer.putSetting(WorldStandardValues.HAS_SKYLIGHT, this.hasSkyLight);
-		writer.putSetting(WorldStandardValues.HAS_CEILING, this.hasCeiling);
-		writer.putSetting(WorldStandardValues.ULTRA_WARM, this.ultraWarm);
-		writer.putSetting(WorldStandardValues.NATURAL, this.natural);
-		writer.putSetting(WorldStandardValues.COORDINATE_SCALE, this.coordinateScale);
-		writer.putSetting(WorldStandardValues.CREATE_DRAGON_FLIGHT, this.createDragonFight);		
-		writer.putSetting(WorldStandardValues.PIGLIN_SAFE, this.piglinSafe);		
-		writer.putSetting(WorldStandardValues.BED_WORKS, this.bedWorks);
-		writer.putSetting(WorldStandardValues.RESPAWN_ANCHOR_WORKS, this.respawnAnchorWorks);
-		writer.putSetting(WorldStandardValues.HAS_RAIDS, this.hasRaids);		
-		writer.putSetting(WorldStandardValues.LOGICAL_HEIGHT, this.logicalHeight);
-		writer.putSetting(WorldStandardValues.INFINIBURN, this.infiniburn);		
-		writer.putSetting(WorldStandardValues.EFFECTS_LOCATION, this.effectsLocation);
-		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight);
+
+		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? -1 : this.fixedTime.getAsLong(),
+			"The time this dimension is fixed at, from 0 to 24000.",
+			"-1 by default, meaning disabled, so time passes normally."
+		);		
+		writer.putSetting(WorldStandardValues.HAS_SKYLIGHT, this.hasSkyLight, 
+			"Whether this dimension uses a skylight, defaults to true.",
+			"Vanilla nether and end use false, nether combines this with AmbientLight:0.1."
+		);
+		writer.putSetting(WorldStandardValues.HAS_CEILING, this.hasCeiling,
+			"Whether this dimension has a ceiling, affects mob spawning, weather (thunder), maps.",
+			"Defaults to false, vanilla nether uses true."				
+		);
+		writer.putSetting(WorldStandardValues.ULTRA_WARM, this.ultraWarm,
+			"Whether water evaporates in this dimension. Also appears to affect lava/lava flow.",
+			"Defaults to false. Vanilla nether uses true."
+		);
+		writer.putSetting(WorldStandardValues.NATURAL, this.natural,
+			"When set to false, mobs do not spawn from portals and players cannot use beds in this dimension.",
+			"Defaults to true."
+		);
+		writer.putSetting(WorldStandardValues.COORDINATE_SCALE, this.coordinateScale,
+			"The amount of blocks traveled compared to other dimensions.",
+			"1 by default, same as vanilla overworld, nether uses 8."
+		);
+		writer.putSetting(WorldStandardValues.CREATE_DRAGON_FLIGHT, this.createDragonFight,
+			"Probably starts a dragon fight, we think. Try it, what could possibly go wrong?"
+		);
+		writer.putSetting(WorldStandardValues.PIGLIN_SAFE, this.piglinSafe,
+			"Whether this dimension can spawn piglins, false by default."
+		);
+		writer.putSetting(WorldStandardValues.BED_WORKS, this.bedWorks, 
+			"Whether beds can be used to sleep and skip time in this dimension, true by default.");
+		writer.putSetting(WorldStandardValues.RESPAWN_ANCHOR_WORKS, this.respawnAnchorWorks,
+			"Whether RespawnAnchorBlocks can be used, false by default."
+		);
+		writer.putSetting(WorldStandardValues.HAS_RAIDS, this.hasRaids, 
+			"Whether the dimension has raids, true by default."
+		);
+		writer.putSetting(WorldStandardValues.LOGICAL_HEIGHT, this.logicalHeight, 
+			"World height, 256 by default. Affects portals and chorus fruits."
+		);
+		writer.putSetting(WorldStandardValues.INFINIBURN, this.infiniburn, 
+			"Infiniburn block tag registry key, minecraft:infiniburn_overworld by default.",
+			"Can be either overworld/nether/end (or potentially modded)."
+		);
+		writer.putSetting(WorldStandardValues.EFFECTS_LOCATION, this.effectsLocation, 
+			"Effects registry key, minecraft:overworld by default.",
+			"Can be either overworld/nether/end (or potentially modded)."
+		);
+		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight,
+			"The base ambient light level for the world, 0.0 for overworld/end, 0.1 for nether."
+		);
 	}
 }
