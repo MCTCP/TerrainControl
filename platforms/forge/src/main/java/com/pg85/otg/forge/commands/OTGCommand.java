@@ -24,6 +24,7 @@ public class OTGCommand
 		commands.add(new FlushCommand());
 		commands.add(new StructureCommand());
 		commands.add(new BiomeCommand());
+		commands.add(new LocateCommand());
 		commands.add(new SpawnCommand());
 		commands.add(new EditCommand());
 		commands.add(new ExportCommand());
