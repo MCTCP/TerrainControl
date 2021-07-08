@@ -12,6 +12,7 @@ import java.util.Set;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
+import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -38,7 +39,7 @@ public class DataCommand implements BaseCommand
 	{
 		builder.then(Commands.literal("data")
 			.executes(context -> execute(context.getSource(), ""))
-				.then(Commands.argument("type", StringArgumentType.word())
+				.then(Commands.argument("type", StringArrayArgument.with(DATA_TYPES))
 					.executes((context -> execute(context.getSource(), context.getArgument("type", String.class)))
 				)
 			)
@@ -76,7 +77,6 @@ public class DataCommand implements BaseCommand
 				break;
 			default:
 				source.sendSuccess(new StringTextComponent(USAGE), false);
-				source.sendSuccess(new StringTextComponent("Data types: " + String.join(", ", DATA_TYPES)), false);
 				return 0;
 		}
 

@@ -1,10 +1,24 @@
 package com.pg85.otg.forge.commands;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import javax.imageio.ImageIO;
+
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.ForgeChunkBuffer;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -17,22 +31,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import javax.imageio.ImageIO;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class MapCommand implements BaseCommand
 {
@@ -48,7 +47,7 @@ public class MapCommand implements BaseCommand
 			.executes(
 				context -> map(context.getSource(), "", 2048, 2048, 0)
 				).then(
-					Commands.argument("type", StringArgumentType.word()).executes(
+					Commands.argument("type", StringArrayArgument.with(new String[] {"biomes", "terrain" })).executes(
 							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0)
 					).then(
 						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
