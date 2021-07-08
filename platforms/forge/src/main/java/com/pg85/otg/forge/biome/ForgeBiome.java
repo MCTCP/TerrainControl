@@ -82,7 +82,7 @@ public class ForgeBiome implements IBiome
 	public static Biome createOTGBiome(boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder = new BiomeGenerationSettings.Builder();
-
+	
 		// Mob spawning
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
@@ -201,24 +201,24 @@ public class ForgeBiome implements IBiome
 	private static MobSpawnInfo.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
 	{
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = new MobSpawnInfo.Builder();
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
-		mobSpawnInfoBuilder.setPlayerCanSpawn(); // Default biomes do this, not sure if needed?
+		addMobGroup(EntityClassification.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(EntityClassification.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}
 
-	private static void addMobGroup(MobSpawnInfo.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	private static void addMobGroup(EntityClassification entitiClassification, MobSpawnInfo.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
 	{
 		for(WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
 			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.addSpawn(entitiClassification, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{

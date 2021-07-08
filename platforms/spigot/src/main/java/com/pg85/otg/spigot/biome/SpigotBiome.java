@@ -417,19 +417,19 @@ public class SpigotBiome implements IBiome
 	{
 		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() for forge
 		BiomeSettingsMobs.a mobSpawnInfoBuilder = new BiomeSettingsMobs.a();
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EnumCreatureType.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
 
 		// a() == isValidSpawnBiomeForPlayer()
-		mobSpawnInfoBuilder.a(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
+		mobSpawnInfoBuilder.a();
 		return mobSpawnInfoBuilder;
 	}
 
-	private static void addMobGroup(BiomeSettingsMobs.a mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	private static void addMobGroup(EnumCreatureType creatureType, BiomeSettingsMobs.a mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
 	{
 		for (WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
@@ -438,7 +438,7 @@ public class SpigotBiome implements IBiome
 			if (entityType.isPresent())
 			{
 				// a() == withSpawner() in forge
-				mobSpawnInfoBuilder.a(EnumCreatureType.MONSTER, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.a(creatureType, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
