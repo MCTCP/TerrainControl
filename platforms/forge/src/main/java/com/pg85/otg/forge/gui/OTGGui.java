@@ -10,7 +10,9 @@ import com.pg85.otg.forge.dimensions.OTGDimensionType;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gui.screens.CreateOTGWorldScreen;
 import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -61,9 +63,16 @@ public class OTGGui
 							// settings when leaving customisation menu.
 							(dimensionConfig) ->
 							{
+
+								MutableRegistry<DimensionType> dimensionTypesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+								Registry<Biome> biomesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY);
+								Registry<DimensionSettings> dimensionSettingsRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+								
 								createWorldScreen.worldGenSettingsComponent.updateSettings(
 									OTGDimensionType.createOTGDimensionGeneratorSettings(
-										createWorldScreen.worldGenSettingsComponent.registryHolder(),
+										dimensionTypesRegistry,
+										biomesRegistry,
+										dimensionSettingsRegistry,
 										dimensionGeneratorSettings.seed(),
 										dimensionGeneratorSettings.generateFeatures(),
 										dimensionGeneratorSettings.generateBonusChest(),

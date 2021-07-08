@@ -86,9 +86,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			return p_236091_0_
 				.group(
-					Codec.STRING.fieldOf("presetFoldername").forGetter(
+					Codec.STRING.fieldOf("preset_folder_name").forGetter(
 						(p_236090_0_) -> {
-							return p_236090_0_.getPreset().getFolderName();
+							return p_236090_0_.preset.getFolderName();
 						}
 					),
 					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
@@ -122,7 +122,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final Preset preset;
 	private CustomStructureCache structureCache; // TODO: Move this?
 	
-	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		this(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
@@ -146,6 +145,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 		
 		this.worldSeed = seed;
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);		
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();	
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
@@ -155,7 +155,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.surfaceNoise = (INoiseGenerator)(noisesettings.useSimplexSurfaceNoise() ? new PerlinNoiseGenerator(this.random, IntStream.rangeClosed(-3, 0)) : new OctavesNoiseGenerator(this.random, IntStream.rangeClosed(-3, 0)));
 		this.noiseHeight = noisesettings.height();
 
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
 		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1,((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();

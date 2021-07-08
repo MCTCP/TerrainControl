@@ -34,8 +34,8 @@ public abstract class LocalPresetLoader
 	private static final int MAX_INHERITANCE_DEPTH = 15;
 	protected final Object materialReaderLock = new Object();
 	protected final File presetsDir;
-	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
-	protected final HashMap<String, String> aliasMap = new HashMap<String, String>();
+	protected final HashMap<String, Preset> presets = new HashMap<>();
+	protected final HashMap<String, String> aliasMap = new HashMap<>();
 	protected HashMap<String, IMaterialReader> materialReaderByPresetFolderName = new HashMap<>();
 
 	public LocalPresetLoader(Path otgRootFolder)
