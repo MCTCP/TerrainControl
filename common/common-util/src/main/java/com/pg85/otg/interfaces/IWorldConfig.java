@@ -2,6 +2,7 @@ package com.pg85.otg.interfaces;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalLong;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -150,4 +151,22 @@ public interface IWorldConfig
 	public double getRavineDepth();
 	public int getRavineMinAltitude();
 	public int getRavineMaxAltitude();
+	
+	// Dimension settings
+
+	public OptionalLong getFixedTime();
+	public boolean getHasSkyLight();
+	public boolean getHasCeiling();
+	public boolean getUltraWarm();
+	public boolean getNatural();
+	public double getCoordinateScale();
+	public boolean getCreateDragonFight();
+	public boolean getPiglinSafe();
+	public boolean getBedWorks();
+	public boolean getRespawnAnchorWorks();
+	public boolean getHasRaids();
+	public int getLogicalHeight();
+	public String getInfiniburn();
+	public String getEffectsLocation();
+	public float getAmbientLight();	
 }

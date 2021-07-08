@@ -50,7 +50,7 @@ public class CustomStructureFileManager
 {
 	// Plotted chunks
 	
-	public static void savePlottedChunksData(Path worldSaveDir, int dimensionId, Map<ChunkCoordinate, PlottedChunksRegion> decoratedChunks, ILogger logger)
+	public static void savePlottedChunksData(Path worldSaveDir, String presetFolderName, Map<ChunkCoordinate, PlottedChunksRegion> decoratedChunks, ILogger logger)
 	{
 		int regionsSaved = 0;
 		if(decoratedChunks.size() > 0)
@@ -67,7 +67,7 @@ public class CustomStructureFileManager
 				File occupiedChunksFile = new File(
 					worldSaveDir + File.separator + 
 					Constants.MOD_ID + File.separator + 
-					(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+					presetFolderName + File.separator +
 					Constants.PlottedChunksDataFolderName + File.separator +
 					chunkPerRegionEntry.getKey().getChunkX() + "_" +
 					chunkPerRegionEntry.getKey().getChunkZ() +
@@ -76,7 +76,7 @@ public class CustomStructureFileManager
 				File occupiedChunksBackupFile = new File(
 					worldSaveDir + File.separator + 
 					Constants.MOD_ID + File.separator + 
-					(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+					presetFolderName + File.separator +
 					Constants.PlottedChunksDataFolderName + File.separator +
 					chunkPerRegionEntry.getKey().getChunkX() + "_" +
 					chunkPerRegionEntry.getKey().getChunkZ() +					
@@ -154,17 +154,17 @@ public class CustomStructureFileManager
 		}
 	}
 	
-	public static Map<ChunkCoordinate, PlottedChunksRegion> loadPlottedChunksData(Path worldSaveDir, int dimensionId, ILogger logger)
+	public static Map<ChunkCoordinate, PlottedChunksRegion> loadPlottedChunksData(Path worldSaveDir, String presetFolderName, ILogger logger)
 	{
 		HashMap<ChunkCoordinate, PlottedChunksRegion> output = new HashMap<ChunkCoordinate, PlottedChunksRegion>();
 		
 		File occupiedChunksFolder = new File(
 			worldSaveDir + File.separator + 
 			Constants.MOD_ID + File.separator + 
-			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			presetFolderName + File.separator +
 			Constants.PlottedChunksDataFolderName + File.separator
 		);
-		
+
 		HashMap<File, File> saveFiles = new HashMap<File, File>();
 		ArrayList<File> mainFiles = new ArrayList<File>();
 		ArrayList<File> backupFiles = new ArrayList<File>();
@@ -368,7 +368,7 @@ public class CustomStructureFileManager
 	// Structure cache
 
 	// TODO: Since we're using regions, use short/byte for (internal) coords?
-	static void saveStructureData(Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks, int dimensionId, Path worldSaveDir, ILogger logger)
+	static void saveStructureData(Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks, String presetFolderName, Path worldSaveDir, ILogger logger)
 	{		
 		// Collect all structure start points (and chunks that have bo3's with spawners/moddata/particles in them)
 		// and group them by BO name (or "NULL" for bo3's with spawners/moddata/particles).
@@ -426,7 +426,7 @@ public class CustomStructureFileManager
 						}
 					}
 				}
-				saveStructuresRegionFile(worldSaveDir, dimensionId, cachedRegion.getKey(), structuresPerRegion, logger);
+				saveStructuresRegionFile(worldSaveDir, presetFolderName, cachedRegion.getKey(), structuresPerRegion, logger);
 			}
 		}
 		if(logger.getLogCategoryEnabled(LogCategory.STRUCTURE_PLOTTING))
@@ -435,12 +435,12 @@ public class CustomStructureFileManager
 		}
 	}
 
-	private static void saveStructuresRegionFile(Path worldSaveDir, int dimensionId, ChunkCoordinate regionCoord, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> structuresPerRegion, ILogger logger)
+	private static void saveStructuresRegionFile(Path worldSaveDir, String presetFolderName, ChunkCoordinate regionCoord, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> structuresPerRegion, ILogger logger)
 	{
 		File structuresRegionFile = new File(
 			worldSaveDir + File.separator + 
 			Constants.MOD_ID + File.separator + 
-			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			presetFolderName + File.separator +
 			Constants.StructureDataFolderName + File.separator +
 			regionCoord.getChunkX() + "_" +
 			regionCoord.getChunkZ() +
@@ -449,7 +449,7 @@ public class CustomStructureFileManager
 		File structuresRegionBackupFile = new File(
 			worldSaveDir + File.separator + 
 			Constants.MOD_ID + File.separator + 
-			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			presetFolderName + File.separator +
 			Constants.StructureDataFolderName + File.separator +
 			regionCoord.getChunkX() + "_" +
 			regionCoord.getChunkZ() +					
@@ -744,14 +744,14 @@ public class CustomStructureFileManager
 	
 	// TODO: Load one region file at a time, on-demand, rather than loading all region files at once.
 	// Almost everything should be set up for it, auto-replacing CustomStructurePlaceHolders take care of most things?
-	static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> loadStructureData(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> loadStructureData(String presetFolderName, Path worldSaveDir, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> output = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
 		
 		File structureDataFolder = new File(
 			worldSaveDir + File.separator + 
 			Constants.MOD_ID + File.separator + 
-			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			presetFolderName + File.separator +
 			Constants.StructureDataFolderName + File.separator
 		);
 		
@@ -1178,10 +1178,10 @@ public class CustomStructureFileManager
 		return structuresFile;
 	}
 
-	public static void saveChunksMapFile(Path worldSaveDir, int dimensionId, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, ILogger logger)
+	public static void saveChunksMapFile(Path worldSaveDir, String presetFolderName, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, ILogger logger)
 	{
-		File occupiedChunksFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresFileName);
-		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresBackupFileName);
+		File occupiedChunksFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + presetFolderName + File.separator + Constants.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + presetFolderName + File.separator + Constants.SpawnedStructuresBackupFileName);
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -1261,10 +1261,10 @@ public class CustomStructureFileManager
 		}
 	}
 
-	public static void loadChunksMapFile(Path worldSaveDir, int dimensionId, boolean isBO4Enabled, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, ILogger logger)
+	public static void loadChunksMapFile(Path worldSaveDir, String presetFolderName, boolean isBO4Enabled, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup, ILogger logger)
 	{
-		File occupiedChunksFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresFileName);
-		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + Constants.SpawnedStructuresBackupFileName);
+		File occupiedChunksFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + presetFolderName + File.separator + Constants.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + Constants.MOD_ID + File.separator + presetFolderName + File.separator + Constants.SpawnedStructuresBackupFileName);
 
 		if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
 		{

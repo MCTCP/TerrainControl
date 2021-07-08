@@ -105,7 +105,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
-							this.materialReaderByPresetFolderName.put(presetFolderName, new ForgeMaterialReader());							
 							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger);
 							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
@@ -123,9 +122,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 		this.globalIdMapping = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
-		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
+		this.materialReaderByPresetFolderName = new HashMap<>();
 	}
-	
+
 	@Override
 	public void registerBiomes()
 	{
@@ -232,6 +231,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 				});
 
 				IBiome otgBiome = new ForgeBiome(biome, biomeConfig);
+				if(otgBiomeId >= presetIdMapping.length)
+				{
+					OTG.getEngine().getLogger().log(LogLevel.FATAL, LogCategory.CONFIGS, "Fatal error while registering OTG biome id's for preset " + preset.getFolderName() + ", most likely you've assigned a DefaultOceanBiome that doesn't exist.");
+					throw new RuntimeException("Fatal error while registering OTG biome id's for preset " + preset.getFolderName() + ", most likely you've assigned a DefaultOceanBiome that doesn't exist.");
+				}
 				presetIdMapping[otgBiomeId] = otgBiome;
 
 				worldBiomes.put(biomeConfig.getName(), otgBiomeId);

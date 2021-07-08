@@ -1051,37 +1051,37 @@ public class CustomStructurePlotter
 	
 	// Persistence
 
-	private void savePlottedChunks(Path worldSaveDir, int dimensionId, ILogger logger)
+	private void savePlottedChunks(Path worldSaveDir, String presetFolderName, ILogger logger)
 	{
-		CustomStructureFileManager.savePlottedChunksData(worldSaveDir, dimensionId, this.plottedChunks, logger);
+		CustomStructureFileManager.savePlottedChunksData(worldSaveDir, presetFolderName, this.plottedChunks, logger);
 	}
 
-	private void loadPlottedChunks(Path worldSaveDir, int dimensionId, ILogger logger)
+	private void loadPlottedChunks(Path worldSaveDir, String presetFolderName, ILogger logger)
 	{
 		this.plottedChunks.clear();
-		this.plottedChunks.putAll(CustomStructureFileManager.loadPlottedChunksData(worldSaveDir, dimensionId, logger));
+		this.plottedChunks.putAll(CustomStructureFileManager.loadPlottedChunksData(worldSaveDir, presetFolderName, logger));
 	}
 	
-	private void saveSpawnedStructures(Path worldSaveDir, int dimensionId, ILogger logger)
+	private void saveSpawnedStructures(Path worldSaveDir, String presetFolderName, ILogger logger)
 	{
-		CustomStructureFileManager.saveChunksMapFile(worldSaveDir, dimensionId, this.spawnedStructuresByName, this.spawnedStructuresByGroup, logger);
+		CustomStructureFileManager.saveChunksMapFile(worldSaveDir, presetFolderName, this.spawnedStructuresByName, this.spawnedStructuresByGroup, logger);
 	}
 	
-	private void loadSpawnedStructures(Path worldSaveDir, int dimensionId, boolean isBO4Enabled, ILogger logger)
+	private void loadSpawnedStructures(Path worldSaveDir, String presetFolderName, boolean isBO4Enabled, ILogger logger)
 	{
-		CustomStructureFileManager.loadChunksMapFile(worldSaveDir, dimensionId, isBO4Enabled, this.spawnedStructuresByName, this.spawnedStructuresByGroup, logger);		
+		CustomStructureFileManager.loadChunksMapFile(worldSaveDir, presetFolderName, isBO4Enabled, this.spawnedStructuresByName, this.spawnedStructuresByGroup, logger);		
 	}
 	
-	public void saveStructureCache(Path worldSaveDir, int dimensionId, boolean isBO4Enabled, ILogger logger)
+	public void saveStructureCache(Path worldSaveDir, String presetFolderName, boolean isBO4Enabled, ILogger logger)
 	{
 		if(isBO4Enabled)
 		{
-			savePlottedChunks(worldSaveDir, dimensionId, logger);
-			saveSpawnedStructures(worldSaveDir, dimensionId, logger);
+			savePlottedChunks(worldSaveDir, presetFolderName, logger);
+			saveSpawnedStructures(worldSaveDir, presetFolderName, logger);
 		}
 	}
 
-	public void loadStructureCache(Path worldSaveDir, int dimensionId, boolean isBO4Enabled, Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures, ILogger logger)
+	public void loadStructureCache(Path worldSaveDir, String presetFolderName, boolean isBO4Enabled, Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures, ILogger logger)
 	{
 		this.bo4StructureCache.clear();
 		
@@ -1113,8 +1113,8 @@ public class CustomStructurePlotter
 				}
 			}
 
-			loadPlottedChunks(worldSaveDir, dimensionId, logger);
-			loadSpawnedStructures(worldSaveDir, dimensionId, isBO4Enabled, logger);
+			loadPlottedChunks(worldSaveDir, presetFolderName, logger);
+			loadSpawnedStructures(worldSaveDir, presetFolderName, isBO4Enabled, logger);
 
 			for(ChunkCoordinate chunkCoord : this.bo4StructureCache.keySet())
 			{

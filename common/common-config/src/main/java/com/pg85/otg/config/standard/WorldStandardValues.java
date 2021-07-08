@@ -45,7 +45,9 @@ public class WorldStandardValues extends Settings
 		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "Ocean"),
 		DEFAULT_WARM_OCEAN_BIOME = stringSetting("DefaultWarmOceanBiome", "Ocean"),
 		DEFAULT_LUKEWARM_OCEAN_BIOME = stringSetting("DefaultLukewarmOceanBiome", "Ocean"),
-		DEFAULT_COLD_OCEAN_BIOME = stringSetting("DefaultColdOceanBiome", "Ocean")
+		DEFAULT_COLD_OCEAN_BIOME = stringSetting("DefaultColdOceanBiome", "Ocean"),
+		INFINIBURN = stringSetting("InfiniBurn", "minecraft:infiniburn_overworld"),
+		EFFECTS_LOCATION = stringSetting("EffectsLocation", "minecraft:overworld")
 	;
 
 	public static final Setting<Integer>
@@ -82,7 +84,12 @@ public class WorldStandardValues extends Settings
 		RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
 		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
-		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255)
+		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255),
+		LOGICAL_HEIGHT = intSetting("CarverLavaBlockHeight", 256, 0, Integer.MAX_VALUE)
+	;
+	
+	public static final Setting<Long>
+		FIXED_TIME = longSetting("FixedTime", -1l, 0, 24000)	
 	;
 	
 	public static final Setting<Boolean>
@@ -118,6 +125,16 @@ public class WorldStandardValues extends Settings
 		SHIPWRECKS_ENABLED = booleanSetting("ShipwrecksEnabled", true),
 		VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true),
 		
+		HAS_SKYLIGHT = booleanSetting("HasSkylight", true),
+		HAS_CEILING = booleanSetting("HasCeiling", false),
+		ULTRA_WARM = booleanSetting("UltraWarm", false),
+		NATURAL = booleanSetting("Natural", true),
+		CREATE_DRAGON_FLIGHT = booleanSetting("CreateDragonFight", false),
+		PIGLIN_SAFE = booleanSetting("PiglinSafe", false),
+		BED_WORKS = booleanSetting("BedWorks", true),
+		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", false),
+		HAS_RAIDS = booleanSetting("HasRaids", true),
+
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
 		ISOTGPLUS = booleanSetting("IsOTGPlus", false)
 	;
@@ -145,7 +162,9 @@ public class WorldStandardValues extends Settings
 		RAVINE_DEPTH = doubleSetting("RavineDepth", 3, 0.1, 15),
 		CANYON_DEPTH = doubleSetting("CanyonDepth", 3, 0.1, 15),
 		FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
-		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500)
+		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),
+		COORDINATE_SCALE = doubleSetting("CoordinateScale", 1.0D, 0.0D, Integer.MAX_VALUE),
+		AMBIENT_LIGHT = doubleSetting("AmbientLight", 0.0D, 0.0D, Double.MAX_VALUE)
 	;
 
 	public static final Setting<Integer>

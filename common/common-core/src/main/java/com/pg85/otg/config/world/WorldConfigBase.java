@@ -2,6 +2,8 @@ package com.pg85.otg.config.world;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalLong;
+
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -150,6 +152,24 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected double ravineDepth;	
 	protected int ravineMinAltitude;
 	protected int ravineMaxAltitude;
+
+	// Dimension settings
+
+	protected OptionalLong fixedTime;
+	protected boolean hasSkyLight;
+	protected boolean hasCeiling;
+	protected boolean ultraWarm;
+	protected boolean natural;
+	protected double coordinateScale;
+	protected boolean createDragonFight;
+	protected boolean piglinSafe;
+	protected boolean bedWorks;
+	protected boolean respawnAnchorWorks;
+	protected boolean hasRaids;
+	protected int logicalHeight;
+	protected String infiniburn;
+	protected String effectsLocation;
+	protected float ambientLight;
 
 	protected WorldConfigBase(String configName)
 	{
@@ -723,4 +743,81 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.riversEnabled;
 	}
+	
+	// Dimension settings
+	
+	public OptionalLong getFixedTime()
+	{
+		return this.fixedTime;
+	}
+	
+	public boolean getHasSkyLight()
+	{
+		return this.hasSkyLight;
+	}
+
+	public boolean getHasCeiling()
+	{
+		return this.hasCeiling;
+	}
+
+	public boolean getUltraWarm()
+	{
+		return this.ultraWarm;
+	}
+
+	public boolean getNatural()
+	{
+		return this.natural;
+	}
+
+	public double getCoordinateScale()
+	{
+		return this.coordinateScale;
+	}
+
+	public boolean getCreateDragonFight()
+	{
+		return this.createDragonFight;
+	}
+
+	public boolean getPiglinSafe()
+	{
+		return this.piglinSafe;
+	}
+
+	public boolean getBedWorks()
+	{
+		return this.bedWorks;
+	}
+
+	public boolean getRespawnAnchorWorks()
+	{
+		return this.respawnAnchorWorks;
+	}
+
+	public boolean getHasRaids()
+	{
+		return this.hasRaids;
+	}
+
+	public int getLogicalHeight()
+	{
+		return this.logicalHeight;
+	}
+
+	public String getInfiniburn()
+	{
+		return this.infiniburn;
+	}
+
+	public String getEffectsLocation()
+	{
+		return this.effectsLocation;
+	}
+
+	public float getAmbientLight()
+	{
+		return this.ambientLight;
+	}	
 }
