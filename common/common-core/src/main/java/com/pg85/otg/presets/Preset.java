@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.interfaces.IWorldConfig;
 
 /**
  * Represents an OTG preset, with all its world and biome configs, stored in /config/OpenTerrainGenerator/Presets/\<PresetName\>/.
@@ -66,7 +67,7 @@ public class Preset
 		return this.shortPresetName;
 	}
 
-	public WorldConfig getWorldConfig()
+	public IWorldConfig getWorldConfig()
 	{
 		return this.worldConfig;
 	}

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.OptionalLong;
+
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.biome.BiomeGroupManager;
@@ -190,6 +192,7 @@ public class WorldConfig extends WorldConfigBase
 		this.defaultColdOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_COLD_OCEAN_BIOME, logger);
 		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
 		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger);
+		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger);		
 		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger);
 		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger);
 		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger);
@@ -256,7 +259,8 @@ public class WorldConfig extends WorldConfigBase
 		this.useOldBO3StructureRarity = reader.getSetting(WorldStandardValues.USE_OLD_BO3_STRUCTURE_RARITY, logger);
 		this.decorationBoundsCheck = reader.getSetting(WorldStandardValues.DECORATION_BOUNDS_CHECK, logger);
 		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger);		
-
+		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger);
+		
 		// Caves & Ravines
 
 		this.cavesEnabled = reader.getSetting(WorldStandardValues.CAVES_ENABLED, logger);
@@ -279,11 +283,24 @@ public class WorldConfig extends WorldConfigBase
 		this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, logger);
 		this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, logger);
 
-		// TODO: Re-implement these and clean up
-
-		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger);
-		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
-		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger);
+		// Dimension settings
+		
+		long fixedTime = reader.getSetting(WorldStandardValues.FIXED_TIME, logger);
+		this.fixedTime = fixedTime == -1l ? OptionalLong.empty() : OptionalLong.of(fixedTime);
+		this.hasSkyLight = reader.getSetting(WorldStandardValues.HAS_SKYLIGHT, logger);
+		this.hasCeiling = reader.getSetting(WorldStandardValues.HAS_CEILING, logger);
+		this.ultraWarm = reader.getSetting(WorldStandardValues.ULTRA_WARM, logger);
+		this.natural = reader.getSetting(WorldStandardValues.NATURAL, logger);
+		this.coordinateScale = reader.getSetting(WorldStandardValues.COORDINATE_SCALE, logger);
+		this.createDragonFight = reader.getSetting(WorldStandardValues.CREATE_DRAGON_FLIGHT, logger);
+		this.piglinSafe = reader.getSetting(WorldStandardValues.PIGLIN_SAFE, logger);
+		this.bedWorks = reader.getSetting(WorldStandardValues.BED_WORKS, logger);
+		this.respawnAnchorWorks = reader.getSetting(WorldStandardValues.RESPAWN_ANCHOR_WORKS, logger);
+		this.hasRaids = reader.getSetting(WorldStandardValues.HAS_RAIDS, logger); 
+		this.logicalHeight = reader.getSetting(WorldStandardValues.LOGICAL_HEIGHT, logger);
+		this.infiniburn = reader.getSetting(WorldStandardValues.INFINIBURN, logger);
+		this.effectsLocation = reader.getSetting(WorldStandardValues.EFFECTS_LOCATION, logger);
+		this.ambientLight = reader.getSetting(WorldStandardValues.AMBIENT_LIGHT, logger).floatValue();		
 	}
 
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
@@ -733,5 +750,23 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
 		writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
 		writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
+		
+		writer.header1("Dimension settings (Forge)");
+		
+		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? -1 : this.fixedTime.getAsLong());		
+		writer.putSetting(WorldStandardValues.HAS_SKYLIGHT, this.hasSkyLight);
+		writer.putSetting(WorldStandardValues.HAS_CEILING, this.hasCeiling);
+		writer.putSetting(WorldStandardValues.ULTRA_WARM, this.ultraWarm);
+		writer.putSetting(WorldStandardValues.NATURAL, this.natural);
+		writer.putSetting(WorldStandardValues.COORDINATE_SCALE, this.coordinateScale);
+		writer.putSetting(WorldStandardValues.CREATE_DRAGON_FLIGHT, this.createDragonFight);		
+		writer.putSetting(WorldStandardValues.PIGLIN_SAFE, this.piglinSafe);		
+		writer.putSetting(WorldStandardValues.BED_WORKS, this.bedWorks);
+		writer.putSetting(WorldStandardValues.RESPAWN_ANCHOR_WORKS, this.respawnAnchorWorks);
+		writer.putSetting(WorldStandardValues.HAS_RAIDS, this.hasRaids);		
+		writer.putSetting(WorldStandardValues.LOGICAL_HEIGHT, this.logicalHeight);
+		writer.putSetting(WorldStandardValues.INFINIBURN, this.infiniburn);		
+		writer.putSetting(WorldStandardValues.EFFECTS_LOCATION, this.effectsLocation);
+		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight);
 	}
 }
