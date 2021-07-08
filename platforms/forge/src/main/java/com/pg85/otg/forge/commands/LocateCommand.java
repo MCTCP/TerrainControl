@@ -1,11 +1,18 @@
 package com.pg85.otg.forge.commands;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IBiomeConfig;
+import com.pg85.otg.presets.Preset;
+import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -15,6 +22,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LocateCommand implements BaseCommand
 {
@@ -23,19 +31,22 @@ public class LocateCommand implements BaseCommand
 			object -> new TranslationTextComponent("commands.locatebiome.notFound", new Object[]
 			{ object }));
 
+	List<String> biomes = ForgeRegistries.BIOMES.getKeys().stream()
+			.filter(key -> key.getNamespace().equals(Constants.MOD_ID_SHORT))
+			.map(key -> key.toString().substring(key.toString().indexOf('.') + 1)).collect(Collectors.toList());
+
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
-		builder.then(Commands.literal("locate")
-				.executes(context -> showHelp(context.getSource()))
-					.then(Commands.argument("biome", StringArgumentType.word()).executes(
-						context -> locateBiome(context.getSource(), StringArgumentType.getString(context, "biome"))))
-		);
+		builder.then(Commands.literal("locate").executes(context -> showHelp(context.getSource()))
+				.then(Commands.argument("biome", StringArrayArgument.with(biomes)).executes(this::locateBiome)));
 	}
 
 	@SuppressWarnings("resource")
-	private int locateBiome(CommandSource source, String biome) throws CommandSyntaxException
+	private int locateBiome(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
+		CommandSource source = context.getSource();
+		String biome = context.getArgument("biome", String.class);
 		ServerWorld world = source.getLevel();
 		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
@@ -43,16 +54,10 @@ public class LocateCommand implements BaseCommand
 			return 0;
 		}
 
-		IBiomeConfig config = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset()
-				.getBiomeConfig(biome);
+		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset();
 
-		if (config == null)
-		{
-			source.sendSuccess(new StringTextComponent("Invalid biome name: " + biome), false);
-			return 0;
-		}
-
-		ResourceLocation key = new ResourceLocation(config.getRegistryKey().toResourceLocationString());
+		ResourceLocation key = new ResourceLocation(new OTGBiomeResourceLocation(preset.getPresetFolder(),
+				preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
 
 		BlockPos pos = world.findNearestBiome(world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key),
 				new BlockPos(source.getPosition()), 6400, 8);
