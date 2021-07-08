@@ -13,8 +13,8 @@ public class BiomeCommand implements BaseCommand
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
-		builder.then(Commands.literal("biome"))
-			.executes(context -> showBiome(context.getSource())
+		builder.then(Commands.literal("biome")
+			.executes(context -> showBiome(context.getSource()))
 		);
 	}
 	
