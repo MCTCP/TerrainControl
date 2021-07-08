@@ -3,7 +3,6 @@ package com.pg85.otg.forge.network;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ColorThreshold;
@@ -13,9 +12,6 @@ import net.minecraft.network.PacketBuffer;
 
 public class BiomeSettingSyncWrapper
 {
-	private int grassColor;
-	private int foliageColor;
-	private int waterColor;
 	private float fogDensity;
 	private ColorSet grassColorControl;
 	private ColorSet foliageColorControl;
@@ -23,10 +19,6 @@ public class BiomeSettingSyncWrapper
 
 	public BiomeSettingSyncWrapper(IBiomeConfig config)
 	{
-		this.grassColor = config.getGrassColor();
-		this.foliageColor = config.getFoliageColor();
-		this.waterColor = config.getWaterColor();
-
 		this.fogDensity = config.getFogDensity();
 
 		this.grassColorControl = config.getGrassColorControl();
@@ -36,10 +28,6 @@ public class BiomeSettingSyncWrapper
 
 	public BiomeSettingSyncWrapper(PacketBuffer buffer)
 	{
-		this.grassColor = buffer.readInt();
-		this.foliageColor = buffer.readInt();
-		this.waterColor = buffer.readInt();
-
 		this.fogDensity = buffer.readFloat();
 
 		List<ColorThreshold> grassColors = new ArrayList<>();
@@ -65,21 +53,6 @@ public class BiomeSettingSyncWrapper
 
 	}
 
-	public int getGrassColor()
-	{
-		return grassColor;
-	}
-
-	public int getFoliageColor()
-	{
-		return foliageColor;
-	}
-
-	public int getWaterColor()
-	{
-		return waterColor;
-	}
-
 	public float getFogDensity()
 	{
 		return fogDensity;
@@ -102,10 +75,6 @@ public class BiomeSettingSyncWrapper
 
 	public void encode(PacketBuffer buffer)
 	{
-		buffer.writeInt(this.grassColor);
-		buffer.writeInt(this.foliageColor);
-		buffer.writeInt(this.waterColor);
-
 		buffer.writeFloat(this.fogDensity);
 
 		buffer.writeInt(this.grassColorControl.getLayers().size());

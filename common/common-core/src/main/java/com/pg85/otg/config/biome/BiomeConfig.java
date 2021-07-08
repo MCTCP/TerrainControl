@@ -297,10 +297,17 @@ public class BiomeConfig extends BiomeConfigBase
 		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
 		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
 	
+		updateLegacySettings(reader, materialReader, logger);
+	}
+
+	private void updateLegacySettings(SettingsMap reader,IMaterialReader materialReader, ILogger logger) {
+		if (fogDensity == 0.5 && fogColor == BiomeStandardValues.FOG_COLOR.getDefaultValue()) {
+			fogDensity = 0.0f;
+		}
+		
 		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_GRASS_COLOR2, logger).ifPresent(set -> this.grassColorControl = set);
 		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_FOLIAGE_COLOR2, logger).ifPresent(set -> this.foliageColorControl = set);
 	}
-
 
 	private Optional<ColorSet> readLegacyColorSetting(SettingsMap reader, IMaterialReader materialReader, Setting<String> oldSetting, ILogger logger)
 	{
@@ -636,7 +643,7 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
 		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
-		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0 to 1. 0.1 will mimic vanilla fog density.");
+		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
 
 		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
 

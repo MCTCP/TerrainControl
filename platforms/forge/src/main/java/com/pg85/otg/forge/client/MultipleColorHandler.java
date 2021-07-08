@@ -29,6 +29,12 @@ public class MultipleColorHandler
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 
+				// This shouldn't be null, but sometimes it is?
+				if (key == null)
+				{
+					return grassColorResolver.getColor(biome, posX, posZ);
+				}
+
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
@@ -36,10 +42,8 @@ public class MultipleColorHandler
 					return grassColorResolver.getColor(biome, posX, posZ);
 				}
 
-				int grassColor = wrapper.getGrassColor() == 0xFFFFFF ? biome.getGrassColor(posX, posZ)
-						: wrapper.getGrassColor();
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);
-				return wrapper.getGrassColorControl().getColor(noise, grassColor);
+				return wrapper.getGrassColorControl().getColor(noise, biome.getGrassColor(posX, posZ));
 
 			};
 
@@ -47,6 +51,11 @@ public class MultipleColorHandler
 			{
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+				
+				if (key == null)
+				{
+					return foliageColorResolver.getColor(biome, posX, posZ);
+				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
@@ -55,10 +64,8 @@ public class MultipleColorHandler
 					return foliageColorResolver.getColor(biome, posX, posZ);
 				}
 
-				int foliageColor = wrapper.getFoliageColor() == 0xFFFFFF ? biome.getFoliageColor()
-						: wrapper.getFoliageColor();
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);
-				return wrapper.getFoliageColorControl().getColor(noise, foliageColor);
+				return wrapper.getFoliageColorControl().getColor(noise, biome.getFoliageColor());
 
 			};
 
@@ -66,6 +73,11 @@ public class MultipleColorHandler
 			{
 				ResourceLocation key = Minecraft.getInstance().level.registryAccess()
 						.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+				
+				if (key == null)
+				{
+					return waterColorResolver.getColor(biome, posX, posZ);
+				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
@@ -74,9 +86,8 @@ public class MultipleColorHandler
 					return waterColorResolver.getColor(biome, posX, posZ);
 				}
 
-				int waterColor = wrapper.getWaterColor() == 0xFFFFFF ? biome.getWaterColor() : wrapper.getWaterColor();
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);
-				return wrapper.getWaterColorControl().getColor(noise, waterColor);
+				return wrapper.getWaterColorControl().getColor(noise, biome.getWaterColor());
 
 			};
 		}
