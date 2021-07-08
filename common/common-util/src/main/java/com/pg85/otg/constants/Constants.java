@@ -19,7 +19,8 @@ public class Constants
 	public static final String PRESETS_FOLDER = "Presets";
 	public static final String MODPACK_CONFIGS_FOLDER = "Modpacks";
 	public static final String GLOBAL_OBJECTS_FOLDER = "GlobalObjects";
-	public static final String DEFAULT_PRESET_NAME = "Default";
+	public static final String DIMENSION_CONFIGS_FOLDER = "DimensionConfigs";	
+	public static final String DEFAULT_PRESET_NAME = "Default";	
 	
 	// Network
 	
@@ -61,15 +62,6 @@ public class Constants
 	public static final String StructureDataFileExtension = ".dat";
 	public static final String BiomeConfigFileExtension = ".bc";
 	
-	// Contains the O menu settings for a world/dims.
-	public static final String DimensionsConfigFileName = "Config.yaml";
-	public static final String DimensionsConfigBackupFileName = "Config" + BackupFileSuffix + ".yaml";
-	// Contains the biome id's for a world/dim, generated on world/dim creation
-	public static final String BiomeIdDataFileName = "BiomeIds.txt";
-	public static final String BiomeIdDataBackupFileName = "BiomeIds" + BackupFileSuffix + ".txt";
-	// Data about dimensions, used to load dims on server start.
-	public static final String DimensionsDataFileName = "Dimensions.txt";
-	public static final String DimensionsDataBackupFileName = "Dimensions" + BackupFileSuffix + ".txt";
 	// Data on all chunks containing structures or spawners/particles/moddata
 	public static final String StructureDataFolderName = "StructureData";	
 	public static final String StructureDataBackupFileExtension = BackupFileSuffix + StructureDataFileExtension;
@@ -77,13 +69,6 @@ public class Constants
 	// Data about structure start points and bo4 groups, used for distance.
 	public static final String SpawnedStructuresFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataFileExtension;
 	public static final String SpawnedStructuresBackupFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataBackupFileExtension;
-	// Data about pregenerator progress
-	public static final String PregeneratedChunksFileName = "PregeneratedChunks.txt";
-	public static final String PregeneratedChunksBackupFileName = "PregeneratedChunks" + BackupFileSuffix + ".txt";
-	// Misc data that should be saved with the world. Currently only contains version, 
-	// can be used for backwards compatibility when updating configs.
-	public static final String WorldSaveDataFileName = "WorldSave.txt";
-	public static final String WorldSaveDataBackupFileName = "WorldSave" + BackupFileSuffix + ".txt";
 	
 	/**
 	 * Temperatures below this temperature will cause the biome to be covered

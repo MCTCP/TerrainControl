@@ -2,11 +2,14 @@ package com.pg85.otg.forge.dimensions;
 
 import java.util.OptionalLong;
 import java.util.Map.Entry;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IWorldConfig;
@@ -38,7 +41,6 @@ public class OTGDimensionType extends DimensionType
 	public static DimensionGeneratorSettings createOTGSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
 	{
 		// Find the preset defined in generatorSettings, if none use the default preset.
-		// TODO: Change this to use DimensionConfig, so we can load multiple dimensions/presets.
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(generatorSettings);
 		String presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
 		if(preset != null)
@@ -46,34 +48,103 @@ public class OTGDimensionType extends DimensionType
 			presetFolderName = preset.getFolderName();
 		}
 
-		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+		MutableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 
 		return OTGDimensionType.createOTGDimensionGeneratorSettings(
-			dynamicRegistries, 
-			seed, 
-			generateStructures, 
-			bonusChest, 
+			dimensionTypesRegistry,
+			biomesRegistry,
+			dimensionSettingsRegistry,
+			seed,
+			generateStructures,
+			bonusChest,
 			DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed),
-			new DimensionConfig(presetFolderName)
+			presetFolderName
 		);
-	}	
+	}
 	
 	// Used for SP and MP
-	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> dimensions, DimensionConfig dimensionConfig)
+	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> dimensions, String presetFolderName)
 	{
-		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
-		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);	
+		SimpleRegistry<Dimension> simpleRegistry = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
+		
+		DimensionConfig dimConfig = DimensionConfig.fromDisk(presetFolderName);
+		if(dimConfig == null)
+		{
+			dimConfig = new DimensionConfig(presetFolderName);
+			dimConfig.OverWorld = new OTGDimension(presetFolderName, seed);
+		}
+		if(dimConfig.OverWorld != null)
+		{
+			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
+				dimConfig.OverWorld.PresetFolderName, new OTGBiomeProvider(dimConfig.OverWorld.PresetFolderName, dimConfig.OverWorld.Seed, false, false, biomesRegistry), dimConfig.OverWorld.Seed,
+				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
+			);
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_overworld"));
+			addDimension(dimConfig.OverWorld.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, dimTypeRegistryKey);
+		}
+		if(dimConfig.Nether != null)
+		{
+			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
+					dimConfig.Nether.PresetFolderName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimConfig.Nether.Seed, false, false, biomesRegistry), dimConfig.Nether.Seed,
+				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
+			);
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_nether"));
+			addDimension(dimConfig.Nether.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, dimTypeRegistryKey);
+		}
+		if(dimConfig.End != null)
+		{
+			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
+					dimConfig.End.PresetFolderName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimConfig.End.Seed, false, false, biomesRegistry), dimConfig.End.Seed,
+				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
+			);
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_end"));
+			addDimension(dimConfig.End.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.END, chunkGenerator, dimTypeRegistryKey);
+		}
+		if(dimConfig.Dimensions != null)
+		{
+			for(OTGDimension otgDim : dimConfig.Dimensions)
+			{
+				ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
+					otgDim.PresetFolderName, new OTGBiomeProvider(otgDim.PresetFolderName, otgDim.Seed, false, false, biomesRegistry), otgDim.Seed,
+					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
+				);
+				RegistryKey<Dimension> dimRegistryKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_" + otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+				RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_" + otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+				addDimension(otgDim.PresetFolderName, simpleRegistry, dimensionTypesRegistry, dimRegistryKey, chunkGenerator, dimTypeRegistryKey);
+			}
+		}
 
-		// TODO: Change this to use DimensionConfig, so we can load multiple dimensions/presets.
-		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(dimensionConfig.PresetFolderName);
+		for(Entry<RegistryKey<Dimension>, Dimension> entry : dimensions.entrySet())
+		{
+			RegistryKey<Dimension> registrykey = entry.getKey();
+			// When replacing nether and/or end, don't copy them from global registry.
+			if (
+				(dimConfig.OverWorld == null || registrykey != Dimension.OVERWORLD) &&
+				(dimConfig.Nether == null || registrykey != Dimension.NETHER) && 
+				(dimConfig.End == null || registrykey != Dimension.END)
+			)
+			{
+				simpleRegistry.register(registrykey, entry.getValue(), dimensions.lifecycle(entry.getValue()));
+			}
+		}
+		
+		return new DimensionGeneratorSettings(
+			seed,
+			generateFeatures,
+			generateBonusChest,
+			simpleRegistry
+		);
+	}
+
+	private static void addDimension(String presetFolderName, SimpleRegistry<Dimension> simpleRegistry, MutableRegistry<DimensionType> dimensionTypeRegistry, RegistryKey<Dimension> dimRegistryKey, ChunkGenerator chunkGenerator, RegistryKey<DimensionType> dimTypeRegistryKey)
+	{
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		IWorldConfig worldConfig = preset.getWorldConfig();
 		
 		// Register OTG DimensionType with settings from WorldConfig
-		RegistryKey<DimensionType> otgOverworldLocation = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation("otg_overworld"));
-		DimensionType otgOverWorld = new OTGDimensionType(
+		DimensionType otgOverWorld = new DimensionType(
 			worldConfig.getFixedTime(),
 			worldConfig.getHasSkyLight(),
 			worldConfig.getHasCeiling(),
@@ -91,61 +162,13 @@ public class OTGDimensionType extends DimensionType
 			new ResourceLocation(worldConfig.getEffectsLocation()),
 			worldConfig.getAmbientLight()
 		);
-		MutableRegistry<DimensionType> mutableregistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);		
-		mutableregistry.register(otgOverworldLocation, otgOverWorld, Lifecycle.stable());
+		dimensionTypeRegistry.registerOrOverride(OptionalInt.empty(), dimTypeRegistryKey, otgOverWorld, Lifecycle.stable());
 		
-		return new DimensionGeneratorSettings(
-			seed,
-			generateFeatures,
-			generateBonusChest,
-			withOverworld(
-				otgOverworldLocation,
-				dimensionTypesRegistry,
-				dimensions,
-				new OTGNoiseChunkGenerator(
-					dimensionConfig,
-					new OTGBiomeProvider(
-						dimensionConfig.PresetFolderName,
-						seed,
-						false,
-						false,
-						biomesRegistry
-					),
-					seed,
-					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
-				)
-			)
-		);
-	}
-
-	private static SimpleRegistry<Dimension> withOverworld(RegistryKey<DimensionType> otgOverworldLocation, Registry<DimensionType> dimensionTypeRegistry, SimpleRegistry<Dimension> dimensionRegistry, ChunkGenerator chunkGenerator)
-	{
+		Dimension dimension = simpleRegistry.get(dimRegistryKey);
 		Supplier<DimensionType> supplier = () -> {
-			return dimensionTypeRegistry.getOrThrow(otgOverworldLocation);
+			// TODO: Is this supposed to be a fallback? Normally falls back to dimensionTypeRegistry.getOrThrow(DimensionType.OVERWORLD_LOCATION)
+			return dimension == null ? dimensionTypeRegistry.getOrThrow(dimTypeRegistryKey) : dimension.type();
 		};
-
-		SimpleRegistry<Dimension> simpleregistry = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
-		simpleregistry.register(Dimension.OVERWORLD, new Dimension(supplier, chunkGenerator), Lifecycle.stable());
-
-		// Replace nether or end with OTG dimension
-		//simpleregistry.register(Dimension.NETHER, new Dimension(supplier, chunkGenerator), Lifecycle.stable());
-		//simpleregistry.register(Dimension.END, new Dimension(supplier, chunkGenerator), Lifecycle.stable());
-
-		// Add custom OTG dimensions
-		//RegistryKey<Dimension> OTGDim = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation("otg_dim"));
-		//simpleregistry.register(OTGDim, new Dimension(supplier, chunkGenerator), Lifecycle.stable());
-		//
-
-		for(Entry<RegistryKey<Dimension>, Dimension> entry : dimensionRegistry.entrySet())
-		{
-			RegistryKey<Dimension> registrykey = entry.getKey();
-			if (registrykey != Dimension.OVERWORLD)
-			// When replacing nether and/or end, don't copy them from global registry.
-			//if (registrykey != Dimension.OVERWORLD && registrykey != Dimension.NETHER && registrykey != Dimension.END)
-			{
-				simpleregistry.register(registrykey, entry.getValue(), dimensionRegistry.lifecycle(entry.getValue()));
-			}
-		}
-		return simpleregistry;
+		simpleRegistry.register(dimRegistryKey, new Dimension(supplier, chunkGenerator), Lifecycle.stable());		
 	}
 }

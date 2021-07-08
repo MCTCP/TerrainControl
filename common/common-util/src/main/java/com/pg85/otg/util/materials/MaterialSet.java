@@ -78,7 +78,7 @@ public class MaterialSet
 			this.allNonSolidMaterials = true;
 			return;
 		}
-
+		
 		LocalMaterialTag tag = materialReader.readTag(input);
 		if(tag != null)
 		{

@@ -318,13 +318,12 @@ public abstract class OTGEngine
 		
 	// Builders/Factories
 	
-	public CustomStructureCache createCustomStructureCache(String presetFolderName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
+	public CustomStructureCache createCustomStructureCache(String presetFolderName, Path worldSavepath, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
 		return new CustomStructureCache(
 			presetFolderName, 
 			worldSavepath, 
-			dimId, 
 			worldSeed, 
 			isBo4Enabled, 
 			getOTGRootFolder(), 

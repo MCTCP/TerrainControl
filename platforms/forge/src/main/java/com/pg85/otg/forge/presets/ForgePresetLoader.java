@@ -105,7 +105,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 					{
 						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
 						{
-							this.materialReaderByPresetFolderName.put(presetFolderName, new ForgeMaterialReader());							
 							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, logger);
 							Preset existingPreset = this.presets.get(preset.getFolderName());
 							existingPreset.update(preset);
@@ -123,9 +122,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 		this.globalIdMapping = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
 		this.biomesByPresetFolderName = new LinkedHashMap<>();
-		this.materialReaderByPresetFolderName = new LinkedHashMap<>();
+		this.materialReaderByPresetFolderName = new HashMap<>();
 	}
-	
+
 	@Override
 	public void registerBiomes()
 	{

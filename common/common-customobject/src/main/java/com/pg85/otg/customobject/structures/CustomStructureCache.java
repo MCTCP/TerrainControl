@@ -42,7 +42,6 @@ public class CustomStructureCache
 {
 	private final Path worldSaveDir;
 	private final boolean isBO4Enabled;
-	private final int dimensionId;
 	private final String presetFolderName;
 	private final long worldSeed;
 	
@@ -64,14 +63,13 @@ public class CustomStructureCache
 	// WorldInfoChunks is used as little as possible, due to its size and slowness.
 	private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
 
-	public CustomStructureCache(String presetFolderName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public CustomStructureCache(String presetFolderName, Path worldSaveDir, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		this.plotter = new CustomStructurePlotter();
 		this.bo3StructureCache = new FifoMap<ChunkCoordinate, BO3CustomStructure>(400);
 		this.worldSaveDir = worldSaveDir;
 		this.isBO4Enabled = isBO4Enabled;
-		this.dimensionId = dimensionId;
 		this.presetFolderName = presetFolderName;
 		this.worldSeed = worldSeed;
 		loadStructureCache(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -311,11 +309,11 @@ public class CustomStructureCache
 
 	private void saveStructureCache(ILogger logger)
 	{
-		CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.dimensionId, this.worldSaveDir, logger);
+		CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.presetFolderName, this.worldSaveDir, logger);
 		
 		if(this.isBO4Enabled)
 		{
-			plotter.saveStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, logger);
+			plotter.saveStructureCache(this.worldSaveDir, this.presetFolderName, this.isBO4Enabled, logger);
 		}
 	}
 
@@ -325,12 +323,12 @@ public class CustomStructureCache
 
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
-		Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetFolderName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.presetFolderName, this.worldSaveDir, this.worldSeed, this.isBO4Enabled, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		if(loadedStructures != null)
 		{
 			if(this.isBO4Enabled)
 			{
-				this.plotter.loadStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, loadedStructures, logger);
+				this.plotter.loadStructureCache(this.worldSaveDir, this.presetFolderName, this.isBO4Enabled, loadedStructures, logger);
 			}
 
 			for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructure : loadedStructures.entrySet())
