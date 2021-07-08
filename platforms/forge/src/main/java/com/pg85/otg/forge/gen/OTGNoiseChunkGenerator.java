@@ -121,10 +121,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
-	private final DimensionConfig dimensionConfig;
+	private final DimensionConfig dimensionConfig; 	// TODO: Implement this.
 	private final Preset preset;
-	// TODO: Move this to WorldLoader when ready?
-	private CustomStructureCache structureCache;
+	private CustomStructureCache structureCache; // TODO: Move this?
 	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
@@ -144,7 +143,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	@SuppressWarnings("deprecation")
-	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfig, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
 
@@ -153,7 +152,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}	
 		
-		this.dimensionConfig = dimensionConfigSupplier;
+		this.dimensionConfig = dimensionConfig;
 		this.worldSeed = seed;
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();	
