@@ -98,5 +98,4 @@ public class BiomeSettingSyncWrapper
 			buffer.writeFloat(color.getMaxNoise());
 		}
 	}
-
 }

@@ -1,11 +1,17 @@
 package com.pg85.otg.forge.materials;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 import net.minecraft.block.*;
 import net.minecraft.state.properties.BambooLeaves;
 import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.ResourceLocation;
+
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ForgeMaterials extends LocalMaterials
@@ -15,11 +21,157 @@ public class ForgeMaterials extends LocalMaterials
 	private static final Block[] CORAL_BLOCKS_TAG = {Blocks.TUBE_CORAL_BLOCK, Blocks.BRAIN_CORAL_BLOCK, Blocks.BUBBLE_CORAL_BLOCK, Blocks.FIRE_CORAL_BLOCK, Blocks.HORN_CORAL_BLOCK};
 	private static final Block[] WALL_CORALS_TAG = {Blocks.TUBE_CORAL_WALL_FAN, Blocks.BRAIN_CORAL_WALL_FAN, Blocks.BUBBLE_CORAL_WALL_FAN, Blocks.FIRE_CORAL_WALL_FAN, Blocks.HORN_CORAL_WALL_FAN};
 	private static final Block[] CORALS_TAG = {Blocks.TUBE_CORAL, Blocks.BRAIN_CORAL, Blocks.BUBBLE_CORAL, Blocks.FIRE_CORAL, Blocks.HORN_CORAL, Blocks.TUBE_CORAL_FAN, Blocks.BRAIN_CORAL_FAN, Blocks.BUBBLE_CORAL_FAN, Blocks.FIRE_CORAL_FAN, Blocks.HORN_CORAL_FAN};
-	
+
+	@SuppressWarnings("serial")
 	public static void init()
 	{
 		// Tags/collections used in OTG code
+		// "WATER", new Block[] { Blocks.FLOWING_WATER , Blocks.STATIONARY_WATER }); // TODO: is this spigot-only, or no longer needed?
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"stone"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.STONE; });
+			add(() -> { return Blocks.GRANITE; });
+			add(() -> { return Blocks.DIORITE; });
+			add(() -> { return Blocks.ANDESITE; });
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"dirt"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.DIRT; });
+			add(() -> { return Blocks.COARSE_DIRT; });
+			add(() -> { return Blocks.PODZOL; });			
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"stained_clay"), new HashSet<Supplier<Block>>()
+		{{		
+			add(() -> { return Blocks.WHITE_TERRACOTTA; });
+			add(() -> { return Blocks.ORANGE_TERRACOTTA; });
+			add(() -> { return Blocks.MAGENTA_TERRACOTTA; });
+			add(() -> { return Blocks.LIGHT_BLUE_TERRACOTTA; });
+			add(() -> { return Blocks.YELLOW_TERRACOTTA; });
+			add(() -> { return Blocks.LIME_TERRACOTTA; });
+			add(() -> { return Blocks.PINK_TERRACOTTA; });
+			add(() -> { return Blocks.GRAY_TERRACOTTA; });
+			add(() -> { return Blocks.LIGHT_GRAY_TERRACOTTA; });
+			add(() -> { return Blocks.CYAN_TERRACOTTA; });
+			add(() -> { return Blocks.PURPLE_TERRACOTTA; });
+			add(() -> { return Blocks.BLUE_TERRACOTTA; });
+			add(() -> { return Blocks.BROWN_TERRACOTTA; });
+			add(() -> { return Blocks.GREEN_TERRACOTTA; });
+			add(() -> { return Blocks.RED_TERRACOTTA; });
+			add(() -> { return Blocks.BLACK_TERRACOTTA; });			
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"log"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.DARK_OAK_LOG; });
+			add(() -> { return Blocks.DARK_OAK_WOOD; });
+			add(() -> { return Blocks.STRIPPED_DARK_OAK_LOG; });
+			add(() -> { return Blocks.STRIPPED_DARK_OAK_WOOD; });
+			add(() -> { return Blocks.OAK_LOG; });
+			add(() -> { return Blocks.OAK_WOOD; });
+			add(() -> { return Blocks.STRIPPED_OAK_LOG; });
+			add(() -> { return Blocks.STRIPPED_OAK_WOOD; });
+			add(() -> { return Blocks.ACACIA_LOG; });
+			add(() -> { return Blocks.ACACIA_WOOD; });
+			add(() -> { return Blocks.STRIPPED_ACACIA_LOG; });
+			add(() -> { return Blocks.STRIPPED_ACACIA_WOOD; });
+			add(() -> { return Blocks.BIRCH_LOG; });
+			add(() -> { return Blocks.BIRCH_WOOD; });
+			add(() -> { return Blocks.STRIPPED_BIRCH_LOG; });
+			add(() -> { return Blocks.STRIPPED_BIRCH_WOOD; });
+			add(() -> { return Blocks.JUNGLE_LOG; });
+			add(() -> { return Blocks.STRIPPED_JUNGLE_LOG; });
+			add(() -> { return Blocks.STRIPPED_JUNGLE_WOOD; });
+			add(() -> { return Blocks.SPRUCE_LOG; });
+			add(() -> { return Blocks.SPRUCE_WOOD; });
+			add(() -> { return Blocks.STRIPPED_SPRUCE_LOG; });
+			add(() -> { return Blocks.STRIPPED_SPRUCE_WOOD; });
+			add(() -> { return Blocks.CRIMSON_STEM; });
+			add(() -> { return Blocks.STRIPPED_CRIMSON_STEM; });
+			add(() -> { return Blocks.CRIMSON_HYPHAE; });
+			add(() -> { return Blocks.STRIPPED_CRIMSON_HYPHAE; });
+			add(() -> { return Blocks.WARPED_STEM; });
+			add(() -> { return Blocks.STRIPPED_WARPED_STEM; });
+			add(() -> { return Blocks.WARPED_HYPHAE; });
+			add(() -> { return Blocks.STRIPPED_WARPED_HYPHAE; });
+		}});
 		
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"air"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.AIR; });
+			add(() -> { return Blocks.CAVE_AIR; });
+		}});
+		
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"sandstone"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.SANDSTONE; });
+			add(() -> { return Blocks.CHISELED_SANDSTONE; });
+			add(() -> { return Blocks.SMOOTH_SANDSTONE; });
+		}});
+		
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"red_sandstone"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.RED_SANDSTONE; });
+			add(() -> { return Blocks.CHISELED_RED_SANDSTONE; });
+			add(() -> { return Blocks.SMOOTH_RED_SANDSTONE; });
+		}});
+		
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"long_grass"), new HashSet<Supplier<Block>>()
+		{{		
+			add(() -> { return Blocks.DEAD_BUSH; });
+			add(() -> { return Blocks.TALL_GRASS; });
+			add(() -> { return Blocks.FERN; });
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"red_flower"), new HashSet<Supplier<Block>>()
+		{{		
+			add(() -> { return Blocks.POPPY; });
+			add(() -> { return Blocks.BLUE_ORCHID; });
+			add(() -> { return Blocks.ALLIUM; });
+			add(() -> { return Blocks.AZURE_BLUET; });
+			add(() -> { return Blocks.RED_TULIP; });
+			add(() -> { return Blocks.ORANGE_TULIP; });
+			add(() -> { return Blocks.WHITE_TULIP; });
+			add(() -> { return Blocks.PINK_TULIP; });
+			add(() -> { return Blocks.OXEYE_DAISY; });
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"quartz_block"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.QUARTZ_BLOCK; });
+			add(() -> { return Blocks.CHISELED_QUARTZ_BLOCK; });
+			add(() -> { return Blocks.QUARTZ_PILLAR; });
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"prismarine"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.PRISMARINE; });
+			add(() -> { return Blocks.PRISMARINE_BRICKS; });
+			add(() -> { return Blocks.DARK_PRISMARINE; });
+		}});
+
+		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"concrete"), new HashSet<Supplier<Block>>()
+		{{
+			add(() -> { return Blocks.WHITE_CONCRETE; });
+			add(() -> { return Blocks.ORANGE_CONCRETE; });
+			add(() -> { return Blocks.MAGENTA_CONCRETE; });
+			add(() -> { return Blocks.LIGHT_BLUE_CONCRETE; });
+			add(() -> { return Blocks.YELLOW_CONCRETE; });
+			add(() -> { return Blocks.LIME_CONCRETE; });
+			add(() -> { return Blocks.PINK_CONCRETE; });
+			add(() -> { return Blocks.GRAY_CONCRETE; });
+			add(() -> { return Blocks.LIGHT_GRAY_CONCRETE; });
+			add(() -> { return Blocks.CYAN_CONCRETE; });
+			add(() -> { return Blocks.PURPLE_CONCRETE; });
+			add(() -> { return Blocks.BLUE_CONCRETE; });
+			add(() -> { return Blocks.BROWN_CONCRETE; });
+			add(() -> { return Blocks.GREEN_CONCRETE; });
+			add(() -> { return Blocks.RED_CONCRETE; });
+			add(() -> { return Blocks.BLACK_CONCRETE; });
+		}});
+
 		// Coral
 		CORAL_BLOCKS = Arrays.stream(CORAL_BLOCKS_TAG).map(block -> ForgeMaterialData.ofBlockState(block.defaultBlockState())).collect(Collectors.toList());
 		WALL_CORALS = Arrays.stream(WALL_CORALS_TAG).map(block -> ForgeMaterialData.ofBlockState(block.defaultBlockState())).collect(Collectors.toList());
