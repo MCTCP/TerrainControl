@@ -25,7 +25,7 @@ public class ForgeMaterials extends LocalMaterials
 	@SuppressWarnings("serial")
 	public static void init()
 	{
-		// Tags/collections used in OTG code
+		// Tags used for OTG configs
 		// "WATER", new Block[] { Blocks.FLOWING_WATER , Blocks.STATIONARY_WATER }); // TODO: is this spigot-only, or no longer needed?
 
 		BlockTags.createOptional(new ResourceLocation(Constants.MOD_ID_SHORT,"stone"), new HashSet<Supplier<Block>>()

@@ -387,38 +387,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public List<MobSpawnInfo.Spawners> getMobsAt(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)
 	{
-		// TODO: Allow users to configure spawn lists for vanilla structures?
-		
-		if (structureManager.getStructureAt(blockPos, true, Structure.SWAMP_HUT).isValid())
-		{
-			if (entityClassification == EntityClassification.MONSTER)
-			{
-				return Structure.SWAMP_HUT.getDefaultSpawnList();
-			}
-
-			if (entityClassification == EntityClassification.CREATURE)
-			{
-				return Structure.SWAMP_HUT.getDefaultCreatureSpawnList();
-			}
-		}
-
-		if (entityClassification == EntityClassification.MONSTER)
-		{
-			if (structureManager.getStructureAt(blockPos, false, Structure.PILLAGER_OUTPOST).isValid())
-			{
-				return Structure.PILLAGER_OUTPOST.getDefaultSpawnList();
-			}
-
-			if (structureManager.getStructureAt(blockPos, false, Structure.OCEAN_MONUMENT).isValid())
-			{
-				return Structure.OCEAN_MONUMENT.getDefaultSpawnList();
-			}
-
-			if (structureManager.getStructureAt(blockPos, true, Structure.NETHER_BRIDGE).isValid())
-			{
-				return Structure.NETHER_BRIDGE.getDefaultSpawnList();
-			}
-		}
+		// Forge code injected into NoiseChunkGenerator
+		List<MobSpawnInfo.Spawners> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structureManager, entityClassification, blockPos);
+		if (spawns != null) return spawns;
+		//
 
 		return super.getMobsAt(biome, structureManager, entityClassification, blockPos);
 	}
