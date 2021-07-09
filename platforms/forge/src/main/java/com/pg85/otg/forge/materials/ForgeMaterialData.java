@@ -151,6 +151,11 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public LocalMaterialData rotate(int rotateTimes)
 	{
+		if(this.isBlank)
+		{
+			return this;
+		}
+
 		// Get the rotation if we haven't stored the rotation yet
 		if (rotated == null)
 		{
