@@ -1,5 +1,23 @@
 package com.pg85.otg.spigot.commands;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.util.BlockIterator;
+import org.bukkit.util.StringUtil;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObject;
@@ -14,19 +32,12 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.BlockIterator;
-
-import java.util.*;
-
-public class SpawnCommand
+public class SpawnCommand implements BaseCommand
 {
-	public static boolean execute(CommandSender sender, HashMap<String, String> strings)
+	public boolean execute(CommandSender sender, String[] args)
 	{
+		Map<String, String> strings = CommandUtil.parseArgs(args, false);
+		
 		if (!(sender instanceof Player))
 		{
 			sender.sendMessage("Only players can execute this command");
@@ -162,7 +173,8 @@ public class SpawnCommand
 				!(genRegion instanceof MCWorldGenRegion)
 			))
 			{
-				sender.sendMessage("Spawned object " + objectName + " at " + block.getLocation().toString());
+				Location location = block.getLocation();
+				sender.sendMessage("Spawned object " + objectName + " at " + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ());
 			} else {
 				sender.sendMessage("Failed to spawn object " + objectName);
 			}
@@ -170,6 +182,31 @@ public class SpawnCommand
 
 		return true;
 	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args)
+	{
+		Map<String, String> strings = CommandUtil.parseArgs(args, true);
+		
+		Set<String> presetFolderNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream()
+			.map(ExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
+		presetFolderNames.add("global");
+
+		String presetFolderName = strings.get("1");
+		String objectName = strings.get("2");
+		if (presetFolderName == null)
+		{
+			return new ArrayList<>(presetFolderNames);
+		}
+
+		if (objectName != null && presetFolderNames.contains(presetFolderName)) // We have a complete first argument, suggest object name
+		{
+			return StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName), new ArrayList<>());
+		} else { // Suggest preset name
+			return StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList<>());
+		}
+	}
+	
 	public static Block getWatchedBlock(Player me, boolean verbose)
 	{
 		if (me == null)

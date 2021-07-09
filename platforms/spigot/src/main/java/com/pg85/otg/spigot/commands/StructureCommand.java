@@ -14,14 +14,17 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 
-public class StructureCommand
+public class StructureCommand implements BaseCommand
 {
-	public static boolean execute(CommandSender sender, String[] args)
+	public boolean execute(CommandSender sender, String[] args)
 	{
 		if (!(sender instanceof Player))
 		{
@@ -59,5 +62,11 @@ public class StructureCommand
 	
 		sender.sendMessage(structureInfo);
 		return true;
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args)
+	{
+		return Collections.emptyList();
 	}
 }

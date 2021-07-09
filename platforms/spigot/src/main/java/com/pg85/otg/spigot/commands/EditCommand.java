@@ -23,6 +23,7 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
 import org.bukkit.Location;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -33,11 +34,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EditCommand
+public class EditCommand implements BaseCommand
 {
 	private static final HashMap<Player, EditSession> sessionsMap = new HashMap<>();
 
-	public static boolean execute(CommandSender sender, String[] args)
+	public boolean execute(CommandSender sender, String[] args)
 	{
 		if (!(sender instanceof Player))
 		{
@@ -224,9 +225,12 @@ public class EditCommand
 
 	private static final List<String> flags = Arrays.asList("-nofix", "-update");
 
-	public static List<String> tabComplete(HashMap<String, String> strings, boolean doFlags)
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args)
 	{
-		if (strings.size() > 3 && doFlags) {
+		Map<String, String> strings = CommandUtil.parseArgs(args, true);
+		
+		if (strings.size() > 3) {
 			// This means we have flags, so we gotta autocomplete the flags
 			return flags;
 		}

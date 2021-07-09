@@ -1,22 +1,9 @@
 package com.pg85.otg.spigot;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.constants.Constants;
-import com.pg85.otg.presets.Preset;
-import com.pg85.otg.spigot.biome.OTGBiomeProvider;
-import com.pg85.otg.spigot.commands.OTGCommandExecutor;
-import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
-import net.minecraft.server.v1_16_R3.BiomeBase;
-import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.IRegistryWritable;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-
-import com.pg85.otg.spigot.util.UnsafeUtil;
-import com.pg85.otg.util.logging.LogCategory;
-import com.pg85.otg.util.logging.LogLevel;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -29,9 +16,25 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.concurrent.locks.ReentrantLock;
+import com.pg85.otg.OTG;
+import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.biome.OTGBiomeProvider;
+import com.pg85.otg.spigot.commands.OTGCommandExecutor;
+import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
+
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.ChunkProviderServer;
+import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.IRegistryWritable;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.PlayerChunkMap;
+import net.minecraft.server.v1_16_R3.WorldServer;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener
@@ -39,6 +42,20 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	private static final ReentrantLock initLock = new ReentrantLock();
 	private static final HashMap<String, String> worlds = new HashMap<>();
 	private static final HashSet<String> processedWorlds = new HashSet<>();
+	
+	private static Field field;
+
+	static
+	{
+		try
+		{
+			field = CustomChunkGenerator.class.getDeclaredField("delegate");
+			field.setAccessible(true);
+		} catch (ReflectiveOperationException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 
 	@Override
 	public void onDisable ()
@@ -111,8 +128,9 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		}
 
 		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Taking over world " + world.getName());
+		WorldServer serverWorld = ((CraftWorld) world).getHandle();
 
-		net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) world).getHandle().getChunkProvider().getChunkGenerator();
+		net.minecraft.server.v1_16_R3.ChunkGenerator generator = serverWorld.getChunkProvider().getChunkGenerator();
 		if (!(generator instanceof CustomChunkGenerator))
 		{
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Mission failed, we'll get them next time");
@@ -141,7 +159,21 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			OTGDelegate = OTGGen.generator;
 		}
 
-		UnsafeUtil.setDelegate(generator, OTGDelegate);
+		try
+		{
+			Field finalGenerator = ChunkProviderServer.class.getDeclaredField("chunkGenerator");
+			finalGenerator.setAccessible(true);
+
+			finalGenerator.set(serverWorld.getChunkProvider(), OTGDelegate);
+
+			Field pcmGen = PlayerChunkMap.class.getDeclaredField("chunkGenerator");
+			pcmGen.setAccessible(true);
+
+			pcmGen.set(serverWorld.getChunkProvider().playerChunkMap, OTGDelegate);
+		} catch (ReflectiveOperationException ex)
+		{
+			ex.printStackTrace();
+		}
 
 		if (OTGGen.generator == null)
 		{
