@@ -1,6 +1,12 @@
 package com.pg85.otg.forge.dimensions;
 
 import java.util.OptionalLong;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -15,6 +21,7 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.presets.Preset;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;
@@ -68,7 +75,7 @@ public class OTGDimensionType extends DimensionType
 	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> dimensions, String presetFolderName)
 	{
 		SimpleRegistry<Dimension> simpleRegistry = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
-		
+
 		DimensionConfig dimConfig = DimensionConfig.fromDisk(presetFolderName);
 		if(dimConfig == null)
 		{
@@ -81,7 +88,7 @@ public class OTGDimensionType extends DimensionType
 				dimConfig.OverWorld.PresetFolderName, new OTGBiomeProvider(dimConfig.OverWorld.PresetFolderName, dimConfig.OverWorld.Seed, false, false, biomesRegistry), dimConfig.OverWorld.Seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_overworld"));
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "overworld"));
 			addDimension(dimConfig.OverWorld.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, dimTypeRegistryKey);
 		}
 		if(dimConfig.Nether != null)
@@ -90,7 +97,7 @@ public class OTGDimensionType extends DimensionType
 					dimConfig.Nether.PresetFolderName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimConfig.Nether.Seed, false, false, biomesRegistry), dimConfig.Nether.Seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_nether"));
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "the_nether"));
 			addDimension(dimConfig.Nether.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, dimTypeRegistryKey);
 		}
 		if(dimConfig.End != null)
@@ -99,7 +106,7 @@ public class OTGDimensionType extends DimensionType
 					dimConfig.End.PresetFolderName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimConfig.End.Seed, false, false, biomesRegistry), dimConfig.End.Seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_end"));
+			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "the_end"));
 			addDimension(dimConfig.End.PresetFolderName, simpleRegistry, dimensionTypesRegistry, Dimension.END, chunkGenerator, dimTypeRegistryKey);
 		}
 		if(dimConfig.Dimensions != null)
@@ -110,8 +117,8 @@ public class OTGDimensionType extends DimensionType
 					otgDim.PresetFolderName, new OTGBiomeProvider(otgDim.PresetFolderName, otgDim.Seed, false, false, biomesRegistry), otgDim.Seed,
 					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 				);
-				RegistryKey<Dimension> dimRegistryKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_" + otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
-				RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT + "_" + otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+				RegistryKey<Dimension> dimRegistryKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+				RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
 				addDimension(otgDim.PresetFolderName, simpleRegistry, dimensionTypesRegistry, dimRegistryKey, chunkGenerator, dimTypeRegistryKey);
 			}
 		}
@@ -170,5 +177,48 @@ public class OTGDimensionType extends DimensionType
 			return dimension == null ? dimensionTypeRegistry.getOrThrow(dimTypeRegistryKey) : dimension.type();
 		};
 		simpleRegistry.register(dimRegistryKey, new Dimension(supplier, chunkGenerator), Lifecycle.stable());		
+	}
+	
+	// Writes OTG DimensionTypes to world save folder as datapack json files so they're picked up on world load.
+	// Unfortunately there doesn't appear to be a way to persist them via code. Silly, but it works.
+	public static void saveDataPackFile(Path datapackFolder, String dimName, IWorldConfig worldConfig, String presetFolderName)
+	{
+		File folder = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator);
+		File file = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator + "pack.mcmeta");
+		if(!folder.exists())
+		{
+			folder.mkdirs();
+		}
+		String data;
+		if(!file.exists())
+		{
+			data = "{ \"pack\": { \"pack_format\":6, \"description\":\"OTG Dimension settings\" } }";	
+	        try(
+	    		FileOutputStream fos = new FileOutputStream(file);
+	    		BufferedOutputStream bos = new BufferedOutputStream(fos)
+			) {
+	            byte[] bytes = data.getBytes();
+	            bos.write(bytes);
+	            bos.close();
+	            fos.close();
+	        } catch (IOException e) { e.printStackTrace(); }
+		}
+
+		folder = new File(datapackFolder + File.separator + "otg" + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator);
+		file = new File(datapackFolder + File.separator + "otg" + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator + dimName + ".json");
+		if(!folder.exists())
+		{
+			folder.mkdirs();
+		}
+		data = "{ \"ultrawarm\": " + worldConfig.getUltraWarm() + ", \"natural\": " + worldConfig.getNatural() + ", \"piglin_safe\": " + worldConfig.getPiglinSafe() + ", \"respawn_anchor_works\": " + worldConfig.getRespawnAnchorWorks() + ", \"bed_works\": " + worldConfig.getBedWorks() + ", \"has_raids\": " + worldConfig.getHasRaids() + ", \"has_skylight\": " + worldConfig.getHasSkyLight() + ", \"has_ceiling\": " + worldConfig.getHasCeiling() + ", \"coordinate_scale\": " + worldConfig.getCoordinateScale() + ", \"ambient_light\": " + worldConfig.getAmbientLight() + ", \"logical_height\": " + worldConfig.getLogicalHeight() + ", \"effects\": \"" + worldConfig.getEffectsLocation() + "\", \"infiniburn\": \"" + worldConfig.getInfiniburn() + "\" }";
+        try(    		        	
+    		FileOutputStream fos = new FileOutputStream(file);
+    		BufferedOutputStream bos = new BufferedOutputStream(fos)
+		) {
+            byte[] bytes = data.getBytes();
+            bos.write(bytes);
+            bos.close();
+            fos.close();
+        } catch (IOException e) { e.printStackTrace(); }
 	}
 }

@@ -47,7 +47,7 @@ public class DimensionConfig
 	
 	public static DimensionConfig fromDisk(String presetFolderName)
 	{
-		File dimensionConfig = new File(OTG.getEngine().getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER + "/" + presetFolderName + ".yaml");
+		File dimensionConfig = new File(OTG.getEngine().getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER + File.separator + presetFolderName + ".yaml");
 		if(dimensionConfig.exists())
 		{
 			DimensionConfig dimConfig = new DimensionConfig(presetFolderName);

@@ -10,7 +10,6 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
