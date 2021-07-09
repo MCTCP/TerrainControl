@@ -5,27 +5,177 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.server.v1_16_R3.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SpigotMaterials extends LocalMaterials
 {
 	// Default blocks in given tags
 	// Tags aren't loaded until datapacks are loaded, on world creation. We mirror the vanilla copy of the tag to solve this.
-	private static final Block[] CORAL_BLOCKS_TAG = {Blocks.TUBE_CORAL_BLOCK, Blocks.BRAIN_CORAL_BLOCK, Blocks.BUBBLE_CORAL_BLOCK, Blocks.FIRE_CORAL_BLOCK, Blocks.HORN_CORAL_BLOCK};
-	private static final Block[] WALL_CORALS_TAG = {Blocks.TUBE_CORAL_WALL_FAN, Blocks.BRAIN_CORAL_WALL_FAN, Blocks.BUBBLE_CORAL_WALL_FAN, Blocks.FIRE_CORAL_WALL_FAN, Blocks.HORN_CORAL_WALL_FAN};
-	private static final Block[] CORALS_TAG = {Blocks.TUBE_CORAL, Blocks.BRAIN_CORAL, Blocks.BUBBLE_CORAL, Blocks.FIRE_CORAL, Blocks.HORN_CORAL, Blocks.TUBE_CORAL_FAN, Blocks.BRAIN_CORAL_FAN, Blocks.BUBBLE_CORAL_FAN, Blocks.FIRE_CORAL_FAN, Blocks.HORN_CORAL_FAN};
+	private static final Block[] CORAL_BLOCKS_TAG = { Blocks.TUBE_CORAL_BLOCK, Blocks.BRAIN_CORAL_BLOCK, Blocks.BUBBLE_CORAL_BLOCK, Blocks.FIRE_CORAL_BLOCK, Blocks.HORN_CORAL_BLOCK };
+	private static final Block[] WALL_CORALS_TAG = { Blocks.TUBE_CORAL_WALL_FAN, Blocks.BRAIN_CORAL_WALL_FAN, Blocks.BUBBLE_CORAL_WALL_FAN, Blocks.FIRE_CORAL_WALL_FAN, Blocks.HORN_CORAL_WALL_FAN };
+	private static final Block[] CORALS_TAG = { Blocks.TUBE_CORAL, Blocks.BRAIN_CORAL, Blocks.BUBBLE_CORAL, Blocks.FIRE_CORAL, Blocks.HORN_CORAL, Blocks.TUBE_CORAL_FAN, Blocks.BRAIN_CORAL_FAN, Blocks.BUBBLE_CORAL_FAN, Blocks.FIRE_CORAL_FAN, Blocks.HORN_CORAL_FAN };
+
+	public static final Map<String, Block[]> OTG_BLOCK_TAGS = new HashMap<>(); 
 
 	public static void init()
 	{
-		// Tags/collections used in OTG code		
+		// Tags used for OTG configs
+		// Since Spigot doesn't appear to allow registering custom tags, we have to implement our own tags logic :/.			
+		// TODO: We should be including these via datapack and make sure we don't use tags before datapacks are loaded.
+
+		OTG_BLOCK_TAGS.put("stone", new Block[]
+		{
+			Blocks.STONE,
+			Blocks.GRANITE,
+			Blocks.DIORITE,
+			Blocks.ANDESITE
+		});
 		
+		OTG_BLOCK_TAGS.put("dirt", new Block[]
+		{
+			Blocks.DIRT,
+			Blocks.COARSE_DIRT,
+			Blocks.PODZOL,
+		});		
+		
+		OTG_BLOCK_TAGS.put("stained_clay", new Block[]
+		{
+			Blocks.WHITE_TERRACOTTA,
+			Blocks.ORANGE_TERRACOTTA,
+			Blocks.MAGENTA_TERRACOTTA,
+			Blocks.LIGHT_BLUE_TERRACOTTA,
+			Blocks.YELLOW_TERRACOTTA,
+			Blocks.LIME_TERRACOTTA,
+			Blocks.PINK_TERRACOTTA,
+			Blocks.GRAY_TERRACOTTA,
+			Blocks.LIGHT_GRAY_TERRACOTTA,
+			Blocks.CYAN_TERRACOTTA,
+			Blocks.PURPLE_TERRACOTTA,
+			Blocks.BLUE_TERRACOTTA,
+			Blocks.BROWN_TERRACOTTA,
+			Blocks.GREEN_TERRACOTTA,
+			Blocks.RED_TERRACOTTA,
+			Blocks.BLACK_TERRACOTTA,	
+		});
+		
+		OTG_BLOCK_TAGS.put("log", new Block[]
+		{
+			Blocks.DARK_OAK_LOG,
+			Blocks.DARK_OAK_WOOD,
+			Blocks.STRIPPED_DARK_OAK_LOG,
+			Blocks.STRIPPED_DARK_OAK_WOOD,
+			Blocks.OAK_LOG,
+			Blocks.OAK_WOOD,
+			Blocks.STRIPPED_OAK_LOG,
+			Blocks.STRIPPED_OAK_WOOD,
+			Blocks.ACACIA_LOG,
+			Blocks.ACACIA_WOOD,
+			Blocks.STRIPPED_ACACIA_LOG,
+			Blocks.STRIPPED_ACACIA_WOOD,
+			Blocks.BIRCH_LOG,
+			Blocks.BIRCH_WOOD,
+			Blocks.STRIPPED_BIRCH_LOG,
+			Blocks.STRIPPED_BIRCH_WOOD,
+			Blocks.JUNGLE_LOG,
+			Blocks.STRIPPED_JUNGLE_LOG,
+			Blocks.STRIPPED_JUNGLE_WOOD,
+			Blocks.SPRUCE_LOG,
+			Blocks.SPRUCE_WOOD,
+			Blocks.STRIPPED_SPRUCE_LOG,
+			Blocks.STRIPPED_SPRUCE_WOOD,
+			Blocks.CRIMSON_STEM,
+			Blocks.STRIPPED_CRIMSON_STEM,
+			Blocks.CRIMSON_HYPHAE,
+			Blocks.STRIPPED_CRIMSON_HYPHAE,
+			Blocks.WARPED_STEM,
+			Blocks.STRIPPED_WARPED_STEM,
+			Blocks.WARPED_HYPHAE,
+			Blocks.STRIPPED_WARPED_HYPHAE,
+		});
+		
+		OTG_BLOCK_TAGS.put("air", new Block[]
+		{
+			Blocks.AIR,
+			Blocks.CAVE_AIR,
+		});
+		
+		OTG_BLOCK_TAGS.put("sandstone", new Block[]
+		{
+			Blocks.SANDSTONE,
+			Blocks.CHISELED_SANDSTONE,
+			Blocks.SMOOTH_SANDSTONE,				
+		});
+		
+		OTG_BLOCK_TAGS.put("red_sandstone", new Block[]
+		{
+			Blocks.RED_SANDSTONE,
+			Blocks.CHISELED_RED_SANDSTONE,
+			Blocks.SMOOTH_RED_SANDSTONE,				
+		});
+		
+		OTG_BLOCK_TAGS.put("long_grass", new Block[]
+		{
+			Blocks.DEAD_BUSH,
+			Blocks.TALL_GRASS,
+			Blocks.FERN,				
+		});
+		
+		OTG_BLOCK_TAGS.put("red_flower", new Block[]
+		{
+			Blocks.POPPY,
+			Blocks.BLUE_ORCHID,
+			Blocks.ALLIUM,
+			Blocks.AZURE_BLUET,
+			Blocks.RED_TULIP,
+			Blocks.ORANGE_TULIP,
+			Blocks.WHITE_TULIP,
+			Blocks.PINK_TULIP,
+			Blocks.OXEYE_DAISY,
+		});
+		
+		OTG_BLOCK_TAGS.put("quartz_block", new Block[]
+		{
+			Blocks.QUARTZ_BLOCK,
+			Blocks.CHISELED_QUARTZ_BLOCK,
+			Blocks.QUARTZ_PILLAR,
+		});
+		
+		OTG_BLOCK_TAGS.put("prismarine", new Block[]
+		{
+			Blocks.PRISMARINE,
+			Blocks.PRISMARINE_BRICKS,
+			Blocks.DARK_PRISMARINE,
+		});
+		
+		OTG_BLOCK_TAGS.put("concrete", new Block[]
+		{
+			Blocks.WHITE_CONCRETE,
+			Blocks.ORANGE_CONCRETE,
+			Blocks.MAGENTA_CONCRETE,
+			Blocks.LIGHT_BLUE_CONCRETE,
+			Blocks.YELLOW_CONCRETE,
+			Blocks.LIME_CONCRETE,
+			Blocks.PINK_CONCRETE,
+			Blocks.GRAY_CONCRETE,
+			Blocks.LIGHT_GRAY_CONCRETE,
+			Blocks.CYAN_CONCRETE,
+			Blocks.PURPLE_CONCRETE,
+			Blocks.BLUE_CONCRETE,
+			Blocks.BROWN_CONCRETE,
+			Blocks.GREEN_CONCRETE,
+			Blocks.RED_CONCRETE,
+			Blocks.BLACK_CONCRETE,
+		});
+
 		// Coral
 		CORAL_BLOCKS = Arrays.stream(CORAL_BLOCKS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());
 		WALL_CORALS = Arrays.stream(WALL_CORALS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());
 		CORALS = Arrays.stream(CORALS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());	
 
 		// Blocks used in OTG code
-		
+
 		AIR = SpigotMaterialData.ofBlockData(Blocks.AIR.getBlockData());
 		CAVE_AIR = SpigotMaterialData.ofBlockData(Blocks.CAVE_AIR.getBlockData());
 		GRASS = SpigotMaterialData.ofBlockData(Blocks.GRASS_BLOCK.getBlockData());

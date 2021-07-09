@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -21,7 +20,6 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.presets.Preset;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.DynamicRegistries;

@@ -252,9 +252,27 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public boolean isBlockTag(LocalMaterialTag tag)
 	{
-		return this.blockData == null ? false : this.blockData.a(((SpigotMaterialTag)tag).getTag());
-	}	
-	
+		if(this.blockData != null)
+		{
+			// Since we can't register OTG block tags for Spigot,
+			// have to use our own block tags logic.
+			// Try OTG tags, then MC tags.
+
+			SpigotMaterialTag spigotTag = ((SpigotMaterialTag)tag);
+			if(spigotTag.isOTGTag(this.blockData.getBlock()))
+			{
+				return true;
+			}
+			
+			Tag<Block> blockTag = spigotTag.getTag();
+			if(blockTag != null)
+			{
+				return this.blockData.a(blockTag);	
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
