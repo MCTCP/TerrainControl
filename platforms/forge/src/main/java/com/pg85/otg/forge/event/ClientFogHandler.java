@@ -50,7 +50,7 @@ public class ClientFogHandler
 
 		if (!(entity instanceof ClientPlayerEntity))
 		{
-			resetFogDistance(Minecraft.getInstance());
+			resetFogDistance(Minecraft.getInstance(), event.getType());
 			return;
 		}
 
@@ -63,7 +63,7 @@ public class ClientFogHandler
 		{
 			if (otgDidLastFogRender)
 			{
-				resetFogDistance(Minecraft.getInstance());
+				resetFogDistance(Minecraft.getInstance(), event.getType());
 			}
 			return;
 		}
@@ -141,18 +141,18 @@ public class ClientFogHandler
 
 		float finalFogDistance = Math.min(fogDistance, event.getFarPlaneDistance());
 		float fogStart = event.getType() == FogType.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
-		
+
 		// set cache values
 		lastX = posX;
 		lastZ = posZ;
 
 		otgDidLastFogRender = true;
-		
+
 		GL11.glFogf(GL11.GL_FOG_START, fogStart);
 		GL11.glFogf(GL11.GL_FOG_END, finalFogDistance);
 	}
 
-	private static void resetFogDistance(Minecraft minecraft)
+	private static void resetFogDistance(Minecraft minecraft, FogType type)
 	{
 		if (otgDidLastFogRender)
 		{
@@ -162,7 +162,13 @@ public class ClientFogHandler
 			otgDidLastFogRender = false;
 			float farPlaneDistance = (float) (minecraft.options.renderDistance * 16);
 
-			GL11.glFogf(GL11.GL_FOG_START, farPlaneDistance * 0.75F);
+			if (type == FogType.FOG_SKY)
+			{
+				GL11.glFogf(GL11.GL_FOG_START, 0.0f);
+			} else
+			{
+				GL11.glFogf(GL11.GL_FOG_START, farPlaneDistance * 0.75F);
+			}
 			GL11.glFogf(GL11.GL_FOG_END, farPlaneDistance);
 
 			for (float[] row : fogDensityCache)
