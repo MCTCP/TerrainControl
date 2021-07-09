@@ -4,7 +4,7 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-// TODO: We're probably only implementing comparable here for biome inheritance, 
+// TODO: We're probably only implementing comparable here for biome inheritance (overriding), 
 // which we burned with fire because it required code like this for every setting, remove?
 class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSurfaceGeneratorLayer>
 {
