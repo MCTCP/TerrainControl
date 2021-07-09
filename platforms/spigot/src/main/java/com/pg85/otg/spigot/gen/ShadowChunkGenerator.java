@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.gen;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import net.minecraft.server.v1_16_R3.StructureSettingsFeature;
 import net.minecraft.server.v1_16_R3.WorldChunkManager;
 import net.minecraft.server.v1_16_R3.WorldGenVillage;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.ArgumentNBTKey.h;
 
 /**
  * Shadow chunk generation means generating base terrain for chunks
@@ -62,6 +64,28 @@ public class ShadowChunkGenerator
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
 	private final FifoMap<ChunkCoordinate, IChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunkAccess>(512);
 	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
+	
+	static Field heightMaps;
+	static Field light;
+	static Field sections;
+	
+	static
+	{
+		try
+		{
+			heightMaps = ProtoChunk.class.getDeclaredField("f");
+			heightMaps.setAccessible(true);
+
+			light = ProtoChunk.class.getDeclaredField("l");
+			light.setAccessible(true);
+
+			sections = ProtoChunk.class.getDeclaredField("j");
+			sections.setAccessible(true);
+		} catch (ReflectiveOperationException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 
 	@SuppressWarnings("unused")
 	private int cacheHits = 0;
@@ -130,15 +154,18 @@ public class ShadowChunkGenerator
 	
 	public void fillWorldGenChunkFromShadowChunk(ChunkCoordinate chunkCoord, IChunkAccess chunk, IChunkAccess cachedChunk)
 	{
-		// Re-use base terrain generated via shadowgen for worldgen.	
-		// TODO: Find some way to clone/swap chunk data efficiently, 
-		// like we do for forge with accesstransformers.
-		/*
-		((ProtoChunk)chunk).sections = ((ProtoChunk)cachedChunk).sections;
-		((ProtoChunk)chunk).heightmaps = ((ProtoChunk)cachedChunk).heightmaps;
-		((ProtoChunk)chunk).lights = ((ProtoChunk)cachedChunk).lights;
-		*/
-		// TODO: Find some way to clone/swap chunk data efficiently :/
+		// TODO: This is experimental and may be slower than not cloning it
+		try
+		{
+			sections.set((ProtoChunk) chunk, sections.get((ProtoChunk) cachedChunk));
+			light.set((ProtoChunk) chunk, light.get((ProtoChunk) cachedChunk));
+			heightMaps.set((ProtoChunk) chunk, heightMaps.get((ProtoChunk) cachedChunk));
+		} catch (ReflectiveOperationException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
 		for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
