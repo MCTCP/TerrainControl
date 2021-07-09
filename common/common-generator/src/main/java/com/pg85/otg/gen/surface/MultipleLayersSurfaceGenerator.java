@@ -39,12 +39,12 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);		
+		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 		{
 			if (noise <= layer.maxNoise)
 			{
-				return layer.getSurfaceBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), yInWorld);
+				return layer.getSurfaceBlockReplaced(yInWorld, biomeConfig);
 			}
 		}		
 		return biomeConfig.getSurfaceBlockReplaced(yInWorld);
@@ -58,7 +58,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 		{
 			if (noise <= layer.maxNoise)
 			{
-				return layer.getGroundBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), yInWorld);
+				return layer.getGroundBlockReplaced(yInWorld, biomeConfig);
 			}
 		}		
 		return biomeConfig.getGroundBlockReplaced(yInWorld);

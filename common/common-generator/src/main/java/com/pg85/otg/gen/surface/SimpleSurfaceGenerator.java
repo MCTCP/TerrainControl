@@ -122,7 +122,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							boolean bIsAir = useAirForSurface;
 							if(!bIsAir && useLayerSurfaceBlockForSurface)
 							{
-								bIsAir = (layer != null ? layer.getSurfaceBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y) : biomeConfig.getSurfaceBlockReplaced(y)).isAir();
+								bIsAir = (layer != null ? layer.getSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getSurfaceBlockReplaced(y)).isAir();
 							}
 							if(bIsAir)
 							{
@@ -157,7 +157,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							}
 							else if(useLayerSurfaceBlockForSurface)
 							{
-								currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y) : biomeConfig.getSurfaceBlockReplaced(y);
+								currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getSurfaceBlockReplaced(y);
 							}
 							
 							chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
@@ -169,7 +169,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							}
 							else if(useLayerGroundBlockForGround)
 							{
-								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y) : biomeConfig.getGroundBlockReplaced(y));
+								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
 							}							
 						}
 					}
@@ -196,7 +196,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 								//);
 								chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(y));
 							} else {
-								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y) : biomeConfig.getGroundBlockReplaced(y));
+								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
 							}
 							
 							// When a ground layer of sand is done spawning, if the BiomeBlocksNoise is above 1 

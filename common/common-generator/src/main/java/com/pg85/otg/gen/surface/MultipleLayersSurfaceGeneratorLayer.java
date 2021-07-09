@@ -1,8 +1,11 @@
 package com.pg85.otg.gen.surface;
 
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+// TODO: We're probably only implementing comparable here for biome inheritance, 
+// which we burned with fire because it required code like this for every setting, remove?
 class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSurfaceGeneratorLayer>
 {
 	protected final LocalMaterialData surfaceBlock;
@@ -20,28 +23,44 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		this.maxNoise = maxNoise;
 	}
 
-	LocalMaterialData getSurfaceBlockReplaced(boolean biomeConfigsHaveReplacement, ReplaceBlockMatrix replaceBlocks, int y)
-	{		
-		// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
-		// Make this prettier?
-		Init(replaceBlocks);
+	LocalMaterialData getSurfaceBlockReplaced(int y, IBiomeConfig biomeConfig)
+	{
+		// TODO: Make this prettier?
+		Init(biomeConfig.getReplaceBlocks());
+		LocalMaterialData materialData = null;
 		if(this.surfaceBlockIsReplaced)
 		{
-			return this.surfaceBlock.parseWithBiomeAndHeight(biomeConfigsHaveReplacement, replaceBlocks, y);	
+			materialData = this.surfaceBlock.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y);
 		}
-		return this.surfaceBlock;
+		if(materialData == null)
+		{
+			materialData = this.surfaceBlock;
+		}
+		if(materialData.isAir() && y < biomeConfig.getWaterLevelMax() && y >= biomeConfig.getWaterLevelMin())
+		{
+			materialData = biomeConfig.getWaterBlockReplaced(y);
+		}
+		return materialData;
 	}
 	
-	LocalMaterialData getGroundBlockReplaced(boolean biomeConfigsHaveReplacement, ReplaceBlockMatrix replaceBlocks, int y)
+	LocalMaterialData getGroundBlockReplaced(int y, IBiomeConfig biomeConfig)
 	{
-		// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
-		// Make this prettier?
-		Init(replaceBlocks);
+		// TODO: Make this prettier?
+		Init(biomeConfig.getReplaceBlocks());
+		LocalMaterialData materialData = null;
 		if(this.groundBlockIsReplaced)
 		{
-			return this.groundBlock.parseWithBiomeAndHeight(biomeConfigsHaveReplacement, replaceBlocks, y);	
+			materialData = this.groundBlock.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y);
 		}
-		return this.groundBlock;
+		if(materialData == null)
+		{
+			materialData = this.groundBlock;
+		}
+		if(materialData.isAir() && y < biomeConfig.getWaterLevelMax() && y >= biomeConfig.getWaterLevelMin())
+		{
+			materialData = biomeConfig.getWaterBlockReplaced(y);
+		}
+		return materialData;
 	}
 	
 	private void Init(ReplaceBlockMatrix replacedBlocks)
