@@ -1,5 +1,24 @@
 package com.pg85.otg.spigot.commands;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
@@ -19,26 +38,16 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+
 import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-public class ExportCommand
+public class ExportCommand implements BaseCommand
 {
 	protected static final HashMap<Player, Region> playerSelectionMap = new HashMap<>();
 
-	public static boolean execute(CommandSender sender, String[] args)
+	public boolean execute(CommandSender sender, String[] args)
 	{
 		if (!(sender instanceof Player))
 		{
@@ -348,8 +357,11 @@ public class ExportCommand
 
 	private static final List<String> flags = Arrays.asList("-a", "-b", "-o");
 
-	public static List<String> tabCompleteExport(HashMap<String, String> strings)
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args)
 	{
+		Map<String, String> strings = CommandUtil.parseArgs(args, true);
+		
 		if (strings.size() > 4) {
 			// Return flags
 			return flags;

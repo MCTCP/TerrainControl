@@ -82,6 +82,12 @@ public class Preset
 		return new ArrayList<IBiomeConfig>(this.biomeConfigs.values());
 	}
 	
+	public ArrayList<String> getAllBiomeNames()
+	{
+		return new ArrayList<String>(this.biomeConfigs.keySet());
+		
+	}
+	
 	public int getMajorVersion()
 	{
 		return this.majorVersion;
@@ -96,4 +102,5 @@ public class Preset
 	{
 		return this.description;
 	}
+
 }

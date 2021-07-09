@@ -1,15 +1,5 @@
 package com.pg85.otg.spigot.commands;
 
-import com.pg85.otg.OTG;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-import net.minecraft.server.v1_16_R3.RegistryGeneration;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.util.StringUtil;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,7 +9,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class DataCommand
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.util.StringUtil;
+
+import com.pg85.otg.OTG;
+
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.RegistryGeneration;
+
+public class DataCommand implements BaseCommand
 {
 	private static final String USAGE = "Usage: /otg data <type>";
 	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
@@ -31,11 +32,11 @@ public class DataCommand
 			"configured_feature"
 	));
 
-	public static boolean execute(CommandSender sender, String[] args)
+	public boolean execute(CommandSender sender, String[] args)
 	{
 		// /otg data music
 		// /otg data sound
-		if (args.length != 2)
+		if (args.length != 1)
 		{
 			sender.sendMessage(USAGE);
 			sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
@@ -44,7 +45,7 @@ public class DataCommand
 
 		IRegistry<?> registry;
 
-		switch (args[1].toLowerCase())
+		switch (args[0].toLowerCase())
 		{
 			case "biome":
 				registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay);
@@ -73,7 +74,7 @@ public class DataCommand
 			try
 			{
 				Path root = OTG.getEngine().getOTGRootFolder();
-				String fileName = root.toString() + File.separator + "data-output-" + args[1] + ".txt".toLowerCase();
+				String fileName = root.toString() + File.separator + "data-output-" + args[0] + ".txt".toLowerCase();
 				File output = new File(fileName);
 				FileWriter writer = new FileWriter(output);
 				for (MinecraftKey key : set)
@@ -91,7 +92,8 @@ public class DataCommand
 		return true;
 	}
 
-	public static List<String> tabComplete(String[] args)
+	@Override
+	public List<String> onTabComplete(CommandSender sender, String[] args)
 	{
 		return StringUtil.copyPartialMatches(args[1], DATA_TYPES, new ArrayList<>());
 	}

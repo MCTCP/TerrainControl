@@ -582,6 +582,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().g();
 	}
 
+	public Preset getPreset()
+	{
+		return preset;
+	}
+
 	public CustomStructureCache getStructureCache(Path worldSaveFolder)
 	{
 		if(this.structureCache == null)
