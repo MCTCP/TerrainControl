@@ -11,11 +11,6 @@ public class SimpleColorSet extends ColorSet
 
 	public SimpleColorSet(String[] args, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		if (args.length < 1)
-		{
-			throw new InvalidConfigException("Needs at least one argument");
-		}
-
 		for (int i = 0; i < args.length - 1; i += 2)
 		{
 			Integer color = StringHelper.readColor(args[i]);
