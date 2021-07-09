@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
