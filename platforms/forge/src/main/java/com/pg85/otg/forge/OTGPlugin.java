@@ -1,19 +1,25 @@
 package com.pg85.otg.forge;
 
+import java.nio.file.Path;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
+import com.pg85.otg.forge.dimensions.OTGDimensionType;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gen.OTGWorldType;
 import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -75,7 +81,7 @@ public class OTGPlugin
 		
 		OTGClientSyncManager.setup();
 		MultipleColorHandler.setup();
-	}
+	} 
 
 	@SubscribeEvent
 	public void onCommandRegister(RegisterCommandsEvent event)
@@ -86,9 +92,21 @@ public class OTGPlugin
 	@SubscribeEvent
 	public void onSave(Save event)
 	{
+		// Save OTG DimensionTypes to world save folder as datapack json files so they're picked up on world load.
+		// Unfortunately there doesn't appear to be a way to persist them via code.
+		if(!event.getWorld().isClientSide())
+		{			
+			if(((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			{
+				Path datapackDir = ((ServerWorld)event.getWorld()).getLevel().getServer().getWorldPath(FolderName.DATAPACK_DIR);
+				Preset preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator).getPreset();
+				String dimName = ((ServerWorld)event.getWorld()).getWorldServer().dimension().location().getPath();
+				OTGDimensionType.saveDataPackFile(datapackDir, dimName, preset.getWorldConfig(), preset.getFolderName());
+			}
+		}
 		((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());
 	}
-	
+
 	@SubscribeEvent
 	public void onUnload(WorldEvent.Unload event)
 	{
