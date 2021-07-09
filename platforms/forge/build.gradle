@@ -22,6 +22,7 @@ repositories {
 	maven { url = 'https://libraries.minecraft.net/' }
 	mavenCentral()
 	maven { url = 'https://maven.minecraftforge.net/' }
+	maven { url = 'https://maven.enginehub.org/repo/' }
 }
 
 
@@ -46,15 +47,11 @@ minecraft {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
-            property 'mixin.env.disableRefMap', 'true'
             workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
+   			property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             arg "-mixin.config=otg.mixins.json"
 
             mods {
@@ -65,15 +62,11 @@ minecraft {
         }
 
         server {
-            property 'mixin.env.disableRefMap', 'true'
             workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
+  			property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             arg "-mixin.config=otg.mixins.json"
 
             mods {
@@ -84,15 +77,11 @@ minecraft {
         }
 
         data {
-            property 'mixin.env.disableRefMap', 'true'
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
+  			workingDirectory project.file("run")
+            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
+            property "forge.logging.console.level", "debug"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             args '--mod', 'openterraingenerator', '--all', '--output', file('src/generated/resources/')
 
             arg "-mixin.config=otg.mixins.json"
@@ -117,6 +106,13 @@ dependencies
 	compile project(':common:common-customobject')
 	compile project(':common:common-generator')
 	compile project(':common:common-core')
+	
+	compile ('com.sk89q.worldedit:worldedit-core:7.2.0') {
+		exclude group: 'org.yaml'
+	}
+	
+	// We may not need this, remove if so
+	compile fg.deobf('com.sk89q.worldedit:worldedit-forge-mc1.16.3:7.2.0')
 }
 
 // Process resources on build: set the version in the mods.toml
