@@ -85,7 +85,7 @@ public class WorldStandardValues extends Settings
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
 		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
 		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255),
-		LOGICAL_HEIGHT = intSetting("CarverLavaBlockHeight", 256, 0, Integer.MAX_VALUE)
+		LOGICAL_HEIGHT = intSetting("LogicalHeight", 256, 0, Integer.MAX_VALUE)
 	;
 	
 	public static final Setting<Long>
