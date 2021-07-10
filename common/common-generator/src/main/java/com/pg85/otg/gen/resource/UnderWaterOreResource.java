@@ -59,15 +59,18 @@ public class UnderWaterOreResource extends FrequencyResourceBase
 			{
 				deltaX = currentX - x;
 				deltaZ = currentZ - z;
-				IBiomeConfig biome = worldGenRegion.getBiomeConfigForDecoration(currentX, currentZ);
-				if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
+				if(worldGenRegion.getDecorationArea().isInAreaBeingDecorated(currentX, currentZ))
 				{
-					for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
+					IBiomeConfig biome = worldGenRegion.getBiomeConfigForDecoration(currentX, currentZ);
+					if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
 					{
-						sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ);
-						if (this.sourceBlocks.contains(sourceBlock))
+						for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
 						{
-							worldGenRegion.setBlock(currentX, y, currentZ, this.material, biome.getReplaceBlocks());
+							sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ);
+							if (this.sourceBlocks.contains(sourceBlock))
+							{
+								worldGenRegion.setBlock(currentX, y, currentZ, this.material, biome.getReplaceBlocks());
+							}
 						}
 					}
 				}
