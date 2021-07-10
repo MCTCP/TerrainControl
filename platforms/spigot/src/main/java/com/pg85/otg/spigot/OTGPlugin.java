@@ -24,6 +24,7 @@ import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
+import com.pg85.otg.spigot.networking.NetworkingListener;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.spigot.events.OTGHandler;
@@ -92,7 +93,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		}
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		
-		this.handler = new OTGHandler(this);		
+		this.handler = new OTGHandler(this);	
+		Bukkit.getPluginManager().registerEvents(new NetworkingListener(this), this);
 	}
 
 	@Override

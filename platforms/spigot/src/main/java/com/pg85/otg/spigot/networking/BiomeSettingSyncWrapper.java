@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.network;
+package com.pg85.otg.spigot.networking;
 
 import java.util.ArrayList;
 import java.util.List;
