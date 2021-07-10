@@ -52,7 +52,6 @@ public class NetworkingListener implements Listener
 		}
 
 		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator()).getPreset();
-		Bukkit.broadcastMessage(preset.getFolderName());
 
 		PacketDataSerializer buffer = new PacketDataSerializer(Unpooled.buffer(32766));
 		buffer.writeByte((byte) 1);
@@ -62,7 +61,6 @@ public class NetworkingListener implements Listener
 		{
 			String key = biome.getRegistryKey().toResourceLocationString();
 			BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key);
-			Bukkit.broadcastMessage(key);
 
 			if (wrapper != null)
 			{
