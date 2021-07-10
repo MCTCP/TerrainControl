@@ -268,7 +268,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// with TemplateForBiome, we want to use registered surfacebuilders though.
 		// TODO: Disable any surface/ground block related features for Template BiomeConfigs. 
 
-		// Fetch the biomeConfig by registryKey
 		IBiomeConfig biomeConfig = this.internalGenerator.getCachedBiomeProvider().getBiomeConfig(worldGenRegion.getCenterX() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);
 
 		// TODO: Improve this check, make sure a non-otg biome is actually being used with this biomeconfig.

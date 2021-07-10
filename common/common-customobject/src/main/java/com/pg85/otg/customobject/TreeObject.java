@@ -67,7 +67,7 @@ class TreeObject implements CustomObject
 	}
 	
 	@Override
-	public boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnFromSapling(IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
 	{
 		return worldGenRegion.placeTree(type, random, x, y, z);
 	}

@@ -19,7 +19,7 @@ import java.util.Objects;
 public class SpigotMaterialData extends LocalMaterialData
 {
 	static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
-	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
+	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>(); // TODO: Move to SpigotMaterialReader?
 
 	private final IBlockData blockData;
 	private String name = null;

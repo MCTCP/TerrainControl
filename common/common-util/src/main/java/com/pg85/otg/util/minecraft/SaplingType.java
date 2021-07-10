@@ -24,6 +24,7 @@ public enum SaplingType
 	Acacia,
 	DarkOak,
 	HugeRedwood,
+	Bamboo,
 	Custom;
 	// Custom represents any non-vanilla tree species, used in Forge.
 

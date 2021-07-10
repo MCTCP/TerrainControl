@@ -8,6 +8,7 @@ import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.dimensions.OTGDimensionType;
+import com.pg85.otg.forge.event.SaplingHandler;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gen.OTGWorldType;
 import com.pg85.otg.forge.gui.OTGGui;
@@ -45,7 +46,8 @@ public class OTGPlugin
 
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
-		
+		MinecraftForge.EVENT_BUS.register(new SaplingHandler());
+
 		// These are needed to let the game know about our chunk generator and biome provider. 
 		// If they are not added, then the game will error and not save games properly.
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);

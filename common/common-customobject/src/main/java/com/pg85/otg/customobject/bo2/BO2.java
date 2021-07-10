@@ -79,7 +79,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	
 	// Used to safely spawn this object from a grown sapling
 	@Override
-	public boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnFromSapling(IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
 	{
 		ObjectCoordinate[] data = this.data[rotation.getRotationId()];
 		ArrayList<ObjectCoordinate> blocksToSpawn = new ArrayList<ObjectCoordinate>();

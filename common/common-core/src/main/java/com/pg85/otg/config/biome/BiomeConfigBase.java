@@ -1,7 +1,10 @@
 package com.pg85.otg.config.biome;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.ConfigFunction;
@@ -13,10 +16,12 @@ import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
+import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.ICustomStructureGen;
+import com.pg85.otg.interfaces.ISaplingSpawner;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ColorSet;
@@ -25,6 +30,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.SaplingType;
 
 /**
  * BiomeConfig (*.bc) classes
@@ -184,6 +190,14 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	protected List<ConfigFunction<IBiomeConfig>> resourceQueue = new ArrayList<ConfigFunction<IBiomeConfig>>();
 	
+	// Saplings
+	
+	protected Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(SaplingType.class);
+	protected Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
+	protected Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();
+	
+	//
+	
 	protected BiomeConfigBase(String configName)
 	{
 		super(configName);
@@ -193,7 +207,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.resourceQueue;
 	}
-	
+
 	@Override
 	public void setRegistryKey(IBiomeResourceLocation registryKey)
 	{
@@ -991,4 +1005,29 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, this, x, z);
 	}
+	
+	@Override
+	public ISaplingSpawner getSaplingGen(SaplingType type)
+	{
+		SaplingResource gen = saplingGrowers.get(type);
+		if (gen == null && type.growsTree())
+		{
+			gen = saplingGrowers.get(SaplingType.All);
+		}
+		return gen;
+	}
+
+	@Override
+	public ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
+	{
+		if (wideTrunk)
+		{
+			ISaplingSpawner spawner = customBigSaplingGrowers.get(materialData);
+			if(spawner != null)
+			{
+				return spawner;
+			}
+		}
+		return customSaplingGrowers.get(materialData);
+	}	
 }

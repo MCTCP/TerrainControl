@@ -121,7 +121,7 @@ public class BO4 implements StructuredCustomObject
 	}
 	
 	@Override
-	public boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnFromSapling(IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
 	{
 		return false;
 	}

@@ -71,10 +71,16 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			);
 	}
 	
+	private boolean isOreSet;
+	private boolean isOre;
 	public boolean isOre()
 	{
-		// TODO: Use BlockTags for these?		
-		return
+		// TODO: Use blocktags for this, to pick up all ores?
+		if(this.isOreSet)
+		{
+			return this.isOre;
+		}
+		this.isOre =
 			isMaterial(LocalMaterials.COAL_ORE) ||
 			isMaterial(LocalMaterials.DIAMOND_ORE) ||
 			isMaterial(LocalMaterials.EMERALD_ORE) ||
@@ -84,24 +90,41 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.QUARTZ_ORE) ||
 			isMaterial(LocalMaterials.REDSTONE_ORE)
 		;
+		this.isOreSet = true;
+		return this.isOre;
 	}
-	
+
+	private boolean isLeavesSet;
+	private boolean isLeaves;
 	public boolean isLeaves()
 	{
-		// TODO: Use BlockTags for these?		
-		return
+		// TODO: Use blocktags for this, to pick up all leaves?
+		if(this.isLeavesSet)
+		{
+			return this.isLeaves;
+		}
+		this.isLeaves =
 			isMaterial(LocalMaterials.ACACIA_LEAVES) ||
 			isMaterial(LocalMaterials.BIRCH_LEAVES) ||
 			isMaterial(LocalMaterials.DARK_OAK_LEAVES) ||
 			isMaterial(LocalMaterials.JUNGLE_LEAVES) ||
 			isMaterial(LocalMaterials.OAK_LEAVES) ||
-			isMaterial(LocalMaterials.SPRUCE_LEAVES);
+			isMaterial(LocalMaterials.SPRUCE_LEAVES)
+		;
+		this.isLeavesSet = true;
+		return this.isLeaves;
 	}
 
+	private boolean isLogSet;
+	private boolean isLog;	
 	public boolean isLog()
 	{
-		// TODO: Use BlockTags for these?
-		return
+		// TODO: Use blocktags for this, to pick up all logs?
+		if(this.isLogSet)
+		{
+			return this.isLog;
+		}
+		this.isLog =
 			isMaterial(LocalMaterials.ACACIA_LOG) ||
 			isMaterial(LocalMaterials.BIRCH_LOG) ||
 			isMaterial(LocalMaterials.DARK_OAK_LOG) ||
@@ -117,8 +140,24 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 			isMaterial(LocalMaterials.STRIPPED_DARK_OAK_LOG) ||
 			isMaterial(LocalMaterials.STRIPPED_JUNGLE_LOG) ||
 			isMaterial(LocalMaterials.STRIPPED_OAK_LOG) ||
-			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG);
+			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG)
+		;
+		this.isLogSet = true;
+		return this.isLog;
 	}
+	
+	public boolean isSapling()
+	{
+		// TODO: Use blocktags for this, to pick up all saplings?
+		return 
+			isMaterial(LocalMaterials.BAMBOO_SAPLING) ||
+			isMaterial(LocalMaterials.BIRCH_SAPLING) ||
+			isMaterial(LocalMaterials.DARK_OAK_SAPLING) ||
+			isMaterial(LocalMaterials.JUNGLE_SAPLING) ||
+			isMaterial(LocalMaterials.OAK_SAPLING) ||
+			isMaterial(LocalMaterials.SPRUCE_SAPLING)
+		;
+	}	
 	
 	/**
 	 * Gets a new material that is rotated 90 degrees. North -> west -> south ->
@@ -165,5 +204,5 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
 	public abstract boolean equals(Object other);
 	
-	public abstract int hashCode();	
+	public abstract int hashCode();
 }

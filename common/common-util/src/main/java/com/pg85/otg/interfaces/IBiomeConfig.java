@@ -14,6 +14,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.SaplingType;
 
 /**
  * BiomeConfig (*.bc) classes
@@ -185,4 +186,9 @@ public interface IBiomeConfig
 	List<WeightedMobSpawnGroup> getAmbientCreatures();	
 	List<WeightedMobSpawnGroup> getWaterAmbientCreatures();
 	List<WeightedMobSpawnGroup> getMiscCreatures();
+	
+	// Saplings
+	
+	ISaplingSpawner getSaplingGen(SaplingType type);
+	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);	
 }
