@@ -1,16 +1,15 @@
-
-package com.pg85.otg.forge.event;
+package com.pg85.spigot.events;
 
 import java.nio.file.Path;
 import java.util.Random;
+
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.event.world.StructureGrowEvent;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.resource.SaplingResource;
-import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -18,42 +17,39 @@ import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.ISaplingSpawner;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
+import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
+import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.SaplingType;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.entity.player.BonemealEvent;
-import net.minecraftforge.event.world.SaplingGrowTreeEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.server.v1_16_R3.BlockPosition;
 
 public class SaplingHandler
 {
-	@SubscribeEvent
-	public void onSaplingGrowTree(SaplingGrowTreeEvent event)
+	void onStructureGrow(StructureGrowEvent event)
 	{
-    	if(!(event.getWorld() instanceof ServerWorld))
+    	if(!(event.getWorld() instanceof CraftWorld))
     	{
     		return;
     	}		
 		
-        BlockPos blockPos = event.getPos();
-		ForgeWorldGenRegion worldGenRegion;	
+        BlockPosition blockPos = new BlockPosition(event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
+		SpigotWorldGenRegion worldGenRegion;
 		Preset preset;
-		if(((ServerWorld)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if(((CraftWorld)event.getWorld()).getGenerator() instanceof OTGSpigotChunkGen)
 		{
-			preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator).getPreset();
-			worldGenRegion = new ForgeWorldGenRegion(
+			preset = ((OTGSpigotChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator.getPreset();
+			worldGenRegion = new SpigotWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
-				(ServerWorld)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator)
+				((CraftWorld)event.getWorld()).getHandle(),
+				((OTGSpigotChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator
 			);
 		} else { 
 			return;
-		}
+		}		
 
 		CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
 		CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
@@ -63,9 +59,9 @@ public class SaplingHandler
 		IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName());
 
         IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(blockPos.getX(), blockPos.getZ());
-        ForgeMaterialData material = (ForgeMaterialData)worldGenRegion.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        SpigotMaterialData material = (SpigotMaterialData)worldGenRegion.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 
-        BlockPos result = findFourSaplings(blockPos, material, worldGenRegion);
+        BlockPosition result = findFourSaplings(blockPos, material, worldGenRegion);
         boolean wideTrunk = false;
         if (result != null)
         {
@@ -77,7 +73,7 @@ public class SaplingHandler
         }        
         
         // Get the sapling generator
-        ISaplingSpawner sapling = biomeConfig.getCustomSaplingGen(ForgeMaterialData.ofBlockState(material.internalBlock().getBlock().defaultBlockState()), wideTrunk);
+        ISaplingSpawner sapling = biomeConfig.getCustomSaplingGen(SpigotMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()), wideTrunk);
         if(sapling != null && sapling.hasWideTrunk() && !wideTrunk)
         {
         	return;
@@ -89,14 +85,14 @@ public class SaplingHandler
         	if(wideTrunk)
         	{
         		// Try to find big (2x2) sapling
-        		saplingType = getBigSaplingType(ForgeMaterialData.ofBlockState(material.internalBlock().getBlock().defaultBlockState()));
+        		saplingType = getBigSaplingType(SpigotMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()));
         	}
             // If not big sapling, try to find small sapling
             if (saplingType == null)
             {
-                saplingType = getSmallSaplingType(ForgeMaterialData.ofBlockState(material.internalBlock().getBlock().defaultBlockState()));
+                saplingType = getSmallSaplingType(SpigotMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()));
             }
-            if(saplingType != null)
+            if (saplingType != null)
             {
             	sapling = biomeConfig.getSaplingGen(saplingType);
             }
@@ -110,7 +106,7 @@ public class SaplingHandler
         // When we have reached this point, we know that we have to handle the
         // event ourselves
         // So cancel it
-        event.setResult(Result.DENY);
+        event.setCancelled(true);
 
         // Remove saplings
 
@@ -154,82 +150,6 @@ public class SaplingHandler
         }
 	}
 
-    @SubscribeEvent
-    public void onBonemealUse(BonemealEvent event)
-    {
-    	if(!(event.getWorld() instanceof ServerWorld))
-    	{
-    		return;
-    	}
-
-        BlockPos blockPos = event.getPos();        
-		IWorldGenRegion worldGenRegion;	
-		Preset preset;
-		if(((ServerWorld)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
-		{
-			preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator).getPreset();
-			worldGenRegion = new ForgeWorldGenRegion(
-				preset.getFolderName(), 
-				preset.getWorldConfig(), 
-				(ServerWorld)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator)
-			);
-		} else {
-			return;
-		}
-		
-		CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-		CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
-		ILogger logger = OTG.getEngine().getLogger();
-		Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
-		IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();		
-		IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName());		
-		
-        IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(blockPos.getX(), blockPos.getZ());	
-
-        // Get sapling gen
-        ISaplingSpawner sapling = null;
-        SaplingType type = null;
-        if (ForgeMaterialData.ofBlockState(event.getBlock()).isMaterial(LocalMaterials.RED_MUSHROOM_BLOCK))
-        {
-            type = SaplingType.RedMushroom;
-        }
-        else if (ForgeMaterialData.ofBlockState(event.getBlock()).isMaterial(LocalMaterials.BROWN_MUSHROOM_BLOCK))
-        {
-            type = SaplingType.BrownMushroom;
-        } else {
-            return;
-        }
-        if(type != null)
-        {
-        	sapling = biomeConfig.getSaplingGen(type);
-        }
-        // No matching saplingType, return;
-        if (sapling == null)
-        {
-            return;
-        }
-        // Generate mushroom
-        event.setResult(Result.ALLOW);
-        worldGenRegion.setBlock(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), LocalMaterials.AIR);
-
-        boolean mushroomGrown = false;
-        Random random = new Random();
-        for (int i = 0; i < 10; i++)
-        {
-        	if (((SaplingResource)sapling).growSapling(worldGenRegion, random, false, blockPos.getX(), blockPos.getY(), blockPos.getZ(), preset.getFolderName(), otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker))
-            {
-                mushroomGrown = true;
-                break;
-            }
-        }
-        if (!mushroomGrown)
-        {
-            // Restore mushroom
-        	worldGenRegion.setBlock(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), ForgeMaterialData.ofBlockState(event.getBlock()));
-        }
-    }
-        
     /**
      * Gets the sapling type, based on the assumption that the sapling is
      * not placed in a 2x2 pattern.
@@ -298,7 +218,7 @@ public class SaplingHandler
      *
      * @return BlockPos of sapling with lowest X and Z, or null if not four saplings
      */
-    private BlockPos findFourSaplings(BlockPos blockPos, LocalMaterialData material, IWorldGenRegion worldGenRegion)
+    private BlockPosition findFourSaplings(BlockPosition blockPos, LocalMaterialData material, IWorldGenRegion worldGenRegion)
     {
         int x = blockPos.getX();
         int y = blockPos.getY();
@@ -315,10 +235,10 @@ public class SaplingHandler
         		)
                 {
                     // Found! Adjust internal position
-                    return blockPos.offset(treeOffsetX, 0, treeOffsetZ);
+                    return blockPos.b(treeOffsetX, 0, treeOffsetZ);
                 }
             }
         }
         return null;
-    }
+    }	
 }

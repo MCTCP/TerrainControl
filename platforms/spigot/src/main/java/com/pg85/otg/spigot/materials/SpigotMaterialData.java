@@ -155,7 +155,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			(
 				!this.isBlank &&
 				!((SpigotMaterialData) material).isBlank &&
-				Objects.equals(IRegistry.BLOCK.getKey(this.blockData.getBlock()), IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()))
+				IRegistry.BLOCK.getKey(this.blockData.getBlock()).toString().equals(IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()).toString())
 			)
 		;
 	}
