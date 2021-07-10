@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.network;
+package com.pg85.otg.spigot.networking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ColorThreshold;
 import com.pg85.otg.util.biome.SimpleColorSet;
 
-import net.minecraft.network.PacketBuffer;
+import io.netty.buffer.ByteBuf;
 
 public class BiomeSettingSyncWrapper
 {
@@ -26,7 +26,7 @@ public class BiomeSettingSyncWrapper
 		this.waterColorControl = config.getWaterColorControl();
 	}
 
-	public BiomeSettingSyncWrapper(PacketBuffer buffer)
+	public BiomeSettingSyncWrapper(ByteBuf buffer)
 	{
 		this.fogDensity = buffer.readFloat();
 
@@ -73,7 +73,7 @@ public class BiomeSettingSyncWrapper
 		return waterColorControl;
 	}
 
-	public void encode(PacketBuffer buffer)
+	public void encode(ByteBuf buffer)
 	{
 		buffer.writeFloat(this.fogDensity);
 

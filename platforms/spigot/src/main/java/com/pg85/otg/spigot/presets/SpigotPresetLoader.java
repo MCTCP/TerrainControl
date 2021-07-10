@@ -1,5 +1,20 @@
 package com.pg85.otg.spigot.presets;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
@@ -18,6 +33,8 @@ import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialReader;
+import com.pg85.otg.spigot.networking.BiomeSettingSyncWrapper;
+import com.pg85.otg.spigot.networking.OTGClientSyncManager;
 import com.pg85.otg.spigot.util.MobSpawnGroupHelper;
 import com.pg85.otg.util.biome.MCBiomeResourceLocation;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
@@ -25,15 +42,13 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
 
-import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-
-import java.io.File;
-import java.util.*;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.EnumCreatureType;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.IRegistryWritable;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.RegistryGeneration;
+import net.minecraft.server.v1_16_R3.ResourceKey;
 
 public class SpigotPresetLoader extends LocalPresetLoader
 {
@@ -114,6 +129,9 @@ public class SpigotPresetLoader extends LocalPresetLoader
 
 				MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getRegistryKey().toResourceLocationString());
 				//System.out.println(resourceLocation);
+				
+				// Populate our map for syncing
+ 				OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
 
 				// Create a registry key
 				ResourceKey<BiomeBase> registryKey = ResourceKey.a(IRegistry.ay, resourceLocation);
