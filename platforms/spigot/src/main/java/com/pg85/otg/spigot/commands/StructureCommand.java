@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;

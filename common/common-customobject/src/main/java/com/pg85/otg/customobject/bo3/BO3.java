@@ -40,7 +40,6 @@ import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import com.pg85.otg.util.materials.LocalMaterials;
 
 public class BO3 implements StructuredCustomObject
 {
@@ -127,7 +126,7 @@ public class BO3 implements StructuredCustomObject
 
 	// Used to safely spawn this object from a grown sapling
 	@Override
-	public boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
+	public boolean spawnFromSapling(IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
 	{
 		BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
 
@@ -148,7 +147,7 @@ public class BO3 implements StructuredCustomObject
 				if (
 					!localMaterial.isAir() && 
 					!localMaterial.isLogOrLeaves() && 
-					!localMaterial.isMaterial(LocalMaterials.SAPLING)
+					!localMaterial.isSapling()
 				)
 				{
 					return false;
@@ -185,7 +184,7 @@ public class BO3 implements StructuredCustomObject
 			}
 		}
 		oeh.extrude(worldGenRegion, random, x, y, z, doReplaceBlocks(), true);
-		handleBO3Functions(null, structureCache, worldGenRegion, random, rotation, x, y, z, chunks);
+		handleBO3Functions(null, null, worldGenRegion, random, rotation, x, y, z, chunks);
 
 		return true;
 	}

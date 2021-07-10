@@ -19,7 +19,7 @@ import java.util.Objects;
 public class SpigotMaterialData extends LocalMaterialData
 {
 	static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
-	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
+	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>(); // TODO: Move to SpigotMaterialReader?
 
 	private final IBlockData blockData;
 	private String name = null;
@@ -155,7 +155,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			(
 				!this.isBlank &&
 				!((SpigotMaterialData) material).isBlank &&
-				Objects.equals(IRegistry.BLOCK.getKey(this.blockData.getBlock()), IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()))
+				IRegistry.BLOCK.getKey(this.blockData.getBlock()).toString().equals(IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()).toString())
 			)
 		;
 	}

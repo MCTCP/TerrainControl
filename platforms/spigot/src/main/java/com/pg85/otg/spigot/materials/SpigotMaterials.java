@@ -246,11 +246,14 @@ public class SpigotMaterials extends LocalMaterials
 		WHITE_TULIP = SpigotMaterialData.ofBlockData(Blocks.WHITE_TULIP.getBlockData());
 		PINK_TULIP = SpigotMaterialData.ofBlockData(Blocks.PINK_TULIP.getBlockData());
 		OXEYE_DAISY = SpigotMaterialData.ofBlockData(Blocks.OXEYE_DAISY.getBlockData());
-		BROWN_MUSHROOM = SpigotMaterialData.ofBlockData(Blocks.BROWN_MUSHROOM.getBlockData());
 		YELLOW_FLOWER = SpigotMaterialData.ofBlockData(Blocks.DANDELION.getBlockData());
 		DEAD_BUSH = SpigotMaterialData.ofBlockData(Blocks.DEAD_BUSH.getBlockData());
 		LONG_GRASS = SpigotMaterialData.ofBlockData(Blocks.GRASS.getBlockData());
+		
+		RED_MUSHROOM_BLOCK = SpigotMaterialData.ofBlockData(Blocks.RED_MUSHROOM_BLOCK.getBlockData());
+		BROWN_MUSHROOM_BLOCK = SpigotMaterialData.ofBlockData(Blocks.BROWN_MUSHROOM_BLOCK.getBlockData());		
 		RED_MUSHROOM = SpigotMaterialData.ofBlockData(Blocks.RED_MUSHROOM.getBlockData());
+		BROWN_MUSHROOM = SpigotMaterialData.ofBlockData(Blocks.BROWN_MUSHROOM.getBlockData());
 
 		DOUBLE_TALL_GRASS_LOWER = SpigotMaterialData.ofBlockData(Blocks.TALL_GRASS.getBlockData().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
 		DOUBLE_TALL_GRASS_UPPER = SpigotMaterialData.ofBlockData(Blocks.TALL_GRASS.getBlockData().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
@@ -265,11 +268,18 @@ public class SpigotMaterials extends LocalMaterials
 		SUNFLOWER_LOWER = SpigotMaterialData.ofBlockData(Blocks.SUNFLOWER.getBlockData().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
 		SUNFLOWER_UPPER = SpigotMaterialData.ofBlockData(Blocks.SUNFLOWER.getBlockData().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
 
+		ACACIA_SAPLING = SpigotMaterialData.ofBlockData(Blocks.ACACIA_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));
+		BAMBOO_SAPLING = SpigotMaterialData.ofBlockData(Blocks.BAMBOO_SAPLING.getBlockData());
+		BIRCH_SAPLING = SpigotMaterialData.ofBlockData(Blocks.BIRCH_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));
+		DARK_OAK_SAPLING = SpigotMaterialData.ofBlockData(Blocks.DARK_OAK_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));
+		JUNGLE_SAPLING = SpigotMaterialData.ofBlockData(Blocks.JUNGLE_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));
+		OAK_SAPLING = SpigotMaterialData.ofBlockData(Blocks.OAK_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));
+		SPRUCE_SAPLING = SpigotMaterialData.ofBlockData(Blocks.SPRUCE_SAPLING.getBlockData().set(BlockSapling.STAGE, 1));		
+
 		PUMPKIN = SpigotMaterialData.ofBlockData(Blocks.PUMPKIN.getBlockData());
 		CACTUS = SpigotMaterialData.ofBlockData(Blocks.CACTUS.getBlockData());
 		MELON_BLOCK = SpigotMaterialData.ofBlockData(Blocks.MELON.getBlockData());
 		VINE = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData());
-		SAPLING = SpigotMaterialData.ofBlockData(Blocks.OAK_SAPLING.getBlockData());
 		WATER_LILY = SpigotMaterialData.ofBlockData(Blocks.LILY_PAD.getBlockData());
 		SUGAR_CANE_BLOCK = SpigotMaterialData.ofBlockData(Blocks.SUGAR_CANE.getBlockData());
 		IBlockData bambooState = Blocks.BAMBOO.getBlockData().set(BlockBamboo.d, 1).set(BlockBamboo.e, BlockPropertyBambooSize.NONE).set(BlockBamboo.f, 0);

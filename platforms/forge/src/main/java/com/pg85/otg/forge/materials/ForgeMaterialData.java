@@ -22,7 +22,7 @@ import java.util.Objects;
 public class ForgeMaterialData extends LocalMaterialData
 {
 	static final LocalMaterialData blank = new ForgeMaterialData(null, null, true);
-	private static final HashMap<BlockState, ForgeMaterialData> stateToMaterialDataMap = new HashMap<>();
+	private static final HashMap<BlockState, ForgeMaterialData> stateToMaterialDataMap = new HashMap<>(); // TODO: Move to ForgeMaterialReader?
 
 	private final BlockState blockData;
 	private String name = null;
@@ -31,7 +31,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	{
 		this(blockData, raw, false);
 	}
-	
+
 	private ForgeMaterialData(BlockState blockData, String raw, boolean isBlank)
 	{
 		this.blockData = blockData;
@@ -73,7 +73,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		{
 			return this.name;
 		}
-		if(isBlank)
+		if(this.isBlank)
 		{
 			return "BLANK";
 		}

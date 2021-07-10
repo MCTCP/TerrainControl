@@ -78,7 +78,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
 	 */
 	public boolean process(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random);
 
-	boolean spawnFromSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);  
+	boolean spawnFromSapling(IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);  
 
 	public boolean loadChecks(IModLoadedChecker modLoadedChecker);
 

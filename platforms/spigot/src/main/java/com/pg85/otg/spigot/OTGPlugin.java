@@ -26,6 +26,7 @@ import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+import com.pg85.spigot.events.OTGHandler;
 
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
@@ -42,7 +43,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	private static final ReentrantLock initLock = new ReentrantLock();
 	private static final HashMap<String, String> worlds = new HashMap<>();
 	private static final HashSet<String> processedWorlds = new HashSet<>();
-	
+
+	private OTGHandler handler;
 	private static Field field;
 
 	static
@@ -89,6 +91,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
 		}
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
+		
+		this.handler = new OTGHandler(this);		
 	}
 
 	@Override

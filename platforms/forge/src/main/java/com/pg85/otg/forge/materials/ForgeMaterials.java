@@ -248,12 +248,15 @@ public class ForgeMaterials extends LocalMaterials
 		ORANGE_TULIP = ForgeMaterialData.ofBlockState(Blocks.ORANGE_TULIP.defaultBlockState());
 		WHITE_TULIP = ForgeMaterialData.ofBlockState(Blocks.WHITE_TULIP.defaultBlockState());
 		PINK_TULIP = ForgeMaterialData.ofBlockState(Blocks.PINK_TULIP.defaultBlockState());
-		OXEYE_DAISY = ForgeMaterialData.ofBlockState(Blocks.OXEYE_DAISY.defaultBlockState());
-		BROWN_MUSHROOM = ForgeMaterialData.ofBlockState(Blocks.BROWN_MUSHROOM.defaultBlockState());
+		OXEYE_DAISY = ForgeMaterialData.ofBlockState(Blocks.OXEYE_DAISY.defaultBlockState());		
 		YELLOW_FLOWER = ForgeMaterialData.ofBlockState(Blocks.DANDELION.defaultBlockState());
 		DEAD_BUSH = ForgeMaterialData.ofBlockState(Blocks.DEAD_BUSH.defaultBlockState());
 		LONG_GRASS = ForgeMaterialData.ofBlockState(Blocks.GRASS.defaultBlockState());
+		
+		RED_MUSHROOM_BLOCK = ForgeMaterialData.ofBlockState(Blocks.RED_MUSHROOM_BLOCK.defaultBlockState());
+		BROWN_MUSHROOM_BLOCK = ForgeMaterialData.ofBlockState(Blocks.BROWN_MUSHROOM_BLOCK.defaultBlockState());		
 		RED_MUSHROOM = ForgeMaterialData.ofBlockState(Blocks.RED_MUSHROOM.defaultBlockState());
+		BROWN_MUSHROOM = ForgeMaterialData.ofBlockState(Blocks.BROWN_MUSHROOM.defaultBlockState());
 
 		DOUBLE_TALL_GRASS_LOWER = ForgeMaterialData.ofBlockState(Blocks.TALL_GRASS.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
 		DOUBLE_TALL_GRASS_UPPER = ForgeMaterialData.ofBlockState(Blocks.TALL_GRASS.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
@@ -268,11 +271,18 @@ public class ForgeMaterials extends LocalMaterials
 		SUNFLOWER_LOWER = ForgeMaterialData.ofBlockState(Blocks.SUNFLOWER.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
 		SUNFLOWER_UPPER = ForgeMaterialData.ofBlockState(Blocks.SUNFLOWER.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
 
+		ACACIA_SAPLING = ForgeMaterialData.ofBlockState(Blocks.ACACIA_SAPLING.defaultBlockState());
+		BAMBOO_SAPLING = ForgeMaterialData.ofBlockState(Blocks.BAMBOO_SAPLING.defaultBlockState());
+		BIRCH_SAPLING = ForgeMaterialData.ofBlockState(Blocks.BIRCH_SAPLING.defaultBlockState());
+		DARK_OAK_SAPLING = ForgeMaterialData.ofBlockState(Blocks.DARK_OAK_SAPLING.defaultBlockState());
+		JUNGLE_SAPLING = ForgeMaterialData.ofBlockState(Blocks.JUNGLE_SAPLING.defaultBlockState());
+		OAK_SAPLING = ForgeMaterialData.ofBlockState(Blocks.OAK_SAPLING.defaultBlockState());
+		SPRUCE_SAPLING = ForgeMaterialData.ofBlockState(Blocks.SPRUCE_SAPLING.defaultBlockState());
+		
 		PUMPKIN = ForgeMaterialData.ofBlockState(Blocks.PUMPKIN.defaultBlockState());
 		CACTUS = ForgeMaterialData.ofBlockState(Blocks.CACTUS.defaultBlockState());
 		MELON_BLOCK = ForgeMaterialData.ofBlockState(Blocks.MELON.defaultBlockState());
 		VINE = ForgeMaterialData.ofBlockState(Blocks.VINE.defaultBlockState());
-		SAPLING = ForgeMaterialData.ofBlockState(Blocks.OAK_SAPLING.defaultBlockState());
 		WATER_LILY = ForgeMaterialData.ofBlockState(Blocks.LILY_PAD.defaultBlockState());
 		SUGAR_CANE_BLOCK = ForgeMaterialData.ofBlockState(Blocks.SUGAR_CANE.defaultBlockState());
 		BlockState bambooState = Blocks.BAMBOO.defaultBlockState().setValue(BambooBlock.AGE, 1).setValue(BambooBlock.LEAVES, BambooLeaves.NONE).setValue(BambooBlock.STAGE, 0);

@@ -1,7 +1,6 @@
 package com.pg85.otg.spigot.commands;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;

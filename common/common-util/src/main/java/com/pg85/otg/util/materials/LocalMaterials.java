@@ -97,19 +97,19 @@ public class LocalMaterials
 	public static LocalMaterialData WHITE_TULIP;
 	public static LocalMaterialData PINK_TULIP;
 	public static LocalMaterialData OXEYE_DAISY;
-
-
-	public static LocalMaterialData BROWN_MUSHROOM;
 	public static LocalMaterialData YELLOW_FLOWER;
 	public static LocalMaterialData DEAD_BUSH;
 	public static LocalMaterialData LONG_GRASS;
-	public static LocalMaterialData RED_MUSHROOM;
+	
+	public static LocalMaterialData RED_MUSHROOM_BLOCK;
+	public static LocalMaterialData BROWN_MUSHROOM_BLOCK;
+	public static LocalMaterialData RED_MUSHROOM;	
+	public static LocalMaterialData BROWN_MUSHROOM;
 	
 	public static LocalMaterialData PUMPKIN;
 	public static LocalMaterialData CACTUS;	
 	public static LocalMaterialData MELON_BLOCK;
 	public static LocalMaterialData VINE;
-	public static LocalMaterialData SAPLING;
 	public static LocalMaterialData WATER_LILY;
 	public static LocalMaterialData SUGAR_CANE_BLOCK;
 	public static LocalMaterialData BAMBOO;
@@ -126,6 +126,16 @@ public class LocalMaterials
 	public static LocalMaterialData VINE_EAST;
 	public static LocalMaterialData VINE_WEST;
 	public static LocalMaterialData SEA_PICKLE;
+	
+	// Saplings
+	
+	public static LocalMaterialData ACACIA_SAPLING;
+	public static LocalMaterialData BAMBOO_SAPLING;
+	public static LocalMaterialData BIRCH_SAPLING;
+	public static LocalMaterialData DARK_OAK_SAPLING;
+	public static LocalMaterialData JUNGLE_SAPLING;
+	public static LocalMaterialData OAK_SAPLING;
+	public static LocalMaterialData SPRUCE_SAPLING;	
 
 	// Coral
 	public static List<LocalMaterialData> CORAL_BLOCKS;

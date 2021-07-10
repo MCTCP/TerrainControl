@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;

@@ -13,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
