@@ -14,7 +14,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 	private Map<String, BiomeSettingSyncWrapper> syncMap = new HashMap<>();
 	private int loginIndex;
 
-	private PacketSyncBiomeSettings()
+	public PacketSyncBiomeSettings()
 	{
 	}
 
