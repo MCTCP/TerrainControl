@@ -28,7 +28,7 @@ public class RavineCarver extends Carver
 	}
 
 	@Override
-	public boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	public boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		double x = chunkX * Constants.CHUNK_SIZE + random.nextInt(Constants.CHUNK_SIZE);
 		double z = chunkZ * Constants.CHUNK_SIZE + random.nextInt(Constants.CHUNK_SIZE);			
@@ -49,11 +49,11 @@ public class RavineCarver extends Carver
 		branchCount = branchCount - random.nextInt(branchCount / 4);		
 		double yawPitchRatio = worldConfig.getRavineDepth();
 
-		this.carveRavine(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, yawPitchRatio, bitSet, cachedBiomeProvider, carversDoSurfaceBlock);
+		this.carveRavine(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, yawPitchRatio, bitSet, cachedBiomeProvider);
 		return true;
 	}
 
-	private void carveRavine(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	private void carveRavine(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		Random random = new Random(seed);
 		float stretchFactor = 1.0F;
@@ -99,7 +99,7 @@ public class RavineCarver extends Carver
 				{
 					return;
 				}
-				this.carveRegion(noiseProvider, heightToHorizontalStretchFactor, chunk, seed, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+				this.carveRegion(noiseProvider, heightToHorizontalStretchFactor, chunk, seed, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask, cachedBiomeProvider);
 			}
 		}
 	}

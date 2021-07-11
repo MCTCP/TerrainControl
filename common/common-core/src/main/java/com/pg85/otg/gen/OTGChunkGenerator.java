@@ -621,7 +621,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		}
 	}
 
-	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask, boolean carversDoSurfaceBlock)
+	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)
 	{
 		// TODO: it should be possible to cache these carver graphs to make larger carvers more efficient and easier to use
 
@@ -634,14 +634,14 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 				
 				if(this.caves.isStartChunk(random, localChunkX, localChunkZ))
 				{
-					this.caves.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider, carversDoSurfaceBlock);
+					this.caves.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider);
 				}
 				
 				setCarverSeed(random, seed, localChunkX, localChunkZ);
 				
 				if(this.ravines.isStartChunk(random, localChunkX, localChunkZ))
 				{
-					this.ravines.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider, carversDoSurfaceBlock);
+					this.ravines.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider);
 				}
 			}
 		}
