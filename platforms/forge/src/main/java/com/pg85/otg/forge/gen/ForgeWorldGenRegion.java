@@ -504,6 +504,18 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
 					mega_spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
 					return true;
+				case CrimsonFungi:
+					ConfiguredFeature<IFeatureConfig, ?> crimson_fungi = (ConfiguredFeature<IFeatureConfig, ?>) Features.CRIMSON_FUNGI;
+					crimson_fungi.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, crimson_fungi.config);
+					return true;
+				case WarpedFungi:
+					ConfiguredFeature<IFeatureConfig, ?> warped_fungi = (ConfiguredFeature<IFeatureConfig, ?>) Features.WARPED_FUNGI;
+					warped_fungi.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, warped_fungi.config);
+					return true;
+				case ChorusPlant:
+					ConfiguredFeature<IFeatureConfig, ?> chorus_plant = (ConfiguredFeature<IFeatureConfig, ?>) Features.CHORUS_PLANT;
+					chorus_plant.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, chorus_plant.config);
+					return true;					
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());
 			}
