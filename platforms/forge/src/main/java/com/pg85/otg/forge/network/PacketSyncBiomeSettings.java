@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -39,7 +40,6 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		for (int i = size; i > 0; i--)
 		{
 			String key = buffer.readUtf();
-			System.out.println(key);
 			BiomeSettingSyncWrapper wrapper = new BiomeSettingSyncWrapper(buffer);
 
 			packet.syncMap.putIfAbsent(key, wrapper);
@@ -55,6 +55,8 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		// forever.
 		OTGClientSyncManager.LOGIN.reply(new AcknowledgeOTGMessage(), context.get());
 		context.get().setPacketHandled(true);
+		
+		Minecraft.getInstance().levelRenderer.allChanged();
 	}
 
 	@Override
