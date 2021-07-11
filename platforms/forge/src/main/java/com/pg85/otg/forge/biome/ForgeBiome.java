@@ -102,7 +102,7 @@ public class ForgeBiome implements IBiome
 			// Avoid temperatures between 0.1 and 0.2, Minecraft restriction
 			safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
 		}
-		
+
 		BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()			
 				.fogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue() ? biomeConfig.getFogColor() : worldConfig.getFogColor())

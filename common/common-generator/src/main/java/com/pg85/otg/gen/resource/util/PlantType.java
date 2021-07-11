@@ -19,14 +19,16 @@ public class PlantType
 	// Builds lookup map
 	private static final Map<String, PlantType> LOOKUP_MAP = new TreeMap<String, PlantType>(String.CASE_INSENSITIVE_ORDER);
 
+	public static final PlantType SeaGrass = register(new PlantType("SeaGrass", LocalMaterials.SEAGRASS));
 	public static final PlantType Allium = register(new PlantType("Allium", LocalMaterials.ALLIUM));
 	public static final PlantType AzureBluet = register(new PlantType("AzureBluet", LocalMaterials.AZURE_BLUET));
 	public static final PlantType BlueOrchid = register(new PlantType("BlueOrchid", LocalMaterials.BLUE_ORCHID));
 	public static final PlantType BrownMushroom = register(new PlantType("BrownMushroom", LocalMaterials.BROWN_MUSHROOM));
 	public static final PlantType Dandelion = register(new PlantType("Dandelion", LocalMaterials.YELLOW_FLOWER));
 	public static final PlantType DeadBush = register(new PlantType("DeadBush", LocalMaterials.DEAD_BUSH));
-	public static final PlantType DoubleTallgrass = register(new PlantType("DoubleTallgrass", LocalMaterials.DOUBLE_TALL_GRASS_LOWER, LocalMaterials.DOUBLE_TALL_GRASS_UPPER));
-	public static final PlantType Fern = register(new PlantType("Fern", LocalMaterials.LONG_GRASS));
+	public static final PlantType DoubleTallSeaGrass = register(new PlantType("DoubleTallSeaGrass", LocalMaterials.TALL_SEAGRASS_LOWER, LocalMaterials.TALL_SEAGRASS_UPPER));	
+	public static final PlantType DoubleTallGrass = register(new PlantType("DoubleTallgrass", LocalMaterials.DOUBLE_TALL_GRASS_LOWER, LocalMaterials.DOUBLE_TALL_GRASS_UPPER));
+	public static final PlantType Fern = register(new PlantType("Fern", LocalMaterials.FERN));
 	public static final PlantType LargeFern = register(new PlantType("LargeFern", LocalMaterials.LARGE_FERN_LOWER, LocalMaterials.LARGE_FERN_UPPER));
 	public static final PlantType Lilac = register(new PlantType("Lilac", LocalMaterials.LILAC_LOWER, LocalMaterials.LILAC_UPPER));
 	public static final PlantType OrangeTulip = register(new PlantType("OrangeTulip", LocalMaterials.ORANGE_TULIP));

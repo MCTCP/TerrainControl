@@ -248,6 +248,7 @@ public class SpigotMaterials extends LocalMaterials
 		OXEYE_DAISY = SpigotMaterialData.ofBlockData(Blocks.OXEYE_DAISY.getBlockData());
 		YELLOW_FLOWER = SpigotMaterialData.ofBlockData(Blocks.DANDELION.getBlockData());
 		DEAD_BUSH = SpigotMaterialData.ofBlockData(Blocks.DEAD_BUSH.getBlockData());
+		FERN = SpigotMaterialData.ofBlockData(Blocks.FERN.getBlockData());
 		LONG_GRASS = SpigotMaterialData.ofBlockData(Blocks.GRASS.getBlockData());
 		
 		RED_MUSHROOM_BLOCK = SpigotMaterialData.ofBlockData(Blocks.RED_MUSHROOM_BLOCK.getBlockData());

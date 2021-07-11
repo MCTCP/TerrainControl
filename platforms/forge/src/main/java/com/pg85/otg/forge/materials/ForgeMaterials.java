@@ -251,6 +251,7 @@ public class ForgeMaterials extends LocalMaterials
 		OXEYE_DAISY = ForgeMaterialData.ofBlockState(Blocks.OXEYE_DAISY.defaultBlockState());		
 		YELLOW_FLOWER = ForgeMaterialData.ofBlockState(Blocks.DANDELION.defaultBlockState());
 		DEAD_BUSH = ForgeMaterialData.ofBlockState(Blocks.DEAD_BUSH.defaultBlockState());
+		FERN = ForgeMaterialData.ofBlockState(Blocks.FERN.defaultBlockState());
 		LONG_GRASS = ForgeMaterialData.ofBlockState(Blocks.GRASS.defaultBlockState());
 		
 		RED_MUSHROOM_BLOCK = ForgeMaterialData.ofBlockState(Blocks.RED_MUSHROOM_BLOCK.defaultBlockState());
