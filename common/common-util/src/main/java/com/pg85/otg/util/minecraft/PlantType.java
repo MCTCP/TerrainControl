@@ -1,4 +1,4 @@
-package com.pg85.otg.gen.resource.util;
+package com.pg85.otg.util.minecraft;
 
 import java.util.Collection;
 import java.util.Map;
