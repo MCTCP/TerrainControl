@@ -202,6 +202,7 @@ public class SpigotMaterials extends LocalMaterials
 		MAGMA = SpigotMaterialData.ofBlockData(Blocks.MAGMA_BLOCK.getBlockData());
 		ICE = SpigotMaterialData.ofBlockData(Blocks.ICE.getBlockData());
 		PACKED_ICE = SpigotMaterialData.ofBlockData(Blocks.PACKED_ICE.getBlockData());
+		BLUE_ICE = SpigotMaterialData.ofBlockData(Blocks.BLUE_ICE.getBlockData());
 		FROSTED_ICE = SpigotMaterialData.ofBlockData(Blocks.FROSTED_ICE.getBlockData());
 		GLOWSTONE = SpigotMaterialData.ofBlockData(Blocks.GLOWSTONE.getBlockData());
 		MYCELIUM = SpigotMaterialData.ofBlockData(Blocks.MYCELIUM.getBlockData());
