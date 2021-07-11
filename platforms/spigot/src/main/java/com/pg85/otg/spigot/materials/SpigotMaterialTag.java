@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.materials;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
 import net.minecraft.server.v1_16_R3.Block;
@@ -11,13 +12,14 @@ public class SpigotMaterialTag extends LocalMaterialTag
 {
 	public static LocalMaterialTag ofString(String name)
 	{
+		// If otg: or no domain was supplied, try OTG tags.
 		// If no domain was supplied, first try OTG tags.
-		if(!name.contains(":"))
+		if(!name.contains(":") || name.startsWith(Constants.MOD_ID_SHORT + ":"))
 		{
-			Block[] blockTag = SpigotMaterials.OTG_BLOCK_TAGS.get(name.trim().toLowerCase()); 
+			Block[] blockTag = SpigotMaterials.OTG_BLOCK_TAGS.get(name.trim().toLowerCase().replace(Constants.MOD_ID_SHORT + ":", "")); 
 			if(blockTag != null)
 			{
-				return new SpigotMaterialTag(blockTag, name.trim().toLowerCase());
+				return new SpigotMaterialTag(blockTag, Constants.MOD_ID_SHORT + ":" + name.trim().toLowerCase().replace(Constants.MOD_ID_SHORT + ":", ""));
 			}
 		}
 		final MinecraftKey resourceLocation;
@@ -28,7 +30,7 @@ public class SpigotMaterialTag extends LocalMaterialTag
 			return null;
 		}
 		Tag<Block> blockTag = TagsBlock.b().stream().filter(n -> n.a().equals(resourceLocation)).findFirst().orElse(null);
-		return blockTag == null ? null : new SpigotMaterialTag(blockTag, name.trim().toLowerCase());
+		return blockTag == null ? null : new SpigotMaterialTag(blockTag, resourceLocation.toString());
 	}
 	
 	private final String name;
