@@ -123,23 +123,23 @@ public abstract class Carver
 				// This should hopefully be more successful at finding
 				// cave/ravine floors that have open air above them and
 				// should get a surfaceblock.
+				// TODO: Implement highestblock to make this work properly?
 				if (blockAbove.isNonCaveAir())
 				{
 					foundSurface.setValue(true);
-				}				
-				go = true;
+				}
 			} else {
 				// Vanilla logic
 				// Normally doesn't see sand as surface?
 				if(material.isMaterial(biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y, worldZ)))
 				{
 					foundSurface.setValue(true);
-				}				
-				if (material.isSolid())
-				{
-					go = true;
 				}
 			}
+			if (material.isSolid())
+			{
+				go = true;
+			}			
 			if(go)
 			{
 				if (y <= this.worldConfig.getCarverLavaBlockHeight())
