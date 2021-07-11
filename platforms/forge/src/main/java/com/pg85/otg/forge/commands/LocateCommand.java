@@ -11,6 +11,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -47,13 +48,21 @@ public class LocateCommand implements BaseCommand
 	@SuppressWarnings("resource")
 	private int locateBiome(CommandSource source, String biome, int range) throws CommandSyntaxException
 	{
+		biome = biome.toLowerCase();
+		
 		ServerWorld world = source.getLevel();
 		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
+		
+		String preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset().getFolderName().toLowerCase();
 
+		if (!biome.startsWith(preset)) {
+			biome = preset + "." + biome;
+		}
+		
 		ResourceLocation key = new ResourceLocation(Constants.MOD_ID_SHORT, biome);
 
 		BlockPos pos = world.findNearestBiome(world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key),
