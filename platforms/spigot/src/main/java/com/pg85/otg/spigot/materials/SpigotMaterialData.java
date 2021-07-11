@@ -155,7 +155,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			(
 				!this.isBlank &&
 				!((SpigotMaterialData) material).isBlank &&
-				IRegistry.BLOCK.getKey(this.blockData.getBlock()).toString().equals(IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()).toString())
+				Objects.equals(this.blockData.getBlock(), ((SpigotMaterialData) material).blockData.getBlock())
 			)
 		;
 	}
@@ -246,8 +246,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			property = BlockProperties.O;
 			EnumDirection direction = EnumDirection.values()[((OTGDirection)value).ordinal()];
 			return SpigotMaterialData.ofBlockData(this.blockData.set(property, direction));
-		} else
-		{
+		} else {
 			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}
 
@@ -295,7 +294,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			(
 				!this.isBlank &&
 				!other.isBlank &&
-				this.blockData.equals(other.blockData)
+				Objects.equals(this.blockData.getBlock(), other.blockData.getBlock())
 			);
 	}
 
