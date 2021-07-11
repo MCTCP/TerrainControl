@@ -19,7 +19,6 @@ import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.customobject.resource.TreeResource;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.gen.resource.*;
-import com.pg85.otg.gen.resource.util.PlantType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -36,6 +35,7 @@ import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.EntityCategory;
+import com.pg85.otg.util.minecraft.PlantType;
 import com.pg85.otg.util.minecraft.SaplingType;
 
 /**

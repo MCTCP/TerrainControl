@@ -45,6 +45,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	private static final HashMap<String, String> worlds = new HashMap<>();
 	private static final HashSet<String> processedWorlds = new HashSet<>();
 
+	@SuppressWarnings("unused")
 	private OTGHandler handler;
 	private static Field field;
 
