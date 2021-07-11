@@ -586,18 +586,6 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.WATER_BLOCK, this.waterBlock,
 			"Block used as water in WaterLevel."
 		);
-
-		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK, this.carverLavaBlock,
-			"Block that replaces all air blocks from Y0 up to CarverLavaBlockHeight.",
-			"For example, vanilla replaces air in caves with lava up to Y10.",
-			"Defaults to: LAVA"
-		);
-
-		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, this.carverLavaBlockHeight,
-			"All air blocks are replaced to CarverLavaBlock from Y0 up to CarverLavaBlockHeight.",
-			"For example, vanilla replaces air in caves with lava up to Y10.",
-			"Defaults to: 10"
-		);
 		
 		writer.putSetting(WorldStandardValues.ICE_BLOCK, this.iceBlock,
 			"Block used as ice."
@@ -678,15 +666,28 @@ public class WorldConfig extends WorldConfigBase
 			"Set this to false to disable the bounds check during chunk decoration.",
 			"While this allows you to spawn objects larger than 32x32, it also makes terrain generation dependent on the direction you explored the world in."
 		);
-		
+
 		writer.header1("Carvers: Caves and Ravines");
 
 		writer.putSetting(WorldStandardValues.CARVERS_DO_SURFACE_BLOCK, this.carversDoSurfaceBlock,
 			"Caves and ravines that break the surface spawn surfaceblocks on their floor, " + 
-			"with more surface blocks spawning in shallow caves/ravines than deep ones."
+			"with more surface blocks spawning in shallow caves/ravines than deep ones.",
+			"Vanilla does this as well, but is less effective at it."
 		);
 
-		writer.header2("Caves");
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK, this.carverLavaBlock,
+			"Block that replaces all air blocks from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: LAVA"
+		);
+
+		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK_HEIGHT, this.carverLavaBlockHeight,
+			"All air blocks are replaced to CarverLavaBlock from Y0 up to CarverLavaBlockHeight.",
+			"For example, vanilla replaces air in caves with lava up to Y10.",
+			"Defaults to: 10"
+		);		
+
+		writer.header2("Caves");		
 		
 		writer.putSetting(WorldStandardValues.CAVES_ENABLED, this.cavesEnabled,
 			"Enables/disables OTG caves. set this to false if you're using modded caves."
