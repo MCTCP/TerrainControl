@@ -22,8 +22,8 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.ICustomStructureGen;
 import com.pg85.otg.interfaces.ISaplingSpawner;
+import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
@@ -231,17 +231,17 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.otgBiomeId;
 	}
-		
+
 	@Override
-	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
+	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
-		return this.surfaceAndGroundControl.getSurfaceBlockAtHeight(worldGenRegion, this, x, y, z);
+		return this.surfaceAndGroundControl.getSurfaceBlockAtHeight(noiseProvider, this, x, y, z);
 	}
 	
 	@Override
-	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
+	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
-		return this.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, this, x, y, z);
+		return this.surfaceAndGroundControl.getGroundBlockAtHeight(noiseProvider, this, x, y, z);
 	}
 		
 	@Override
@@ -276,6 +276,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 			}
 		}
 	}
+
+	// Note: getSurfaceBlockReplaced / getGroundBlockReplaced don't take into
+	// account SAGC, so they should only be used by surfacegenerators.
 	
 	@Override
 	public LocalMaterialData getSurfaceBlockReplaced(int y)

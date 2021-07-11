@@ -3,7 +3,7 @@ package com.pg85.otg.gen.surface;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IMaterialReader;
-import com.pg85.otg.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -37,9 +37,9 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	}
 
 	@Override
-	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+		double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 		{
 			if (noise <= layer.maxNoise)
@@ -51,9 +51,9 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	}
 
 	@Override
-	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
-		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
+		double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
 		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 		{
 			if (noise <= layer.maxNoise)
