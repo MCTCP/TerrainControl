@@ -44,6 +44,10 @@ public class DecorationArea
 		this.chunkBeingDecorated = chunkBeingDecorated;
 	}
 
+	// TODO: Some resources don't check decoration bounds before calling getMaterial/setBlock,
+	// which does the check and returns null/ignores the call. Making resources check preemptively
+	// may be more efficient and would allow us to remove isInAreaBeingDecorated checks in
+	// getMaterial/setBlock (except for debugging purposes).
 	public boolean isInAreaBeingDecorated(int blockX, int blockZ)
 	{
 		return 
@@ -68,24 +72,24 @@ public class DecorationArea
 	{
 		return this.minZ;
 	}
-	
+
 	public int getLeft()
 	{
 		return this.minX;
 	}
-	
+
 	public ChunkCoordinate getChunkBeingDecorated()
 	{
 		return this.chunkBeingDecorated;
-	}	
-	
+	}
+
 	public int getChunkBeingDecoratedCenterX()
 	{
 		return this.chunkBeingDecorated.getChunkX() * Constants.CHUNK_SIZE + DECORATION_OFFSET;
 	}
-	
+
 	public int getChunkBeingDecoratedCenterZ()
 	{
 		return this.chunkBeingDecorated.getChunkZ() * Constants.CHUNK_SIZE + DECORATION_OFFSET;
-	}	
+	}
 }
