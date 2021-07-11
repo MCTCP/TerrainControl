@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import com.pg85.otg.constants.Constants;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -40,6 +42,22 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		for (int i = size; i > 0; i--)
 		{
 			String key = buffer.readUtf();
+			BiomeSettingSyncWrapper wrapper = new BiomeSettingSyncWrapper(buffer);
+
+			packet.syncMap.putIfAbsent(key, wrapper);
+		}
+		return packet;
+	}
+	
+	public static PacketSyncBiomeSettings decodeSpigot(PacketBuffer buffer)
+	{
+		PacketSyncBiomeSettings packet = new PacketSyncBiomeSettings();
+		int size = buffer.readInt();
+		String preset = buffer.readUtf();
+		for (int i = size; i > 0; i--)
+		{
+			String biomeName = buffer.readUtf();
+			String key = Constants.MOD_ID_SHORT + ":" + preset + "." + biomeName;
 			BiomeSettingSyncWrapper wrapper = new BiomeSettingSyncWrapper(buffer);
 
 			packet.syncMap.putIfAbsent(key, wrapper);

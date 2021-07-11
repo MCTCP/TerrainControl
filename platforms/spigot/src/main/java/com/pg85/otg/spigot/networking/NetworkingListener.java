@@ -54,8 +54,11 @@ public class NetworkingListener implements Listener
 		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator()).getPreset();
 
 		PacketDataSerializer buffer = new PacketDataSerializer(Unpooled.buffer(32766));
+		String presetName = preset.getFolderName().toLowerCase();
+		
 		buffer.writeByte((byte) 1);
 		buffer.writeInt(preset.getAllBiomeConfigs().size());
+		buffer.a(presetName);
 
 		for (IBiomeConfig biome : preset.getAllBiomeConfigs())
 		{
@@ -64,7 +67,7 @@ public class NetworkingListener implements Listener
 
 			if (wrapper != null)
 			{
-				buffer.a(key);
+				buffer.a(key.replace(Constants.MOD_ID_SHORT + ":" + presetName + ".", ""));
 				wrapper.encode(buffer);
 			}
 		}
@@ -74,6 +77,6 @@ public class NetworkingListener implements Listener
 					"Sending sync data of size " + buffer.writerIndex() + " bytes to " + player.getName() + ".");
 			player.sendPluginMessage(plugin, Constants.MOD_ID_SHORT + ":spigot", buffer.array());
 		}, 100); // 100 ticks is arbitrary, but 20 wasn't long enough
-		// TODO is there a differnt event we can use to send this, where we don't need a dalay
+		// TODO is there a different event we can use to send this, where we don't need a delay
 	}
 }
