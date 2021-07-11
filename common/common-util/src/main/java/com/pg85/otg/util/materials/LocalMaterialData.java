@@ -33,6 +33,8 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 
 	public abstract boolean isEmptyOrAir();
 	
+	public abstract boolean isNonCaveAir();	
+	
 	public abstract boolean isAir();
 
 	public abstract boolean isEmpty();

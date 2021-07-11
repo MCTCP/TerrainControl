@@ -311,7 +311,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
+			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.preset.getWorldConfig().getCarversDoSurfaceBlock());
 		}
 		super.applyCarvers(seed, biomeManager, chunk, stage);
 	}

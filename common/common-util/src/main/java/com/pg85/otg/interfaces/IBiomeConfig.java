@@ -95,8 +95,11 @@ public interface IBiomeConfig
 	// Any blocks spawned during decoration will have their materials parsed before spawning
 	// them via world.setBlock(), so they use the default biomeconfig materials.	
 	
-	LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
-	LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
+	// Note: getSurfaceBlockReplaced / getGroundBlockReplaced don't take into
+	// account SAGC, so they should only be used by surfacegenerators.
+	
+	LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z);
+	LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z);
 	LocalMaterialData getSurfaceBlockReplaced(int y);
 	LocalMaterialData getGroundBlockReplaced(int y);
 	LocalMaterialData getStoneBlockReplaced(int y);

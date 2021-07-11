@@ -6,7 +6,7 @@ import java.util.Random;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.interfaces.IBiomeConfig;
-import com.pg85.otg.interfaces.IWorldGenRegion;
+import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
@@ -144,13 +144,13 @@ class MesaSurfaceGenerator implements SurfaceGenerator
 	}
 
 	@Override
-	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
 		return getBand(biomeConfig, xInWorld, yInWorld, zInWorld);
 	}
 	
 	@Override
-	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
 		return getBand(biomeConfig, xInWorld, yInWorld, zInWorld);
 	}

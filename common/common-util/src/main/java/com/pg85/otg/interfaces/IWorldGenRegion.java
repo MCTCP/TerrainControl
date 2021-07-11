@@ -9,7 +9,7 @@ import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 
-public interface IWorldGenRegion
+public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 {
 	public IPluginConfig getPluginConfig();
 	public IWorldConfig getWorldConfig();
@@ -26,7 +26,6 @@ public interface IWorldGenRegion
 	public ICachedBiomeProvider getCachedBiomeProvider();
 	public IBiome getBiomeForDecoration(int x, int z);
 	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ);
-	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z);
 	public LocalMaterialData getMaterial(int x, int y, int z);
 	public LocalMaterialData getMaterialDirect(int x, int y, int z);

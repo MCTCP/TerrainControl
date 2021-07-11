@@ -133,6 +133,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	// Caves & Ravines
 	
+	protected boolean carversDoSurfaceBlock;
+	
 	protected boolean cavesEnabled;
 	protected int caveFrequency;
 	protected int caveRarity;	
@@ -268,6 +270,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public int getRavineMaxAltitude()
 	{
 		return this.ravineMaxAltitude;
+	}
+
+	@Override
+	public boolean getCarversDoSurfaceBlock()
+	{
+		return this.carversDoSurfaceBlock;
 	}
 	
 	@Override
