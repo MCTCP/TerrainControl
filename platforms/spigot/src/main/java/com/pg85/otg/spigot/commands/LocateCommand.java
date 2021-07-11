@@ -60,6 +60,7 @@ public class LocateCommand implements BaseCommand
 			if (biomeBase == null)
 			{
 				sender.sendMessage("Invalid biome: " + biome + ".");
+				return true;
 			}
 
 			BlockPosition playerPos = new BlockPosition(player.getLocation().getBlockX(),
@@ -78,8 +79,8 @@ public class LocateCommand implements BaseCommand
 						new ClickEvent(Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " ~ " + pos.getZ()));
 				sender.spigot().sendMessage(new ComponentBuilder(new TextComponent("The nearest " + biome + " is at "))
 						.append(coordComponent)
-						.append(new TextComponent("(" + Integer.toString((int)Math.round(
-								Math.sqrt(pos.distanceSquared(playerPos.getX(), playerPos.getY(), playerPos.getZ(), false))))
+						.append(new TextComponent("(" + Integer.toString((int) Math.round(Math.sqrt(
+								pos.distanceSquared(playerPos.getX(), playerPos.getY(), playerPos.getZ(), false))))
 								+ " blocks away)"))
 						.create());
 			}
@@ -97,10 +98,13 @@ public class LocateCommand implements BaseCommand
 			WorldServer serverWorld = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
 			if (serverWorld.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator)
 			{
-				StringUtil.copyPartialMatches(args[1],
-						((OTGNoiseChunkGenerator) serverWorld.getChunkProvider().getChunkGenerator()).getPreset()
-								.getAllBiomeNames(),
-						options);
+				List<String> biomeNames = new ArrayList<>();
+				for (String name : ((OTGNoiseChunkGenerator) serverWorld.getChunkProvider().getChunkGenerator())
+						.getPreset().getAllBiomeNames())
+				{
+					biomeNames.add(name.replace(' ', '_'));
+				}
+				StringUtil.copyPartialMatches(args[1], biomeNames, options);
 			}
 		}
 		return options;
