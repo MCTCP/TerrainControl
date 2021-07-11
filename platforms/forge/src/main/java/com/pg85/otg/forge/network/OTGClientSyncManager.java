@@ -2,6 +2,7 @@ package com.pg85.otg.forge.network;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.pg85.otg.constants.Constants;
 
@@ -24,9 +25,8 @@ public class OTGClientSyncManager
 
 	public static final SimpleChannel SPIGOT = NetworkRegistry.ChannelBuilder
 			.named(new ResourceLocation(Constants.MOD_ID_SHORT, "spigot"))
-			.networkProtocolVersion(() -> PROTOCOL_VERSION)
-			.clientAcceptedVersions(NetworkRegistry.ACCEPTVANILLA::equals)
-			.serverAcceptedVersions(NetworkRegistry.ACCEPTVANILLA::equals).simpleChannel();
+			.networkProtocolVersion(() -> PROTOCOL_VERSION).clientAcceptedVersions(str -> true)
+			.serverAcceptedVersions(str -> true).simpleChannel();
 
 	public static void setup()
 	{
@@ -43,7 +43,8 @@ public class OTGClientSyncManager
 				.consumer(FMLHandshakeHandler.indexFirst(AcknowledgeOTGMessage::handle)).add();
 
 		SPIGOT.registerMessage(1, PacketSyncBiomeSettings.class, PacketSyncBiomeSettings::encode,
-				PacketSyncBiomeSettings::decode, PacketSyncBiomeSettings::handleLogin);
+				PacketSyncBiomeSettings::decode, PacketSyncBiomeSettings::handleLogin,
+				Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 	}
 
 	public static Map<String, BiomeSettingSyncWrapper> getSyncedData()
