@@ -11,7 +11,6 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.presets.Preset;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -20,12 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class LocateCommand implements BaseCommand
+public class TpCommand implements BaseCommand
 {
-	private static final String USAGE = "Usage: /otg locate <biome name> [range]";
+	private static final String USAGE = "Usage: /otg tp <biome name> [range]";
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
 			object -> new TranslationTextComponent("commands.locatebiome.notFound", object));
 
@@ -36,7 +36,7 @@ public class LocateCommand implements BaseCommand
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
-		builder.then(Commands.literal("locate")
+		builder.then(Commands.literal("tp")
 			.executes(context -> showHelp(context.getSource()))
 				.then(Commands.argument("biome", StringArrayArgument.with(biomes))
 					.executes(context -> locateBiome(context.getSource(), StringArgumentType.getString(context, "biome"), 10000))
@@ -48,8 +48,8 @@ public class LocateCommand implements BaseCommand
 	@SuppressWarnings("resource")
 	private int locateBiome(CommandSource source, String biome, int range) throws CommandSyntaxException
 	{
-		biome = biome.toLowerCase();
-		
+        biome = biome.toLowerCase();
+        
 		ServerWorld world = source.getLevel();
 		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
@@ -57,12 +57,12 @@ public class LocateCommand implements BaseCommand
 			return 0;
 		}
 		
-		String preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset().getFolderName().toLowerCase();
+        String preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset().getFolderName().toLowerCase();
 
-		if (!biome.startsWith(preset)) {
-			biome = preset + "." + biome;
-		}
-		
+        if (!biome.startsWith(preset)) {
+            biome = preset + "." + biome;
+        }
+
 		ResourceLocation key = new ResourceLocation(Constants.MOD_ID_SHORT, biome);
 
 		BlockPos pos = world.findNearestBiome(world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key),
@@ -73,8 +73,10 @@ public class LocateCommand implements BaseCommand
 			throw ERROR_BIOME_NOT_FOUND.create(biome);
 		} else
 		{
-			return net.minecraft.command.impl.LocateCommand.showLocateResult(source, biome,
-					new BlockPos(source.getPosition()), pos, "commands.locatebiome.success");
+			int y = world.getChunkSource().generator.getBaseHeight(pos.getX(), pos.getZ(), Type.MOTION_BLOCKING_NO_LEAVES);
+			source.getPlayerOrException().teleportTo(pos.getX(), y, pos.getZ()); 
+			source.sendSuccess(new StringTextComponent("Teleporting you to the nearest " + biome + "."), false);
+			return 0;
 		}
 	}
 
