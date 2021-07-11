@@ -263,7 +263,6 @@ public class WorldConfig extends WorldConfigBase
 		
 		// Caves & Ravines
 		
-		this.carversDoSurfaceBlock = reader.getSetting(WorldStandardValues.CARVERS_DO_SURFACE_BLOCK, logger);
 		this.cavesEnabled = reader.getSetting(WorldStandardValues.CAVES_ENABLED, logger);
 		this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger);
 		this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger);
@@ -668,12 +667,6 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.header1("Carvers: Caves and Ravines");
-
-		writer.putSetting(WorldStandardValues.CARVERS_DO_SURFACE_BLOCK, this.carversDoSurfaceBlock,
-			"Caves and ravines that break the surface spawn surfaceblocks on their floor, " + 
-			"with more surface blocks spawning in shallow caves/ravines than deep ones.",
-			"Vanilla does this as well, but is less effective at it."
-		);
 
 		writer.putSetting(WorldStandardValues.CARVER_LAVA_BLOCK, this.carverLavaBlock,
 			"Block that replaces all air blocks from Y0 up to CarverLavaBlockHeight.",

@@ -31,7 +31,7 @@ public abstract class Carver
 		return 4;
 	}
 
-	protected boolean carveRegion(ISurfaceGeneratorNoiseProvider noiseProvider, float[] cache, ChunkBuffer chunkBuffer, long seed, int chunkX, int chunkZ, double x, double y, double z, double yaw, double pitch, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	protected boolean carveRegion(ISurfaceGeneratorNoiseProvider noiseProvider, float[] cache, ChunkBuffer chunkBuffer, long seed, int chunkX, int chunkZ, double x, double y, double z, double yaw, double pitch, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		Random random = new Random(seed + (long) chunkX + (long) chunkZ);
 		double d = chunkX * Constants.CHUNK_SIZE + DecorationArea.CARVER_OFFSET;
@@ -81,7 +81,7 @@ public abstract class Carver
 								h = ((double) s - 0.5D - y) / pitch;
 								if (!this.isPositionExcluded(cache, f, h, g, s))
 								{								
-									bl |= this.carveAtPoint(noiseProvider, chunkBuffer, carvingMask, random, biomeConfig.getWaterLevelMax(), chunkX, chunkZ, worldX, worldZ, o, s, q, foundSurface, biomeConfig, carversDoSurfaceBlock);
+									bl |= this.carveAtPoint(noiseProvider, chunkBuffer, carvingMask, random, biomeConfig.getWaterLevelMax(), chunkX, chunkZ, worldX, worldZ, o, s, q, foundSurface, biomeConfig);
 								}
 							}
 						}
@@ -94,7 +94,7 @@ public abstract class Carver
 		}
 	}
 
-	protected boolean carveAtPoint(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunkBuffer, BitSet carvingMask, Random random, int seaLevel, int mainChunkX, int mainChunkZ, int worldX, int worldZ, int relativeX, int y, int relativeZ, MutableBoolean foundSurface, IBiomeConfig biomeConfig, boolean carversDoSurfaceBlock)
+	protected boolean carveAtPoint(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunkBuffer, BitSet carvingMask, Random random, int seaLevel, int mainChunkX, int mainChunkZ, int worldX, int worldZ, int relativeX, int y, int relativeZ, MutableBoolean foundSurface, IBiomeConfig biomeConfig)
 	{
 		int i = relativeX | relativeZ << 4 | y << 8;
 		if (carvingMask.get(i))
@@ -113,23 +113,11 @@ public abstract class Carver
 
 			// Check to see if we've found the surface, if so place surfaceblocks.
 			// TODO: Search a larger height up instead of just the current carving sphere?
-			if(carversDoSurfaceBlock)
+			// Vanilla logic
+			// Normally doesn't see sand as surface?
+			if(material.isMaterial(biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y - 1, worldZ)))
 			{
-				// This should hopefully be more successful at finding
-				// cave/ravine floors that have open air above them and
-				// should get a surfaceblock.
-				// TODO: Implement highestblock to make this work properly?
-				if (blockAbove.isNonCaveAir())
-				{
-					foundSurface.setValue(true);
-				}
-			} else {
-				// Vanilla logic
-				// Normally doesn't see sand as surface?
-				if(material.isMaterial(biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y - 1, worldZ)))
-				{
-					foundSurface.setValue(true);
-				}
+				foundSurface.setValue(true);
 			}				
 			if (material.isSolid() && !blockAbove.isMaterial(LocalMaterials.WATER))
 			{
@@ -196,7 +184,7 @@ public abstract class Carver
 		return f * f + g * g - h * h <= i * i;
 	}
 
-	public abstract boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock);
+	public abstract boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider);
 
 	public abstract boolean isStartChunk(Random random, int chunkX, int chunkZ);
 

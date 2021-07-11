@@ -19,7 +19,7 @@ public class CaveCarver extends Carver
 	}
 
 	@Override
-	public boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	public boolean carve(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, Random random, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		int branchFactor = (this.getBranchFactor() * 2 - 1) * Constants.CHUNK_SIZE;
 		int caveCount = random.nextInt(random.nextInt(random.nextInt(this.getMaxCaveCount()) + 1) + 1);
@@ -40,7 +40,7 @@ public class CaveCarver extends Carver
 			if (random.nextInt(100) < this.worldConfig.getIndividualCaveRarity())
 			{
 				float size = 1.0F + random.nextFloat() * 6.0F;
-				this.carveCave(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, size, 0.5D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+				this.carveCave(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, size, 0.5D, carvingMask, cachedBiomeProvider);
 				// Vanilla Behavior: Add 0 to 3 more caves when generating a spherical cave.
 				// tunnelCount += random.nextInt(4);
 				tunnelCount += RandomHelper.numberInRange(random, this.worldConfig.getCaveSystemPocketMinSize(), this.worldConfig.getCaveSystemPocketMaxSize());
@@ -56,7 +56,7 @@ public class CaveCarver extends Carver
 				float size = (random.nextFloat() - 0.5F) / 4.0F;
 				float width = this.getTunnelSystemWidth(random);
 				int branchCount = branchFactor - random.nextInt(branchFactor / 4);
-				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, width, yaw, size, 0, branchCount, this.getTunnelSystemHeightWidthRatio(), carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, width, yaw, size, 0, branchCount, this.getTunnelSystemHeightWidthRatio(), carvingMask, cachedBiomeProvider);
 			}
 		}
 
@@ -112,15 +112,15 @@ public class CaveCarver extends Carver
 		}
 	}
 
-	protected void carveCave(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float yaw, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	protected void carveCave(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float yaw, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		//double scaledYaw = 1.5D + (double)(MathHelper.sin(((float)Math.PI / 2F)) * yaw);
 		double scaledYaw = 1.5D + (double) (MathHelper.sin(1.5707964F) * yaw);
 		double scaledPitch = scaledYaw * yawPitchRatio;
-		this.carveRegion(noiseProvider, null, chunk, seed, mainChunkX, mainChunkZ, x + 1.0D, y, z, scaledYaw, scaledPitch, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+		this.carveRegion(noiseProvider, null, chunk, seed, mainChunkX, mainChunkZ, x + 1.0D, y, z, scaledYaw, scaledPitch, carvingMask, cachedBiomeProvider);
 	}
 
-	protected void carveTunnels(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider, boolean carversDoSurfaceBlock)
+	protected void carveTunnels(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunk, long seed, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		Random random = new Random(seed);
 		int nextBranchIndex = random.nextInt(branchCount / 2) + branchCount / 4;
@@ -149,8 +149,8 @@ public class CaveCarver extends Carver
 			yawChange += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 4.0F;
 			if (branchIndex == nextBranchIndex && width > 1.0F)
 			{
-				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw - 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
-				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw + 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw - 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider);
+				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw + 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider);
 	            //this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw - ((float)Math.PI / 2F), pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
 	            //this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw + ((float)Math.PI / 2F), pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
 				return;
@@ -163,7 +163,7 @@ public class CaveCarver extends Carver
 					return;
 				}
 
-				this.carveRegion(noiseProvider, null, chunk, seed, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
+				this.carveRegion(noiseProvider, null, chunk, seed, mainChunkX, mainChunkZ, x, y, z, currentYaw, currentPitch, carvingMask, cachedBiomeProvider);
 			}
 		}
 	}
