@@ -53,7 +53,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	@Override
 	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
-			double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
+		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
 		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 		{
 			if (noise <= layer.maxNoise)
