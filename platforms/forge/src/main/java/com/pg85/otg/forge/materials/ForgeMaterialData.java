@@ -112,6 +112,12 @@ public class ForgeMaterialData extends LocalMaterialData
 	}
 	
 	@Override
+	public boolean isNonCaveAir()
+	{
+		return this.blockData != null && this.blockData.getBlock() == Blocks.AIR;
+	}
+	
+	@Override
 	public boolean isAir()
 	{
 		return this.blockData != null && this.blockData.getMaterial() == Material.AIR;

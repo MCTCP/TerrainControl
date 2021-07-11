@@ -20,6 +20,7 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -38,7 +39,7 @@ import it.unimi.dsi.fastutil.objects.ObjectListIterator;
  * Generates the base terrain, sets stone/ground/surface blocks and does SurfaceAndGroundControl, generates caves and canyons.
  */
 @SuppressWarnings("deprecation")
-public class OTGChunkGenerator
+public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 {
 	// "It's a number that made the worldgen look good!" - Dinnerbone 2020
 	private static final double WORLD_GEN_CONSTANT = 684.412;
@@ -119,8 +120,8 @@ public class OTGChunkGenerator
 
 		this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(random, 4);
 
-		this.caves = new CaveCarver(256, preset.getWorldConfig());
-		this.ravines = new RavineCarver(256, preset.getWorldConfig());
+		this.caves = new CaveCarver(Constants.WORLD_HEIGHT, preset.getWorldConfig());
+		this.ravines = new RavineCarver(Constants.WORLD_HEIGHT, preset.getWorldConfig());
 	}
 	
 	public ICachedBiomeProvider getCachedBiomeProvider()
@@ -620,29 +621,27 @@ public class OTGChunkGenerator
 		}
 	}
 
-	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)
+	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask, boolean carversDoSurfaceBlock)
 	{
 		// TODO: it should be possible to cache these carver graphs to make larger carvers more efficient and easier to use
 
 		Random random = new Random();
-		boolean cavesShouldCarve;
-		boolean ravinesShouldCarve;
 		for (int localChunkX = chunkX - 8; localChunkX <= chunkX + 8; ++localChunkX)
 		{
 			for (int localChunkZ = chunkZ - 8; localChunkZ <= chunkZ + 8; ++localChunkZ)
 			{
 				setCarverSeed(random, seed, localChunkX, localChunkZ);
-				cavesShouldCarve = this.caves.shouldCarve(random, localChunkX, localChunkZ);
-				ravinesShouldCarve = this.ravines.shouldCarve(random, localChunkX, localChunkZ);
-
-				if (cavesShouldCarve)
+				
+				if(this.caves.isStartChunk(random, localChunkX, localChunkZ))
 				{
-					this.caves.carve(chunk, random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider);
+					this.caves.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider, carversDoSurfaceBlock);
 				}
-
-				if (ravinesShouldCarve)
+				
+				setCarverSeed(random, seed, localChunkX, localChunkZ);
+				
+				if(this.ravines.isStartChunk(random, localChunkX, localChunkZ))
 				{
-					this.ravines.carve(chunk, random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider);
+					this.ravines.carve(this, chunk, random, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask, this.cachedBiomeProvider, carversDoSurfaceBlock);
 				}
 			}
 		}
@@ -679,7 +678,7 @@ public class OTGChunkGenerator
 			}
 		}
 	}
-
+	
 	// Used by sagc for generating surface/ground block patterns
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{

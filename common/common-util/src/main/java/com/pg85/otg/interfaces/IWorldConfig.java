@@ -151,6 +151,7 @@ public interface IWorldConfig
 	public double getRavineDepth();
 	public int getRavineMinAltitude();
 	public int getRavineMaxAltitude();
+	public boolean getCarversDoSurfaceBlock();
 	
 	// Dimension settings
 

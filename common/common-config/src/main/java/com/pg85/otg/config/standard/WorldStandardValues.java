@@ -72,7 +72,7 @@ public class WorldStandardValues extends Settings
 		CAVE_RARITY = intSetting("CaveRarity", 14, 0, 100),
 		CAVE_FREQUENCY = intSetting("CaveFrequency", 15, 0, 200),
 		CAVE_MIN_ALTITUDE = intSetting("CaveMinAltitude", 8, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
-		CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 127, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
+		CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 128, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		INDIVIDUAL_CAVE_RARITY = intSetting("IndividualCaveRarity", 25, 0, 100),
 		CAVE_SYSTEM_FREQUENCY = intSetting("CaveSystemFrequency", 1, 0, 200),
 		CAVE_SYSTEM_POCKET_CHANCE = intSetting("CaveSystemPocketChance", 0, 0, 100),
@@ -80,9 +80,9 @@ public class WorldStandardValues extends Settings
 		CAVE_SYSTEM_POCKET_MAX_SIZE = intSetting("CaveSystemPocketMaxSize", 3, 0, 100),
 		RAVINE_RARITY = intSetting("RavineRarity", 2, 0, 100),
 		RAVINE_MIN_ALTITUDE = intSetting("RavineMinAltitude", 20, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
-		RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
+		RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 68, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
-		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
+		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 112, 1, 500),
 		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
 		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255),
 		LOGICAL_HEIGHT = intSetting("LogicalHeight", 256, 0, Integer.MAX_VALUE)
@@ -107,6 +107,7 @@ public class WorldStandardValues extends Settings
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 
 		OLD_GROUP_RARITY = booleanSetting("OldGroupRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin
+		CARVERS_DO_SURFACE_BLOCK = booleanSetting("CarversDoSurfaceBlock", false),
 		CAVES_ENABLED = booleanSetting("CavesEnabled", true),
 		RAVINES_ENABLED = booleanSetting("RavinesEnabled", true),
 		MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),

@@ -5,6 +5,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialProperty;
+
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
@@ -122,6 +123,12 @@ public class SpigotMaterialData extends LocalMaterialData
 	{
 		return this.blockData == null || this.blockData.getMaterial() == Material.AIR;
 	}
+	
+	@Override
+	public boolean isNonCaveAir()
+	{
+		return this.blockData != null && this.blockData.getBlock() == Blocks.AIR;
+	}	
 
 	@Override
 	public boolean isAir()
