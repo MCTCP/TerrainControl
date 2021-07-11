@@ -64,14 +64,25 @@ public class TpCommand implements BaseCommand
 				sender.sendMessage("Invalid biome: " + biome + ".");
 				return true;
 			}
+			
+			int range = 10000;
+			
+			if (args.length >= 2) {
+				try {
+					range = Integer.parseInt(args[1]);
+				} catch (NumberFormatException ex) {
+					sender.sendMessage("Invalid search radius: " + (args[1] + "."));
+					return true;
+				}
+			}
 
 			BlockPosition playerPos = new BlockPosition(player.getLocation().getBlockX(),
 					player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-			BlockPosition pos = world.a(biomeBase, playerPos, 10000, 8);
+			BlockPosition pos = world.a(biomeBase, playerPos, range, 8);
 
 			if (pos == null)
 			{
-				sender.sendMessage(ERROR_BIOME_NOT_FOUND.create(biomeBase).getLocalizedMessage());
+				sender.sendMessage(ERROR_BIOME_NOT_FOUND.create(biome).getLocalizedMessage());
 				return true;
 			} else
 			{
