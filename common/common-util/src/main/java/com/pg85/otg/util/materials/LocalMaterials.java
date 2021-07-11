@@ -99,6 +99,7 @@ public class LocalMaterials
 	public static LocalMaterialData OXEYE_DAISY;
 	public static LocalMaterialData YELLOW_FLOWER;
 	public static LocalMaterialData DEAD_BUSH;
+	public static LocalMaterialData FERN;
 	public static LocalMaterialData LONG_GRASS;
 	
 	public static LocalMaterialData RED_MUSHROOM_BLOCK;

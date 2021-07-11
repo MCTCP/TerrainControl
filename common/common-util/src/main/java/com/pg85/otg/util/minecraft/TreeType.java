@@ -15,6 +15,9 @@ public enum TreeType
 	 * Soft-deprecated, renamed to Birch
 	 */
 	Forest("Birch"),
+	CrimsonFungi,
+	WarpedFungi,
+	ChorusPlant,
 	GroundBush,
 	HugeMushroom,
 	HugeRedMushroom,

@@ -686,6 +686,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"				Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2 -",
 			"				JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)",
 			"				DarkOak (from the roofed forest biome) - Acacia",
+			"				New for 1.16.5: CrimsonFungi, WarpedFungi, ChorusPlant.",
 			"				You can also use your own custom objects, as long as they have Tree:true in their settings.",
 			"TreeTypeChance: Similar to Rarity. Example:",
 			"				Tree(10,Taiga1,35,Taiga2,100) - tries 10 times, for each attempt it tries to place Taiga1 (35% chance),",

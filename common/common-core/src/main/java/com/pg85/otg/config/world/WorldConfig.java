@@ -619,10 +619,9 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.DISABLE_OREGEN, this.disableOreGen,
 			"Disables Ore(), UnderWaterOre() and Vein() biome resources that use any type of ore block."
 		);
-		
-		writer.header1("Structures");
-		
+
 		// Structures
+
 		writer.header1("Structures",
 			"The settings are global on/off toggles for the entire world for each vanilla structure type.",
 			"When set to true, structures configured in biome configs are able to spawn.",
