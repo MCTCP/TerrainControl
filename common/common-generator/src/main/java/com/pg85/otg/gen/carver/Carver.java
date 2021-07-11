@@ -108,14 +108,9 @@ public abstract class Carver
 			{
 				return false;
 			}
-			
+
 			LocalMaterialData blockAbove = chunkBuffer.getBlock(worldX, y + 1, worldZ);
-			if(blockAbove.isLiquid())
-			{
-				return false;
-			}
-			
-			boolean go = false;
+
 			// Check to see if we've found the surface, if so place surfaceblocks.
 			// TODO: Search a larger height up instead of just the current carving sphere?
 			if(carversDoSurfaceBlock)
@@ -131,16 +126,12 @@ public abstract class Carver
 			} else {
 				// Vanilla logic
 				// Normally doesn't see sand as surface?
-				if(material.isMaterial(biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y, worldZ)))
+				if(material.isMaterial(biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y - 1, worldZ)))
 				{
 					foundSurface.setValue(true);
 				}
-			}
-			if (material.isSolid())
-			{
-				go = true;
-			}			
-			if(go)
+			}				
+			if (material.isSolid() && !blockAbove.isMaterial(LocalMaterials.WATER))
 			{
 				if (y <= this.worldConfig.getCarverLavaBlockHeight())
 				{
@@ -151,12 +142,14 @@ public abstract class Carver
 					if(foundSurface.isValue())
 					{
 						LocalMaterialData blockBelow = chunkBuffer.getBlock(worldX, y - 1, worldZ);
-						if(blockBelow.isSolid())
+						if(blockBelow.isMaterial(biomeConfig.getGroundBlockAtHeight(noiseProvider, worldX, y - 1, worldZ)))
 						{
 							chunkBuffer.setBlock(worldX, y - 1, worldZ, biomeConfig.getSurfaceBlockAtHeight(noiseProvider, worldX, y - 1, worldZ));
 						}
 					}
 				}			
+			} else {
+				return false;
 			}
 
 			return true;
