@@ -143,11 +143,11 @@ public class ForgeMaterialData extends LocalMaterialData
 			(
 				!this.isBlank && 
 				!((ForgeMaterialData)material).isBlank &&
-				Objects.equals(this.blockData.getBlock().getRegistryName(), ((ForgeMaterialData) material).internalBlock().getBlock().getRegistryName())
+				Objects.equals(this.blockData.getBlock(), ((ForgeMaterialData) material).internalBlock().getBlock())
 			)
 		;
 	}
-	
+
 	@Override
 	public LocalMaterialData rotate(int rotateTimes)
 	{
