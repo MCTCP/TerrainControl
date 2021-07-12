@@ -28,12 +28,14 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ);
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z);
 	public LocalMaterialData getMaterial(int x, int y, int z);
+	public LocalMaterialData getMaterialDirect(int x, int y, int z);
 	public int getBlockAboveLiquidHeight(int x, int z);
 	public int getBlockAboveSolidHeight(int x, int z);
 	public int getHighestBlockAboveYAt(int x, int z);
 	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
 	public int getHeightMapHeight(int x, int z);
 	public int getLightLevel(int x, int y, int z);
+	public void setBlockDirect(int x, int y, int z, LocalMaterialData material);
 	public void setBlock(int x, int y, int z, LocalMaterialData material);
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag);
 	public void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);

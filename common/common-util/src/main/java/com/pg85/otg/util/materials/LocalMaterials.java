@@ -53,6 +53,7 @@ public class LocalMaterials
 	public static LocalMaterialData MAGMA;
 	public static LocalMaterialData ICE;
 	public static LocalMaterialData PACKED_ICE;
+	public static LocalMaterialData BLUE_ICE;
 	public static LocalMaterialData FROSTED_ICE;
 	public static LocalMaterialData GLOWSTONE;
 	public static LocalMaterialData MYCELIUM;

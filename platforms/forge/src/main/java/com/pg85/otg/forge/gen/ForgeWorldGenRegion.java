@@ -126,6 +126,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
+	public LocalMaterialData getMaterialDirect(int x, int y, int z)
+	{
+		return ForgeMaterialData.ofBlockState(this.worldGenRegion.getBlockState(new BlockPos(x, y, z)));
+	}
+	
+	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z)
 	{
 		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
@@ -309,6 +315,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return this.worldGenRegion.getMaxLocalRawBrightness(new BlockPos(x, y, z));
 		}
 		return -1;
+	}
+	
+	@Override
+	public void setBlockDirect(int x, int y, int z, LocalMaterialData material)
+	{
+		this.worldGenRegion.setBlock(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 3);
 	}
 
 	@Override

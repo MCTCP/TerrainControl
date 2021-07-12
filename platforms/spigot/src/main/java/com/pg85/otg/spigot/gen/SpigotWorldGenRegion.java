@@ -107,6 +107,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
+	public LocalMaterialData getMaterialDirect(int x, int y, int z)
+	{
+		return SpigotMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPosition(x, y, z)));
+	}
+	
+	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z)
 	{
 		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
@@ -292,6 +298,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return -1;
 	}
 
+	@Override
+	public void setBlockDirect(int x, int y, int z, LocalMaterialData material)
+	{
+		this.worldGenRegion.setTypeAndData(new BlockPosition(x, y, z), ((SpigotMaterialData)material).internalBlock(), 3);
+	}
+	
 	@Override
 	public void setBlock(int x, int y, int z, LocalMaterialData material)
 	{

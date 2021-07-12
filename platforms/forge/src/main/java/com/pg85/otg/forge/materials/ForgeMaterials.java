@@ -205,6 +205,7 @@ public class ForgeMaterials extends LocalMaterials
 		MAGMA = ForgeMaterialData.ofBlockState(Blocks.MAGMA_BLOCK.defaultBlockState());
 		ICE = ForgeMaterialData.ofBlockState(Blocks.ICE.defaultBlockState());
 		PACKED_ICE = ForgeMaterialData.ofBlockState(Blocks.PACKED_ICE.defaultBlockState());
+		BLUE_ICE = ForgeMaterialData.ofBlockState(Blocks.BLUE_ICE.defaultBlockState());
 		FROSTED_ICE = ForgeMaterialData.ofBlockState(Blocks.FROSTED_ICE.defaultBlockState());
 		GLOWSTONE = ForgeMaterialData.ofBlockState(Blocks.GLOWSTONE.defaultBlockState());
 		MYCELIUM = ForgeMaterialData.ofBlockState(Blocks.MYCELIUM.defaultBlockState());
