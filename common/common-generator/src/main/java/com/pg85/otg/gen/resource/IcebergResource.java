@@ -15,19 +15,31 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 public class IcebergResource extends BiomeResourceBase implements IBasicResource
 {
+	private final LocalMaterialData material;
+	private final double rarity;
+
 	public IcebergResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(biomeConfig, args, logger, materialReader);
+		assureSize(2, args);
+		
+		this.material = materialReader.readMaterial(args.get(0));
+		this.rarity = readRarity(args.get(1));
 	}
 
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion world, Random random, ILogger logger, IMaterialReader materialReader)
 	{
+		if (random.nextDouble() * 100.0 > this.rarity)
+		{
+			return;
+		}
+		
 		int x = world.getDecorationArea().getChunkBeingDecorated().getBlockX();
 		int z = world.getDecorationArea().getChunkBeingDecorated().getBlockZ();
 		int y = world.getBiomeConfigForDecoration(x, z).getWaterLevelMax();
 		boolean lvt_6_1_ = (random.nextDouble() > 0.7D);
-		LocalMaterialData pakcedIce = LocalMaterials.PACKED_ICE;
+		LocalMaterialData iceBergMaterial = this.material;
 
 		double lvt_8_1_ = random.nextDouble() * 2.0D * Math.PI;
 		int lvt_10_1_ = 11 - random.nextInt(5);
@@ -55,7 +67,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					if (lvt_12_1_ || lvt_18_1_ < lvt_21_1_)
 					{
 						generateIcebergBlock(world, random, x, y, z, lvt_14_1_, lvt_18_1_, lvt_20_1_, lvt_19_1_,
-								lvt_21_1_, lvt_17_1_, lvt_12_1_, lvt_11_1_, lvt_8_1_, lvt_6_1_, pakcedIce);
+								lvt_21_1_, lvt_17_1_, lvt_12_1_, lvt_11_1_, lvt_8_1_, lvt_6_1_, iceBergMaterial);
 					}
 				}
 			}
@@ -75,7 +87,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					if (lvt_18_2_ < lvt_22_1_)
 					{
 						generateIcebergBlock(world, random, x, y, z, lvt_15_1_, lvt_18_2_, lvt_20_2_, lvt_19_2_,
-								lvt_22_1_, lvt_21_2_, lvt_12_1_, lvt_11_1_, lvt_8_1_, lvt_6_1_, pakcedIce);
+								lvt_22_1_, lvt_21_2_, lvt_12_1_, lvt_11_1_, lvt_8_1_, lvt_6_1_, iceBergMaterial);
 					}
 				}
 			}
@@ -335,6 +347,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 	@Override
 	public String toString()
 	{
-		return "Iceberg(" + ")";
+		return "Iceberg(" + this.material.toString() + ", " + this.rarity + ")";
 	}
 }
