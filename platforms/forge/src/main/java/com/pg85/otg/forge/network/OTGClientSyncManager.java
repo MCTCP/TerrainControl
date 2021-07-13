@@ -2,7 +2,6 @@ package com.pg85.otg.forge.network;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import com.pg85.otg.constants.Constants;
 
@@ -43,8 +42,7 @@ public class OTGClientSyncManager
 				.consumer(FMLHandshakeHandler.indexFirst(AcknowledgeOTGMessage::handle)).add();
 
 		SPIGOT.registerMessage(1, PacketSyncBiomeSettings.class, PacketSyncBiomeSettings::encode,
-				PacketSyncBiomeSettings::decode, PacketSyncBiomeSettings::handleLogin,
-				Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+				PacketSyncBiomeSettings::decodeSpigot, PacketSyncBiomeSettings::handleLogin);
 	}
 
 	public static Map<String, BiomeSettingSyncWrapper> getSyncedData()

@@ -29,7 +29,7 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 		commandMap.put("map", new MapCommand());
 		commandMap.put("help", new HelpCommand());
 		commandMap.put("biome", new BiomeCommand());
-		commandMap.put("locate", new LocateCommand());
+		commandMap.put("tp", new TpCommand());
 	}
 
 	@Override

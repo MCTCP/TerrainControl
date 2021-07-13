@@ -246,7 +246,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 
 	private int heightDependentRadiusEllipse(int irandomy, int irandom1, int irandom2)
 	{
-		float f1 = 1.0F;
 		float frandom = (1.0F - (float)Math.pow((double)irandomy, 2.0D) / ((float)irandom1 * 1.0F)) * (float)irandom2;
 		return MathHelper.ceil(frandom / 2.0F);
 	}

@@ -3,6 +3,7 @@ package com.pg85.otg.spigot.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -20,12 +21,13 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChatMessage;
+import net.minecraft.server.v1_16_R3.HeightMap.Type;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
 import net.minecraft.server.v1_16_R3.ResourceKey;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
-public class LocateCommand implements BaseCommand
+public class TpCommand implements BaseCommand
 {
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
 			object -> new ChatMessage("commands.locatebiome.notFound", object));
@@ -60,28 +62,34 @@ public class LocateCommand implements BaseCommand
 			if (biomeBase == null)
 			{
 				sender.sendMessage("Invalid biome: " + biome + ".");
+				return true;
+			}
+			
+			int range = 10000;
+			
+			if (args.length >= 2) {
+				try {
+					range = Integer.parseInt(args[1]);
+				} catch (NumberFormatException ex) {
+					sender.sendMessage("Invalid search radius: " + (args[1] + "."));
+					return true;
+				}
 			}
 
 			BlockPosition playerPos = new BlockPosition(player.getLocation().getBlockX(),
 					player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-			BlockPosition pos = world.a(biomeBase, playerPos, 10000, 8);
+			BlockPosition pos = world.a(biomeBase, playerPos, range, 8);
 
 			if (pos == null)
 			{
-				sender.sendMessage(ERROR_BIOME_NOT_FOUND.create(biomeBase).getLocalizedMessage());
+				sender.sendMessage(ERROR_BIOME_NOT_FOUND.create(biome).getLocalizedMessage());
 				return true;
 			} else
 			{
-
-				TextComponent coordComponent = new TextComponent("[" + pos.getX() + " ~ " + pos.getZ() + "] ");
-				coordComponent.setClickEvent(
-						new ClickEvent(Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " ~ " + pos.getZ()));
-				sender.spigot().sendMessage(new ComponentBuilder(new TextComponent("The nearest " + biome + " is at "))
-						.append(coordComponent)
-						.append(new TextComponent("(" + Integer.toString((int)Math.round(
-								Math.sqrt(pos.distanceSquared(playerPos.getX(), playerPos.getY(), playerPos.getZ(), false))))
-								+ " blocks away)"))
-						.create());
+				int y = world.getChunkProvider().getChunkGenerator().getBaseHeight(pos.getX(), pos.getZ(),
+						Type.MOTION_BLOCKING_NO_LEAVES);
+				player.teleport(new Location(player.getWorld(), pos.getX(), y, pos.getZ()));
+				player.sendMessage("Teleporting you to the nearest " + biome + ".");
 			}
 
 		}
@@ -97,10 +105,13 @@ public class LocateCommand implements BaseCommand
 			WorldServer serverWorld = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
 			if (serverWorld.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator)
 			{
-				StringUtil.copyPartialMatches(args[1],
-						((OTGNoiseChunkGenerator) serverWorld.getChunkProvider().getChunkGenerator()).getPreset()
-								.getAllBiomeNames(),
-						options);
+				List<String> biomeNames = new ArrayList<>();
+				for (String name : ((OTGNoiseChunkGenerator) serverWorld.getChunkProvider().getChunkGenerator())
+						.getPreset().getAllBiomeNames())
+				{
+					biomeNames.add(name.replace(' ', '_'));
+				}
+				StringUtil.copyPartialMatches(args[1], biomeNames, options);
 			}
 		}
 		return options;
