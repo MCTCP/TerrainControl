@@ -86,6 +86,11 @@ public class MathHelper
 	{
 		return check > max ? max : (check < min ? min : check);
 	}
+	
+	public static float clamp(float check, float min, float max)
+	{
+		return check > max ? max : (check < min ? min : check);
+	}
 
 	public static double clampedLerp(double start, double end, double delta)
 	{
