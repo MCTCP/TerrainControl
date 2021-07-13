@@ -70,22 +70,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			}
 		}
 
-<<<<<<< HEAD
-		for (int xOffset = -lvt_17_1_; xOffset < lvt_17_1_; xOffset++)
-		{
-			for (int zOffset = -lvt_17_1_; zOffset < lvt_17_1_; zOffset++)
-			{
-				for (int yOffset = -1; yOffset > -lvt_15_1_; yOffset--)
-				{
-					int lvt_21_2_ = lvt_12_1_
-							? MathHelper.ceil(lvt_17_1_ * (1.0F - (float) Math.pow(yOffset, 2.0D) / lvt_15_1_ * 8.0F))
-							: lvt_17_1_;
-					int lvt_22_1_ = heightDependentRadiusSteep(random, -yOffset, lvt_15_1_, lvt_16_1_);
-					if (xOffset < lvt_22_1_)
-					{
-						generateIcebergBlock(world, random, x, y, z, lvt_15_1_, xOffset, yOffset, zOffset,
-								lvt_22_1_, lvt_21_2_, lvt_12_1_, lvt_11_1_, lvt_8_1_, lvt_6_1_, iceBergMaterial);
-=======
 		smooth(world, x, y, z, irandom5, ismoothheight, flag2, irandom1);
 
 		for (int x1 = -irandom6; x1 < irandom6; x1++)
@@ -99,7 +83,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					if (x1 < heightDependentRadiusSteep)
 					{
 						generateIcebergBlock(world, random, x, y, z, irandom4, x1, y1, z1, heightDependentRadiusSteep, irandom7, flag2, irandom2, drandom1, flag1, iceBergMaterial);
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 					}
 				}
 			}
@@ -191,45 +174,14 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		}
 	}
 
-<<<<<<< HEAD
-	private void generateIcebergBlock(
-		IWorldGenRegion world, Random random, int x, int y, int z, int p_205181_4_, 
-		int p_205181_5_, int p_205181_6_, int p_205181_7_, int p_205181_8_, int p_205181_9_, 
-		boolean p_205181_10_, int p_205181_11_, double p_205181_12_, boolean p_205181_14_, 
-		LocalMaterialData material
-	)
-	{
-		double lvt_16_1_ = p_205181_10_
-			? signedDistanceEllipse(p_205181_5_, p_205181_7_, 0, 0, p_205181_9_, getEllipseC(p_205181_6_, p_205181_4_, p_205181_11_), p_205181_12_)
-			: signedDistanceCircle(p_205181_5_, p_205181_7_, 0, 0, p_205181_8_, random);
-=======
 	private void generateIcebergBlock(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, int irandom, int x1, int y1, int z1, int irandom1, int irandom2, boolean flag, int irandom3, double drandom, boolean flag1, LocalMaterialData material)
 	{
 		double signedDistance = flag
 			? signedDistanceEllipse(x1, z1, 0, 0, 0, irandom2, getEllipseC(y1, irandom, irandom3), drandom)
 			: signedDistanceCircle(x1, z1, 0, 0, 0, irandom1, random);
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 
 		if (signedDistance < 0.0D)
 		{
-<<<<<<< HEAD
-			int x2 = x + p_205181_5_;
-			int y2 = y + p_205181_6_;
-			int z2 = z + p_205181_7_;
-			double lvt_19_1_ = p_205181_10_ ? -0.5D : (-6 - random.nextInt(3));
-			if (lvt_16_1_ > lvt_19_1_ && random.nextDouble() > 0.9D)
-			{
-				return;
-			}
-			setIcebergBlock(x2, y2, z2, world, random, p_205181_4_ - p_205181_6_, p_205181_4_, p_205181_10_, p_205181_14_, material);
-		}
-	}
-
-	private void setIcebergBlock(
-		int x, int y, int z, IWorldGenRegion world, Random random, int p_205175_4_,
-		int p_205175_5_, boolean p_205175_6_, boolean p_205175_7_, LocalMaterialData material
-	)
-=======
 			int x2 = x + x1;
 			int y2 = y + y1;
 			int z2 = z + z1;
@@ -243,24 +195,13 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 	}
 
 	private void setIcebergBlock(int x, int y, int z, IWorldGenRegion world, Random random, int irandomy, int irandom, boolean flag, boolean flag1, LocalMaterialData material)
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 	{
 		LocalMaterialData current = world.getMaterialDirect(x, y, z);
 		if (current.isAir() || current.isMaterial(LocalMaterials.SNOW_BLOCK) || current.isMaterial(LocalMaterials.ICE) || current.isMaterial(LocalMaterials.WATER))
 		{
-<<<<<<< HEAD
-			boolean lvt_10_1_ = (!p_205175_6_ || random.nextDouble() > 0.05D);
-			int lvt_11_1_ = p_205175_6_ ? 3 : 2;
-			if (
-				p_205175_7_ && (!current.isMaterial(LocalMaterials.WATER))
-				&& p_205175_4_ <= random.nextInt(Math.max(1, p_205175_5_ / lvt_11_1_)) + p_205175_5_ * 0.6D
-				&& lvt_10_1_
-			)
-=======
 			boolean flag2 = !flag || random.nextDouble() > 0.05D;
 			int irandom1 = flag ? 3 : 2;
 			if (flag1 && !current.isMaterial(LocalMaterials.WATER) && (double)irandomy <= (double)random.nextInt(Math.max(1, irandom / irandom1)) + (double)irandom * 0.6D && flag2)
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 			{
 				world.setBlockDirect(x, y, z, LocalMaterials.SNOW_BLOCK);
 			} else {
@@ -291,18 +232,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		return Math.pow(((double)(x1 - x) * Math.cos(drandom) - (double)(z1 - z) * Math.sin(drandom)) / (double)irandom, 2.0D) + Math.pow(((double)(x1 - x) * Math.sin(drandom) + (double)(z1 - z) * Math.cos(drandom)) / (double)iellipsec, 2.0D) - 1.0D;
 	}
 
-<<<<<<< HEAD
-	private int heightDependentRadiusRound(Random random, int p_205183_2_, int p_205183_3_, int p_205183_4_)
-	{
-		float lvt_5_1_ = 3.5F - random.nextFloat();
-		float lvt_6_1_ = (1.0F - (float) Math.pow(p_205183_2_, 2.0D) / p_205183_3_ * lvt_5_1_) * p_205183_4_;
-
-		if (p_205183_3_ > 15 + random.nextInt(5))
-		{
-			int lvt_7_1_ = (p_205183_2_ < 3 + random.nextInt(6)) ? (p_205183_2_ / 2) : p_205183_2_;
-			lvt_6_1_ = (1.0F - lvt_7_1_ / p_205183_3_ * lvt_5_1_ * 0.4F) * p_205183_4_;
-
-=======
 	private int heightDependentRadiusRound(Random random, int irandom1, int irandom2, int irandom3)
 	{
 		float frandom1 = 3.5F - random.nextFloat();
@@ -311,21 +240,14 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		{
 			int irandom4 = irandom1 < 3 + random.nextInt(6) ? irandom1 / 2 : irandom1;
 			frandom2 = (1.0F - (float)irandom4 / ((float)irandom2 * frandom1 * 0.4F)) * (float)irandom3;
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 		}
 		return MathHelper.ceil(frandom2 / 2.0F);
 	}
 
 	private int heightDependentRadiusEllipse(int irandomy, int irandom1, int irandom2)
 	{
-<<<<<<< HEAD
-		float lvt_5_1_ = (1.0F - (float) Math.pow(p_205178_1_, 2.0D) / p_205178_2_ * 1.0F) * p_205178_3_;
-		return MathHelper.ceil(lvt_5_1_ / 2.0F);
-=======
-		float f1 = 1.0F;
 		float frandom = (1.0F - (float)Math.pow((double)irandomy, 2.0D) / ((float)irandom1 * 1.0F)) * (float)irandom2;
 		return MathHelper.ceil(frandom / 2.0F);
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 	}
 
 	private int heightDependentRadiusSteep(Random random, int random1, int random2, int random3)
@@ -347,26 +269,11 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 
 	private void smooth(IWorldGenRegion world, int x, int y, int z, int irandom1, int ismoothheight, boolean flag, int irandom3)
 	{
-<<<<<<< HEAD
-		int radius = p_205186_5_ ? p_205186_6_ : (p_205186_3_ / 2);
-=======
 		int iradius = flag ? irandom3 : irandom1 / 2;
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 
 		int x2;
 		int y2;
 		int z2;
-<<<<<<< HEAD
-		for (int xOffset = -radius; xOffset <= radius; xOffset++)
-		{
-			for (int zOffset = -radius; zOffset <= radius; zOffset++)
-			{
-				for (int yOffset = 0; yOffset <= p_205186_4_; yOffset++)
-				{
-					x2 = x + xOffset;
-					y2 = y + yOffset;
-					z2 = z + zOffset;
-=======
 		for (int x1 = -iradius; x1 <= iradius; x1++)
 		{
 			for (int z1 = -iradius; z1 <= iradius; z1++)
@@ -376,7 +283,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					x2 = x + x1;
 					y2 = y + y1;
 					z2 = z + z1;
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 					LocalMaterialData material = world.getMaterialDirect(x2, y2, z2);
 					if (isIcebergBlock(material) || material.isMaterial(LocalMaterials.SNOW))
 					{
@@ -386,30 +292,14 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 							world.setBlockDirect(x2, y2 + 1, z2, LocalMaterials.AIR);	
 						}
 						else if (isIcebergBlock(material))
-<<<<<<< HEAD
-						{	
-							LocalMaterialData[] adjacentMaterials =
-=======
 						{
 							LocalMaterialData[] materials =
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 							{
 								world.getMaterialDirect(x2 - 1, y2, z2), 
 								world.getMaterialDirect(x2 + 1, y2, z2),
 								world.getMaterialDirect(x2, y2, z2 - 1), 
 								world.getMaterialDirect(x2, y2, z2 + 1) 
 							};
-<<<<<<< HEAD
-							int count = 0;
-							for (LocalMaterialData mat : adjacentMaterials)
-							{
-								if (!isIcebergBlock(mat))
-								{
-									count++;
-								}
-							}
-							if (count >= 3)
-=======
 							int iheight = 0;
 							for (LocalMaterialData mat : materials)
 							{
@@ -419,7 +309,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 								}
 							}
 							if (iheight >= 3)
->>>>>>> daf775313c7c12b81ed6606aab1c2d888e46ae1e
 							{
 								world.setBlockDirect(x2, y2, z2, LocalMaterials.AIR);
 							}
