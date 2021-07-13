@@ -16,15 +16,17 @@ import com.pg85.otg.util.materials.LocalMaterials;
 public class IcebergResource extends BiomeResourceBase implements IBasicResource
 {
 	private final LocalMaterialData material;
+	private final LocalMaterialData material2;
 	private final double rarity;
 
 	public IcebergResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(biomeConfig, args, logger, materialReader);
-		assureSize(2, args);
+		assureSize(3, args);
 		
 		this.material = materialReader.readMaterial(args.get(0));
-		this.rarity = readRarity(args.get(1));
+		this.material2 = materialReader.readMaterial(args.get(1));
+		this.rarity = readRarity(args.get(2));
 	}
 
 	@Override
@@ -203,9 +205,9 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			int irandom1 = flag ? 3 : 2;
 			if (flag1 && !current.isMaterial(LocalMaterials.WATER) && (double)irandomy <= (double)random.nextInt(Math.max(1, irandom / irandom1)) + (double)irandom * 0.6D && flag2)
 			{
-				world.setBlockDirect(x, y, z, LocalMaterials.SNOW_BLOCK);
+				world.setBlockDirect(x, y, z, this.material2);
 			} else {
-				world.setBlockDirect(x, y, z, material);
+				world.setBlockDirect(x, y, z, this.material);
 			}
 		}
 	}
@@ -259,7 +261,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 
 	private boolean isIcebergBlock(LocalMaterialData material)
 	{
-		return material.isMaterial(LocalMaterials.PACKED_ICE) || material.isMaterial(LocalMaterials.SNOW_BLOCK) || material.isMaterial(LocalMaterials.BLUE_ICE);
+		return material.isMaterial(this.material) || material.isMaterial(this.material2);
 	}
 
 	private boolean belowIsAir(IWorldGenRegion world, int x, int y, int z)
@@ -322,6 +324,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 	@Override
 	public String toString()
 	{
-		return "Iceberg(" + this.material.toString() + ", " + this.rarity + ")";
+		return "Iceberg(" + this.material.toString() + ", " + this.material2.toString() + ", "+ this.rarity + ")";
 	}
 }
