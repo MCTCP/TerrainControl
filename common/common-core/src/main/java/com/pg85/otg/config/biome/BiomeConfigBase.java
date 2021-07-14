@@ -100,6 +100,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	protected LocalMaterialData stoneBlock;
 	protected LocalMaterialData surfaceBlock;
+	protected LocalMaterialData underWaterSurfaceBlock;
 	protected LocalMaterialData groundBlock;
 	protected LocalMaterialData sandStoneBlock;
 	protected LocalMaterialData redSandStoneBlock;
@@ -113,6 +114,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int waterLevelMin;
 	protected LocalMaterialData waterBlock;
 	protected LocalMaterialData iceBlock;
+	protected LocalMaterialData packedIceBlock;
+	protected LocalMaterialData snowBlock;
 	protected LocalMaterialData cooledLavaBlock;
 
 	// Visuals and weather
@@ -234,6 +237,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.otgBiomeId;
 	}
 
+	// TODO: Ideally, callers should be aware whether they're fetching a block underwater or not, and call getUnderWaterSurfaceBlock instead.
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
@@ -265,16 +269,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 					this.replacedBlocks.init(
 						this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
 						this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
+						this.packedIceBlock,
+						this.snowBlock,
 						this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
 						this.stoneBlock,
 						this.groundBlock,
 						this.surfaceBlock,
+						this.underWaterSurfaceBlock,
 						this.worldConfig.getDefaultBedrockBlock(),
 						this.sandStoneBlock,
 						this.redSandStoneBlock
-					);					
+					);
 				}
-				this.replacedBlocksInited = true;				
+				this.replacedBlocksInited = true;
 			}
 		}
 	}
@@ -291,6 +298,16 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		}
 		return this.surfaceBlock;
 	}
+	
+	@Override
+	public LocalMaterialData getUnderWaterSurfaceBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesUnderWaterSurface)
+		{
+			return this.underWaterSurfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.underWaterSurfaceBlock;
+	}	
 	
 	@Override
 	public LocalMaterialData getGroundBlockReplaced(int y)
@@ -346,6 +363,26 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 			return this.iceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.iceBlock;
+	}
+	
+	@Override
+	public LocalMaterialData getPackedIceBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesPackedIce)
+		{
+			return this.packedIceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.packedIceBlock;
+	}
+
+	@Override
+	public LocalMaterialData getSnowBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesSnow)
+		{
+			return this.snowBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.snowBlock;
 	}
 	
 	@Override

@@ -26,13 +26,31 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 			throw new InvalidConfigException("Needs at least two arguments");
 		}
 
-		layers = new ArrayList<MultipleLayersSurfaceGeneratorLayer>();
-		for (int i = 0; i < args.length - 2; i += 3)
+		this.layers = new ArrayList<MultipleLayersSurfaceGeneratorLayer>();
+		int entryLength = 3;
+		for (int i = 0; i < args.length - 2; i += entryLength)
 		{
-			LocalMaterialData surfaceBlock = materialReader.readMaterial(args[i]);
-			LocalMaterialData groundBlock = materialReader.readMaterial(args[i+1]);
-			float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
-			layers.add(new MultipleLayersSurfaceGeneratorLayer(surfaceBlock, groundBlock, maxNoise));
+			LocalMaterialData firstBlock = materialReader.readMaterial(args[i]);
+			LocalMaterialData secondBlock = materialReader.readMaterial(args[i + 1]);
+			LocalMaterialData thirdBlock = null;
+			float maxNoise;
+			try
+			{
+				maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
+			}
+			catch(InvalidConfigException ex)
+			{
+				thirdBlock = materialReader.readMaterial(args[i + 2]);
+				maxNoise = (float) StringHelper.readDouble(args[i + 3], -20, 20);
+			}
+			if(thirdBlock != null)
+			{
+				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, thirdBlock, secondBlock, maxNoise));
+				entryLength = 4;
+			} else {
+				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, secondBlock, secondBlock, maxNoise));
+				entryLength = 3;
+			}
 		}
 		Collections.sort(layers);
 	}

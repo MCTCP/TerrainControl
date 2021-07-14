@@ -193,8 +193,15 @@ public class BiomeConfig extends BiomeConfigBase
 		this.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
 		this.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
 		this.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
+		this.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
+		if(this.underWaterSurfaceBlock == null)
+		{
+			this.underWaterSurfaceBlock = this.groundBlock; 	
+		}
 		this.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
 		this.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
+		this.packedIceBlock = reader.getSetting(BiomeStandardValues.PACKED_ICE_BLOCK, logger, materialReader);
+		this.snowBlock = reader.getSetting(BiomeStandardValues.SNOW_BLOCK, logger, materialReader);
 		this.configCooledLavaBlock = reader.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 		this.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
 		this.sandStoneBlock = LocalMaterials.SANDSTONE;
@@ -520,6 +527,9 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.putSetting(BiomeStandardValues.GROUND_BLOCK, this.groundBlock,
 			"The ground block used for the biome, usually DIRT.");
+		
+		writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.underWaterSurfaceBlock,
+			"The surface block used for the biome when underwater, usually the same as GroundBlock.");
 
 		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.surfaceAndGroundControl,
 			"Setting for biomes with more complex surface and ground blocks.",
@@ -560,6 +570,12 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock,
 			"The block used as ice. Ice only spawns if the BiomeTemperature is low enough.");
 
+		writer.putSetting(BiomeStandardValues.PACKED_ICE_BLOCK, this.packedIceBlock,
+			"The block used as packed ice. Packed ice only spawns when using Iceberg SurfaceAndGroundControl.");
+		
+		writer.putSetting(BiomeStandardValues.SNOW_BLOCK, this.snowBlock,
+			"The block used as snow (block, not tile). Snow blocks only spawn when using Iceberg SurfaceAndGroundControl.");		
+	
 		writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
 			"The block used as cooled or frozen lava.",
 			"Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
