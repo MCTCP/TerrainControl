@@ -30,7 +30,7 @@ public abstract class ConfigFunction<T>
 	 * Checks the size of the given list.
 	 * @param size The minimum size of the list.
 	 * @param args The list to check.
-	 * @throws InvalidConfigException If the size of the list is small than
+	 * @throws InvalidConfigException If the size of the list is smaller than
 	 * the given size.
 	 */
 	protected final void assureSize(int size, List<String> args) throws InvalidConfigException
