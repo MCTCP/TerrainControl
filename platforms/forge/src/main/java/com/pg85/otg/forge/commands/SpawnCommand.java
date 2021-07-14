@@ -136,6 +136,8 @@ public class SpawnCommand implements BaseCommand
 	            // bo4 for a structure, but rather a branch that should be spawned individually.	            
 	        	if(((BO4)objectToSpawn).getName().matches(".*C[0-9]([0-9]*)R[0-9]([0-9]*)$"))
 	        	{
+	        		int x = playerChunk.getBlockX() + ((BO4)objectToSpawn).getConfig().getminX();
+	        		int z = playerChunk.getBlockZ() + ((BO4)objectToSpawn).getConfig().getminZ();
 	        		((BO4)objectToSpawn).trySpawnAt(
         				preset.getFolderName(), 
         				OTG.getEngine().getOTGRootFolder(), 
@@ -148,9 +150,9 @@ public class SpawnCommand implements BaseCommand
         				new Random(), 
         				Rotation.NORTH, 
         				playerChunk, 
-        				playerChunk.getBlockX() + ((BO4)objectToSpawn).getConfig().getminX(), 
-        				genRegion.getHighestBlockAboveYAt(playerChunk.getBlockX() + ((BO4)objectToSpawn).getConfig().getminX(), playerChunk.getBlockZ() + ((BO4)objectToSpawn).getConfig().getminZ()),
-        				playerChunk.getBlockZ() + ((BO4)objectToSpawn).getConfig().getminZ(), 
+        				x, 
+        				genRegion.getHighestBlockAboveYAt(x, z),
+        				z, 
         				null, 
         				null, 
         				false, 
@@ -158,7 +160,7 @@ public class SpawnCommand implements BaseCommand
         				null,
         				null,
         				false, 
-        				63, 
+        				genRegion.getCachedBiomeProvider().getBiomeConfig(x, z).getWaterLevelMax(),
         				false, 
         				false, 
         				false
