@@ -54,7 +54,7 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 	@Override
 	public ArrayList<LocalMaterialData> read(String string, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		String[] materialNames = string.split(",");
+		String[] materialNames = string.split(",(?![^\\(\\[]*[\\]\\)])"); // Splits on any comma not inside brackets
 		ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
 		for(String materialName : materialNames)
 		{
