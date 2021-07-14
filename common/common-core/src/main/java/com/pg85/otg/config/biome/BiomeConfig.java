@@ -536,15 +536,16 @@ public class BiomeConfig extends BiomeConfigBase
 			"Each column in the world has a noise value from what appears to be -7 to 7.",
 			"Values near 0 are more common than values near -7 and 7. This setting is",
 			"used to change the surface block based on the noise value for the column.",
-			"Syntax: SurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,[AnotherGroundBlockName,MaxNoise[,...]]",
+			"1.12.2 Syntax: SurfaceBlockName,GroundBlockName,MaxNoise[,AnotherSurfaceBlockName,AnotherGroundBlockName,MaxNoise][,...]",
 			"Example: " + SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0",
+			"1.16.x Syntax: SurfaceBlockName,UnderWaterSurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,AnotherUnderWaterSurfaceBlockName,AnotherGroundBlockName,MaxNoise[,...]]",
 			"  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0",
 			"  gravel with stone just below and between 0.0 and 10.0 there's only dirt.",
 			"  Because 10.0 is higher than the noise can ever get, the normal " + BiomeStandardValues.SURFACE_BLOCK,
 			"  and " + BiomeStandardValues.GROUND_BLOCK + " will never appear in this biome.", "",
 			"Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks",
 			"like the blocks found in the Mesa biomes.",
-			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans.");
+			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans. Iceberg accepts a normal SAGC string: \"Iceberg <SAGC>\", so you can use normal SAGC with it.");
 
 		writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks,
 			"Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])", "Example :",

@@ -10,7 +10,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 public class SimpleSurfaceGenerator implements SurfaceGenerator
-{	
+{
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
@@ -26,22 +26,23 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 	@Override
 	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
-		spawnColumn(null, generatingChunk, chunkBuffer, biome, xInWorld & 0xf, zInWorld & 0xf);
+		spawnColumn(worldSeed, null, generatingChunk, chunkBuffer, biome, xInWorld, zInWorld);
 	}
 
 	// net.minecraft.world.biome.Biome.generateBiomeTerrain
-	protected final void spawnColumn(MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int x, int z)
+	protected void spawnColumn(long worldSeed, MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
+		int internalX = xInWorld & 0xf;
+		int internalZ = zInWorld & 0xf;
 		IBiomeConfig biomeConfig = biome.getBiomeConfig(); 
-		float currentTemperature = biome.getTemperatureAt(x, biomeConfig.getWaterLevelMax(), z);
 		// Used to create a variable depth ground layer per column
-		int biomeBlocksNoise = (int) (generatingChunk.getNoise(x, z) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
+		int biomeBlocksNoise = (int) (generatingChunk.getNoise(internalX, internalZ) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
 
 		// Bedrock on the ceiling
 		if (biomeConfig.isCeilingBedrock())
 		{
 			// Moved one block lower to fix lighting issues
-			chunkBuffer.setBlock(x, generatingChunk.heightCap - 2, z, biomeConfig.getBedrockBlockReplaced(generatingChunk.heightCap - 2));
+			chunkBuffer.setBlock(internalX, generatingChunk.heightCap - 2, internalZ, biomeConfig.getBedrockBlockReplaced(generatingChunk.heightCap - 2));
 		}
 
 		// Traverse down the block column to place bedrock, ground and surface blocks
@@ -57,21 +58,21 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 		boolean useSandStoneForGround = false;
 		boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(LocalMaterials.SAND);
 		boolean layerGroundBlockIsSand = layer != null && layer.groundBlock.isMaterial(LocalMaterials.SAND);
-		final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
+		final int currentWaterLevel = generatingChunk.getWaterLevel(internalX, internalZ);
 		LocalMaterialData blockOnCurrentPos;
 		LocalMaterialData blockOnPreviousPos = null;
 		
-		int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(x, z);
+		int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(internalX, internalZ);
 		for (int y = highestBlockInColumn; y >= 0; y--)
 		{
 			if (generatingChunk.mustCreateBedrockAt(biomeConfig.isFlatBedrock(), biomeConfig.isBedrockDisabled(), biomeConfig.isCeilingBedrock(), y))
 			{
 				// Place bedrock
-				chunkBuffer.setBlock(x, y, z, biomeConfig.getBedrockBlockReplaced(y));
+				chunkBuffer.setBlock(internalX, y, internalZ, biomeConfig.getBedrockBlockReplaced(y));
 			} else {
 
 				// Surface blocks logic (grass, dirt, sand, sandstone)
-				blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
+				blockOnCurrentPos = chunkBuffer.getBlock(internalX, y, internalZ);
 				if (blockOnCurrentPos.isEmptyOrAir())
 				{
 					// Reset when air is found
@@ -129,7 +130,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							}
 							if(bIsAir)
 							{
-								if (currentTemperature < Constants.SNOW_AND_ICE_TEMP)
+								if (biome.getTemperatureAt(xInWorld, y, zInWorld) < Constants.SNOW_AND_ICE_TEMP)
 								{
 									useAirForSurface = false;
 									useIceForSurface = true;
@@ -163,7 +164,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 								currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getSurfaceBlockReplaced(y);
 							}
 							
-							chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
+							chunkBuffer.setBlock(internalX, y, internalZ, currentSurfaceBlock);
 						} else {
 							if(useBiomeStoneBlockForGround)
 							{
@@ -175,9 +176,9 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							{
 								if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
 								{
-									chunkBuffer.setBlock(x, y, z, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
 								} else {
-									chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
 								}
 							}							
 						}
@@ -204,13 +205,13 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 										//biomeConfig.getRedSandStoneBlockReplaced(world, y) : 
 										//biomeConfig.getSandStoneBlockReplaced(world, y)
 								//);
-								chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(y));
+								chunkBuffer.setBlock(internalX, y, internalZ, biomeConfig.getSandStoneBlockReplaced(y));
 							} else {
 								if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
 								{
-									chunkBuffer.setBlock(x, y, z, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
 								} else {
-									chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
 								}
 							}
 

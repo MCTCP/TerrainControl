@@ -17,15 +17,12 @@ import java.util.List;
 class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 {
 	// Must be sorted based on the noise field
-	private List<MultipleLayersSurfaceGeneratorLayer> layers;
+	protected List<MultipleLayersSurfaceGeneratorLayer> layers;
 
+	protected MultipleLayersSurfaceGenerator() { }
+	
 	MultipleLayersSurfaceGenerator(String[] args, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		if (args.length < 2)
-		{
-			throw new InvalidConfigException("Needs at least two arguments");
-		}
-
 		this.layers = new ArrayList<MultipleLayersSurfaceGeneratorLayer>();
 		int entryLength = 3;
 		for (int i = 0; i < args.length - 2; i += entryLength)
@@ -58,28 +55,34 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
-		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
+		if(this.layers.size() > 0)
 		{
-			if (noise <= layer.maxNoise)
+			double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+			for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 			{
-				return layer.getSurfaceBlockReplaced(yInWorld, biomeConfig);
+				if (noise <= layer.maxNoise)
+				{
+					return layer.getSurfaceBlockReplaced(yInWorld, biomeConfig);
+				}
 			}
-		}		
+		}
 		return biomeConfig.getSurfaceBlockReplaced(yInWorld);
 	}
 
 	@Override
 	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
-	{	
-		double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
-		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
+	{
+		if(this.layers.size() > 0)
 		{
-			if (noise <= layer.maxNoise)
+			double noise = noiseProvider.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
+			for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 			{
-				return layer.getGroundBlockReplaced(yInWorld, biomeConfig);
+				if (noise <= layer.maxNoise)
+				{
+					return layer.getGroundBlockReplaced(yInWorld, biomeConfig);
+				}
 			}
-		}		
+		}
 		return biomeConfig.getGroundBlockReplaced(yInWorld);
 	}
 
@@ -88,19 +91,21 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	{
 		int x = xInWorld & 0xf;
 		int z = zInWorld & 0xf;
-		double noise = generatingChunkInfo.getNoise(x, z);
-
-		for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
+		if(this.layers.size() > 0)
 		{
-			if (noise <= layer.maxNoise)
+			double noise = generatingChunkInfo.getNoise(x, z);
+			for (MultipleLayersSurfaceGeneratorLayer layer : this.layers)
 			{
-				spawnColumn(layer, generatingChunkInfo, chunkBuffer, biome, x, z);
-				return;
+				if (noise <= layer.maxNoise)
+				{
+					spawnColumn(worldSeed, layer, generatingChunkInfo, chunkBuffer, biome, xInWorld, zInWorld);
+					return;
+				}
 			}
 		}
 
 		// Fall back on normal column
-		spawnColumn(null, generatingChunkInfo, chunkBuffer, biome, x, z);
+		spawnColumn(worldSeed, null, generatingChunkInfo, chunkBuffer, biome, xInWorld, zInWorld);
 	}
 
 	@Override
@@ -110,6 +115,8 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 		for (MultipleLayersSurfaceGeneratorLayer groundLayer : this.layers)
 		{
 			stringBuilder.append(groundLayer.surfaceBlock);
+			stringBuilder.append(',').append(' ');
+			stringBuilder.append(groundLayer.underWaterSurfaceBlock);
 			stringBuilder.append(',').append(' ');
 			stringBuilder.append(groundLayer.groundBlock);
 			stringBuilder.append(',').append(' ');
