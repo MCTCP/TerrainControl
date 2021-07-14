@@ -45,7 +45,7 @@ public class ReplaceBlockMatrix
 		 */
 		private ReplacedBlocksInstruction(String instruction, int maxAllowedY, IMaterialReader materialReader) throws InvalidConfigException
 		{
-			String[] values = instruction.split(",");
+			String[] values = instruction.split(",(?![^\\(\\[]*[\\]\\)])"); // Splits on any comma not inside brackets
 			if (values.length == 5)
 			{
 				// Replace in TC 2.3 style found
