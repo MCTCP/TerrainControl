@@ -307,7 +307,7 @@ public class IcebergSurfaceGenerator extends MultipleLayersSurfaceGenerator
 			blockOnPreviousPos = blockOnCurrentPos;
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
