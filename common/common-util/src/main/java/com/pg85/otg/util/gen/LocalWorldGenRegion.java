@@ -34,6 +34,9 @@ public abstract class LocalWorldGenRegion implements IWorldGenRegion
 		this.pluginConfig = pluginConfig;
 		this.worldConfig = worldConfig;
 		this.logger = logger;
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.
 		this.decorationBiomeCache = null;
 		this.decorationArea = null;
 	}
