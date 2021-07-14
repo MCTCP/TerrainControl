@@ -87,6 +87,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 		boolean useSandStoneForGround = false;
 		boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(LocalMaterials.SAND);
 		LocalMaterialData blockOnCurrentPos;
+		LocalMaterialData blockOnPreviousPos = null;
 
 		int topY = chunkBuffer.getHighestBlockForColumn(x & 0xf, z & 0xf);
 		for (int y = Math.max(topY, (int)icebergHeight + 1); y >= 0; y--)
@@ -101,17 +102,18 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 			// Store whether we set the iceberg here or not
 			boolean setIceberg = false;
 
-			// Place ice above and below the sea level, with a 99% and 85% chance respetively
+			// Place ice above and below the sea level, with a 99% and 85% chance respectively
+			// TODO: Create biomeconfig BiomePackedIceBlock setting and use that?
 			if (chunkBuffer.getBlock(x, y, z).isAir() && y < icebergHeight && random.nextDouble() > 0.01D) {
-				chunkBuffer.setBlock(x, y, z, LocalMaterials.PACKED_ICE);
+				chunkBuffer.setBlock(x, y, z, biomeConfig.getPackedIceBlockReplaced(y));
 				setIceberg = true;
-			} else if (chunkBuffer.getBlock(x, y, z).isMaterial(LocalMaterials.WATER) && y > (int)icebergDepth && y < seaLevel && icebergDepth != 0.0D && random.nextDouble() > 0.15D) {
-				chunkBuffer.setBlock(x, y, z, LocalMaterials.PACKED_ICE);
+			} else if (chunkBuffer.getBlock(x, y, z).isMaterial(biomeConfig.getWaterBlockReplaced(y)) && y > (int)icebergDepth && y < seaLevel && icebergDepth != 0.0D && random.nextDouble() > 0.15D) {
+				chunkBuffer.setBlock(x, y, z, biomeConfig.getPackedIceBlockReplaced(y));
 				setIceberg = true;
 			}
 
-			if (chunkBuffer.getBlock(x, y, z).isMaterial(LocalMaterials.PACKED_ICE) && generatedSnow <= snowHeight && y > snowStart) {
-				chunkBuffer.setBlock(x, y, z, LocalMaterials.SNOW_BLOCK);
+			if (chunkBuffer.getBlock(x, y, z).isMaterial(biomeConfig.getPackedIceBlockReplaced(y)) && generatedSnow <= snowHeight && y > snowStart) {
+				chunkBuffer.setBlock(x, y, z, biomeConfig.getSnowBlockReplaced(y));
 				++snowHeight;
 				setIceberg = true;
 			}
@@ -221,11 +223,17 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 						if(useBiomeStoneBlockForGround)
 						{
 							// block should already be the replaced stoneblock
+							blockOnPreviousPos = blockOnCurrentPos;
 							continue;
 						}
 						else if(useLayerGroundBlockForGround)
 						{
-							chunkBuffer.setBlock(x, y, z, biomeConfig.getGroundBlockReplaced(y));
+							if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
+							{
+								chunkBuffer.setBlock(x, y, z, biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+							} else {
+								chunkBuffer.setBlock(x, y, z, biomeConfig.getGroundBlockReplaced(y));
+							}							
 						}
 					}
 				}
@@ -238,6 +246,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 					if(useBiomeStoneBlockForGround)
 					{
 						// block should already be the replaced stoneblock
+						blockOnPreviousPos = blockOnCurrentPos;
 						continue;
 					}
 					else if(useLayerGroundBlockForGround)
@@ -253,7 +262,12 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 							//);
 							chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(y));
 						} else {
-							chunkBuffer.setBlock(x, y, z, biomeConfig.getGroundBlockReplaced(y));
+							if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
+							{
+								chunkBuffer.setBlock(x, y, z, biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+							} else {
+								chunkBuffer.setBlock(x, y, z, biomeConfig.getGroundBlockReplaced(y));
+							}
 						}
 
 						// When a ground layer of sand is done spawning, if the BiomeBlocksNoise is above 1
@@ -275,6 +289,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 					}
 				}
 			}
+			blockOnPreviousPos = blockOnCurrentPos;			
 		}
 	}
 

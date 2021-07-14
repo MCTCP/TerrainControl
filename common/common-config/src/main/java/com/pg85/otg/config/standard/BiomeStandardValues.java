@@ -114,10 +114,13 @@ public class BiomeStandardValues extends Settings
 	public static final Setting<LocalMaterialData>
 		STONE_BLOCK = new MaterialSetting("StoneBlock", LocalMaterials.STONE_NAME),
 		SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", LocalMaterials.GRASS_NAME),
+		UNDER_WATER_SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", ""),				
 		GROUND_BLOCK = new MaterialSetting("GroundBlock", LocalMaterials.DIRT_NAME),
 		COOLED_LAVA_BLOCK = WorldStandardValues.COOLED_LAVA_BLOCK,
 		WATER_BLOCK = WorldStandardValues.WATER_BLOCK,
-		ICE_BLOCK = WorldStandardValues.ICE_BLOCK
+		ICE_BLOCK = WorldStandardValues.ICE_BLOCK,
+		PACKED_ICE_BLOCK = new MaterialSetting("PackedIceBlock", LocalMaterials.PACKED_ICE_NAME),
+		SNOW_BLOCK = new MaterialSetting("SnowBlock", LocalMaterials.SNOW_BLOCK_NAME)
 	;
 
 	public static final Setting<double[]>

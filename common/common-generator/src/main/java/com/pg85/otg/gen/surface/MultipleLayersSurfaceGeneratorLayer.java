@@ -4,21 +4,22 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-// TODO: We're probably only implementing comparable here for biome inheritance (overriding), 
-// which we burned with fire because it required code like this for every setting, remove?
 class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSurfaceGeneratorLayer>
 {
 	protected final LocalMaterialData surfaceBlock;
+	protected final LocalMaterialData underWaterSurfaceBlock;
 	protected final LocalMaterialData groundBlock;
 	final float maxNoise;
 
 	private boolean initialized = false;
 	private boolean surfaceBlockIsReplaced;
+	private boolean underWaterSurfaceBlockIsReplaced;
 	private boolean groundBlockIsReplaced;
 
-	MultipleLayersSurfaceGeneratorLayer(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
+	MultipleLayersSurfaceGeneratorLayer(LocalMaterialData surfaceBlock, LocalMaterialData underWaterSurfaceBlock, LocalMaterialData groundBlock, float maxNoise)
 	{
 		this.surfaceBlock = surfaceBlock;
+		this.underWaterSurfaceBlock = underWaterSurfaceBlock;
 		this.groundBlock = groundBlock;
 		this.maxNoise = maxNoise;
 	}
@@ -35,6 +36,26 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		if(materialData == null)
 		{
 			materialData = this.surfaceBlock;
+		}
+		if(materialData.isAir() && y < biomeConfig.getWaterLevelMax() && y >= biomeConfig.getWaterLevelMin())
+		{
+			materialData = biomeConfig.getWaterBlockReplaced(y);
+		}
+		return materialData;
+	}
+
+	LocalMaterialData getUnderWaterSurfaceBlockReplaced(int y, IBiomeConfig biomeConfig)
+	{
+		// TODO: Make this prettier?
+		Init(biomeConfig.getReplaceBlocks());
+		LocalMaterialData materialData = null;
+		if(this.underWaterSurfaceBlockIsReplaced)
+		{
+			materialData = this.underWaterSurfaceBlock.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y);
+		}
+		if(materialData == null)
+		{
+			materialData = this.underWaterSurfaceBlock;
 		}
 		if(materialData.isAir() && y < biomeConfig.getWaterLevelMax() && y >= biomeConfig.getWaterLevelMin())
 		{
@@ -69,6 +90,7 @@ class MultipleLayersSurfaceGeneratorLayer implements Comparable<MultipleLayersSu
 		{
 			initialized = true;
 			surfaceBlockIsReplaced = replacedBlocks.replacesBlock(surfaceBlock);
+			underWaterSurfaceBlockIsReplaced = replacedBlocks.replacesBlock(underWaterSurfaceBlock);
 			groundBlockIsReplaced = replacedBlocks.replacesBlock(groundBlock);
 		}
 	}

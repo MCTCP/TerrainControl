@@ -115,7 +115,10 @@ public interface IBiomeConfig
 	int getWaterLevelMax();
 	int getWaterLevelMin();
 	LocalMaterialData getWaterBlockReplaced(int y);
+	LocalMaterialData getUnderWaterSurfaceBlockReplaced(int y);	
 	LocalMaterialData getIceBlockReplaced(int y);
+	LocalMaterialData getPackedIceBlockReplaced(int y);
+	LocalMaterialData getSnowBlockReplaced(int y);
 	LocalMaterialData getCooledLavaBlockReplaced(int y);
 	
 	// Visuals / weather
@@ -194,5 +197,5 @@ public interface IBiomeConfig
 	// Saplings
 	
 	ISaplingSpawner getSaplingGen(SaplingType type);
-	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);	
+	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);
 }
