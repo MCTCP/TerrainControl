@@ -1,5 +1,6 @@
 package com.pg85.otg.gen.surface;
 
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -27,7 +28,7 @@ public interface SurfaceGenerator
 	 * @param xInWorld		X position in the world.
 	 * @param zInWorld		Z position in the world.
 	 */
-	void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld);
+	void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld);
 
 	/**
 	 * Writes the settings used to a string. There must be a constructor to

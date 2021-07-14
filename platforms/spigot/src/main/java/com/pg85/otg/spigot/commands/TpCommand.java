@@ -14,10 +14,6 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ClickEvent.Action;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChatMessage;

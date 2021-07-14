@@ -440,13 +440,13 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		int blockX = chunkCoord.getBlockX();
 		int blockZ = chunkCoord.getBlockZ();
 
-		IBiomeConfig[] biomes = this.cachedBiomeProvider.getBiomeConfigsForChunk(chunkCoord);
+		IBiome[] biomes = this.cachedBiomeProvider.getBiomesForChunk(chunkCoord);
 		for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
 				// TODO: water levels used to be interpolated via bilinear interpolation. Do we still need to do that?
-				waterLevel[x * Constants.CHUNK_SIZE + z] = biomes[x * Constants.CHUNK_SIZE + z].getWaterLevelMax();
+				waterLevel[x * Constants.CHUNK_SIZE + z] = biomes[x * Constants.CHUNK_SIZE + z].getBiomeConfig().getWaterLevelMax();
 			}
 		}
 
@@ -566,7 +566,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 								// Normalize the noise from (-256, 256) to [-1, 1]
 								density = MathHelper.clamp(rawNoise / 200.0D, -1.0D, 1.0D);
 
-								biomeConfig = biomes[localX * 16 + localZ];
+								biomeConfig = biomes[localX * 16 + localZ].getBiomeConfig();
 
 								// TODO: make this bigger and look better
 								// Iterate through structures to add density
@@ -662,19 +662,21 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		return noiseSizeY;
 	}
 
-	private void doSurfaceAndGroundControl(IBiomeConfig[] biomes, Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, int[] waterLevel)
+	private void doSurfaceAndGroundControl(IBiome[] biomes, Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, int[] waterLevel)
 	{
 		// Process surface and ground blocks for each column in the chunk
 		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();		
 		double d1 = 0.03125D;
 		this.biomeBlocksNoise.set(this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise.get(), chunkCoord.getBlockX(), chunkCoord.getBlockZ(), Constants.CHUNK_SIZE, Constants.CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D));
 		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise.get(), heightCap);
+		IBiome biome;
 		for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
 				// Get the current biome config and some properties
-				biomes[x * Constants.CHUNK_SIZE + z].doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+				biome = biomes[x * Constants.CHUNK_SIZE + z];
+				biome.getBiomeConfig().doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z, biome);
 			}
 		}
 	}

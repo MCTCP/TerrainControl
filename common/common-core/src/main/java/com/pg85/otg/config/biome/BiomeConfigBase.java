@@ -18,6 +18,7 @@ import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.ICustomStructureGen;
@@ -99,6 +100,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	protected LocalMaterialData stoneBlock;
 	protected LocalMaterialData surfaceBlock;
+	protected LocalMaterialData underWaterSurfaceBlock;
 	protected LocalMaterialData groundBlock;
 	protected LocalMaterialData sandStoneBlock;
 	protected LocalMaterialData redSandStoneBlock;
@@ -112,11 +114,14 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int waterLevelMin;
 	protected LocalMaterialData waterBlock;
 	protected LocalMaterialData iceBlock;
+	protected LocalMaterialData packedIceBlock;
+	protected LocalMaterialData snowBlock;
 	protected LocalMaterialData cooledLavaBlock;
 
 	// Visuals and weather
 	
 	protected float biomeTemperature;
+	protected boolean useFrozenOceanTemperature;
 	protected float biomeWetness;
 	protected int grassColor;
 	protected ColorSet grassColorControl;
@@ -232,6 +237,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.otgBiomeId;
 	}
 
+	// TODO: Ideally, callers should be aware whether they're fetching a block underwater or not, and call getUnderWaterSurfaceBlock instead.
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
@@ -263,16 +269,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 					this.replacedBlocks.init(
 						this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
 						this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
+						this.packedIceBlock,
+						this.snowBlock,
 						this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
 						this.stoneBlock,
 						this.groundBlock,
 						this.surfaceBlock,
+						this.underWaterSurfaceBlock,
 						this.worldConfig.getDefaultBedrockBlock(),
 						this.sandStoneBlock,
 						this.redSandStoneBlock
-					);					
+					);
 				}
-				this.replacedBlocksInited = true;				
+				this.replacedBlocksInited = true;
 			}
 		}
 	}
@@ -289,6 +298,16 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		}
 		return this.surfaceBlock;
 	}
+	
+	@Override
+	public LocalMaterialData getUnderWaterSurfaceBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesUnderWaterSurface)
+		{
+			return this.underWaterSurfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.underWaterSurfaceBlock;
+	}	
 	
 	@Override
 	public LocalMaterialData getGroundBlockReplaced(int y)
@@ -344,6 +363,26 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 			return this.iceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.iceBlock;
+	}
+	
+	@Override
+	public LocalMaterialData getPackedIceBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesPackedIce)
+		{
+			return this.packedIceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.packedIceBlock;
+	}
+
+	@Override
+	public LocalMaterialData getSnowBlockReplaced(int y)
+	{
+		if(getReplaceBlocks().replacesSnow)
+		{
+			return this.snowBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+		}
+		return this.snowBlock;
 	}
 	
 	@Override
@@ -425,6 +464,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public float getBiomeTemperature()
 	{
 		return this.biomeTemperature;
+	}
+	
+	@Override
+	public boolean useFrozenOceanTemperature()
+	{
+		return this.useFrozenOceanTemperature;
 	}
 	
 	@Override
@@ -1004,9 +1049,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z)
+	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome)
 	{
-		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, this, x, z);
+		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biome, x, z);
 	}
 	
 	@Override

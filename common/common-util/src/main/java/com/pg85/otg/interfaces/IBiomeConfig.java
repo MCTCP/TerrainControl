@@ -106,7 +106,7 @@ public interface IBiomeConfig
 	LocalMaterialData getBedrockBlockReplaced(int y);
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getDefaultGroundBlock();
-	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z);
+	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome);
 	boolean hasReplaceBlocksSettings();
 	ReplaceBlockMatrix getReplaceBlocks();
 	
@@ -115,12 +115,16 @@ public interface IBiomeConfig
 	int getWaterLevelMax();
 	int getWaterLevelMin();
 	LocalMaterialData getWaterBlockReplaced(int y);
+	LocalMaterialData getUnderWaterSurfaceBlockReplaced(int y);	
 	LocalMaterialData getIceBlockReplaced(int y);
+	LocalMaterialData getPackedIceBlockReplaced(int y);
+	LocalMaterialData getSnowBlockReplaced(int y);
 	LocalMaterialData getCooledLavaBlockReplaced(int y);
 	
 	// Visuals / weather
 	
 	float getBiomeTemperature();
+	boolean useFrozenOceanTemperature();
 	float getBiomeWetness();
 	int getFogColor();
 	float getFogDensity();
@@ -193,5 +197,5 @@ public interface IBiomeConfig
 	// Saplings
 	
 	ISaplingSpawner getSaplingGen(SaplingType type);
-	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);	
+	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);
 }

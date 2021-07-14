@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -9,10 +10,10 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 public class SimpleSurfaceGenerator implements SurfaceGenerator
-{	
+{
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
-	{
+	{	
 		return biomeConfig.getSurfaceBlockReplaced(yInWorld);
 	}
 	
@@ -23,23 +24,25 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 	}
 	
 	@Override
-	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld)
+	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
-		spawnColumn(null, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
+		spawnColumn(worldSeed, null, generatingChunk, chunkBuffer, biome, xInWorld, zInWorld);
 	}
 
 	// net.minecraft.world.biome.Biome.generateBiomeTerrain
-	protected final void spawnColumn(MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
+	protected void spawnColumn(long worldSeed, MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
-		float currentTemperature = biomeConfig.getBiomeTemperature();
+		int internalX = xInWorld & 0xf;
+		int internalZ = zInWorld & 0xf;
+		IBiomeConfig biomeConfig = biome.getBiomeConfig(); 
 		// Used to create a variable depth ground layer per column
-		int biomeBlocksNoise = (int) (generatingChunk.getNoise(x, z) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
+		int biomeBlocksNoise = (int) (generatingChunk.getNoise(internalX, internalZ) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
 
 		// Bedrock on the ceiling
 		if (biomeConfig.isCeilingBedrock())
 		{
 			// Moved one block lower to fix lighting issues
-			chunkBuffer.setBlock(x, generatingChunk.heightCap - 2, z, biomeConfig.getBedrockBlockReplaced(generatingChunk.heightCap - 2));
+			chunkBuffer.setBlock(internalX, generatingChunk.heightCap - 2, internalZ, biomeConfig.getBedrockBlockReplaced(generatingChunk.heightCap - 2));
 		}
 
 		// Traverse down the block column to place bedrock, ground and surface blocks
@@ -55,20 +58,21 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 		boolean useSandStoneForGround = false;
 		boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(LocalMaterials.SAND);
 		boolean layerGroundBlockIsSand = layer != null && layer.groundBlock.isMaterial(LocalMaterials.SAND);
-		final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
+		final int currentWaterLevel = generatingChunk.getWaterLevel(internalX, internalZ);
 		LocalMaterialData blockOnCurrentPos;
+		LocalMaterialData blockOnPreviousPos = null;
 		
-		int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(x, z);
+		int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(internalX, internalZ);
 		for (int y = highestBlockInColumn; y >= 0; y--)
 		{
 			if (generatingChunk.mustCreateBedrockAt(biomeConfig.isFlatBedrock(), biomeConfig.isBedrockDisabled(), biomeConfig.isCeilingBedrock(), y))
 			{
 				// Place bedrock
-				chunkBuffer.setBlock(x, y, z, biomeConfig.getBedrockBlockReplaced(y));
+				chunkBuffer.setBlock(internalX, y, internalZ, biomeConfig.getBedrockBlockReplaced(y));
 			} else {
 
 				// Surface blocks logic (grass, dirt, sand, sandstone)
-				blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
+				blockOnCurrentPos = chunkBuffer.getBlock(internalX, y, internalZ);
 				if (blockOnCurrentPos.isEmptyOrAir())
 				{
 					// Reset when air is found
@@ -126,7 +130,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							}
 							if(bIsAir)
 							{
-								if (currentTemperature < Constants.SNOW_AND_ICE_TEMP)
+								if (biome.getTemperatureAt(xInWorld, y, zInWorld) < Constants.SNOW_AND_ICE_TEMP)
 								{
 									useAirForSurface = false;
 									useIceForSurface = true;
@@ -140,7 +144,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 								}
 							}
 						}
-					
+
 						if (y >= currentWaterLevel - 1)
 						{
 							if(useAirForSurface)
@@ -160,16 +164,22 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 								currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getSurfaceBlockReplaced(y);
 							}
 							
-							chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
+							chunkBuffer.setBlock(internalX, y, internalZ, currentSurfaceBlock);
 						} else {
 							if(useBiomeStoneBlockForGround)
 							{
 								// block should already be the replaced stoneblock
+								blockOnPreviousPos = blockOnCurrentPos;								
 								continue;
 							}
 							else if(useLayerGroundBlockForGround)
 							{
-								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+								if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
+								{
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+								} else {
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+								}
 							}							
 						}
 					}
@@ -181,6 +191,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 						if(useBiomeStoneBlockForGround)
 						{
 							// block should already be the replaced stoneblock
+							blockOnPreviousPos = blockOnCurrentPos;
 							continue;
 						}
 						else if(useLayerGroundBlockForGround)
@@ -194,22 +205,27 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 										//biomeConfig.getRedSandStoneBlockReplaced(world, y) : 
 										//biomeConfig.getSandStoneBlockReplaced(world, y)
 								//);
-								chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(y));
+								chunkBuffer.setBlock(internalX, y, internalZ, biomeConfig.getSandStoneBlockReplaced(y));
 							} else {
-								chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+								if(blockOnPreviousPos != null && blockOnPreviousPos.isLiquid())
+								{
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getUnderWaterSurfaceBlockReplaced(y, biomeConfig) : biomeConfig.getUnderWaterSurfaceBlockReplaced(y));
+								} else {
+									chunkBuffer.setBlock(internalX, y, internalZ, layer != null ? layer.getGroundBlockReplaced(y, biomeConfig) : biomeConfig.getGroundBlockReplaced(y));
+								}
 							}
-							
-							// When a ground layer of sand is done spawning, if the BiomeBlocksNoise is above 1 
+
+							// When a ground layer of sand is done spawning, if the BiomeBlocksNoise is above 1
 							// spawn layers of sandstone underneath.
 							// If we end up at (y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1)
 							// after doing this, the groundblock is set back to sand and we repeat the process,
 							// otherwise we stop and leave blocks as stone, until we're done or hit air.
-							
+
 							// BiomeBlocksNoise is used to create a pattern of sandstone vs stone columns.
 							// For waterlevel, the higher above it we are, the taller the sandstone sections become.
 							// For vanilla deserts, this makes the sand layer deeper around waterlevel, affecting
 							// mostly flat terrain, while hills have only a 1 block layer of sand and more sandstone.
-							
+
 							if (
 								groundLayerDepth == 0 &&
 								biomeBlocksNoise > 1 &&
@@ -222,6 +238,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 						} 
 					}
 				}
+				blockOnPreviousPos = blockOnCurrentPos;
 			}
 		}
 	}

@@ -46,8 +46,7 @@ public abstract class StringHelper
 			if (!Character.isJavaIdentifierPart(charArray[i]))
 			{
 				charArray[i] = '_';
-			} else
-			{
+			} else {
 				charArray[i] = Character.toLowerCase(charArray[i]);
 			}
 		}
@@ -94,9 +93,7 @@ public abstract class StringHelper
 					return maxValue;
 				}
 				return number;
-			}
-			catch (NumberFormatException e2)
-			{
+			} catch (NumberFormatException e2) {
 				throw new InvalidConfigException("Incorrect number: " + string);				
 			}
 		}
@@ -112,8 +109,7 @@ public abstract class StringHelper
 				throw new InvalidConfigException("Color must have 6 hexadecimal digits");
 			}
 			return integer;
-		} catch (NumberFormatException e)
-		{
+		} catch (NumberFormatException e) {
 			throw new InvalidConfigException("Invalid color " + string);
 		}
 	}
@@ -145,8 +141,7 @@ public abstract class StringHelper
 				return maxValue;
 			}
 			return number;
-		} catch (NumberFormatException e)
-		{
+		} catch (NumberFormatException e) {
 			throw new InvalidConfigException("Incorrect number: " + string);
 		}
 	}
@@ -194,10 +189,13 @@ public abstract class StringHelper
 				lastFound = index + 1;
 			}
 			if (c == '(' || c == '[')
+			{
 				inBracer++;
+			}
 			if (c == ')' || c == ']')
+			{
 				inBracer--;
-
+			}
 			index++;
 		}
 		buffer.add(line.substring(lastFound, index).trim());
@@ -205,7 +203,9 @@ public abstract class StringHelper
 		String[] output = new String[0];
 
 		if (inBracer == 0)
+		{
 			output = buffer.toArray(output);
+		}
 
 		return output;
 	}
@@ -237,8 +237,7 @@ public abstract class StringHelper
 				return maxValue;
 			}
 			return number;
-		} catch (NumberFormatException e)
-		{
+		} catch (NumberFormatException e) {
 			throw new InvalidConfigException("Incorrect number: " + string);
 		}
 	}

@@ -183,6 +183,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
 		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
 		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
+		this.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);		
 		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
 		this.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
 		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
@@ -192,8 +193,15 @@ public class BiomeConfig extends BiomeConfigBase
 		this.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
 		this.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
 		this.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
+		this.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
+		if(this.underWaterSurfaceBlock == null)
+		{
+			this.underWaterSurfaceBlock = this.groundBlock; 	
+		}
 		this.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
 		this.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
+		this.packedIceBlock = reader.getSetting(BiomeStandardValues.PACKED_ICE_BLOCK, logger, materialReader);
+		this.snowBlock = reader.getSetting(BiomeStandardValues.SNOW_BLOCK, logger, materialReader);
 		this.configCooledLavaBlock = reader.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 		this.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
 		this.sandStoneBlock = LocalMaterials.SANDSTONE;
@@ -519,21 +527,25 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.putSetting(BiomeStandardValues.GROUND_BLOCK, this.groundBlock,
 			"The ground block used for the biome, usually DIRT.");
+		
+		writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.underWaterSurfaceBlock,
+			"The surface block used for the biome when underwater, usually the same as GroundBlock.");
 
 		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.surfaceAndGroundControl,
 			"Setting for biomes with more complex surface and ground blocks.",
 			"Each column in the world has a noise value from what appears to be -7 to 7.",
 			"Values near 0 are more common than values near -7 and 7. This setting is",
 			"used to change the surface block based on the noise value for the column.",
-			"Syntax: SurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,[AnotherGroundBlockName,MaxNoise[,...]]",
+			"1.12.2 Syntax: SurfaceBlockName,GroundBlockName,MaxNoise[,AnotherSurfaceBlockName,AnotherGroundBlockName,MaxNoise][,...]",
 			"Example: " + SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0",
+			"1.16.x Syntax: SurfaceBlockName,UnderWaterSurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,AnotherUnderWaterSurfaceBlockName,AnotherGroundBlockName,MaxNoise[,...]]",
 			"  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0",
 			"  gravel with stone just below and between 0.0 and 10.0 there's only dirt.",
 			"  Because 10.0 is higher than the noise can ever get, the normal " + BiomeStandardValues.SURFACE_BLOCK,
 			"  and " + BiomeStandardValues.GROUND_BLOCK + " will never appear in this biome.", "",
 			"Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks",
 			"like the blocks found in the Mesa biomes.",
-			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans.");
+			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans. Iceberg accepts a normal SAGC string: \"Iceberg <SAGC>\", so you can use normal SAGC with it.");
 
 		writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks,
 			"Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])", "Example :",
@@ -559,6 +571,12 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock,
 			"The block used as ice. Ice only spawns if the BiomeTemperature is low enough.");
 
+		writer.putSetting(BiomeStandardValues.PACKED_ICE_BLOCK, this.packedIceBlock,
+			"The block used as packed ice. Packed ice only spawns when using Iceberg SurfaceAndGroundControl.");
+		
+		writer.putSetting(BiomeStandardValues.SNOW_BLOCK, this.snowBlock,
+			"The block used as snow (block, not tile). Snow blocks only spawn when using Iceberg SurfaceAndGroundControl.");		
+	
 		writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
 			"The block used as cooled or frozen lava.",
 			"Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
@@ -571,6 +589,10 @@ public class BiomeConfig extends BiomeConfigBase
 			"When this value is around 0.1, the whole biome will be covered in snow and ice.",
 			"However, on default biomes, this won't do anything except changing the grass and leaves colors slightly.");
 
+		writer.putSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, this.useFrozenOceanTemperature,
+			"Set this to true to use variable temperatures within the biome based on noise.",
+			"Used for vanilla Frozen Ocean and Deep Frozen Ocean biomes to create patches of water/ice.");
+		
 		writer.putSetting(BiomeStandardValues.BIOME_WETNESS, this.biomeWetness,
 			"Biome wetness. Float value from 0.0 to 1.0.",
 			"If this biome is a custom biome, and this value is set to 0, no rain will fall.",

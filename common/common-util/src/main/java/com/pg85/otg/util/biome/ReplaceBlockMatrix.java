@@ -128,10 +128,13 @@ public class ReplaceBlockMatrix
 	
 	public boolean replacesCooledLava = false;
 	public boolean replacesIce = false;
+	public boolean replacesPackedIce = false;
+	public boolean replacesSnow = false;
 	public boolean replacesWater = false;
 	public boolean replacesStone = false;
 	public boolean replacesGround = false;
 	public boolean replacesSurface = false;
+	public boolean replacesUnderWaterSurface = false;
 	public boolean replacesBedrock = false;
 	public boolean replacesSandStone = false;
 	public boolean replacesRedSandStone = false;
@@ -168,7 +171,7 @@ public class ReplaceBlockMatrix
 		setInstructions(instructions);		
 	}
 	
-	public void init(LocalMaterialData biomeCooledLavaBlock, LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock, LocalMaterialData biomeSandStoneBlock, LocalMaterialData biomeRedSandStoneBlock)
+	public void init(LocalMaterialData biomeCooledLavaBlock, LocalMaterialData biomeIceBlock, LocalMaterialData biomePackedIceBlock, LocalMaterialData biomeSnowBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeUnderWaterSurfaceBlock, LocalMaterialData biomeBedrockBlock, LocalMaterialData biomeSandStoneBlock, LocalMaterialData biomeRedSandStoneBlock)
 	{
 		// Fill maps for faster access
 		for(ReplacedBlocksInstruction instruction : this.instructions)
@@ -247,6 +250,20 @@ public class ReplaceBlockMatrix
 				this.replacesIce = true;
 			}
 			if(
+				isBlockTag ? biomePackedIceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
+				instruction.from.hashCode() == biomePackedIceBlock.hashCode() 
+			)
+			{
+				this.replacesPackedIce = true;
+			}
+			if(
+				isBlockTag ? biomeSnowBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
+				instruction.from.hashCode() == biomeSnowBlock.hashCode() 
+			)
+			{
+				this.replacesSnow = true;
+			}			
+			if(
 				isBlockTag ? biomeWaterBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeWaterBlock.hashCode() 
 			)				
@@ -273,6 +290,13 @@ public class ReplaceBlockMatrix
 			)			
 			{
 				this.replacesSurface = true;
+			}
+			if(
+				isBlockTag ? biomeUnderWaterSurfaceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
+				instruction.from.hashCode() == biomeUnderWaterSurfaceBlock.hashCode()
+			)			
+			{
+				this.replacesUnderWaterSurface = true;
 			}
 			if(
 				isBlockTag ? biomeBedrockBlock.isBlockTag((LocalMaterialTag)instruction.from) : 

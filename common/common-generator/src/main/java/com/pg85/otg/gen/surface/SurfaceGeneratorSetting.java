@@ -35,7 +35,7 @@ public class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
 				return mesa;
 			}
 
-			SurfaceGenerator iceberg = IcebergSurfaceGenerator.getFor(string);
+			SurfaceGenerator iceberg = IcebergSurfaceGenerator.getFor(string, materialReader);
 			if (iceberg != null)
 			{
 				return iceberg;
