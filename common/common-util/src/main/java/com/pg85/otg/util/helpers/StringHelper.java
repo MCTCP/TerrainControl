@@ -185,6 +185,7 @@ public abstract class StringHelper
 		int lastFound = 0;
 		int inBracer = 0;
 
+		// This excludes any comma's inside brackets/braces (?)
 		for (char c : line.toCharArray())
 		{
 			if (c == ',' && inBracer == 0)
