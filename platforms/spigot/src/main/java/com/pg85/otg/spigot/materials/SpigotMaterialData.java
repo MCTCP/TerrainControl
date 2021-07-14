@@ -93,9 +93,14 @@ public class SpigotMaterialData extends LocalMaterialData
 				this.name = "Unknown";
 			}
 		} else {
-			this.name = this.blockData.toString()
-				.replace("Block{", "")
-				.replace("}", "");
+			if(this.blockData != this.blockData.getBlock().getBlockData())
+			{
+				this.name = this.blockData.toString()
+					.replace("Block{", "")
+					.replace("}", "");
+			} else {
+				this.name = this.blockData.getBlock().r().toString();
+			}
 		}
 		return this.name;
 	}
