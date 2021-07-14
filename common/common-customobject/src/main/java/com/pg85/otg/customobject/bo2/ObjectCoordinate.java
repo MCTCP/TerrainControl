@@ -21,7 +21,6 @@ class ObjectCoordinate
 		this.z = _z;
 		this.branchDirection = -1;
 		this.branchOdds = -1;
-
 		this.hash = this.x + this.z << 8 + this.y << 16;
 	}
 
@@ -52,7 +51,9 @@ class ObjectCoordinate
 		{
 			newCoordinate.branchDirection = this.branchDirection + 1;
 			if (newCoordinate.branchDirection > 3)
+			{
 				newCoordinate.branchDirection = 0;
+			}
 		}
 
 		return newCoordinate;
@@ -61,7 +62,7 @@ class ObjectCoordinate
 
 	static ObjectCoordinate getCoordinateFromString(String key, String value, IMaterialReader materialReader)
 	{
-		String[] coordinates = key.split(",", 3);
+		String[] coordinates = key.split(",(?![^\\(\\[]*[\\]\\)])", 3); // Splits on any comma not inside brackets
 		if (coordinates.length != 3)
 		{
 			return null;
@@ -76,6 +77,7 @@ class ObjectCoordinate
 
 			ObjectCoordinate newCoordinate = new ObjectCoordinate(x, y, z);
 
+			// TODO: What is this for, where do we ever use # or @?
 			String workingDataString = value;
 			if (workingDataString.contains("#"))
 			{
@@ -95,7 +97,7 @@ class ObjectCoordinate
 		}
 		catch (InvalidConfigException e)
 		{
-			return null;			
+			return null;
 		}
 	}
 }
