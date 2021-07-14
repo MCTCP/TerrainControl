@@ -45,7 +45,8 @@ public class BiomeStandardValues extends Settings
 		BASTION_REMNANT_ENABLED = booleanSetting("BastionRemnantEnabled", false),
 		NETHER_FOSSIL_ENABLED = booleanSetting("NetherFossilEnabled", false),
 		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false),
-		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false)
+		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false),
+		USE_FROZEN_OCEAN_TEMPERATURE = booleanSetting("UseFrozenOceanTemperature", false)			
 	;
 
 	public static final Setting<String>

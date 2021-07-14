@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -240,13 +241,15 @@ class MesaSurfaceGenerator implements SurfaceGenerator
 	private boolean clayBandsGenerated = false;
 	// net.minecraft.world.biome.BiomeMesa.genTerrainBlocks
 	@Override
-	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld)
+	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{				
 		if (this.clayBands == null || !this.clayBandsGenerated)
 		{
 			this.generateBands(worldSeed);
 		}
 
+		IBiomeConfig biomeConfig = biome.getBiomeConfig();
+		
 		// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
 		// Make this prettier?
 		Init(biomeConfig.getReplaceBlocks());		

@@ -183,6 +183,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
 		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
 		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
+		this.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);		
 		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
 		this.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
 		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
@@ -571,6 +572,10 @@ public class BiomeConfig extends BiomeConfigBase
 			"When this value is around 0.1, the whole biome will be covered in snow and ice.",
 			"However, on default biomes, this won't do anything except changing the grass and leaves colors slightly.");
 
+		writer.putSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, this.useFrozenOceanTemperature,
+			"Set this to true to use variable temperatures within the biome based on noise.",
+			"Used for vanilla Frozen Ocean and Deep Frozen Ocean biomes to create patches of water/ice.");
+		
 		writer.putSetting(BiomeStandardValues.BIOME_WETNESS, this.biomeWetness,
 			"Biome wetness. Float value from 0.0 to 1.0.",
 			"If this biome is a custom biome, and this value is set to 0, no rain will fall.",

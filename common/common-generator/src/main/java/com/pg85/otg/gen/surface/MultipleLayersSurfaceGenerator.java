@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.exceptions.InvalidConfigException;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
@@ -65,7 +66,7 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 	}
 
 	@Override
-	public void spawn(long worldSeed, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, IBiomeConfig config, int xInWorld, int zInWorld)
+	public void spawn(long worldSeed, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
 		int x = xInWorld & 0xf;
 		int z = zInWorld & 0xf;
@@ -75,13 +76,13 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 		{
 			if (noise <= layer.maxNoise)
 			{
-				spawnColumn(layer, generatingChunkInfo, chunkBuffer, config, x, z);
+				spawnColumn(layer, generatingChunkInfo, chunkBuffer, biome, x, z);
 				return;
 			}
 		}
 
 		// Fall back on normal column
-		spawnColumn(null, generatingChunkInfo, chunkBuffer, config, x, z);
+		spawnColumn(null, generatingChunkInfo, chunkBuffer, biome, x, z);
 	}
 
 	@Override

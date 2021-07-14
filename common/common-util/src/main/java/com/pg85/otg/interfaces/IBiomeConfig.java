@@ -106,7 +106,7 @@ public interface IBiomeConfig
 	LocalMaterialData getBedrockBlockReplaced(int y);
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getDefaultGroundBlock();
-	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z);
+	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome);
 	boolean hasReplaceBlocksSettings();
 	ReplaceBlockMatrix getReplaceBlocks();
 	
@@ -121,6 +121,7 @@ public interface IBiomeConfig
 	// Visuals / weather
 	
 	float getBiomeTemperature();
+	boolean useFrozenOceanTemperature();
 	float getBiomeWetness();
 	int getFogColor();
 	float getFogDensity();

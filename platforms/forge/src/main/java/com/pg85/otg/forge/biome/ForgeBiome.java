@@ -185,6 +185,12 @@ public class ForgeBiome implements IBiome
 			.mobSpawnSettings(mobSpawnInfoBuilder.build())
 			.generationSettings(biomeGenerationSettingsBuilder.build())
 		;
+		
+		if(biomeConfig.useFrozenOceanTemperature())
+		{
+			biomeBuilder.temperatureAdjustment(Biome.TemperatureModifier.FROZEN);
+		}
+
 		Biome.Category category = Biome.Category.byName(biomeConfig.getBiomeCategory());
 		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
 		if (category == null)
