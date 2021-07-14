@@ -85,7 +85,7 @@ public class BiomeConfig extends BiomeConfigBase
 		RESOURCE_QUEUE_RESOURCES.put("CoralMushroom", CoralMushroomResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("CoralTree", CoralTreeResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("CoralClaw", CoralClawResource.class);
-		RESOURCE_QUEUE_RESOURCES.put("IceBerg", IcebergResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("Iceberg", IcebergResource.class);
 	}
 
 	// Private fields, only used when reading/writing
@@ -698,7 +698,8 @@ public class BiomeConfig extends BiomeConfigBase
 			"Bamboo(Frequency,Rarity,PodzolChance,BlockSource[,BlockSource2,BlockSource3.....])",
 			"SeaGrass(Frequency,Rarity,TallChance)", "Kelp(Frequency,Rarity)",
 			"SeaPickle(Frequency,Rarity,Attempts)", "Registry(RegistryKey)", "CoralMushroom(Frequency,Rarity)",
-			"CoralTree(Frequency,Rarity)", "CoralClaw(Frequency,Rarity)", "",
+			"CoralTree(Frequency,Rarity)", "CoralClaw(Frequency,Rarity)", 
+			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", "",
 			"BlockName:	  	The name of the block, can include data.",
 			"BlockSource:	List of blocks the resource can spawn on/in. You can also use \"Solid\" or \"All\".",
 			"Frequency:	  	Number of attempts to place this resource in each chunk.",
