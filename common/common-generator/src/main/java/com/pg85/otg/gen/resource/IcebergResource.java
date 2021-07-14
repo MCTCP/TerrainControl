@@ -15,25 +15,52 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 public class IcebergResource extends BiomeResourceBase implements IBasicResource
 {
-	private final LocalMaterialData material;
-	private final LocalMaterialData material2;
-	private final double rarity;
+	private final LocalMaterialData[] materials;
+	private final LocalMaterialData[] materials2;
+	private final double[] rarities;
+	private final double totalRarity;
 
 	public IcebergResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(biomeConfig, args, logger, materialReader);
-		assureSize(3, args);
+		assureSize(4, args);
 		
-		this.material = materialReader.readMaterial(args.get(0));
-		this.material2 = materialReader.readMaterial(args.get(1));
-		this.rarity = readRarity(args.get(2));
+		int size = (int) Math.floor(args.size() / 3);
+		this.materials = new LocalMaterialData[size]; 
+		this.materials2 = new LocalMaterialData[size]; 
+		this.rarities = new double[size]; 
+		
+		int pos = 0;
+		for (int i = 0; i < args.size() - 1; i+=3) {
+			this.materials[pos] = materialReader.readMaterial(args.get(i));
+			this.materials2[pos] = materialReader.readMaterial(args.get(i + 1));
+			this.rarities[pos] = readRarity(args.get(i + 2));
+			pos++;
+		}
+		totalRarity = readRarity(args.get(args.size() - 1));
 	}
 
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion world, Random random, ILogger logger, IMaterialReader materialReader)
 	{
-		if (random.nextDouble() * 100.0 > this.rarity)
+		LocalMaterialData material = null;
+		LocalMaterialData material2 = null;
+		double currentRarity = 0;
+		int rarity = random.nextInt((int) this.totalRarity);
+
+		for (int i = 0; i < this.rarities.length; i++)
 		{
+			currentRarity += this.rarities[i];
+
+			if (currentRarity >= rarity)
+			{
+				material = this.materials[i];
+				material2 = this.materials2[i];
+				break;
+			}
+		}
+		
+		if (material == null) {
 			return;
 		}
 		
@@ -41,7 +68,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		int z = world.getDecorationArea().getChunkBeingDecorated().getBlockZ();
 		int y = world.getBiomeConfigForDecoration(x, z).getWaterLevelMax();
 		boolean flag1 = random.nextDouble() > 0.7D;
-		LocalMaterialData iceBergMaterial = this.material;
 		double drandom1 = random.nextDouble() * 2.0D * Math.PI;
 		int irandom1 = 11 - random.nextInt(5);
 		int irandom2 = 3 + random.nextInt(3);
@@ -66,13 +92,13 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					int heightDependentRadiusEllipse = flag2 ? heightDependentRadiusEllipse(y1, ismoothheight, irandom5) : heightDependentRadiusRound(random, y1, ismoothheight, irandom5);
 					if (flag2 || x1 < heightDependentRadiusEllipse)
 					{
-						generateIcebergBlock(world, random, x, y, z, ismoothheight, x1, y1, z1, heightDependentRadiusEllipse, irandom6, flag2, irandom2, drandom1, flag1, iceBergMaterial);
+						generateIcebergBlock(world, random, x, y, z, ismoothheight, x1, y1, z1, heightDependentRadiusEllipse, irandom6, flag2, irandom2, drandom1, flag1, material, material2);
 					}
 				}
 			}
 		}
 
-		smooth(world, x, y, z, irandom5, ismoothheight, flag2, irandom1);
+		smooth(world, x, y, z, irandom5, ismoothheight, flag2, irandom1, material, material2);
 
 		for (int x1 = -irandom6; x1 < irandom6; x1++)
 		{
@@ -84,7 +110,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					int heightDependentRadiusSteep = heightDependentRadiusSteep(random, -y1, irandom4, irandom5);
 					if (x1 < heightDependentRadiusSteep)
 					{
-						generateIcebergBlock(world, random, x, y, z, irandom4, x1, y1, z1, heightDependentRadiusSteep, irandom7, flag2, irandom2, drandom1, flag1, iceBergMaterial);
+						generateIcebergBlock(world, random, x, y, z, irandom4, x1, y1, z1, heightDependentRadiusSteep, irandom7, flag2, irandom2, drandom1, flag1, material, material2);
 					}
 				}
 			}
@@ -92,11 +118,11 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		boolean flag3 = flag2 ? random.nextDouble() > 0.1D : random.nextDouble() > 0.7D;
 		if (flag3)
 		{
-			generateCutOut(random, world, irandom5, ismoothheight, x, y, z, flag2, irandom1, drandom1, irandom2);
+			generateCutOut(random, world, irandom5, ismoothheight, x, y, z, flag2, irandom1, drandom1, irandom2, material, material2);
 		}
 	}
 
-	private void generateCutOut(Random random, IWorldGenRegion world, int irandom, int irandom1, int x, int y, int z, boolean flag, int irandom2, double drandom1, int irandom3)
+	private void generateCutOut(Random random, IWorldGenRegion world, int irandom, int irandom1, int x, int y, int z, boolean flag, int irandom2, double drandom1, int irandom3, LocalMaterialData material, LocalMaterialData material2)
 	{
 		int irandom4 = random.nextBoolean() ? -1 : 1;
 		int irandom5 = random.nextBoolean() ? -1 : 1;
@@ -125,16 +151,16 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		for (int irandom8 = 0; irandom8 < irandom1 - 3; ++irandom8)
 		{
 			int heightDependentRadiusRound = heightDependentRadiusRound(random, irandom8, irandom1, irandom);
-			carve(heightDependentRadiusRound, irandom8, x, y, z, world, false, drandom2, x2, z2, irandom2, irandom3);
+			carve(heightDependentRadiusRound, irandom8, x, y, z, world, false, drandom2, x2, z2, irandom2, irandom3, material, material2);
 		}
 		for (int irandom8 = -1; irandom8 > -irandom1 + random.nextInt(5); --irandom8)
 		{
 			int heightDependentRadiusSteep = heightDependentRadiusSteep(random, -irandom8, irandom1, irandom);
-			carve(heightDependentRadiusSteep, irandom8, x, y, z, world, true, drandom2, x2, z2, irandom2, irandom3);
+			carve(heightDependentRadiusSteep, irandom8, x, y, z, world, true, drandom2, x2, z2, irandom2, irandom3, material, material2);
 		}
 	}
 
-	private void carve(int heightDependentRadius, int irandom, int x, int y, int z, IWorldGenRegion world, boolean flag, double drandom, int x3, int z3, int irandom1, int irandom2)
+	private void carve(int heightDependentRadius, int irandom, int x, int y, int z, IWorldGenRegion world, boolean flag, double drandom, int x3, int z3, int irandom1, int irandom2, LocalMaterialData material, LocalMaterialData material2)
 	{
 		int irandom3 = heightDependentRadius + 1 + irandom1 / 3;
 		int irandom4 = Math.min(heightDependentRadius - 3, 3) + irandom2 / 2 - 1;
@@ -151,8 +177,8 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					x2 = x + x1;
 					y2 = y + irandom;
 					z2 = z + z1;
-					LocalMaterialData material = world.getMaterialDirect(x2, y2, z2);
-					if (isIcebergBlock(material) || material.isMaterial(LocalMaterials.SNOW_BLOCK))
+					LocalMaterialData current = world.getMaterialDirect(x2, y2, z2);
+					if (isIcebergBlock(current, material, material2) || current.isMaterial(LocalMaterials.SNOW_BLOCK))
 					{
 						if (flag)
 						{
@@ -176,7 +202,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		}
 	}
 
-	private void generateIcebergBlock(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, int irandom, int x1, int y1, int z1, int irandom1, int irandom2, boolean flag, int irandom3, double drandom, boolean flag1, LocalMaterialData material)
+	private void generateIcebergBlock(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, int irandom, int x1, int y1, int z1, int irandom1, int irandom2, boolean flag, int irandom3, double drandom, boolean flag1, LocalMaterialData material, LocalMaterialData material2)
 	{
 		double signedDistance = flag
 			? signedDistanceEllipse(x1, z1, 0, 0, 0, irandom2, getEllipseC(y1, irandom, irandom3), drandom)
@@ -192,11 +218,11 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			{
 				return;
 			}
-			setIcebergBlock(x2, y2, z2, worldGenRegion, random, irandom - y1, irandom, flag, flag1, material);
+			setIcebergBlock(x2, y2, z2, worldGenRegion, random, irandom - y1, irandom, flag, flag1, material, material2);
 		}
 	}
 
-	private void setIcebergBlock(int x, int y, int z, IWorldGenRegion world, Random random, int irandomy, int irandom, boolean flag, boolean flag1, LocalMaterialData material)
+	private void setIcebergBlock(int x, int y, int z, IWorldGenRegion world, Random random, int irandomy, int irandom, boolean flag, boolean flag1, LocalMaterialData material, LocalMaterialData material2)
 	{
 		LocalMaterialData current = world.getMaterialDirect(x, y, z);
 		if (current.isAir() || current.isMaterial(LocalMaterials.SNOW_BLOCK) || current.isMaterial(LocalMaterials.ICE) || current.isMaterial(LocalMaterials.WATER))
@@ -205,9 +231,9 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			int irandom1 = flag ? 3 : 2;
 			if (flag1 && !current.isMaterial(LocalMaterials.WATER) && (double)irandomy <= (double)random.nextInt(Math.max(1, irandom / irandom1)) + (double)irandom * 0.6D && flag2)
 			{
-				world.setBlockDirect(x, y, z, this.material2);
+				world.setBlockDirect(x, y, z, material2);
 			} else {
-				world.setBlockDirect(x, y, z, this.material);
+				world.setBlockDirect(x, y, z, material);
 			}
 		}
 	}
@@ -259,9 +285,9 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		return MathHelper.ceil(frandom1 / 2.0F);
 	}
 
-	private boolean isIcebergBlock(LocalMaterialData material)
+	private boolean isIcebergBlock(LocalMaterialData target, LocalMaterialData material, LocalMaterialData material2)
 	{
-		return material.isMaterial(this.material) || material.isMaterial(this.material2);
+		return target.isMaterial(material) || target.isMaterial(material2);
 	}
 
 	private boolean belowIsAir(IWorldGenRegion world, int x, int y, int z)
@@ -269,7 +295,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		return world.getMaterialDirect(x, y - 1, z).isAir();
 	}
 
-	private void smooth(IWorldGenRegion world, int x, int y, int z, int irandom1, int ismoothheight, boolean flag, int irandom3)
+	private void smooth(IWorldGenRegion world, int x, int y, int z, int irandom1, int ismoothheight, boolean flag, int irandom3, LocalMaterialData material, LocalMaterialData material2)
 	{
 		int iradius = flag ? irandom3 : irandom1 / 2;
 
@@ -285,15 +311,15 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					x2 = x + x1;
 					y2 = y + y1;
 					z2 = z + z1;
-					LocalMaterialData material = world.getMaterialDirect(x2, y2, z2);
-					if (isIcebergBlock(material) || material.isMaterial(LocalMaterials.SNOW))
+					LocalMaterialData current = world.getMaterialDirect(x2, y2, z2);
+					if (isIcebergBlock(current, material, material2) || material.isMaterial(LocalMaterials.SNOW))
 					{
 						if (belowIsAir(world, x2, y2, z2))
 						{
 							world.setBlockDirect(x2, y2, z2, LocalMaterials.AIR);
 							world.setBlockDirect(x2, y2 + 1, z2, LocalMaterials.AIR);	
 						}
-						else if (isIcebergBlock(material))
+						else if (isIcebergBlock(current, material, material2) )
 						{
 							LocalMaterialData[] materials =
 							{
@@ -305,7 +331,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 							int iheight = 0;
 							for (LocalMaterialData mat : materials)
 							{
-								if (!isIcebergBlock(mat))
+								if (!isIcebergBlock(mat, material, material2) )
 								{
 									iheight++;
 								}
@@ -324,6 +350,14 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 	@Override
 	public String toString()
 	{
-		return "Iceberg(" + this.material.toString() + ", " + this.material2.toString() + ", "+ this.rarity + ")";
+		StringBuilder builder = new StringBuilder("Iceberg(");
+		for (int i = 0; i < this.materials.length; i++) {
+			builder.append(this.materials[i] + ", ");
+			builder.append(this.materials2[i] + ", ");
+			builder.append(this.rarities[i] + ", ");
+		}
+		builder.append(this.totalRarity + ")");
+		
+		return builder.toString();
 	}
 }
