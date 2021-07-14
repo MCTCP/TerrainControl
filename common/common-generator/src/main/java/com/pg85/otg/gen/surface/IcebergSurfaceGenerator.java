@@ -1,7 +1,5 @@
 package com.pg85.otg.gen.surface;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -22,18 +20,18 @@ public class IcebergSurfaceGenerator extends MultipleLayersSurfaceGenerator
 {
 	private OctaveSimplexNoiseSampler icebergNoise;
 	private OctaveSimplexNoiseSampler icebergCutoffNoise;
-	
-	IcebergSurfaceGenerator(String[] args, IMaterialReader materialReader) throws InvalidConfigException	
+
+	IcebergSurfaceGenerator(String[] args, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(args, materialReader);
 	}
-	
+
 	@Override
 	protected void spawnColumn(long worldSeed, MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
 		int internalX = xInWorld & 0xf;
 		int internalZ = zInWorld & 0xf;
-		
+
 		if (this.icebergNoise == null || this.icebergCutoffNoise == null)
 		{
 			Random random = new Random(worldSeed);
