@@ -128,14 +128,49 @@ public class SpawnCommand implements BaseCommand
 	        		return 0;
 	        	}
 	        	
+	            int playerX = blockPos.getX();
+	            int playerZ = blockPos.getZ();
+	            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
+	        	
+	            // Matches any bo4/bo4data file ending with C[0-9]R[0-9], assuming it's not a start
+	            // bo4 for a structure, but rather a branch that should be spawned individually.	            
+	        	if(((BO4)objectToSpawn).getName().matches(".*C[0-9]([0-9]*)R[0-9]([0-9]*)$"))
+	        	{
+	        		((BO4)objectToSpawn).trySpawnAt(
+        				preset.getFolderName(), 
+        				OTG.getEngine().getOTGRootFolder(), 
+        				OTG.getEngine().getLogger(), 
+        				OTG.getEngine().getCustomObjectManager(), 
+        				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), 
+        				OTG.getEngine().getCustomObjectResourcesManager(), 
+        				null, 
+        				genRegion, 
+        				new Random(), 
+        				Rotation.NORTH, 
+        				playerChunk, 
+        				playerChunk.getBlockX() + ((BO4)objectToSpawn).getConfig().getminX(), 
+        				genRegion.getHighestBlockAboveYAt(playerChunk.getBlockX() + ((BO4)objectToSpawn).getConfig().getminX(), playerChunk.getBlockZ() + ((BO4)objectToSpawn).getConfig().getminZ()),
+        				playerChunk.getBlockZ() + ((BO4)objectToSpawn).getConfig().getminZ(), 
+        				null, 
+        				null, 
+        				false, 
+        				null, 
+        				null,
+        				null,
+        				false, 
+        				63, 
+        				false, 
+        				false, 
+        				false
+    				);
+	        		return 0;
+	        	}
+	        	
 				CustomStructureCache cache = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder);
 	        	
 	        	// Try spawning the structure in available chunks around the player
 	        	int maxRadius = 1000;
 	        	source.sendSuccess(new StringTextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
-	            int playerX = blockPos.getX();
-	            int playerZ = blockPos.getZ();
-	            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
 
 	            ChunkCoordinate chunkCoord;
 	            for (int cycle = 1; cycle < maxRadius; cycle++)
@@ -217,6 +252,7 @@ public class SpawnCommand implements BaseCommand
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Error during spawn command: ");
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during spawn command: ", (Object[])e.getStackTrace()));
 		}
 		return 0;

@@ -91,13 +91,19 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiomeForDecoration(int x, int z)
 	{
-		return this.decorationBiomeCache.getBiome(x, z);
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
+		return this.decorationArea != null ? this.decorationBiomeCache.getBiome(x, z) : this.getCachedBiomeProvider().getBiome(x, z);
 	}
 
 	@Override
 	public IBiomeConfig getBiomeConfigForDecoration(int x, int z)
 	{
-		return this.decorationBiomeCache.getBiomeConfig(x, z);
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
+		return this.decorationArea != null ? this.decorationBiomeCache.getBiomeConfig(x, z) : this.getCachedBiomeProvider().getBiomeConfig(x, z);
 	}
 
 	@Override
@@ -124,6 +130,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
@@ -184,6 +193,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
@@ -339,6 +351,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If no decorationArea is present, we're doing something outside of the decoration cycle.
 		// If a decorationArea exists, only spawn in the area being decorated.
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
 		if(this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			if(replaceBlocksMatrix != null)
@@ -584,6 +599,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
@@ -607,6 +625,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
 		IChunkAccess chunk = null;
+		// TOOD: Don't use this.decorationArea == null for worldgenregions
+		// doing things outside of population, split up worldgenregion
+		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
