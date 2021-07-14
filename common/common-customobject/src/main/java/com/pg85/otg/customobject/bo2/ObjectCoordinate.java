@@ -57,7 +57,6 @@ class ObjectCoordinate
 		}
 
 		return newCoordinate;
-
 	}
 
 	static ObjectCoordinate getCoordinateFromString(String key, String value, IMaterialReader materialReader)
