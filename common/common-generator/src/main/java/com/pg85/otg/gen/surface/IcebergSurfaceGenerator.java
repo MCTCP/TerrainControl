@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 import com.google.common.collect.ImmutableList;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.noise.OctaveSimplexNoiseSampler;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -19,7 +20,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 	private OctaveSimplexNoiseSampler icebergCutoffNoise;
 
 	@Override
-	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
+	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int x, int z)
 	{
 		if (this.icebergNoise == null || this.icebergCutoffNoise == null)
 		{
@@ -29,7 +30,8 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 		}
 
 		Random random = generatingChunk.random;
-
+		IBiomeConfig biomeConfig = biome.getBiomeConfig();
+		
 		// Bedrock on the ceiling
 		if (biomeConfig.isCeilingBedrock())
 		{
@@ -42,6 +44,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 		int seaLevel = generatingChunk.getWaterLevel(x & 0xf, z & 0xf);
 
 		double noise = generatingChunk.getNoise(x & 0xf, z & 0xf);
+		float temperature = biome.getTemperatureAt(x, biomeConfig.getWaterLevelMax(), z);
 		double icebergNoise = Math.min(Math.abs(noise), this.icebergNoise.sample((double)x * 0.1D, (double)z * 0.1D, false) * 15.0D);
 
 		if (icebergNoise > 1.8D)
@@ -54,8 +57,11 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 				icebergHeight = maxHeight;
 			}
 
-			// TODO: when biome goes above temp 0.1 reduce iceberg height by 2
-
+			if(temperature > 0.1F)
+			{
+				icebergHeight -= 2.0D;
+			}
+			
 			if (icebergHeight > 2.0D) {
 				icebergDepth = (double)seaLevel - icebergHeight - 7.0D;
 				icebergHeight = icebergHeight + (double)seaLevel;
@@ -80,7 +86,6 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 		boolean useLayerGroundBlockForGround = true;
 		boolean useSandStoneForGround = false;
 		boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(LocalMaterials.SAND);
-		float currentTemperature = biomeConfig.getBiomeTemperature();
 		LocalMaterialData blockOnCurrentPos;
 
 		int topY = chunkBuffer.getHighestBlockForColumn(x & 0xf, z & 0xf);
@@ -90,7 +95,6 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 			{
 				// Place bedrock
 				chunkBuffer.setBlock(x, y, z, biomeConfig.getBedrockBlockReplaced(y));
-
 				continue;
 			}
 
@@ -117,6 +121,8 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 				continue;
 			}
 
+			// Normal OTG surfacebuilder logic.
+			
 			// Surface blocks logic (grass, dirt, sand, sandstone)
 			blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
 			if (blockOnCurrentPos.isEmptyOrAir())
@@ -176,7 +182,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 						}
 						if(bIsAir)
 						{
-							if (currentTemperature < Constants.SNOW_AND_ICE_TEMP)
+							if (biome.getTemperatureAt(x, y, z) < Constants.SNOW_AND_ICE_TEMP)
 							{
 								useAirForSurface = false;
 								useIceForSurface = true;
@@ -261,10 +267,7 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 						// For vanilla deserts, this makes the sand layer deeper around waterlevel, affecting
 						// mostly flat terrain, while hills have only a 1 block layer of sand and more sandstone.
 
-						if (
-								groundLayerDepth == 0 &&
-										dirtDepth > 1 && biomeGroundBlockIsSand
-						)
+						if (groundLayerDepth == 0 && dirtDepth > 1 && biomeGroundBlockIsSand)
 						{
 							groundLayerDepth = generatingChunk.random.nextInt(4) + Math.max(0, y - seaLevel);
 							useSandStoneForGround = true;
@@ -278,13 +281,13 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		return null;
+		return biomeConfig.getSurfaceBlockReplaced(yInWorld);
 	}
 
 	@Override
 	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		return null;
+		return biomeConfig.getGroundBlockReplaced(yInWorld);
 	}
 
 	@Override

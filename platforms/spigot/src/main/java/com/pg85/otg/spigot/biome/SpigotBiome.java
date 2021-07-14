@@ -13,6 +13,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.server.v1_16_R3.BiomeBase.TemperatureModifier;
 
 import java.util.List;
 import java.util.Optional;
@@ -151,6 +152,11 @@ public class SpigotBiome implements IBiome
 			// All other biome settings...
 			.a(biomeGenerationSettingsBuilder.a());
 
+		if(biomeConfig.useFrozenOceanTemperature())
+		{
+			builder.a(TemperatureModifier.FROZEN);
+		}		
+		
 		BiomeBase.Geography category = BiomeBase.Geography.a(biomeConfig.getBiomeCategory());
 		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS);
 		if (category == null)

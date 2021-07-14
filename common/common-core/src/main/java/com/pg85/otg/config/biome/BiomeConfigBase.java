@@ -18,6 +18,7 @@ import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.customobject.resource.SaplingResource;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.ICustomStructureGen;
@@ -117,6 +118,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	// Visuals and weather
 	
 	protected float biomeTemperature;
+	protected boolean useFrozenOceanTemperature;
 	protected float biomeWetness;
 	protected int grassColor;
 	protected ColorSet grassColorControl;
@@ -425,6 +427,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public float getBiomeTemperature()
 	{
 		return this.biomeTemperature;
+	}
+	
+	@Override
+	public boolean useFrozenOceanTemperature()
+	{
+		return this.useFrozenOceanTemperature;
 	}
 	
 	@Override
@@ -1004,9 +1012,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z)
+	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome)
 	{
-		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, this, x, z);
+		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biome, x, z);
 	}
 	
 	@Override

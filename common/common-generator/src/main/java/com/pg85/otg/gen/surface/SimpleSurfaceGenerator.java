@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -12,7 +13,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 {	
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, IBiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
-	{
+	{	
 		return biomeConfig.getSurfaceBlockReplaced(yInWorld);
 	}
 	
@@ -23,15 +24,16 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 	}
 	
 	@Override
-	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld)
+	public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int xInWorld, int zInWorld)
 	{
-		spawnColumn(null, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
+		spawnColumn(null, generatingChunk, chunkBuffer, biome, xInWorld & 0xf, zInWorld & 0xf);
 	}
 
 	// net.minecraft.world.biome.Biome.generateBiomeTerrain
-	protected final void spawnColumn(MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
+	protected final void spawnColumn(MultipleLayersSurfaceGeneratorLayer layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiome biome, int x, int z)
 	{
-		float currentTemperature = biomeConfig.getBiomeTemperature();
+		IBiomeConfig biomeConfig = biome.getBiomeConfig(); 
+		float currentTemperature = biome.getTemperatureAt(x, biomeConfig.getWaterLevelMax(), z);
 		// Used to create a variable depth ground layer per column
 		int biomeBlocksNoise = (int) (generatingChunk.getNoise(x, z) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
 
