@@ -1,5 +1,11 @@
 {
   "generator.otg": "OTG",
   "otg.createWorld.customize.preset": "Select a preset",
-  "otg.createWorld.customize.title": "Open Terrain Generator"
+  "otg.createWorld.customize.title": "Open Terrain Generator",
+  "otg.createDimensions.customize.title": "Create OTG dimensions",
+  "otg.createDimensions.customize.dimension": "Dimension",
+  "otg.createDimensions.customize.preset": "Preset",
+  "otg.createDimensions.customize.dimension.addDimension": "Add",
+  "otg.createDimensions.customize.dimension.removeDimension": "Remove",
+  "otg.createDimensions.customize.dimension.editDimension": "Edit"
 }

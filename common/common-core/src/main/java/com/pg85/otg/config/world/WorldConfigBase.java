@@ -746,76 +746,91 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	// Dimension settings
 	
+	@Override
 	public OptionalLong getFixedTime()
 	{
 		return this.fixedTime;
 	}
 	
+	@Override
 	public boolean getHasSkyLight()
 	{
 		return this.hasSkyLight;
 	}
 
+	@Override
 	public boolean getHasCeiling()
 	{
 		return this.hasCeiling;
 	}
 
+	@Override
 	public boolean getUltraWarm()
 	{
 		return this.ultraWarm;
 	}
 
+	@Override
 	public boolean getNatural()
 	{
 		return this.natural;
 	}
 
+	@Override
 	public double getCoordinateScale()
 	{
 		return this.coordinateScale;
 	}
 
+	@Override
 	public boolean getCreateDragonFight()
 	{
 		return this.createDragonFight;
 	}
 
+	@Override
 	public boolean getPiglinSafe()
 	{
 		return this.piglinSafe;
 	}
 
+	@Override
 	public boolean getBedWorks()
 	{
 		return this.bedWorks;
 	}
 
+	@Override
 	public boolean getRespawnAnchorWorks()
 	{
 		return this.respawnAnchorWorks;
 	}
 
+	@Override
 	public boolean getHasRaids()
 	{
 		return this.hasRaids;
 	}
 
+	@Override
 	public int getLogicalHeight()
 	{
 		return this.logicalHeight;
 	}
 
+	@Override
 	public String getInfiniburn()
 	{
 		return this.infiniburn;
 	}
 
+	@Override
 	public String getEffectsLocation()
 	{
 		return this.effectsLocation;
 	}
 
+	@Override
 	public float getAmbientLight()
 	{
 		return this.ambientLight;
