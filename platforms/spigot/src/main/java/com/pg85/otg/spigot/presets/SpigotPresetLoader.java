@@ -144,7 +144,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				
 				presetBiomes.add(ResourceKey.a(BIOME_KEY, resourceLocation));
 				biomeConfig.setRegistryKey(new MCBiomeResourceLocation(resourceLocation.getNamespace(), resourceLocation.getKey(), preset.getFolderName()));
-				biomeConfig.setOTGBiomeId(currentId);				
+				biomeConfig.setOTGBiomeId(otgBiomeId);
 
 				IBiome otgBiome = new SpigotBiome(biome, biomeConfig);
 				if(otgBiomeId >= presetIdMapping.length)

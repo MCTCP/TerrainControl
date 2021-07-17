@@ -168,6 +168,8 @@ public class ForgePresetLoader extends LocalPresetLoader
  					isOceanBiome = true;
  				}
 
+				int otgBiomeId = isOceanBiome ? 0 : currentId;
+
  				// When using TemplateForBiome, we'll fetch the non-OTG biome from the registry, including any settings registered to it.
  				// For normal biomes we create our own new OTG biome and apply settings from the biome config.
 				ResourceLocation resourceLocation;
@@ -180,11 +182,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 					presetBiomes.add(registryKey);
 					biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 					biomeConfig.setRegistryKey(new MCBiomeResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath(), preset.getFolderName()));
-					biomeConfig.setOTGBiomeId(currentId);
+					biomeConfig.setOTGBiomeId(otgBiomeId);
 				} else {
 					IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 					biomeConfig.setRegistryKey(otgLocation);
-					biomeConfig.setOTGBiomeId(currentId);
+					biomeConfig.setOTGBiomeId(otgBiomeId);
 					resourceLocation = new ResourceLocation(otgLocation.toResourceLocationString());	
  	 				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
  					presetBiomes.add(registryKey);
@@ -201,8 +203,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 
  				// Populate our map for syncing
  				OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig));
- 				
- 				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				
  				// Ocean temperature mappings. Probably a better way to do this?
  				if (biomeConfig.getName().equals(worldConfig.getDefaultWarmOceanBiome()))
