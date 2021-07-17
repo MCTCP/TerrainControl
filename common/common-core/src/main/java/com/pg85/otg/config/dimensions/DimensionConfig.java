@@ -29,7 +29,7 @@ public class DimensionConfig
 	public OTGDimension Nether;
 	public OTGDimension End;
 	public List<OTGDimension> Dimensions = new ArrayList<>();
-	
+
 	// Parameterless constructor for deserialisation
 	public DimensionConfig() {}
 	

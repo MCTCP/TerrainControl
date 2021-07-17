@@ -48,8 +48,8 @@ public class OTGPlugin
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(new SaplingHandler());
 
-		// These are needed to let the game know about our chunk generator and biome provider. 
-		// If they are not added, then the game will error and not save games properly.
+		// Let the game know about our chunk generator and biome provider. 
+		// If they're not added, we get errors and the game does not save properly.
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
@@ -90,7 +90,7 @@ public class OTGPlugin
 	{
 		OTGCommand.register(event.getDispatcher());
 	}
-	
+
 	@SubscribeEvent
 	public void onSave(Save event)
 	{
