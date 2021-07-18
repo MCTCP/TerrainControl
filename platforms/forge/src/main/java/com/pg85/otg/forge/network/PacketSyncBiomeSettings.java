@@ -73,8 +73,8 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		// forever.
 		OTGClientSyncManager.LOGIN.reply(new AcknowledgeOTGMessage(), context.get());
 		context.get().setPacketHandled(true);
-		
-		Minecraft.getInstance().levelRenderer.allChanged();
+
+		context.get().enqueueWork(() -> Minecraft.getInstance().levelRenderer.allChanged());
 	}
 
 	@Override
