@@ -171,6 +171,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String effectsLocation;
 	protected float ambientLight;
 
+	// Portals
+
+	protected ArrayList<LocalMaterialData> portalBlocks;
+	protected String portalColor;
+	protected String portalMob;
+	protected String portalIgnitionSource;
+
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -834,5 +841,31 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public float getAmbientLight()
 	{
 		return this.ambientLight;
-	}	
+	}
+
+	// Portal settings
+	
+	@Override
+	public ArrayList<LocalMaterialData> getPortalBlocks()
+	{
+		return this.portalBlocks;
+	}
+
+	@Override
+	public String getPortalColor()
+	{
+		return this.portalColor;
+	}
+
+	@Override
+	public String getPortalMob()
+	{
+		return this.portalMob;
+	}
+
+	@Override
+	public String getPortalIgnitionSource()
+	{
+		return this.portalIgnitionSource;
+	}
 }

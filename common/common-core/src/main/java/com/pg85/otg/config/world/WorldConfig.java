@@ -109,6 +109,7 @@ public class WorldConfig extends WorldConfigBase
 		reader.renameOldSetting("EvenCaveDistrubution", WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 		reader.renameOldSetting("WorldFog", WorldStandardValues.WORLD_FOG_COLOR);
 		reader.renameOldSetting("BedrockobBlock", WorldStandardValues.BEDROCK_BLOCK);
+		reader.renameOldSetting("DimensionPortalMaterials", WorldStandardValues.PORTAL_BLOCKS);		
 	}
 
 	@Override
@@ -300,7 +301,14 @@ public class WorldConfig extends WorldConfigBase
 		this.logicalHeight = reader.getSetting(WorldStandardValues.LOGICAL_HEIGHT, logger);
 		this.infiniburn = reader.getSetting(WorldStandardValues.INFINIBURN, logger);
 		this.effectsLocation = reader.getSetting(WorldStandardValues.EFFECTS_LOCATION, logger);
-		this.ambientLight = reader.getSetting(WorldStandardValues.AMBIENT_LIGHT, logger).floatValue();		
+		this.ambientLight = reader.getSetting(WorldStandardValues.AMBIENT_LIGHT, logger).floatValue();
+		
+		// Portal settings
+
+		this.portalBlocks = reader.getSetting(WorldStandardValues.PORTAL_BLOCKS, logger, materialReader);
+		this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR, logger);
+		this.portalMob = reader.getSetting(WorldStandardValues.PORTAL_MOB, logger);
+		this.portalIgnitionSource = reader.getSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, logger);
 	}
 
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
@@ -805,6 +813,21 @@ public class WorldConfig extends WorldConfigBase
 		);
 		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight,
 			"The base ambient light level for the world, 0.0 for overworld/end, 0.1 for nether."
+		);
+
+		// Portal settings
+
+		writer.putSetting(WorldStandardValues.PORTAL_BLOCKS, this.portalBlocks,
+			"The portal blocks used to when building a portal to this dimension, or back to the overworld."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
+			"The portal color used for this world's portals."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_MOB, this.portalMob,
+			"The mob that spawns from this portal, minecraft:zombie_pigman by default."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, this.portalIgnitionSource,
+			"The ignition source for this portal, minecraft:flint_and_steel by default."
 		);
 	}
 }

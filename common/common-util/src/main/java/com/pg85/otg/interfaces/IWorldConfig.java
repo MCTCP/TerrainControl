@@ -168,5 +168,12 @@ public interface IWorldConfig
 	public int getLogicalHeight();
 	public String getInfiniburn();
 	public String getEffectsLocation();
-	public float getAmbientLight();	
+	public float getAmbientLight();
+	
+	// Portal settings
+	
+	public List<LocalMaterialData> getPortalBlocks();
+	public String getPortalColor();
+	public String getPortalMob();
+	public String getPortalIgnitionSource();
 }

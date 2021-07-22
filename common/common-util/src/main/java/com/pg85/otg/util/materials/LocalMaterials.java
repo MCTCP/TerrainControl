@@ -22,6 +22,7 @@ public class LocalMaterials
 	public static final String ICE_NAME = getRegistryKey("ice");
 	public static final String PACKED_ICE_NAME = getRegistryKey("packed_ice");
 	public static final String SNOW_BLOCK_NAME = getRegistryKey("snow_block");
+	public static final String QUARTZ_BLOCK_NAME = getRegistryKey("quartz_block");
 	
 	// Blocks used in OTG code, these must be initialised by 
 	// the forge/spigot classes extending this class.
