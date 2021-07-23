@@ -3,9 +3,6 @@ package com.pg85.otg.customobject.structures;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo4.BO4;
-import com.pg85.otg.customobject.bofunctions.ModDataFunction;
-import com.pg85.otg.customobject.bofunctions.ParticleFunction;
-import com.pg85.otg.customobject.bofunctions.SpawnerFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobject.structures.bo3.BO3CustomStructureCoordinate;
@@ -127,14 +124,7 @@ public class CustomStructureCache
 			{
 				if(canOverride)
 				{
-					structure.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-					structure.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-					structure.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
 					addToWorldInfoChunks(structure, chunkCoord, true);
-				} else {
-					existingObject.modDataManager.modData.addAll(structure.modDataManager.modData);
-					existingObject.particlesManager.particleData.addAll(structure.particlesManager.particleData);
-					existingObject.spawnerManager.spawnerData.addAll(structure.spawnerManager.spawnerData);
 				}
 			}
 		} else {
@@ -341,21 +331,6 @@ public class CustomStructureCache
 				for(ChunkCoordinate chunkCoord : loadedStructure.getValue())
 				{
 					addToWorldInfoChunks(loadedStructure.getKey(), chunkCoord, false);
-				}
-
-				for(ModDataFunction<?> modDataFunc : loadedStructure.getKey().modDataManager.modData)
-				{
-					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(modDataFunc.x, modDataFunc.z), false);
-				}
-
-				for(SpawnerFunction<?> spawnerFunc : loadedStructure.getKey().spawnerManager.spawnerData)
-				{
-					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(spawnerFunc.x, spawnerFunc.z), false);
-				}
-
-				for(ParticleFunction<?> particleFunc : loadedStructure.getKey().particlesManager.particleData)
-				{
-					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(particleFunc.x, particleFunc.z), false);
 				}
 			}
 		}

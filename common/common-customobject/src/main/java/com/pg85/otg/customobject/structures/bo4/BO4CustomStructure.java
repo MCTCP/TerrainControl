@@ -2332,9 +2332,6 @@ public class BO4CustomStructure extends CustomStructure
 					structureCache.markRegionForSaving(chunkCoordinate.toRegionCoord());					
 					return;
 				} else {
-					this.modDataManager.spawnModData(objectConfig.getModData(), coordObject, chunkCoordinate);
-					this.spawnerManager.spawnSpawners(objectConfig.getSpawnerData(), coordObject, chunkCoordinate);
-					this.particlesManager.spawnParticles(objectConfig.getParticleData(), coordObject, chunkCoordinate);
 					this.entitiesManager.spawnEntities(worldGenRegion, objectConfig.getEntityData(), coordObject, chunkCoordinate);
 					coordObject.isSpawned = true;
 				}

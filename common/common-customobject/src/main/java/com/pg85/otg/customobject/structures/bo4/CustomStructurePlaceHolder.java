@@ -28,10 +28,6 @@ public class CustomStructurePlaceHolder extends BO4CustomStructure
 		Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> mergedSmoothingAreas = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 		mergedSmoothingAreas.putAll(structure.getSmoothingAreaManager().smoothingAreasToSpawn);
 		mergedSmoothingAreas.putAll(this.getSmoothingAreaManager().smoothingAreasToSpawn);
-		structure.getSmoothingAreaManager().fillSmoothingLineCaches(mergedSmoothingAreas);
-		
-		structure.modDataManager.modData.addAll(this.modDataManager.modData);
-		structure.particlesManager.particleData.addAll(this.particlesManager.particleData);
-		structure.spawnerManager.spawnerData.addAll(this.spawnerManager.spawnerData);		
+		structure.getSmoothingAreaManager().fillSmoothingLineCaches(mergedSmoothingAreas);		
 	}
 }

@@ -8,10 +8,7 @@ import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BranchFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4EntityFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ModDataFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ParticleFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4SpawnerFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4WeightedBranchFunction;
 import com.pg85.otg.customobject.bofunctions.BranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
@@ -172,9 +169,6 @@ public class BO4Config extends CustomObjectConfigFile
 	//
 	
 	private BO4BranchFunction[] branchesBO4;
-	private BO4ModDataFunction[] modDataBO4;
-	private BO4SpawnerFunction[] spawnerDataBO4;
-	private BO4ParticleFunction[] particleDataBO4;
 	private BO4EntityFunction[] entityDataBO4;
 		
 	private boolean isCollidable = false;
@@ -484,21 +478,6 @@ public class BO4Config extends CustomObjectConfigFile
 		return this.branchesBO4;
 	}
 
-	public BO4ModDataFunction[] getModData()
-	{
-		return this.modDataBO4;
-	}
-
-	public BO4SpawnerFunction[] getSpawnerData()
-	{
-		return this.spawnerDataBO4;
-	}
-
-	public BO4ParticleFunction[] getParticleData()
-	{
-		return this.particleDataBO4;
-	}
-
 	public BO4EntityFunction[] getEntityData()
 	{
 		return this.entityDataBO4;
@@ -602,48 +581,6 @@ public class BO4Config extends CustomObjectConfigFile
 				}
 				this.branchesBO4 = newBranches.toArray(new BO4BranchFunction[newBranches.size()]);
 
-				ArrayList<BO4ModDataFunction> newModData = new ArrayList<BO4ModDataFunction>();
-				if(this.modDataBO4 != null)
-				{
-					for(BO4ModDataFunction modData : this.modDataBO4)
-					{
-						newModData.add(modData);
-					}
-				}
-				for(BO4ModDataFunction modData : ((BO4)parentBO3).getConfig().modDataBO4)
-				{
-					newModData.add(modData.rotate(this.inheritBO3Rotation));
-				}
-				this.modDataBO4 = newModData.toArray(new BO4ModDataFunction[newModData.size()]);
-
-				ArrayList<BO4SpawnerFunction> newSpawnerData = new ArrayList<BO4SpawnerFunction>();
-				if(this.spawnerDataBO4 != null)
-				{
-					for(BO4SpawnerFunction spawnerData : this.spawnerDataBO4)
-					{
-						newSpawnerData.add(spawnerData);
-					}
-				}
-				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getConfig().spawnerDataBO4)
-				{
-					newSpawnerData.add(spawnerData.rotate(this.inheritBO3Rotation));
-				}
-				this.spawnerDataBO4 = newSpawnerData.toArray(new BO4SpawnerFunction[newSpawnerData.size()]);
-
-				ArrayList<BO4ParticleFunction> newParticleData = new ArrayList<BO4ParticleFunction>();
-				if(this.particleDataBO4 != null)
-				{
-					for(BO4ParticleFunction particleData : this.particleDataBO4)
-					{
-						newParticleData.add(particleData);
-					}
-				}
-				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getConfig().particleDataBO4)
-				{
-					newParticleData.add(particleData.rotate(this.inheritBO3Rotation));
-				}
-				this.particleDataBO4 = newParticleData.toArray(new BO4ParticleFunction[newParticleData.size()]);
-
 				ArrayList<BO4EntityFunction> newEntityData = new ArrayList<BO4EntityFunction>();
 				if(this.entityDataBO4 != null)
 				{
@@ -676,9 +613,6 @@ public class BO4Config extends CustomObjectConfigFile
 		List<BO4BlockFunction> tempBlocksList = new ArrayList<BO4BlockFunction>();
 		List<BO4BranchFunction> tempBranchesList = new ArrayList<BO4BranchFunction>();
 		List<BO4EntityFunction> tempEntitiesList = new ArrayList<BO4EntityFunction>();
-		List<BO4ModDataFunction> tempModDataList = new ArrayList<BO4ModDataFunction>();
-		List<BO4ParticleFunction> tempParticlesList = new ArrayList<BO4ParticleFunction>();
-		List<BO4SpawnerFunction> tempSpawnerList = new ArrayList<BO4SpawnerFunction>();
 
 		short[][] columnSizes = new short[xSize][zSize];
 		
@@ -809,18 +743,6 @@ public class BO4Config extends CustomObjectConfigFile
 				{
 					tempBranchesList.add((BO4BranchFunction) res);
 				}
-				else if (res instanceof BO4ModDataFunction)
-				{
-					tempModDataList.add((BO4ModDataFunction) res);
-				}
-				else if (res instanceof BO4SpawnerFunction)
-				{
-					tempSpawnerList.add((BO4SpawnerFunction) res);
-				}
-				else if (res instanceof BO4ParticleFunction)
-				{
-					tempParticlesList.add((BO4ParticleFunction) res);
-				}
 				else if (res instanceof BO4EntityFunction)
 				{
 					tempEntitiesList.add((BO4EntityFunction) res);
@@ -924,60 +846,6 @@ public class BO4Config extends CustomObjectConfigFile
 			columnBlockIndex[block.x][block.z]++;
 		}
 
-		boolean illegalModData = false;
-		for(BO4ModDataFunction modData : tempModDataList)
-		{
-			modData.x += this.getXOffset();
-			modData.z += this.getZOffset();
-
-			if(modData.x > 15 || modData.z > 15)
-			{
-				illegalModData = true;
-			}
-
-			if(modData.x < 0 || modData.z < 0)
-			{
-				illegalModData = true;
-			}
-		}
-		this.modDataBO4 = tempModDataList.toArray(new BO4ModDataFunction[tempModDataList.size()]);
-
-		boolean illegalSpawnerData = false;
-		for(BO4SpawnerFunction spawnerData : tempSpawnerList)
-		{
-			spawnerData.x += this.getXOffset();
-			spawnerData.z += this.getZOffset();
-
-			if(spawnerData.x > 15 || spawnerData.z > 15)
-			{
-				illegalSpawnerData = true;
-			}
-
-			if(spawnerData.x < 0 || spawnerData.z < 0)
-			{
-				illegalSpawnerData = true;
-			}
-		}
-		this.spawnerDataBO4 = tempSpawnerList.toArray(new BO4SpawnerFunction[tempSpawnerList.size()]);
-
-		boolean illegalParticleData = false;
-		for(BO4ParticleFunction particleData : tempParticlesList)
-		{
-			particleData.x += this.getXOffset();
-			particleData.z += this.getZOffset();
-
-			if(particleData.x > 15 || particleData.z > 15)
-			{
-				illegalParticleData = true;
-			}
-
-			if(particleData.x < 0 || particleData.z < 0)
-			{
-				illegalParticleData = true;
-			}
-		}
-		this.particleDataBO4 = tempParticlesList.toArray(new BO4ParticleFunction[tempParticlesList.size()]);
-
 		boolean illegalEntityData = false;
 		for(BO4EntityFunction entityData : tempEntitiesList)
 		{
@@ -1001,18 +869,6 @@ public class BO4Config extends CustomObjectConfigFile
 			if(illegalBlock)
 			{
 				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
-			}
-			if(illegalModData)
-			{
-				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
-			}
-			if(illegalSpawnerData)
-			{
-				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
-			}
-			if(illegalParticleData)
-			{
-				logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Warning: BO4 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalEntityData)
 			{
@@ -1381,10 +1237,7 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment(" MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")");
 		writer.comment(" spawns the bottom part of an igloo.");
 
-			ArrayList<BO4ModDataFunction> modDataList = new ArrayList<BO4ModDataFunction>();
-			ArrayList<BO4ParticleFunction> particlesList = new ArrayList<BO4ParticleFunction>();
-			ArrayList<BO4SpawnerFunction> spawnerList = new ArrayList<BO4SpawnerFunction>();
-			ArrayList<BO4EntityFunction> entitiesList = new ArrayList<BO4EntityFunction>();
+		ArrayList<BO4EntityFunction> entitiesList = new ArrayList<BO4EntityFunction>();
 		
 		// Re-read the raw data, if no data was supplied. Don't save any loaded data, since it has been processed/transformed.
 		if(blocksList == null || branchesList == null || entitiesList == null)
@@ -1411,18 +1264,6 @@ public class BO4Config extends CustomObjectConfigFile
 					else if (res instanceof BO4BranchFunction)
 					{
 						branchesList.add((BO4BranchFunction) res);
-					}
-					else if (res instanceof BO4ModDataFunction)
-					{
-						modDataList.add((BO4ModDataFunction) res);
-					}
-					else if (res instanceof BO4SpawnerFunction)
-					{
-						spawnerList.add((BO4SpawnerFunction) res);
-					}
-					else if (res instanceof BO4ParticleFunction)
-					{
-						particlesList.add((BO4ParticleFunction) res);
 					}
 					else if (res instanceof BO4EntityFunction)
 					{
@@ -1484,87 +1325,6 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
 
 		for(BO4EntityFunction func : entitiesList)
-		{
-			writer.function(func);
-		}
-		
-		writer.bigTitle("Particles");
-		writer.comment("Forge only (this may have changed, check for updates).");
-		writer.comment("Creates an invisible particle spawner at the given location that spawns particles every x milliseconds.");
-		writer.comment("Usage: Particle(x,y,z,particleName,interval,velocityX,velocityY,velocityZ)");
-		writer.comment("velocityX, velocityY and velocityZ are optional.");
-		writer.comment("Only vanilla particle names can be used, for 1.11.2 these are;");
-		writer.comment("explode, largeexplode, hugeexplosion, fireworksSpark, bubble, splash, wake, suspended");
-		writer.comment("depthsuspend, crit, magicCrit, smoke, largesmoke, spell, instantSpell, mobSpell");
-		writer.comment("mobSpellAmbient, witchMagic, dripWater, dripLava, angryVillager, happyVillager");
-		writer.comment("townaura, note, portal, enchantmenttable, flame, lava, footstep, cloud, reddust");
-		writer.comment("snowballpoof,  snowshovel, slime, heart, barrier, iconcrack, blockcrack, blockdust");
-		writer.comment("droplet, take, mobappearance, dragonbreath, endRod, damageIndicator, sweepAttack");
-		writer.comment("fallingdust, totem, spit.");
-		writer.comment("Use /otg particles (forge only) to show a list of particles.");
-		writer.comment("velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
-
-		for(BO4ParticleFunction func : particlesList)
-		{
-			writer.function(func);
-		}
-		
-		writer.bigTitle("Spawners");
-		writer.comment("Forge only (this may have changed, check for updates).");
-		writer.comment("Creates an invisible entity spawner at the given location that spawns entities every x seconds.");
-		writer.comment("Entities can only spawn if their spawn requirements are met (zombies/skeletons only spawn in the dark etc). Max entity count for the server is ignored, each spawner has its own maxCount setting.");
-		writer.comment("Usage: Spawner(x,y,z,entityName,nbtFileName,groupSize,interval,spawnChance,maxCount,despawnTime,velocityX,velocityY,velocityZ,yaw,pitch)");
-		writer.comment("nbtFileName, despawnTime, velocityX, velocityY, velocityZ, yaw and pitch are optional");
-		writer.comment("Example Spawner(0, 0, 0, Villager, 1, 5, 100, 5) or Spawner(0, 0, 0, Villager, villager1.txt, 1, 5, 100, 5) or Spawner(0, 0, 0, Villager, 1, 5, 100, 5, 30, 1, 1, 1, 0, 0)");
-		writer.comment("entityName - Name of the entity to spawn, use /otg entities to get a list of entities that can be used as entityName, this includes entities added by other mods and non-living entities.");
-		writer.comment("nbtFileName - A .txt file with nbt data (such as myentityinfo.txt).");
-		writer.comment("In the text file you can use the same mob spawning parameters used with the /summon command to equip the");
-		writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
-		writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
-		writer.comment("groupSize - Number of entities that should spawn for each successful spawn attempt.");
-		writer.comment("interval - Time in seconds between each spawn attempt.");
-		writer.comment("spawnChance - For each spawn attempt, the chance between 0-100 that the spawn attempt will succeed.");
-		writer.comment("maxCount - The maximum amount of this kind of entity that can exist within 32 blocks. If there are already maxCount or more entities of this type in a 32 radius this spawner will not spawn anything.");
-		writer.comment("despawnTime - After despawnTime seconds, if there is no player within 32 blocks of the entity it will despawn..");
-		writer.comment("velocityX,velocityY,velocityZ,yaw,pitch - Spawn the enemy with the given velocity and angle, handy for making traps and launchers (shooting arrows and fireballs etc).");
-
-		for(BO4SpawnerFunction func : spawnerList)
-		{
-			writer.function(func);
-		}
-		
-		// ModData
-		writer.bigTitle("ModData");
-		writer.comment("Forge only.");
-		writer.comment("Use the ModData() tag to include data that other mods can use");
-		writer.comment("Mod makers can use ModData and the /otg GetModData command to test IMC communications between OTG");
-		writer.comment("and their mod.");
-		writer.comment("Normal users can use it to spawn some mobs and blocks on command.");
-		writer.comment("ModData(x,y,z,\"ModName\", \"MyModDataAsText\"");
-		writer.comment("Example: ModData(x,y,z,MyCystomNPCMod,SpawnBobHere/WithAPotato/And50Health)");
-		writer.comment("Try not to use exotic/reserved characters, like brackets and comma's etc, this stuff isn't fool-proof.");
-		writer.comment("Also, use this only to store IDs/object names etc for your mod, DO NOT include things like character dialogue,");
-		writer.comment("messages on signs, loot lists etc in this file. As much as possible just store id's/names here and store all the data related to those id's/names in your own mod.");
-		writer.comment("OTG has some built in ModData commands for basic mob and block spawning.");
-		writer.comment("These are mostly just a demonstration for mod makers to show how ModData.");
-		writer.comment("can be used by other mods.");
-		writer.comment("For mob spawning in OTG use: ModData(x,y,z,OTG,mob/MobType/Count/Persistent/Name)");
-		writer.comment("mob: Makes OTG recognise this as a mob spawning command.");
-		writer.comment("MobType: Lower-case, no spaces. Any vanilla mob like dragon, skeleton, wither, villager etc");
-		writer.comment("Count: The number of mobs to spawn");
-		writer.comment("Persistent (true/false): Should the mobs never de-spawn? If set to true the mob will get a");
-		writer.comment("name-tag ingame so you can recognise it.");
-		writer.comment("Name: A name-tag for the monster/npc.");
-		writer.comment("Example: ModData(0,0,0,OTG,villager/1/true/Bob)");
-		writer.comment("To spawn blocks using ModData use: ModData(x,y,z,OTG,block/material)");
-		writer.comment("block: Makes OTG recognise this as a block spawning command.");
-		writer.comment("material: id or text, custom blocks can be added using ModName:MaterialName.");
-		writer.comment("To send all ModData within a radius in chunks around the player to the specified mod");
-		writer.comment("use this console command: /otg GetModData ModName Radius");
-		writer.comment("ModName: name of the mod, for OTG commands use OTG ");
-		writer.comment("Radius (optional): Radius in chunks around the player.");
-
-		for(BO4ModDataFunction func : modDataList)
 		{
 			writer.function(func);
 		}
@@ -1649,23 +1409,9 @@ public class BO4Config extends CustomObjectConfigFile
 			func.writeToStream(stream);
 		}
 		
-		stream.writeInt(this.particleDataBO4.length);
-		for(BO4ParticleFunction func : Arrays.asList(this.particleDataBO4))
-		{
-			func.writeToStream(stream);
-		}
-
-		stream.writeInt(this.spawnerDataBO4.length);
-		for(BO4SpawnerFunction func : Arrays.asList(this.spawnerDataBO4))
-		{
-			func.writeToStream(stream);
-		}
-
-		stream.writeInt(this.modDataBO4.length);
-		for(BO4ModDataFunction func : Arrays.asList(this.modDataBO4))
-		{
-			func.writeToStream(stream);
-		}		
+		stream.writeInt(0); // Used to be particledata length
+		stream.writeInt(0); // Used to be spawnerdata length
+		stream.writeInt(0); // Used to be moddata length
 		
 		ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
 		ArrayList<String> metaDataNames = new ArrayList<String>();
@@ -2019,27 +1765,12 @@ public class BO4Config extends CustomObjectConfigFile
 				{
 					entityDataBO4[i] = BO4EntityFunction.fromStream(this, bufferDecompressed, logger);
 				}
-				
-				int particleDataOTGPlusLength = bufferDecompressed.getInt();
-				BO4ParticleFunction[] particleDataBO4 = new BO4ParticleFunction[particleDataOTGPlusLength];
-				for(int i = 0; i < particleDataOTGPlusLength; i++)
-				{
-					particleDataBO4[i] = BO4ParticleFunction.fromStream(this, bufferDecompressed);
-				}
-						
-				int spawnerDataOTGPlusLength = bufferDecompressed.getInt();
-				BO4SpawnerFunction[] spawnerDataBO4 = new BO4SpawnerFunction[spawnerDataOTGPlusLength];
-				for(int i = 0; i < spawnerDataOTGPlusLength; i++)
-				{
-					spawnerDataBO4[i] = BO4SpawnerFunction.fromStream(this, bufferDecompressed);
-				}
-		
-				int modDataOTGPlusLength = bufferDecompressed.getInt();
-				BO4ModDataFunction[] modDataBO4 = new BO4ModDataFunction[modDataOTGPlusLength];
-				for(int i = 0; i < modDataOTGPlusLength; i++)
-				{
-					modDataBO4[i] = BO4ModDataFunction.fromStream(this, bufferDecompressed);
-				}
+
+				// Legacy settings, hoping they were always 0 and noone actually used them :/.
+				bufferDecompressed.getInt(); // Used to be particles
+				bufferDecompressed.getInt(); // Used to be spawners
+				bufferDecompressed.getInt(); // Used to be moddata
+				//
 					
 				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();
 				short[][] columnSizes = null;
@@ -2210,9 +1941,6 @@ public class BO4Config extends CustomObjectConfigFile
 							
 				this.branchesBO4 = branchesBO4;
 				this.entityDataBO4 = entityDataBO4;
-				this.particleDataBO4 = particleDataBO4;
-				this.spawnerDataBO4 = spawnerDataBO4;
-				this.modDataBO4 = modDataBO4;
 
 				// Reconstruct blocks
 				if(getBlocks)

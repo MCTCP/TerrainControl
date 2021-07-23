@@ -16,9 +16,6 @@ public abstract class CustomStructure
 	public CustomStructureCoordinate start;
 	
 	public EntitiesManager entitiesManager = new EntitiesManager();
-	public ParticlesManager particlesManager = new ParticlesManager();
-	public ModDataManager modDataManager = new ModDataManager();
-	public SpawnerManager spawnerManager = new SpawnerManager();
 	
 	protected Map<ChunkCoordinate, Set<CustomStructureCoordinate>> objectsToSpawn;
 	protected Random random;

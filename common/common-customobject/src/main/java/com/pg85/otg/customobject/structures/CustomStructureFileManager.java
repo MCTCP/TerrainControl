@@ -20,15 +20,6 @@ import java.util.Map.Entry;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObjectManager;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ModDataFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ParticleFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3SpawnerFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ModDataFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ParticleFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4SpawnerFunction;
-import com.pg85.otg.customobject.bofunctions.ModDataFunction;
-import com.pg85.otg.customobject.bofunctions.ParticleFunction;
-import com.pg85.otg.customobject.bofunctions.SpawnerFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobject.structures.bo3.BO3CustomStructureCoordinate;
@@ -585,113 +576,8 @@ public class CustomStructureFileManager
 						}
 					} else {
 						dos.writeBoolean(false);
-					}
-
-					// Save moddata/particles/spawner data
-					// Bo3 objects/structures have start == null
-					// For Bo4's, only save for the start bo4, data will be reconstituted when the file is loaded.
-					
-					if(structure.modDataManager.modData.size() > 0)
-					{
-						dos.writeBoolean(true);
-						
-						HashSet<ModDataFunction<?>> modDataPerRegion = new HashSet<ModDataFunction<?>>();
-						int size = 0;
-						for(ModDataFunction<?> modData : structure.modDataManager.modData)
-						{
-							if(ChunkCoordinate.fromBlockCoords(modData.x, modData.z).toRegionCoord().equals(regionCoord))
-							{
-								modDataPerRegion.add(modData);
-								size++;
-							}
-						}
-						
-						dos.writeInt(size);
-						for(ModDataFunction<?> modData : modDataPerRegion)
-						{
-							dos.writeInt(modData.x);
-							dos.writeInt(modData.y);
-							dos.writeInt(modData.z);
-							StreamHelper.writeStringToStream(dos, modData.modId.replace(":", "&#58;").replace(" ", "&nbsp;"));
-							StreamHelper.writeStringToStream(dos, modData.modData.replace(":", "&#58;").replace(" ", "&nbsp;"));
-						}
-					} else {
 						dos.writeBoolean(false);
-					}
-
-					if(structure.spawnerManager.spawnerData.size() > 0)
-					{
-						dos.writeBoolean(true);
-						
-						HashSet<SpawnerFunction<?>> spawnerDataPerRegion = new HashSet<SpawnerFunction<?>>();
-						int size = 0;
-						for(SpawnerFunction<?> spawnerData : structure.spawnerManager.spawnerData)
-						{
-							if(ChunkCoordinate.fromBlockCoords(spawnerData.x, spawnerData.z).toRegionCoord().equals(regionCoord))
-							{
-								spawnerDataPerRegion.add(spawnerData);
-								size++;
-							}
-						}
-						
-						dos.writeInt(size);
-						for(SpawnerFunction<?> spawnerData : spawnerDataPerRegion)
-						{
-							dos.writeInt(spawnerData.x); 
-							dos.writeInt(spawnerData.y); 
-							dos.writeInt(spawnerData.z);
-							StreamHelper.writeStringToStream(dos, spawnerData.mobName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
-							StreamHelper.writeStringToStream(dos, spawnerData.originalnbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
-							StreamHelper.writeStringToStream(dos, spawnerData.nbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;"));
-							dos.writeInt(spawnerData.groupSize);
-							dos.writeInt(spawnerData.interval);
-							dos.writeInt(spawnerData.spawnChance); 
-							dos.writeInt(spawnerData.maxCount); 
-							dos.writeInt(spawnerData.despawnTime); 
-							dos.writeDouble(spawnerData.velocityX); 
-							dos.writeDouble(spawnerData.velocityY); 
-							dos.writeDouble(spawnerData.velocityZ); 
-							dos.writeBoolean(spawnerData.velocityXSet); 
-							dos.writeBoolean(spawnerData.velocityYSet); 
-							dos.writeBoolean(spawnerData.velocityZSet); 
-							dos.writeFloat(spawnerData.yaw); 
-							dos.writeFloat(spawnerData.pitch);
-						}
-					} else {
 						dos.writeBoolean(false);
-					}
-
-					if(structure.particlesManager.particleData.size() > 0)
-					{
-						dos.writeBoolean(true);
-						
-						HashSet<ParticleFunction<?>> particleDataPerRegion = new HashSet<ParticleFunction<?>>();
-						int size = 0;
-						for(ParticleFunction<?> particleData : structure.particlesManager.particleData)
-						{
-							if(ChunkCoordinate.fromBlockCoords(particleData.x, particleData.z).toRegionCoord().equals(regionCoord))
-							{
-								particleDataPerRegion.add(particleData);
-								size++;
-							}
-						}
-						
-						dos.writeInt(size);
-						for(ParticleFunction<?> particleData : particleDataPerRegion)
-						{
-							dos.writeInt(particleData.x); 
-							dos.writeInt(particleData.y);
-							dos.writeInt(particleData.z); 
-							StreamHelper.writeStringToStream(dos, particleData.particleName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
-							dos.writeDouble(particleData.interval); 
-							dos.writeDouble(particleData.velocityX); 
-							dos.writeDouble(particleData.velocityY); 
-							dos.writeDouble(particleData.velocityZ); 
-							dos.writeBoolean(particleData.velocityXSet); 
-							dos.writeBoolean(particleData.velocityYSet); 
-							dos.writeBoolean(particleData.velocityZSet);
-						}
-					} else {
 						dos.writeBoolean(false);
 					}					
 				}
@@ -1056,101 +942,11 @@ public class CustomStructureFileManager
 						smoothingAreasToSpawn.put(chunkCoord, smoothingAreaLines);
 					}
 				}
-				
-				// Save moddata/particles/spawner data
-				// Bo3 objects/structures have start == null
-				// For Bo4's, only save for the start bo4, data will be reconstituted when the file is loaded.
-				
-				HashSet<ModDataFunction<?>> modData = new HashSet<ModDataFunction<?>>();			
-				if(buffer.get() != 0)
-				{
-					int modDataSize = buffer.getInt();
-					for(int l = 0; l < modDataSize; l++)						
-					{
-						ModDataFunction<?> modDataFunction;
-						if(isBO4Enabled)
-						{
-							modDataFunction = new BO4ModDataFunction();
-						} else {
-							modDataFunction = new BO3ModDataFunction();
-						}
-						
-						modDataFunction.x = buffer.getInt();
-						modDataFunction.y = buffer.getInt();
-						modDataFunction.z = buffer.getInt();
-						modDataFunction.modId = StreamHelper.readStringFromBuffer(buffer);
-						modDataFunction.modData = StreamHelper.readStringFromBuffer(buffer);
-						modData.add(modDataFunction);
-					}
-				}
 
-				HashSet<SpawnerFunction<?>> spawnerData = new HashSet<SpawnerFunction<?>>();				
-				if(buffer.get() != 0)
-				{
-					int spawnerDataSize = buffer.getInt();
-					for(int l = 0; l < spawnerDataSize; l++)
-					{
-						SpawnerFunction<?> spawnerFunction;
-						if(isBO4Enabled)
-						{
-							spawnerFunction = new BO4SpawnerFunction();
-						} else {
-							spawnerFunction = new BO3SpawnerFunction();
-						}
-						
-						spawnerFunction.x = buffer.getInt();
-						spawnerFunction.y = buffer.getInt();
-						spawnerFunction.z = buffer.getInt();
-						spawnerFunction.mobName = StreamHelper.readStringFromBuffer(buffer);
-						spawnerFunction.originalnbtFileName = StreamHelper.readStringFromBuffer(buffer);
-						spawnerFunction.nbtFileName = StreamHelper.readStringFromBuffer(buffer);
-						spawnerFunction.groupSize = buffer.getInt();
-						spawnerFunction.interval = buffer.getInt();
-						spawnerFunction.spawnChance = buffer.getInt();
-						spawnerFunction.maxCount = buffer.getInt();
-						spawnerFunction.despawnTime = buffer.getInt(); 
-						spawnerFunction.velocityX = buffer.getDouble();
-						spawnerFunction.velocityY = buffer.getDouble(); 
-						spawnerFunction.velocityZ = buffer.getDouble(); 
-						spawnerFunction.velocityXSet = buffer.get() != 0; 
-						spawnerFunction.velocityYSet = buffer.get() != 0; 
-						spawnerFunction.velocityZSet = buffer.get() != 0;
-						spawnerFunction.yaw = buffer.getFloat();
-						spawnerFunction.pitch = buffer.getFloat();						
-						spawnerData.add(spawnerFunction);
-					}
-				}
+				buffer.get(); // Used to be particles
+				buffer.get(); // Used to be spawners
+				buffer.get(); // Used to be moddata
 
-				HashSet<ParticleFunction<?>> particleData = new HashSet<ParticleFunction<?>>();				
-				if(buffer.get() != 0)
-				{
-					int particleDataSize = buffer.getInt();
-					for(int l = 0; l < particleDataSize; l++)
-					{
-						ParticleFunction<?> particleFunction;
-						if(isBO4Enabled)
-						{
-							particleFunction = new BO4ParticleFunction();
-						} else {
-							particleFunction = new BO3ParticleFunction();
-						}
-						
-						particleFunction.x = buffer.getInt();
-						particleFunction.y = buffer.getInt();
-						particleFunction.z = buffer.getInt(); 
-						particleFunction.particleName = StreamHelper.readStringFromBuffer(buffer);
-						particleFunction.interval = buffer.getDouble(); 
-						particleFunction.velocityX = buffer.getDouble(); 
-						particleFunction.velocityY = buffer.getDouble();
-						particleFunction.velocityZ = buffer.getDouble();
-						particleFunction.velocityXSet = buffer.get() != 0;
-						particleFunction.velocityYSet = buffer.get() != 0; 
-						particleFunction.velocityZSet = buffer.get() != 0;
-						
-						particleData.add(particleFunction);
-					}
-				}
-				
 				CustomStructure structure;
 				if(isBO4Enabled)
 				{
@@ -1168,9 +964,6 @@ public class CustomStructureFileManager
 				} else {
 					structure = new BO3CustomStructure((BO3CustomStructureCoordinate)structureStart);
 				}
-				structure.modDataManager.modData = modData;
-				structure.spawnerManager.spawnerData = spawnerData;
-				structure.particlesManager.particleData = particleData;				
 				structuresFile.put(structure, chunkCoords);
 			}
 		}
