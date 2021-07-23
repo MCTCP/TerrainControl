@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gen;
+package com.pg85.otg.forge.dimensions;
 
 import com.pg85.otg.constants.Constants;
 

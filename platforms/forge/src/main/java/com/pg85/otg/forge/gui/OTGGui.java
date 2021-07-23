@@ -5,10 +5,8 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.dimensions.OTGDimensionType;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.gui.screens.CreateOTGWorldScreen;
+import com.pg85.otg.forge.gui.screens.CreateOTGDimensionsScreen;
 import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
@@ -23,23 +21,27 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class OTGGui
-{	
+{
 	// Define a new world type for the world creation screen
 	private static final BiomeGeneratorTypeScreens OTG_WORLD_TYPE = new BiomeGeneratorTypeScreens(Constants.MOD_ID_SHORT)
 	{
 		protected ChunkGenerator generator(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
+			// TODO: Clean this up, we don't use this anymore since it doesn't take into account our world creation 
+			// screen's settings and may cause a hiccup due to presets being loaded when selecting the otg world type.
+			// Ignoring this may break things like pregenerator mods though?
+
 			// Provide our custom chunk generator, biome provider and dimension settings.
-			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
-			{
-				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD));
-			} else {
+			//if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
+			///{
+				//return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD));
+			//} else {
 				// If no presets are installed, return the default chunkgenerator / biomeprovider
 				return new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, () ->
 				{
 					return dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD);
 				});
-			}
+			//}
 		}
 	};
 
@@ -56,28 +58,26 @@ public class OTGGui
 				{
 					if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 					{
-						return new CreateOTGWorldScreen(
+						return new CreateOTGDimensionsScreen(
 							createWorldScreen,
-							createWorldScreen.worldGenSettingsComponent.registryHolder(),
 							// Define apply function, generates updated 
 							// settings when leaving customisation menu.
-							(dimensionConfig) ->
+							(dimGenSettings) ->
 							{
-
 								MutableRegistry<DimensionType> dimensionTypesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 								Registry<Biome> biomesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY);
 								Registry<DimensionSettings> dimensionSettingsRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-								
+
 								createWorldScreen.worldGenSettingsComponent.updateSettings(
 									OTGDimensionType.createOTGDimensionGeneratorSettings(
+										dimGenSettings.dimensionConfig,
 										dimensionTypesRegistry,
 										biomesRegistry,
 										dimensionSettingsRegistry,
 										dimensionGeneratorSettings.seed(),
 										dimensionGeneratorSettings.generateFeatures(),
 										dimensionGeneratorSettings.generateBonusChest(),
-										dimensionGeneratorSettings.dimensions(),
-										dimensionConfig.PresetFolderName
+										dimensionGeneratorSettings.dimensions()
 									)
 								);
 							}

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.resource.SaplingResource;
@@ -27,8 +28,10 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+@EventBusSubscriber(modid = Constants.MOD_ID_SHORT)
 public class SaplingHandler
 {
 	@SubscribeEvent
@@ -37,7 +40,7 @@ public class SaplingHandler
     	if(!(event.getWorld() instanceof ServerWorld))
     	{
     		return;
-    	}		
+    	}
 		
         BlockPos blockPos = event.getPos();
 		ForgeWorldGenRegion worldGenRegion;	

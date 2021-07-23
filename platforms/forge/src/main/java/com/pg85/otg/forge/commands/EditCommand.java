@@ -47,7 +47,7 @@ import net.minecraft.util.text.StringTextComponent;
 public class EditCommand implements BaseCommand
 {
 	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
-	
+
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{

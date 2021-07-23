@@ -25,12 +25,9 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientFogHandler
 {
-
 	private static double lastX = Double.MIN_VALUE;
 	private static double lastZ = Double.MIN_VALUE;
-
 	private static float[][] fogDensityCache = new float[0][0];
-
 	private static boolean otgDidLastFogRender = false;
 
 	private ClientFogHandler()

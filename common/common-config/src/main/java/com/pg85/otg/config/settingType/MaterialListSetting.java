@@ -1,7 +1,6 @@
 package com.pg85.otg.config.settingType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -12,13 +11,12 @@ import com.pg85.otg.util.materials.LocalMaterialData;
  * Reads and writes a material. Materials are read using
  * {@link OTG#readMaterial(String)} and written using
  * {@link LocalMaterialData#toString()}.
- *
  */
 public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 {
 	private final String[] defaultValue;
 	private boolean processedMaterials;
-	private LocalMaterialData[] defaultMaterials;
+	private ArrayList<LocalMaterialData> defaultMaterials;
 
 	public MaterialListSetting(String name, String[] defaultValue)
 	{
@@ -29,11 +27,11 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 	@Override
 	public ArrayList<LocalMaterialData> getDefaultValue(IMaterialReader materialReader)
 	{
-		if(!processedMaterials)
+		if(!this.processedMaterials)
 		{
-			processedMaterials = true;
+			this.processedMaterials = true;
 			ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
-			for(String defaultMaterial : defaultValue)
+			for(String defaultMaterial : this.defaultValue)
 			{
 				LocalMaterialData material = null;
 				try {
@@ -47,8 +45,9 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 					materials.add(material);
 				}
 			}
+			this.defaultMaterials = materials;
 		}
-		return this.defaultMaterials == null ? new ArrayList<LocalMaterialData>() : new ArrayList<LocalMaterialData>(Arrays.asList(this.defaultMaterials));
+		return this.defaultMaterials;
 	}
 
 	@Override

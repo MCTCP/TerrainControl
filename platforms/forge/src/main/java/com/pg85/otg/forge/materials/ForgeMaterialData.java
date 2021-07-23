@@ -86,13 +86,18 @@ public class ForgeMaterialData extends LocalMaterialData
 				this.name = "Unknown";
 			}
 		} else {
-			this.name = this.blockData.toString()
-				.replace("Block{", "")
-				.replace("}", "");
+			if(this.blockData != this.blockData.getBlock().defaultBlockState())
+			{
+				this.name = this.blockData.toString()
+					.replace("Block{", "")
+					.replace("}", "");
+			} else {
+				this.name = this.blockData.getBlock().getRegistryName().toString();
+			}
 		}
 		return this.name;
 	}
-		
+
 	@Override
 	public boolean isLiquid()
 	{

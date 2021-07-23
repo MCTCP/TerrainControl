@@ -1,5 +1,6 @@
 package com.pg85.otg.config.standard;
 
+import com.pg85.otg.config.settingType.MaterialListSetting;
 import com.pg85.otg.config.settingType.MaterialSetting;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.settingType.Settings;
@@ -12,6 +13,7 @@ import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorldStandardValues extends Settings
@@ -47,7 +49,10 @@ public class WorldStandardValues extends Settings
 		DEFAULT_LUKEWARM_OCEAN_BIOME = stringSetting("DefaultLukewarmOceanBiome", "Ocean"),
 		DEFAULT_COLD_OCEAN_BIOME = stringSetting("DefaultColdOceanBiome", "Ocean"),
 		INFINIBURN = stringSetting("InfiniBurn", "minecraft:infiniburn_overworld"),
-		EFFECTS_LOCATION = stringSetting("EffectsLocation", "minecraft:overworld")
+		EFFECTS_LOCATION = stringSetting("EffectsLocation", "minecraft:overworld"),
+		PORTAL_COLOR = stringSetting("PortalColor", "Default"),
+		PORTAL_IGNITION_SOURCE = stringSetting("PortalIgnitionSource", "minecraft:flint_and_steel"),
+		PORTAL_MOB = stringSetting("PortalMob", "minecraft:zombie_pigman")
 	;
 
 	public static final Setting<Integer>
@@ -147,6 +152,8 @@ public class WorldStandardValues extends Settings
 		CARVER_LAVA_BLOCK = new MaterialSetting("CarverLavaBlock", LocalMaterials.LAVA_NAME)
 	;
 
+    public static final Setting<ArrayList<LocalMaterialData>> PORTAL_BLOCKS = new MaterialListSetting("PortalBlocks", new String[] { LocalMaterials.QUARTZ_BLOCK_NAME });	
+	
 	public static final Setting<List<String>>
 		ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
 			"Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",

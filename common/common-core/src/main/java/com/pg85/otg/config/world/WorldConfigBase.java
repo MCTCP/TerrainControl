@@ -171,6 +171,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String effectsLocation;
 	protected float ambientLight;
 
+	// Portals
+
+	protected ArrayList<LocalMaterialData> portalBlocks;
+	protected String portalColor;
+	protected String portalMob;
+	protected String portalIgnitionSource;
+
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -746,78 +753,119 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	// Dimension settings
 	
+	@Override
 	public OptionalLong getFixedTime()
 	{
 		return this.fixedTime;
 	}
 	
+	@Override
 	public boolean getHasSkyLight()
 	{
 		return this.hasSkyLight;
 	}
 
+	@Override
 	public boolean getHasCeiling()
 	{
 		return this.hasCeiling;
 	}
 
+	@Override
 	public boolean getUltraWarm()
 	{
 		return this.ultraWarm;
 	}
 
+	@Override
 	public boolean getNatural()
 	{
 		return this.natural;
 	}
 
+	@Override
 	public double getCoordinateScale()
 	{
 		return this.coordinateScale;
 	}
 
+	@Override
 	public boolean getCreateDragonFight()
 	{
 		return this.createDragonFight;
 	}
 
+	@Override
 	public boolean getPiglinSafe()
 	{
 		return this.piglinSafe;
 	}
 
+	@Override
 	public boolean getBedWorks()
 	{
 		return this.bedWorks;
 	}
 
+	@Override
 	public boolean getRespawnAnchorWorks()
 	{
 		return this.respawnAnchorWorks;
 	}
 
+	@Override
 	public boolean getHasRaids()
 	{
 		return this.hasRaids;
 	}
 
+	@Override
 	public int getLogicalHeight()
 	{
 		return this.logicalHeight;
 	}
 
+	@Override
 	public String getInfiniburn()
 	{
 		return this.infiniburn;
 	}
 
+	@Override
 	public String getEffectsLocation()
 	{
 		return this.effectsLocation;
 	}
 
+	@Override
 	public float getAmbientLight()
 	{
 		return this.ambientLight;
-	}	
+	}
+
+	// Portal settings
+	
+	@Override
+	public ArrayList<LocalMaterialData> getPortalBlocks()
+	{
+		return this.portalBlocks;
+	}
+
+	@Override
+	public String getPortalColor()
+	{
+		return this.portalColor;
+	}
+
+	@Override
+	public String getPortalMob()
+	{
+		return this.portalMob;
+	}
+
+	@Override
+	public String getPortalIgnitionSource()
+	{
+		return this.portalIgnitionSource;
+	}
 }
