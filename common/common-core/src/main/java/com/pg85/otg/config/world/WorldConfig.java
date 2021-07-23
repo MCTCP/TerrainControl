@@ -818,10 +818,12 @@ public class WorldConfig extends WorldConfigBase
 		// Portal settings
 
 		writer.putSetting(WorldStandardValues.PORTAL_BLOCKS, this.portalBlocks,
-			"The portal blocks used to when building a portal to this dimension, or back to the overworld."
+			"A list of one or more portal blocks used to build a portal to this dimension, or back to the overworld."
 		);
 		writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
-			"The portal color used for this world's portals."
+			"The portal color used for this world's portals, only applies for dimensions, not overworld/nether/end.",
+			"Options: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame, gold,",
+			"green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default."
 		);
 		writer.putSetting(WorldStandardValues.PORTAL_MOB, this.portalMob,
 			"The mob that spawns from this portal, minecraft:zombie_pigman by default."
