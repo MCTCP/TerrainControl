@@ -17,7 +17,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
@@ -157,7 +156,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		if (OTGGen.generator == null)
 		{
 			OTGDelegate = new OTGNoiseChunkGenerator(
-				new DimensionConfig(OTGGen.getPreset().getFolderName()),
+				OTGGen.getPreset().getFolderName(),
 				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
 				world.getSeed(),
 				GeneratorSettingBase::i

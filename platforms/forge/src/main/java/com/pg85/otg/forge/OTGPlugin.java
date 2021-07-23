@@ -8,11 +8,11 @@ import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.dimensions.OTGDimensionType;
+import com.pg85.otg.forge.dimensions.OTGWorldType;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalBlocks;
 import com.pg85.otg.forge.dimensions.portals.OTGCapabilities;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalPois;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.gen.OTGWorldType;
 import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.presets.Preset;
@@ -46,20 +46,20 @@ public class OTGPlugin
 	public OTGPlugin()
 	{
 		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-		
+
 		// Register the clientSetup method for client-side initialisation logic (GUI etc).
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::commonSetup);
 
-		// Register ourselves for server and other game events we are interested in
+		// Register self for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 
-		// Let the game know about our chunk generator and biome provider. 
-		// If they're not added, we get errors and the game does not save properly.
+		// Let MC know about our chunk generator and biome provider. 
+		// If they're not added, we get errors and MC does not save properly.
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
-		
+
 		// Deferred registers
 		OTGPortalPois.poi.register(modEventBus);
 		OTGPortalBlocks.blocks.register(modEventBus);

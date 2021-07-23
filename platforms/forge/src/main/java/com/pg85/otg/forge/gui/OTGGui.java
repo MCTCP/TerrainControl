@@ -2,7 +2,6 @@ package com.pg85.otg.forge.gui;
 
 import java.util.Map;
 import java.util.Optional;
-
 import com.google.common.collect.ImmutableMap;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -96,15 +95,13 @@ public class OTGGui
 								createWorldScreen.worldGenSettingsComponent.updateSettings(
 									OTGDimensionType.createOTGDimensionGeneratorSettings(
 										dimGenSettings.dimensionConfig,
-										dimGenSettings.dimGenSettings,
 										dimensionTypesRegistry,
 										biomesRegistry,
 										dimensionSettingsRegistry,
 										dimensionGeneratorSettings.seed(),
 										dimensionGeneratorSettings.generateFeatures(),
 										dimensionGeneratorSettings.generateBonusChest(),
-										dimensionGeneratorSettings.dimensions(),
-										dimGenSettings.dimensionConfig.PresetFolderName
+										dimensionGeneratorSettings.dimensions()
 									)
 								);
 							}

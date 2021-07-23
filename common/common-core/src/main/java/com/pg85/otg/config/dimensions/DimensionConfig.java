@@ -24,8 +24,7 @@ public class DimensionConfig
 {
 	// Use capitals since we're serialising to yaml and want to make it look nice.
 	public int Version;
-	public String PresetFolderName;
-	public OTGDimension OverWorld;
+	public OTGOverWorld OverWorld;
 	public OTGDimension Nether;
 	public OTGDimension End;
 	public List<OTGDimension> Dimensions = new ArrayList<>();
@@ -33,15 +32,9 @@ public class DimensionConfig
 	// Parameterless constructor for deserialisation
 	public DimensionConfig() {}
 	
-	public DimensionConfig(String presetFolderName)
-	{
-		this.Version = 0;
-		this.PresetFolderName = presetFolderName;
-	}
-	
 	public DimensionConfig clone()
 	{
-		DimensionConfig clone = new DimensionConfig(this.PresetFolderName);
+		DimensionConfig clone = new DimensionConfig();
 		return clone;
 	}
 	
@@ -50,7 +43,7 @@ public class DimensionConfig
 		File dimensionConfig = new File(OTG.getEngine().getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER + File.separator + presetFolderName + ".yaml");
 		if(dimensionConfig.exists())
 		{
-			DimensionConfig dimConfig = new DimensionConfig(presetFolderName);
+			DimensionConfig dimConfig = new DimensionConfig();
 	        String content = "";
 	        try
 	        {
@@ -100,6 +93,24 @@ public class DimensionConfig
 		return null;
 	}
 	
+	public static class OTGOverWorld extends OTGDimension
+	{
+		public String NonOTGWorldType; // Only used for MP atm to create non-otg overworlds.
+		public String NonOTGGeneratorSettings; // Only used for MP atm to create non-otg overworlds.
+		
+		public OTGOverWorld()
+		{
+			super();
+		}
+
+		public OTGOverWorld(String presetFolderName, long seed, String nonOTGWorldType, String nonOTGGeneratorSettings)
+		{
+			super(presetFolderName, seed);
+			this.NonOTGWorldType = nonOTGWorldType;
+			this.NonOTGGeneratorSettings = nonOTGGeneratorSettings;
+		}
+	}
+
 	public static class OTGDimension
 	{
 		public String PresetFolderName;

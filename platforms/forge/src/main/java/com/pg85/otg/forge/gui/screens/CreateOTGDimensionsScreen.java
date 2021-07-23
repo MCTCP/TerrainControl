@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -41,9 +42,9 @@ public class CreateOTGDimensionsScreen extends Screen
 		this.parent = parent;
 		this.dimensionConfigConsumer = dimensionConfigConsumer;
 		this.currentSelection = new DimensionConfig();
-		this.currentSelection.OverWorld = new OTGDimension(null, 0);
-		this.currentSelection.Nether = new OTGDimension(null, 1);
-		this.currentSelection.End = new OTGDimension(null, 2);
+		this.currentSelection.OverWorld = new OTGOverWorld(null, -1, null, null);
+		this.currentSelection.Nether = new OTGDimension(null, -1);
+		this.currentSelection.End = new OTGDimension(null, -1);
 	}
 
 	protected void init()

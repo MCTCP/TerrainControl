@@ -9,6 +9,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.presets.Preset;
 
 import net.minecraft.client.gui.AbstractGui;
@@ -158,14 +159,14 @@ public class SelectOTGPresetScreen extends Screen
 				{
 					if(this.preset == null && SelectOTGPresetScreen.this.dimId == 0)
 					{
-						SelectOTGPresetScreen.this.currentSelection.OverWorld = new OTGDimension(null, -1l);
+						SelectOTGPresetScreen.this.currentSelection.OverWorld = new OTGOverWorld(null, -1l, null, null);
 						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCreateWorldScreen.create(SelectOTGPresetScreen.this.parent));
 					} else {
 						OTGDimension otgDim = new OTGDimension(this.preset == null ? null : this.preset.getFolderName(), -1l);
 						switch(SelectOTGPresetScreen.this.dimId)
 						{
 							case 0:
-								SelectOTGPresetScreen.this.currentSelection.OverWorld = otgDim;
+								SelectOTGPresetScreen.this.currentSelection.OverWorld = new OTGOverWorld(this.preset == null ? null : this.preset.getFolderName(), -1l, null, null);
 								break;
 							case 1:
 								SelectOTGPresetScreen.this.currentSelection.Nether = otgDim;

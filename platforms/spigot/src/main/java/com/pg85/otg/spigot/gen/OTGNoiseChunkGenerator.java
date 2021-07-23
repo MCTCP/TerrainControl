@@ -3,7 +3,6 @@ package com.pg85.otg.spigot.gen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
@@ -76,8 +75,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
 		(p_236091_0_) -> p_236091_0_
 			.group(
-				Codec.STRING.fieldOf("otg_dimension_config").forGetter(
-					(p_236090_0_) -> p_236090_0_.dimensionConfig.toYamlString() // TODO: Use bytestream instead?
+				Codec.STRING.fieldOf("otg_preset_name").forGetter(
+					(p_236090_0_) -> p_236090_0_.presetFolderName
 				),
 				// BiomeProvider -> WorldChunkManager
 				WorldChunkManager.a.fieldOf("biome_source").forGetter(
@@ -103,7 +102,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
-	private final DimensionConfig dimensionConfig;
+	private final String presetFolderName;
 	private final Preset preset;
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
@@ -114,22 +113,17 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	public OTGNoiseChunkGenerator (WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
-		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this("default", biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
-	private OTGNoiseChunkGenerator (String dimensionConfigYaml, WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator (String presetName, WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
-		this(DimensionConfig.fromYamlString(dimensionConfigYaml), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
-	}
-
-	public OTGNoiseChunkGenerator (DimensionConfig dimensionConfig, WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
-	{
-		this(dimensionConfig, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(presetName, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
-	private OTGNoiseChunkGenerator (DimensionConfig dimensionConfigSupplier, WorldChunkManager biomeProvider1, WorldChunkManager biomeProvider2, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator (String presetFolderName, WorldChunkManager biomeProvider1, WorldChunkManager biomeProvider2, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
 		// getStructures() -> a()
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().a(), seed);
@@ -139,7 +133,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
 
-		this.dimensionConfig = dimensionConfigSupplier;
+		this.presetFolderName = presetFolderName;
 		this.worldSeed = seed;
 		GeneratorSettingBase dimensionsettings = dimensionSettingsSupplier.get();
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
@@ -148,9 +142,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// func_236169_a_() -> a()
 		this.noiseHeight = noisesettings.a();
 
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(this.dimensionConfig.PresetFolderName);
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();
-		this.internalGenerator = new OTGChunkGenerator(preset, seed, (ILayerSource) biomeProvider1, ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(this.dimensionConfig.PresetFolderName), OTG.getEngine().getLogger());
+		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1, ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
 

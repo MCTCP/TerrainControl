@@ -1,6 +1,4 @@
-package com.pg85.otg.forge.gen;
-
-import com.pg85.otg.forge.dimensions.OTGDimensionType;
+package com.pg85.otg.forge.dimensions;
 
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
@@ -21,7 +19,7 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 
 	// Used for MP when starting the server, with settings from server.properties.
 	public DimensionGeneratorSettings createSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
-	{
+	{	
 		return OTGDimensionType.createOTGSettings(dynamicRegistries, seed, generateStructures, bonusChest, generatorSettings);
 	}
 }
