@@ -15,6 +15,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+// Player capabilities used for tracking players in OTG portals. 
 public class OTGCapabilities
 {
 	@CapabilityInject(OTGPlayer.class)

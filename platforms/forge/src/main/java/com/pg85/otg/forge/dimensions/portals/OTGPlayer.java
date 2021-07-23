@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 
+// Used only for tracking players in OTG portals.
 public class OTGPlayer
 {
 	private final PlayerEntity player;

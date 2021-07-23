@@ -43,7 +43,7 @@ public class BlockHandler
 			)
 		)
 		{
-			// TODO: Optimise this, may cause lag?
+			// TODO: Optimise this, may cause lag doing this for every right-click?
 			BlockRayTraceResult hitVec = event.getHitVec();
 			BlockPos pos = hitVec.getBlockPos().relative(hitVec.getDirection());
 			Collection<ServerWorld> worlds = (Collection<ServerWorld>) event.getWorld().getServer().getAllLevels();

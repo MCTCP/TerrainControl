@@ -68,7 +68,7 @@ public class OTGDimensionType extends DimensionType
 		
 		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
 		DimensionConfig dimConfig = DimensionConfig.fromDisk(generatorSettings);
-		SimpleRegistry<Dimension> dimensions = null;		
+		SimpleRegistry<Dimension> dimensions = null;
 		Preset preset = null;
 		if(dimConfig == null)
 		{
@@ -136,6 +136,7 @@ public class OTGDimensionType extends DimensionType
 	// Used for SP and MP
 	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DimensionConfig dimConfig, MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> defaultDimensions)
 	{
+		// Create a new registry object and register dimensions to it.
 		SimpleRegistry<Dimension> dimensions = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
 		boolean nonOTGOverWorld = dimConfig.OverWorld.PresetFolderName == null;
 
@@ -183,6 +184,7 @@ public class OTGDimensionType extends DimensionType
 			}
 		}
 
+		// Register default dimensions (if we're not overriding them with otg dimensions)
 		for(Entry<RegistryKey<Dimension>, Dimension> entry : defaultDimensions.entrySet())
 		{
 			RegistryKey<Dimension> registrykey = entry.getKey();

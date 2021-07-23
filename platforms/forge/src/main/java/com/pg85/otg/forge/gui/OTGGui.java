@@ -27,6 +27,10 @@ public class OTGGui
 	{
 		protected ChunkGenerator generator(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
+			// TODO: Clean this up, we don't use this anymore since it doesn't take into account our world creation 
+			// screen's settings and may cause a hiccup due to presets being loaded when selecting the otg world type.
+			// Ignoring this may break things like pregenerator mods though?
+
 			// Provide our custom chunk generator, biome provider and dimension settings.
 			//if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 			///{
@@ -54,34 +58,6 @@ public class OTGGui
 				{
 					if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 					{
-						/*
-						return new CreateOTGWorldScreen(
-							createWorldScreen,
-							createWorldScreen.worldGenSettingsComponent.registryHolder(),
-							// Define apply function, generates updated 
-							// settings when leaving customisation menu.
-							(dimensionConfig) ->
-							{
-
-								MutableRegistry<DimensionType> dimensionTypesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-								Registry<Biome> biomesRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY);
-								Registry<DimensionSettings> dimensionSettingsRegistry = createWorldScreen.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-								
-								createWorldScreen.worldGenSettingsComponent.updateSettings(
-									OTGDimensionType.createOTGDimensionGeneratorSettings(
-										dimensionTypesRegistry,
-										biomesRegistry,
-										dimensionSettingsRegistry,
-										dimensionGeneratorSettings.seed(),
-										dimensionGeneratorSettings.generateFeatures(),
-										dimensionGeneratorSettings.generateBonusChest(),
-										dimensionGeneratorSettings.dimensions(),
-										dimensionConfig.PresetFolderName
-									)
-								);
-							}
-						);
-						*/
 						return new CreateOTGDimensionsScreen(
 							createWorldScreen,
 							// Define apply function, generates updated 

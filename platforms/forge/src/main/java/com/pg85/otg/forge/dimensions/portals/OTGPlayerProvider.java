@@ -5,6 +5,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
+// Player capabilities used for tracking players in OTG portals.
 public class OTGPlayerProvider implements ICapabilityProvider
 {
 	private final OTGPlayer otgPlayer;

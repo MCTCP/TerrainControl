@@ -97,9 +97,10 @@ public class OTGPlugin
 		// Register all biomes
 		OTG.getEngine().getPresetLoader().registerBiomes();
 		
+		// Fog & colors networking/handlers
 		OTGClientSyncManager.setup();
 		MultipleColorHandler.setup();
-	} 
+	}
 
 	@SubscribeEvent
 	public void onCommandRegister(RegisterCommandsEvent event)
@@ -111,7 +112,7 @@ public class OTGPlugin
 	public void onSave(Save event)
 	{
 		// Save OTG DimensionTypes to world save folder as datapack json files so they're picked up on world load.
-		// Unfortunately there doesn't appear to be a way to persist them via code.
+		// Unfortunately there doesn't appear to be a way to persist them via code(?)
 		if(!event.getWorld().isClientSide())
 		{			
 			if(((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)

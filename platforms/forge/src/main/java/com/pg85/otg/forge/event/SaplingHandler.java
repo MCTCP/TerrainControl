@@ -40,7 +40,7 @@ public class SaplingHandler
     	if(!(event.getWorld() instanceof ServerWorld))
     	{
     		return;
-    	}		
+    	}
 		
         BlockPos blockPos = event.getPos();
 		ForgeWorldGenRegion worldGenRegion;	

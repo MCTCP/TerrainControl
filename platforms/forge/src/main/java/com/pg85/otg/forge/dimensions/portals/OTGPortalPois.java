@@ -7,6 +7,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
+// Points of interest, used to track OTG portals.
 public class OTGPortalPois
 {
 	public static final DeferredRegister<PointOfInterestType> poi = DeferredRegister.create(ForgeRegistries.POI_TYPES, Constants.MOD_ID_SHORT);
