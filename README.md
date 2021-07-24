@@ -16,7 +16,7 @@ We're always looking for people to contribute or collaborate with. For OTG 1.16,
 ## Installation / building
 
 - As with Forge mods, download the repo, then run /gradlew genEclipseRuns, then /gradlew eclipse (for Eclipse IDE).
-- To create a release jar in the build folder, run /gradlew createReleaseJar.
+- To create a release jar in the build folder, update the build version in build.gradle, then run /gradlew createReleaseJar.
 - If you're having problems, make a sacrifice to the gradle gods and/or run /gradlew clean and /gradlew --refresh-dependencies.
 
 ## Links
@@ -25,7 +25,10 @@ We're always looking for people to contribute or collaborate with. For OTG 1.16,
 * [Discord](https://discord.com/invite/UXzdVTH)
 * [Installation](https://openterraingen.fandom.com/wiki/Installing_OTG) for Spigot and Forge
 
-## Original TerrainControl developers
+## Original developers (TerrainControl, PhoenixTerrainMod, BiomeTerrainMod)
+
+OpenTerrainGenerator is a fork of Terrain Control, which is the successor to <a href="http://www.minecraftforum.net/topic/313991-phoenixterrainmod/">PhoenixTerrainMod</a>, which was based on <a href="http://www.minecraftforum.net/topic/71565-biomemod/">BiomeTerrainMod</a>. 
+
 * <a href="https://github.com/rutgerkok">Rutgerkok</a>
 * <a href="https://github.com/Timethor">Timethor</a>
 * <a href="https://github.com/oloflarsson">Oloflarsson</a>
