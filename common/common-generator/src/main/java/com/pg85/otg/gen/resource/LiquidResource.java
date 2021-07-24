@@ -40,7 +40,6 @@ public class LiquidResource extends FrequencyResourceBase
 	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-
 		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y + 1, z);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
@@ -54,7 +53,7 @@ public class LiquidResource extends FrequencyResourceBase
 		}
 
 		worldMaterial = worldGenRegion.getMaterial(x, y, z);
-		if (worldMaterial == null || !worldMaterial.isAir() || !this.sourceBlocks.contains(worldMaterial))
+		if (worldMaterial == null || (!worldMaterial.isAir() && !this.sourceBlocks.contains(worldMaterial)))
 		{
 			return;
 		}
