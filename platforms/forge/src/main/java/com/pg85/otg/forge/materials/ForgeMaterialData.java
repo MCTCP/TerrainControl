@@ -38,7 +38,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		this.rawEntry = raw;
 		this.isBlank = isBlank;
 	}
-		
+
 	static ForgeMaterialData ofBlock(Block block, String raw)
 	{
 		return ofBlockState(block.defaultBlockState(), raw);
@@ -293,5 +293,21 @@ public class ForgeMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16
 		return this.blockData == null ? -1 : this.blockData.hashCode();
-	}	
+	}
+
+	@Override
+	public LocalMaterialData legalOrPersistentLeaves()
+	{
+		if (!this.isLeaves())
+		{
+			return this;
+		}
+		int i = blockData.getValue(LeavesBlock.DISTANCE);
+		if (i > 6)
+		{
+			return ForgeMaterialData.ofBlockState(blockData.setValue(LeavesBlock.PERSISTENT, true));
+		} else {
+			return ForgeMaterialData.ofBlockState(blockData.setValue(LeavesBlock.PERSISTENT, false));
+		}
+	}
 }

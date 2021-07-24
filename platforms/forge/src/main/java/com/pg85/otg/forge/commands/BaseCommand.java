@@ -6,5 +6,5 @@ import net.minecraft.command.CommandSource;
 
 public interface BaseCommand
 {
-	public void build(LiteralArgumentBuilder<CommandSource> builder);
+	void build(LiteralArgumentBuilder<CommandSource> builder);
 }

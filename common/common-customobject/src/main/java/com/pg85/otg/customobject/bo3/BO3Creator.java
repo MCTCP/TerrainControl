@@ -2,6 +2,10 @@ package com.pg85.otg.customobject.bo3;
 
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.BOCreator;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
+import com.pg85.otg.customobject.bofunctions.BranchFunction;
+import com.pg85.otg.customobject.creator.Extractor;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BranchFunction;
@@ -27,6 +31,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class BO3Creator extends BOCreator
 {
 	public static BO3 create(
@@ -54,7 +59,7 @@ public class BO3Creator extends BOCreator
 		}
 
 		// Loop through region, getting the block from the localWorld
-		List<BO3BlockFunction> blocks = getBlockFunctions(min, max, center, localWorld, nbtHelper, includeAir, objectName, objectFolder);
+		List<BlockFunction<?>> blocks = getBlockFunctions(min, max, center, localWorld, nbtHelper, includeAir, objectName, objectFolder);
 
 		// Add extra blocks in from the fixbo3 command
 		if (extraBlocks != null) blocks.addAll(extraBlocks);
@@ -69,22 +74,9 @@ public class BO3Creator extends BOCreator
 	}
 
 	// Use this to make the BO3 config
-	private static BO3Config makeBO3Config(
-		BO3Config template, 
-		String objectName, 
-		File bo3File, 
-		ILogger logger, 
-		Corner max, 
-		Corner min,
-		List<BO3BlockFunction> blocks, 
-		List<BO3BranchFunction> branches, 
-		String presetFolderName, 
-		Path rootPath,
-		CustomObjectManager boManager, 
-		IMaterialReader mr, 
-		CustomObjectResourcesManager manager, 
-		IModLoadedChecker mlc
-	)
+	private static BO3Config makeBO3Config(BO3Config template, String objectName, File bo3File, ILogger logger, Corner max, Corner min,
+										   List<BlockFunction<?>> blocks, List<BranchFunction<?>> branches, String presetFolderName, Path rootPath,
+										   CustomObjectManager boManager, IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 		BO3Config config = template.cloneConfigValues(new FileSettingsReaderBO4(objectName, bo3File, logger));
 		if (branches != null)
@@ -100,14 +92,14 @@ public class BO3Creator extends BOCreator
 		return config;
 	}
 
-	private static ArrayList<BO3BlockFunction> getBlockFunctions(
+	private static List<BlockFunction<?>> getBlockFunctions(
 		Corner min, Corner max, Corner center, LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, boolean includeAir, String objectName, File objectFolder)
 	{
 		// Loop through the defined region and make BO3BlockFunctions of all the found blocks
 		// Also includes TileEntities, which are saved to their own sub-folder
 
 		File nbtFolder = new File(objectFolder, objectName);
-		ArrayList<BO3BlockFunction> blocks = new ArrayList<>();
+		ArrayList<BlockFunction<?>> blocks = new ArrayList<>();
 		for (int x = min.x; x <= max.x; x++)
 		{
 			for (int z = min.z; z <= max.z; z++)
@@ -116,9 +108,10 @@ public class BO3Creator extends BOCreator
 				{
 					LocalMaterialData materialData = localWorld.getMaterial(x, y, z);
 					if (materialData == null || (!includeAir && materialData.isMaterial(LocalMaterials.AIR)))
-					{
 						continue;
-					}
+
+					if (materialData.isLeaves())
+						materialData = materialData.legalOrPersistentLeaves();
 
 					BO3BlockFunction block = new BO3BlockFunction();
 					block.material = materialData;
@@ -134,7 +127,7 @@ public class BO3Creator extends BOCreator
 						try
 						{
 							if (!nbtFolder.exists()) nbtFolder.mkdirs();
-							String tileName = getTileEntityName(nbt);
+							String tileName = Extractor.getTileEntityName(nbt);
 							String nbtName = objectName + "/" + tileName + "_" + block.x + "_" + block.y + "_" + block.z + ".nbt";
 							block.nbt = nbt;
 							block.nbtName = nbtName;
@@ -160,16 +153,12 @@ public class BO3Creator extends BOCreator
 
 	public static BO3 createStructure(
 		Corner min, Corner max, Corner center, String objectName, boolean includeAir, Path objectPath,
-		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
+		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, BO3Config template,
 		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
-		File objectFolder = objectPath.toFile();
-
-		File branchFolder = new File(objectFolder, objectName);
+		File branchFolder = new File(objectPath.toFile(), objectName);
 		branchFolder.mkdirs();
-
-		File mainFile = new File(objectFolder, objectName + ".bo3");
 
 		// Plot out how many sub-objects we need
 
@@ -181,8 +170,7 @@ public class BO3Creator extends BOCreator
 		// Get the blocks for each branch, put them in a grid
 		//  - Make sure empty branches are ignored
 
-		@SuppressWarnings("unchecked")
-		ArrayList<BO3BlockFunction>[][] branchGrid = (ArrayList<BO3BlockFunction>[][]) new ArrayList<?>[chunksOnXAxis][chunksOnZAxis];
+		List<BlockFunction<?>>[][] branchGrid = (List<BlockFunction<?>>[][]) new ArrayList<?>[chunksOnXAxis][chunksOnZAxis];
 
 		// Array with booleans, saying if a given branch exists
 		boolean[][] exists = new boolean[chunksOnXAxis][chunksOnZAxis];
@@ -196,7 +184,8 @@ public class BO3Creator extends BOCreator
 				Corner branchMax = new Corner(
 					branchX == chunksOnXAxis - 1 ? max.x : branchMin.x + 15,
 					max.y,
-					branchZ == chunksOnZAxis - 1 ? max.z : branchMin.z + 15);
+					branchZ == chunksOnZAxis - 1 ? max.z : branchMin.z + 15
+				);
 				String branchName = objectName + "_C" + branchX + "_r" + branchZ;
 
 				branchGrid[branchX][branchZ] = getBlockFunctions(branchMin, branchMax, branchMin, localWorld, nbtHelper,
@@ -204,7 +193,6 @@ public class BO3Creator extends BOCreator
 				exists[branchX][branchZ] = !branchGrid[branchX][branchZ].isEmpty();
 			}
 		}
-
 
 		// Connect the grid in a nice way
 
@@ -224,7 +212,7 @@ public class BO3Creator extends BOCreator
 					heads.add(ChunkCoordinate.fromChunkCoords(x, z));
 				}
 				// Create config for this BO3
-				ArrayList<BO3BranchFunction> branches = new ArrayList<>();
+				ArrayList<BranchFunction<?>> branches = new ArrayList<>();
 
 				if (x < exists.length - 1 && exists[x + 1][z] && !processed[x + 1][z])
 				{ // East
@@ -263,7 +251,7 @@ public class BO3Creator extends BOCreator
 
 		//Add the heads as branches to the main BO3
 
-		List<BO3BranchFunction> branches = new ArrayList<>();
+		List<BranchFunction<?>> branches = new ArrayList<>();
 
 		for (ChunkCoordinate coord : heads)
 		{
@@ -272,19 +260,19 @@ public class BO3Creator extends BOCreator
 		}
 
 		BO3Config mainConfig = makeBO3Config(
-			template, 
-			objectName, 
-			mainFile, 
-			logger, 
-			min, 
-			max, 
-			new ArrayList<>(), 
-			branches, 
+			template,
+			objectName,
+			new File(objectPath.toFile(), objectName + ".bo3"),
+			logger,
+			min,
+			max,
+			new ArrayList<>(),
+			branches,
 			presetFolderName,
-			rootPath, 
-			boManager, 
+			rootPath,
+			boManager,
 			mr,
-			manager, 
+			manager,
 			mlc
 		);
 

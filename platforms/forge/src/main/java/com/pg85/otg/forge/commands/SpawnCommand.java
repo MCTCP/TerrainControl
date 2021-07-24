@@ -45,7 +45,7 @@ public class SpawnCommand implements BaseCommand
 	{
 		builder.then(Commands.literal("spawn")
 			.then(
-				Commands.argument("preset", new PresetArgument()).then(
+				Commands.argument("preset", new PresetArgument(true)).then(
 					Commands.argument("object", new BiomeObjectArgument()).executes(
 						context -> SpawnCommand.execute(
 							context.getSource(),

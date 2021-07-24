@@ -35,7 +35,7 @@ public class CustomObjectCollection
 	private HashMap<String, HashMap<String, File>> customObjectFilesPerPreset = new HashMap<String, HashMap<String, File>>();
 	private HashMap<String, HashMap<String, File>> boTemplateFilesPerPreset = new HashMap<>();
 
-	private CustomObject loadObject(File file, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public CustomObject loadObject(File file, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		synchronized(indexingFilesLock)
 		{
@@ -202,36 +202,58 @@ public class CustomObjectCollection
 		}
 	}
 
-	public ArrayList<String> getAllBONamesForPreset(String presetFolderName)
+	public ArrayList<String> getAllBONamesForPreset(String presetFolderName, ILogger logger, Path otgRootPath)
 	{
 		HashMap<String, File> files = customObjectFilesPerPreset.get(presetFolderName);
+		if (files == null)
+		{
+			indexPresetObjectsFolder(presetFolderName, logger, otgRootPath);
+			files = customObjectFilesPerPreset.get(presetFolderName);
+		}
 		return files == null ? null : new ArrayList<>(files.keySet());
 	}
 
-	public ArrayList<String> getTemplatesForPreset(String presetFolderName)
+	public ArrayList<String> getTemplatesForPreset(String presetFolderName, ILogger logger, Path otgRootPath)
 	{
 		HashMap<String, File> files = boTemplateFilesPerPreset.get(presetFolderName);
+		if (files == null)
+		{
+			indexPresetObjectsFolder(presetFolderName, logger, otgRootPath);
+			files = customObjectFilesPerPreset.get(presetFolderName);
+		}
 		return files == null ? null : new ArrayList<>(files.keySet());
 	}
 
-	public ArrayList<String> getGlobalObjectNames()
+	public ArrayList<String> getGlobalObjectNames(ILogger logger, Path otgRootPath)
 	{
+		if (customObjectFilesGlobalObjects == null)
+		{
+			indexGlobalObjectsFolder(logger, otgRootPath);
+		}
 		return customObjectFilesGlobalObjects == null
 				? null
 				: new ArrayList<>(customObjectFilesGlobalObjects.keySet());
 	}
 
-	public ArrayList<String> getGlobalTemplates()
+	public ArrayList<String> getGlobalTemplates(ILogger logger, Path otgRootPath)
 	{
+		if (globalTemplates == null)
+		{
+			indexGlobalObjectsFolder(logger, otgRootPath);
+		}
 		return globalTemplates == null
 				? null
 				: new ArrayList<>(globalTemplates.keySet());
 	}
 
+	// Adds an object to a preset, if it has been loaded
+	// Does not add the object if the preset's BO's have not yet been indexed
 	public void addObjectToPreset(String presetFolderName, String objectName, File boFile, CustomObject object)
 	{
-		objectsByNamePerPreset.get(presetFolderName).put(objectName, object);
-		customObjectFilesPerPreset.get(presetFolderName).put(objectName, boFile);
+		HashMap<String, CustomObject> objectsByName = objectsByNamePerPreset.get(presetFolderName);
+		if (objectsByName != null) objectsByName.put(objectName, object);
+		HashMap<String, File> customObjectFiles = customObjectFilesPerPreset.get(presetFolderName);
+		if (customObjectFiles != null) customObjectFiles.put(objectName, boFile);
 	}
 	
 	public CustomObject getObjectByName(String name, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)

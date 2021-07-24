@@ -2,6 +2,7 @@ package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.exceptions.InvalidConfigException;
@@ -16,12 +17,11 @@ import java.nio.file.Path;
 public abstract class CustomObjectConfigFile
 {
 	public SettingsReaderBO4 reader;
+	public ConfigMode settingsMode;
 
 	/**
 	 * Creates a new configuration file.
 	 * <p/>
-	 * @param name	Name of the thing that is being read,
-	 *				like Plains or MyBO3. May not be null.
 	 * @param reader Settings reader
 	 */
 	protected CustomObjectConfigFile(SettingsReaderBO4 reader) throws IllegalArgumentException
@@ -116,4 +116,6 @@ public abstract class CustomObjectConfigFile
 	{
 		return reader.getFile();
 	}
+
+	public abstract BlockFunction<?>[] getBlockFunctions(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker);
 }

@@ -181,6 +181,9 @@ public class ForgeMaterials extends LocalMaterials
 		
 		AIR = ForgeMaterialData.ofBlockState(Blocks.AIR.defaultBlockState());
 		CAVE_AIR = ForgeMaterialData.ofBlockState(Blocks.CAVE_AIR.defaultBlockState());
+		STRUCTURE_VOID = ForgeMaterialData.ofBlockState(Blocks.STRUCTURE_VOID.defaultBlockState());
+		COMMAND_BLOCK = ForgeMaterialData.ofBlockState(Blocks.COMMAND_BLOCK.defaultBlockState());
+		STRUCTURE_BLOCK = ForgeMaterialData.ofBlockState(Blocks.STRUCTURE_BLOCK.defaultBlockState());
 		GRASS = ForgeMaterialData.ofBlockState(Blocks.GRASS.defaultBlockState());
 		DIRT = ForgeMaterialData.ofBlockState(Blocks.DIRT.defaultBlockState());
 		CLAY = ForgeMaterialData.ofBlockState(Blocks.CLAY.defaultBlockState());

@@ -237,7 +237,8 @@ public class SpawnCommand implements BaseCommand
 
 		if (objectName != null && presetFolderNames.contains(presetFolderName)) // We have a complete first argument, suggest object name
 		{
-			return StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName), new ArrayList<>());
+			return StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()), new ArrayList<>());
 		} else { // Suggest preset name
 			return StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList<>());
 		}

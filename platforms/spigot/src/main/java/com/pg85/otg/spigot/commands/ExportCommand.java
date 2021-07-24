@@ -22,7 +22,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.customobject.BOCreator;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
@@ -48,26 +48,17 @@ public class ExportCommand implements BaseCommand
 
 	public boolean execute(CommandSender sender, String[] args)
 	{
-		if (!(sender instanceof Player))
-		{
-			sender.sendMessage("Only players can execute this command"); 
-			return true;
-		}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Only players can execute this command"); return true;}
 		Player player = (Player) sender;
 
-		if (args.length == 0)
-		{
-			help(player); 
-			return true;
-		}
+		if (args.length == 0) {help(player); return true;}
 		String objectName =  args[0];
 		IBlockData centerBlockState = null;
 		try
 		{
-			if (args.length >= 2)
-			{
-				centerBlockState = ArgumentTile.a().parse(new StringReader(args[1])).a();
-			}
+			// Get the material to use for center block
+			 if (args.length >= 2) centerBlockState = ArgumentTile.a().parse(new StringReader(args[1])).a();
 		}
 		catch (CommandSyntaxException e)
 		{
@@ -84,18 +75,13 @@ public class ExportCommand implements BaseCommand
 
 		// Get region
 		Region region = playerSelectionMap.get(player);
-		if (region == null || region.getLow() == null)
-		{
-			sender.sendMessage("Please mark two corners with /otg region mark"); 
-			return true;
-		}
+		if (region == null || region.getLow() == null) {
+			sender.sendMessage("Please mark two corners with /otg region mark"); return true;}
+
 		// Get preset
 		Preset preset = getPresetOrDefault(presetName);
-		if (preset == null)
-		{
-			sender.sendMessage("Could not find preset " + (presetName == null ? "" : presetName)); 
-			return true;
-		}
+		if (preset == null) {
+			sender.sendMessage("Could not find preset "+presetName); return true; }
 
 		// Get object path
 		Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
@@ -115,23 +101,23 @@ public class ExportCommand implements BaseCommand
 		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
 		{
 			genRegion = new SpigotWorldGenRegion(
-				preset.getFolderName(), 
-				preset.getWorldConfig(), 
+				preset.getFolderName(),
+				preset.getWorldConfig(),
 				((CraftWorld)player.getWorld()).getHandle(),
 				((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
 			);
 		} else {
 			genRegion = new MCWorldGenRegion(
-				preset.getFolderName(), 
-				preset.getWorldConfig(), 
+				preset.getFolderName(),
+				preset.getWorldConfig(),
 				((CraftWorld) player.getWorld()).getHandle()
 			);
 		}
 
 		LocalNBTHelper nbtHelper = new SpigotNBTHelper();
-		BOCreator.Corner lowCorner = region.getLow();
-		BOCreator.Corner highCorner = region.getHigh();
-		BOCreator.Corner center = new BOCreator.Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
+		Corner lowCorner = region.getLow();
+		Corner highCorner = region.getHigh();
+		Corner center = new Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
 
 		// Fetch template or default settings
 		BO3 template = (BO3) OTG.getEngine().getCustomObjectManager().getObjectLoaders().get("bo3")
@@ -139,12 +125,12 @@ public class ExportCommand implements BaseCommand
 
 		// Initialize the settings
 		template.onEnable(
-			preset.getFolderName(), 
+			preset.getFolderName(),
 			OTG.getEngine().getOTGRootFolder(),
-			OTG.getEngine().getLogger(), 
-			OTG.getEngine().getCustomObjectManager(), 
+			OTG.getEngine().getLogger(),
+			OTG.getEngine().getCustomObjectManager(),
 			OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-			OTG.getEngine().getCustomObjectResourcesManager(), 
+			OTG.getEngine().getCustomObjectResourcesManager(),
 			OTG.getEngine().getModLoadedChecker()
 		);
 
@@ -155,20 +141,19 @@ public class ExportCommand implements BaseCommand
 			try
 			{
 				bo3 = BO3Creator.createStructure(
-					lowCorner, 
-					highCorner, 
-					center, 
-					objectName, 
-					includeAir, 
-					objectPath, 
+					lowCorner,
+					highCorner,
+					center,
+					objectName,
+					includeAir,
+					objectPath,
 					genRegion,
-					nbtHelper, 
-					null, 
-					template.getSettings(), 
-					preset.getFolderName(), 
+					nbtHelper,
+					template.getConfig(),
+					preset.getFolderName(),
 					OTG.getEngine().getOTGRootFolder(),
-					OTG.getEngine().getLogger(), 
-					OTG.getEngine().getCustomObjectManager(), 
+					OTG.getEngine().getLogger(),
+					OTG.getEngine().getCustomObjectManager(),
 					OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()
 				);
@@ -182,23 +167,23 @@ public class ExportCommand implements BaseCommand
 			// Create a new BO3 from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : SpigotMaterialData.ofBlockData(centerBlockState);
 			bo3 = BO3Creator.create(
-				lowCorner, 
-				highCorner, 
-				center, 
-				centerBlock, 
-				objectName, 
+				lowCorner,
+				highCorner,
+				center,
+				centerBlock,
+				objectName,
 				includeAir,
-				objectPath, 
-				genRegion, 
-				nbtHelper, 
-				null, 
-				template.getSettings(), 
+				objectPath,
+				genRegion,
+				nbtHelper,
+				null,
+				template.getConfig(),
 				preset.getFolderName(),
-				OTG.getEngine().getOTGRootFolder(), 
-				OTG.getEngine().getLogger(), 
-				OTG.getEngine().getCustomObjectManager(), 
+				OTG.getEngine().getOTGRootFolder(),
+				OTG.getEngine().getLogger(),
+				OTG.getEngine().getCustomObjectManager(),
 				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-				OTG.getEngine().getCustomObjectResourcesManager(), 
+				OTG.getEngine().getCustomObjectResourcesManager(),
 				OTG.getEngine().getModLoadedChecker()
 			);
 		}
@@ -209,9 +194,9 @@ public class ExportCommand implements BaseCommand
 			sender.sendMessage("Successfully created BO3 " + objectName);
 			if (isGlobal)
 			{
-				OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
+				OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getConfig().getFile());
 			} else {
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), bo3.getName().toLowerCase(Locale.ROOT), bo3.getConfig().getFile(), bo3);
 			}
 		} else {
 			sender.sendMessage("Failed to create BO3 " + objectName);
@@ -318,22 +303,22 @@ public class ExportCommand implements BaseCommand
 		switch (direction)
 		{
 			case "south": // positive Z
-				region.setHighCorner(new BOCreator.Corner(region.high.x, region.high.y, region.high.z + value));
+				region.setHighCorner(new Corner(region.high.x, region.high.y, region.high.z + value));
 				break;
 			case "north": // negative Z
-				region.setLowCorner(new BOCreator.Corner(region.low.x, region.low.y, region.low.z - value));
+				region.setLowCorner(new Corner(region.low.x, region.low.y, region.low.z - value));
 				break;
 			case "east": // positive X
-				region.setHighCorner(new BOCreator.Corner(region.high.x + value, region.high.y, region.high.z));
+				region.setHighCorner(new Corner(region.high.x + value, region.high.y, region.high.z));
 				break;
 			case "west": // negative X
-				region.setLowCorner(new BOCreator.Corner(region.low.x - value, region.low.y, region.low.z));
+				region.setLowCorner(new Corner(region.low.x - value, region.low.y, region.low.z));
 				break;
 			case "up": // positive y
-				region.setHighCorner(new BOCreator.Corner(region.high.x, region.high.y + value, region.high.z));
+				region.setHighCorner(new Corner(region.high.x, region.high.y + value, region.high.z));
 				break;
 			case "down": // negative y
-				region.setLowCorner(new BOCreator.Corner(region.low.x, region.low.y - value, region.low.z));
+				region.setLowCorner(new Corner(region.low.x, region.low.y - value, region.low.z));
 				break;
 			default:
 				source.sendMessage("Unrecognized direction " + direction);
@@ -371,9 +356,11 @@ public class ExportCommand implements BaseCommand
 			List<String> list;
 			if (preset.equalsIgnoreCase("global"))
 			{
-				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getGlobalTemplates();
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+					.getGlobalTemplates(OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
 			} else {
-				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplatesForPreset(preset);
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+					.getTemplatesForPreset(preset, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
 			}
 			if (list == null) list = new ArrayList<>();
 			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
@@ -427,8 +414,8 @@ public class ExportCommand implements BaseCommand
 
 	public static class Region
 	{
-		private BOCreator.Corner low = null;
-		private BOCreator.Corner high = null;
+		private Corner low = null;
+		private Corner high = null;
 		private final BlockPosition[] posArr = new BlockPosition[2];
 
 		public Region()
@@ -466,34 +453,34 @@ public class ExportCommand implements BaseCommand
 			high = null;
 		}
 
-		public BOCreator.Corner getLow()
+		public Corner getLow()
 		{
 			return low;
 		}
 
-		public BOCreator.Corner getHigh()
+		public Corner getHigh()
 		{
 			return high;
 		}
 
-		protected void setLowCorner(BOCreator.Corner newCorner)
+		protected void setLowCorner(Corner newCorner)
 		{
 			this.low = newCorner;
 		}
 
-		protected void setHighCorner(BOCreator.Corner newCorner)
+		protected void setHighCorner(Corner newCorner)
 		{
 			this.high = newCorner;
 		}
 
 		private void updateCorners()
 		{
-			low = new BOCreator.Corner(
+			low = new Corner(
 				Math.min(posArr[0].getX(), posArr[1].getX()),
 				Math.min(posArr[0].getY(), posArr[1].getY()),
 				Math.min(posArr[0].getZ(), posArr[1].getZ())
 			);
-			high = new BOCreator.Corner(
+			high = new Corner(
 				Math.max(posArr[0].getX(), posArr[1].getX()),
 				Math.max(posArr[0].getY(), posArr[1].getY()),
 				Math.max(posArr[0].getZ(), posArr[1].getZ())

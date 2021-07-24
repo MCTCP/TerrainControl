@@ -2,6 +2,9 @@ package com.pg85.otg.customobject.config.io;
 
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.customobject.bo4.BO4Config;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
+import com.pg85.otg.customobject.bofunctions.BranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
@@ -15,6 +18,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileSettingsWriterBO4 implements SettingsWriterBO4
 {
@@ -36,7 +41,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static void writeToFile(CustomObjectConfigFile config, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		writeToFile(config, config.getFile(), configMode, logger, materialReader, manager);
 	}
@@ -50,7 +55,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 	 * @param configMode The configuration mode. If this is set to
 	 * WriteDisable, this method does nothing.
 	 */
-	public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	public static void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
 	{
 		if (configMode == ConfigMode.WriteDisable)
 		{
@@ -66,6 +71,35 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
 				LogLevel.ERROR,
 				LogCategory.CONFIGS,
 				String.format("Failed to write to file " + file + ", error: ",(Object[])e.getStackTrace())
+			);
+		}
+	}
+
+	/** Writes a BO4 to file with extra data; used by /otg export
+	 *
+	 * @param config The BO4 Config to be written
+	 * @param blocksList The list of blocks to be written to the config
+	 * @param branchesList The list of branches to be written to the config
+	 */
+	public static void writeToFileWithData(BO4Config config, List<BlockFunction<?>> blocksList, List<BranchFunction<?>> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+	{
+		FileSettingsWriterBO4 writer = new FileSettingsWriterBO4(config.getFile());
+		try
+		{
+			config.writeWithData
+				(
+					writer,
+					blocksList == null ? new ArrayList<>() : blocksList,
+					branchesList == null ? new ArrayList<>() : branchesList,
+					logger,
+					materialReader,
+					manager
+				);
+		} catch (IOException e) {
+			logger.log(
+				LogLevel.ERROR,
+				LogCategory.CONFIGS,
+				String.format("Failed to write BO4 config " + config.getName() + ", error: ",(Object[])e.getStackTrace())
 			);
 		}
 	}

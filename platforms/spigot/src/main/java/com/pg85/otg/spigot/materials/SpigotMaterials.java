@@ -178,6 +178,9 @@ public class SpigotMaterials extends LocalMaterials
 
 		AIR = SpigotMaterialData.ofBlockData(Blocks.AIR.getBlockData());
 		CAVE_AIR = SpigotMaterialData.ofBlockData(Blocks.CAVE_AIR.getBlockData());
+		STRUCTURE_VOID = SpigotMaterialData.ofBlockData(Blocks.STRUCTURE_VOID.getBlockData());
+		COMMAND_BLOCK = SpigotMaterialData.ofBlockData(Blocks.COMMAND_BLOCK.getBlockData());
+		STRUCTURE_BLOCK = SpigotMaterialData.ofBlockData(Blocks.STRUCTURE_BLOCK.getBlockData());
 		GRASS = SpigotMaterialData.ofBlockData(Blocks.GRASS_BLOCK.getBlockData());
 		DIRT = SpigotMaterialData.ofBlockData(Blocks.DIRT.getBlockData());
 		CLAY = SpigotMaterialData.ofBlockData(Blocks.CLAY.getBlockData());

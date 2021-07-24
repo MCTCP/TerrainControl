@@ -55,7 +55,7 @@ public class StructureCommand implements BaseCommand
 					structureInfo += "\n" + branchesInChunk;
 				}
 			} else {
-				structureInfo += "-- BO3 Info -- \nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().getName().replace("Start", "") + "\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().author + "\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getSettings().description;
+				structureInfo += "-- BO3 Info -- \nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
 			}
 		}		
 	

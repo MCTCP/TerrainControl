@@ -108,10 +108,10 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public boolean isLiquid()
 	{
-		return 
+		return
 			this.blockData != null &&
 			(
-				this.blockData.getMaterial() == Material.WATER || 
+				this.blockData.getMaterial() == Material.WATER ||
 				this.blockData.getMaterial() == Material.LAVA
 			);
 	}
@@ -315,5 +315,21 @@ public class SpigotMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16
 		return this.blockData == null ? -1 : this.blockData.hashCode();
+	}
+
+	@Override
+	public LocalMaterialData legalOrPersistentLeaves()
+	{
+		if (!this.isLeaves())
+		{
+			return this;
+		}
+		int i = blockData.get(BlockLeaves.DISTANCE);
+		if (i > 6)
+		{
+			return SpigotMaterialData.ofBlockData(blockData.set(BlockLeaves.PERSISTENT, true));
+		} else {
+			return SpigotMaterialData.ofBlockData(blockData.set(BlockLeaves.PERSISTENT, false));
+		}
 	}
 }

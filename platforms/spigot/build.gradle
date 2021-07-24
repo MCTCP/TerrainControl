@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly "org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT"
     compile project(':common:common-util')
     compile project(':common:common-config')
     compile project(':common:common-customobject')

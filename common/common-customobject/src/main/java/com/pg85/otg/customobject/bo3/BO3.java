@@ -18,6 +18,7 @@ import com.pg85.otg.customobject.bo3.checks.BO3Check;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
+import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
@@ -73,7 +74,14 @@ public class BO3 implements StructuredCustomObject
 		return this.name;
 	}
 
-	public BO3Config getSettings()
+	@Override
+	public ObjectType getType()
+	{
+		return ObjectType.BO3;
+	}
+
+	@Override
+	public BO3Config getConfig()
 	{
 		return this.settings;
 	}
@@ -270,11 +278,11 @@ public class BO3 implements StructuredCustomObject
 		// A bit ugly, but avoids having to create and implement another spawnAsTree method.
 		if(minY == -1)
 		{
-			minY = this.getSettings().minHeight;
+			minY = this.getConfig().minHeight;
 		}
 		if(maxY == -1)
 		{
-			maxY = this.getSettings().maxHeight;
+			maxY = this.getConfig().maxHeight;
 		}
 		return spawn(structureCache, worldGenRegion, random, x, z, minY, maxY);
 	}

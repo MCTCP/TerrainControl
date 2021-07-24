@@ -3,6 +3,7 @@ package com.pg85.otg.customobject.bo2;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -10,11 +11,18 @@ import java.util.Random;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
+import com.pg85.otg.customobject.bo3.BO3Config;
+import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
+import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
@@ -31,16 +39,16 @@ import com.pg85.otg.util.materials.MaterialSet;
 /**
  * The good old BO2.
  */
-class BO2 extends CustomObjectConfigFile implements CustomObject
+public class BO2 extends CustomObjectConfigFile implements CustomObject
 {	
 	private ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 	private boolean isEnabled = false;
-	private MaterialSet spawnOnBlockType;
+	public MaterialSet spawnOnBlockType;
 	private MaterialSet collisionBlockType;
 	private boolean spawnWater;
 	private boolean spawnLava;
-	private boolean spawnAboveGround;
-	private boolean spawnUnderGround;
+	public boolean spawnAboveGround;
+	public boolean spawnUnderGround;
 	private boolean spawnSunlight;
 	private boolean spawnDarkness;
 	private boolean randomRotation;
@@ -50,9 +58,9 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 	private boolean needsFoundation;
 	private boolean doReplaceBlocks;
 	private int rarity;
-	private double collisionPercentage;
-	private int spawnElevationMin;
-	private int spawnElevationMax;
+	public double collisionPercentage;
+	public int spawnElevationMin;
+	public int spawnElevationMax;
 
 	BO2(SettingsReaderBO4 reader)
 	{
@@ -124,6 +132,57 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
 			}
 		}
 		return true;
+	}
+
+	public BO3Config getConvertedConfig(String presetFolderName, Path otgRootFolder, ILogger logger,
+										CustomObjectManager customObjectManager, IMaterialReader materialReader,
+										CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	{
+		BO3Config newConfig = new BO3Config(new FileSettingsReaderBO4(
+			this.getName(),
+			ObjectType.BO3.getObjectFilePathFromName(this.getName(), this.getFile().getParentFile().toPath()).toFile(),
+			logger),
+			presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+
+		// Convert the blocks
+		BoundingBox box = BoundingBox.newEmptyBox();
+		newConfig.extractBlocks(Arrays.asList(getBlockFunctions(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)));
+		newConfig.addBlockCheckFromBO2(this.spawnOnBlockType);
+		for (BlockFunction<?> res : newConfig.getBlockFunctions(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+		{
+			if (res instanceof BO3BlockFunction)
+			{
+				BO3BlockFunction block = (BO3BlockFunction) res;
+				box.expandToFit(block.x, block.y, block.z);
+			}
+		}
+		newConfig.setBoundingBox(box);
+		newConfig.rotateBlocksAndChecks(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+
+		// Convert settings
+		newConfig.getSettingsFromBO2(this);
+
+		return newConfig;
+	}
+
+	@Override
+	public BlockFunction<?>[] getBlockFunctions(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	{
+		ObjectCoordinate[] data = this.data[0];
+		BlockFunction<?>[] blockFunctions = new BO3BlockFunction[data.length];
+		int i = 0;
+		for (ObjectCoordinate point : data)
+		{
+			BO3BlockFunction block = new BO3BlockFunction();
+			block.material = point.material;
+			block.nbt = null;
+			block.nbtName = "";
+			block.x = point.x;
+			block.y = (short) point.y;
+			block.z = point.z;
+			blockFunctions[i++] = block;
+		}
+		return blockFunctions;
 	}
 
 	@Override

@@ -11,45 +11,45 @@ import com.pg85.otg.util.minecraft.TreeType;
 
 public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 {
-	public IPluginConfig getPluginConfig();
-	public IWorldConfig getWorldConfig();
-	public String getPresetFolderName();
-	public long getSeed();
-	public Random getWorldRandom();
-	public ChunkCoordinate getSpawnChunk();
+	IPluginConfig getPluginConfig();
+	IWorldConfig getWorldConfig();
+	String getPresetFolderName();
+	long getSeed();
+	Random getWorldRandom();
+	ChunkCoordinate getSpawnChunk();
 	
 	// Any getBiome/getBiomeConfig requests done as a part
 	// of chunk decoration should call getBiomeForDecoration(),
 	// unless they are intentionally querying outside of
 	// the area being decorated, in which case use getBiome().
 
-	public ICachedBiomeProvider getCachedBiomeProvider();
-	public IBiome getBiomeForDecoration(int x, int z);
-	public IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ);
-	public boolean placeTree(TreeType type, Random rand, int x, int y, int z);
-	public LocalMaterialData getMaterial(int x, int y, int z);
-	public LocalMaterialData getMaterialDirect(int x, int y, int z);
-	public int getBlockAboveLiquidHeight(int x, int z);
-	public int getBlockAboveSolidHeight(int x, int z);
-	public int getHighestBlockAboveYAt(int x, int z);
-	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
-	public int getHeightMapHeight(int x, int z);
-	public int getLightLevel(int x, int y, int z);
-	public void setBlockDirect(int x, int y, int z, LocalMaterialData material);
-	public void setBlock(int x, int y, int z, LocalMaterialData material);
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag);
-	public void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ReplaceBlockMatrix replaceBlocksMatrix);
-	public void spawnEntity(IEntityFunction<?> newEntityData);
-	public void placeDungeon(Random random, int x, int y, int z, int range, int count);
-	public void placeFossil(Random random, int x, int y, int z, int chance);
-	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
-	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
-	public DecorationArea getDecorationArea();
+	ICachedBiomeProvider getCachedBiomeProvider();
+	IBiome getBiomeForDecoration(int x, int z);
+	IBiomeConfig getBiomeConfigForDecoration(int worldX, int worldZ);
+	boolean placeTree(TreeType type, Random rand, int x, int y, int z);
+	LocalMaterialData getMaterial(int x, int y, int z);
+	LocalMaterialData getMaterialDirect(int x, int y, int z);
+	int getBlockAboveLiquidHeight(int x, int z);
+	int getBlockAboveSolidHeight(int x, int z);
+	int getHighestBlockAboveYAt(int x, int z);
+	int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
+	int getHeightMapHeight(int x, int z);
+	int getLightLevel(int x, int y, int z);
+	void setBlockDirect(int x, int y, int z, LocalMaterialData material);
+	void setBlock(int x, int y, int z, LocalMaterialData material);
+	void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag);
+	void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);
+	void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ReplaceBlockMatrix replaceBlocksMatrix);
+	void spawnEntity(IEntityFunction<?> newEntityData);
+	void placeDungeon(Random random, int x, int y, int z, int range, int count);
+	void placeFossil(Random random, int x, int y, int z, int chance);
+	void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
+	boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
+	DecorationArea getDecorationArea();
 
 	// Shadowgen
 
-	public LocalMaterialData getMaterialWithoutLoading(int x, int y, int z);
-	public int getHighestBlockYAtWithoutLoading(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
-	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);	
+	LocalMaterialData getMaterialWithoutLoading(int x, int y, int z);
+	int getHighestBlockYAtWithoutLoading(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
+	boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
 }

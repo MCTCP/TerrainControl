@@ -18,7 +18,14 @@ import net.minecraft.command.ISuggestionProvider;
 public class PresetArgument implements ArgumentType<String>
 {
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
-	
+	private final boolean global;
+
+	public PresetArgument(boolean global)
+	{
+
+		this.global = global;
+	}
+
 	@Override
 	public String parse(StringReader reader) throws CommandSyntaxException
 	{
@@ -31,7 +38,7 @@ public class PresetArgument implements ArgumentType<String>
 		// TODO: Should this include shortnames?
 		Set<String> set = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream()
 			.map(filterNamesWithSpaces).collect(Collectors.toSet());
-		set.add("global");
+		if (global) set.add("global");
 		return ISuggestionProvider.suggest(set, builder);
 	}
 }

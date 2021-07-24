@@ -13,6 +13,7 @@ import com.pg85.otg.customobject.bo4.bo4function.BO4ParticleFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4SpawnerFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4WeightedBranchFunction;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.bofunctions.BranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
@@ -22,6 +23,7 @@ import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
+import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
@@ -56,7 +58,6 @@ public class BO4Config extends CustomObjectConfigFile
 	
 	public String author;
 	public String description;
-	ConfigMode settingsMode;
 	public boolean doReplaceBlocks;
 	public int frequency;
 	
@@ -66,8 +67,9 @@ public class BO4Config extends CustomObjectConfigFile
 	public int maxHeight;
 
 	public SpawnHeightEnum spawnHeight;
-	public boolean useCenterForHighestBlock;	
-	
+	public boolean useCenterForHighestBlock;
+	public BoundingBox[] boundingBoxes = new BoundingBox[4];
+
 	private BO4BlockFunction[][] heightMap;
 	
 	private boolean inheritedBO3Loaded;
@@ -181,11 +183,11 @@ public class BO4Config extends CustomObjectConfigFile
 	boolean isBO4Data = false;
 		
 	/**
-	 * Creates a BO3Config from a file.
+	 * Creates a BO4Config from a file.
 	 *
-	 * @param reader		The settings of the BO3.
+	 * @param reader		The settings of the BO4.
 	 */
-	BO4Config(SettingsReaderBO4 reader, boolean init, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	public BO4Config(SettingsReaderBO4 reader, boolean init, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		super(reader);
 		if(init)
@@ -194,6 +196,11 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 	}
 
+	private BO4Config(SettingsReaderBO4 reader)
+	{
+		super(reader);
+	}
+	
 	static int BO4BlocksLoadedFromBO4Data = 0;
 	static int accumulatedTime = 0;
 	static int accumulatedTime2 = 0;
@@ -216,7 +223,7 @@ public class BO4Config extends CustomObjectConfigFile
 			//OTG.log(LogMarker.INFO, ".BO4 loaded in: " + timeTaken + " " + this.getName() + ".BO4");
 		} else {
 			//long startTime = System.currentTimeMillis();
-				this.readFromBO4DataFile(false, logger, materialReader);
+			this.readFromBO4DataFile(false, logger, materialReader);
 			//BO4BlocksLoadedFromBO4Data++;
 			//long timeTaken = (System.currentTimeMillis() - startTime);
 			//accumulatedTime2 += timeTaken;			
@@ -574,12 +581,12 @@ public class BO4Config extends CustomObjectConfigFile
 				}
 
 				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getConfig().getBlocks(presetFolderName, otgRootFolder, logger, customObjectManager2, materialReader, manager, modLoadedChecker);				
-				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
+				ArrayList<BlockFunction<?>> newBlocks = new ArrayList<>();				
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(parentBlocks)));
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(blocks)));
 					
 				short[][] columnSizes = new short[16][16];
-				for(BO4BlockFunction block : newBlocks)
+				for(BlockFunction<?> block : newBlocks)
 				{
 					columnSizes[block.x][block.z]++;
 				}
@@ -1021,9 +1028,9 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 
 		this.branchesBO4 = tempBranchesList.toArray(new BO4BranchFunction[tempBranchesList.size()]);
-	}
-	
-	public void setBranches(List<BO4BranchFunction> branches)
+    }
+    
+	public void setBranches(List<BranchFunction<?>> branches)
 	{
 		this.branchesBO4 = branches.toArray(new BO4BranchFunction[branches.size()]);
 	}
@@ -1039,12 +1046,18 @@ public class BO4Config extends CustomObjectConfigFile
 	}
 
 	@Override
+	public BlockFunction<?>[] getBlockFunctions(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	{
+		return getBlocks(presetFolderName, otgRootFolder, logger, (CustomObjectManager) customObjectManager, materialReader, manager, modLoadedChecker);
+	}
+
+	@Override
 	protected void writeConfigSettings(SettingsWriterBO4 writer, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		writeSettings(writer, null, null, logger, materialReader, manager);
 	}
-	
-	public void writeWithData(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+
+	public void writeWithData(SettingsWriterBO4 writer, List<BlockFunction<?>> blocksList, List<BranchFunction<?>> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		writer.setConfigMode(ConfigMode.WriteAll);
 		try
@@ -1056,7 +1069,7 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 	}
 	
-	private void writeSettings(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	private void writeSettings(SettingsWriterBO4 writer, List<BlockFunction<?>> blocksList, List<BranchFunction<?>> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		// The object
 		writer.bigTitle("BO4 object");
@@ -1367,7 +1380,7 @@ public class BO4Config extends CustomObjectConfigFile
 			loadInheritedBO3(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
-	private void writeResources(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	private void writeResources(SettingsWriterBO4 writer, List<BlockFunction<?>> blocksList, List<BranchFunction<?>> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		writer.bigTitle("Blocks");
 		writer.comment("All the blocks used in the BO4 are listed here. Possible blocks:");
@@ -1389,8 +1402,8 @@ public class BO4Config extends CustomObjectConfigFile
 		// Re-read the raw data, if no data was supplied. Don't save any loaded data, since it has been processed/transformed.
 		if(blocksList == null || branchesList == null || entitiesList == null)
 		{
-				blocksList = new ArrayList<BO4BlockFunction>();
-				branchesList = new ArrayList<BO4BranchFunction>();
+				blocksList = new ArrayList<>();
+				branchesList = new ArrayList<>();
 			
 			for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true, logger, materialReader, manager))
 			{
@@ -1432,7 +1445,7 @@ public class BO4Config extends CustomObjectConfigFile
 			}
 		}
 				
-		for(BO4BlockFunction block : blocksList)
+		for(BlockFunction<?> block : blocksList)
 		{
 			writer.function(block);
 		}
@@ -1467,7 +1480,7 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("*Note: isRequiredBranch must be set to false. It is not possible to use isRequiredBranch:true with WeightedBranch() since isRequired:true branches must spawn and automatically have a rarity of 100.0.");
 		writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
 		
-		for(BO4BranchFunction func : branchesList)
+		for(BranchFunction<?> func : branchesList)
 		{
 			writer.function(func);
 		}
@@ -2041,7 +2054,7 @@ public class BO4Config extends CustomObjectConfigFile
 					modDataBO4[i] = BO4ModDataFunction.fromStream(this, bufferDecompressed);
 				}
 					
-				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();
+				ArrayList<BlockFunction<?>> newBlocks = new ArrayList<>();
 				short[][] columnSizes = null;
 				
 				this.minX = minX;
@@ -2145,7 +2158,7 @@ public class BO4Config extends CustomObjectConfigFile
 						}
 					}
 									
-					newBlocks = new ArrayList<BO4BlockFunction>();				
+					newBlocks = new ArrayList<>();
 					newBlocks.addAll(nonRandomBlocks);
 					newBlocks.addAll(randomBlocks);				
 				}
@@ -2285,7 +2298,7 @@ public class BO4Config extends CustomObjectConfigFile
 		return this;
 	}
 			
-	private void loadBlockArrays(ArrayList<BO4BlockFunction> newBlocks, short[][] columnSizes)
+	private void loadBlockArrays(List<BlockFunction<?>> newBlocks, short[][] columnSizes)
 	{
 		// Store blocks in arrays instead of BO4BlockFunctions,
 		// since that gives way too much overhead memory wise.
@@ -2315,7 +2328,7 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 		for(int i = 0; i < newBlocks.size(); i++)
 		{
-			block = newBlocks.get(i);
+			block = (BO4BlockFunction) newBlocks.get(i);
 
 			this.blocks[block.x][block.z][columnBlockIndex[block.x][block.z]] = (short) block.y;
 
@@ -2360,8 +2373,19 @@ public class BO4Config extends CustomObjectConfigFile
 	@Override
 	protected void renameOldSettings() { }
 
-	public boolean isCollidable()
+    public boolean isCollidable()
+    {
+    	return isCollidable;
+    }
+
+	public void setBlocks(List<BlockFunction<?>> newBlocks)
 	{
-		return isCollidable;
+		short[][] columnSizes = new short[16][16];
+		for(BlockFunction<?> block : newBlocks)
+		{
+			columnSizes[block.x][block.z]++;
+		}
+
+		loadBlockArrays(newBlocks, columnSizes);
 	}
 }

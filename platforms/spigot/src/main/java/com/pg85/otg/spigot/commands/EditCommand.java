@@ -1,7 +1,7 @@
 package com.pg85.otg.spigot.commands;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.customobject.BOCreator;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
@@ -39,23 +39,13 @@ public class EditCommand implements BaseCommand
 
 	public boolean execute(CommandSender sender, String[] args)
 	{
-		if (!(sender instanceof Player))
-		{
-			sender.sendMessage("Only players can execute this command"); 
-			return true;
-		}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Only players can execute this command"); return true;}
 		Player player = (Player) sender;
 
-		if (args.length == 0)
-		{
-			help(player); return true;
-		}
+		if (args.length == 0) { help(player); return true;}
 
-		if (args.length < 2)
-		{
-			sender.sendMessage("Please supply an object name to export"); 
-			return true;
-		}
+		if (args.length < 2) { sender.sendMessage("Please supply an object name to export"); return true;}
 
 		String presetName = args[0];
 		String objectName = args[1];
@@ -67,18 +57,11 @@ public class EditCommand implements BaseCommand
 
 		CustomObject objectToSpawn = SpawnCommand.getObject(objectName, presetName);
 
-		if (!(objectToSpawn instanceof BO3))
-		{
-			sender.sendMessage("Could not find BO3 " + objectName); 
-			return true; 
-		}
+		if (!(objectToSpawn instanceof BO3)) { sender.sendMessage("Could not find BO3 " + objectName); return true; }
 
 		Preset preset = ExportCommand.getPresetOrDefault(presetName);
-		if (preset == null)
-		{
-			sender.sendMessage("Could not find preset " + (presetName == null ? "" : presetName)); 
-			return true;
-		}
+		if (preset == null) { sender.sendMessage("Could not find preset "+presetName); return true; }
+
 		Path objectPath = ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
 		BO3 bo3 = (BO3) objectToSpawn;
@@ -103,7 +86,7 @@ public class EditCommand implements BaseCommand
 		Location pos = player.getLocation();
 
 		BoundingBox box = bo3.getBoundingBox(Rotation.NORTH);
-		BOCreator.Corner center = new BOCreator.Corner(pos.getBlockX() + 2 + (box.getWidth() / 2), pos.getBlockY(), pos.getBlockZ() + 2 + (box.getDepth() / 2));
+		Corner center = new Corner(pos.getBlockX() + 2 + (box.getWidth() / 2), pos.getBlockY(), pos.getBlockZ() + 2 + (box.getDepth() / 2));
 		ExportCommand.Region region = ExportCommand.getRegionFromObject(center.x, center.y, center.z, bo3);
 
 		// Prepare area for spawning
@@ -132,7 +115,7 @@ public class EditCommand implements BaseCommand
 				genRegion, 
 				new SpigotNBTHelper(), 
 				extraBlocks, 
-				bo3.getSettings(),
+				bo3.getConfig(),
 				preset.getFolderName(),
 				OTG.getEngine().getOTGRootFolder(),
 				OTG.getEngine().getLogger(), 
@@ -144,7 +127,7 @@ public class EditCommand implements BaseCommand
 			if (fixedBO3 != null)
 			{
 				player.sendMessage("Successfully updated BO3 " + bo3.getName());
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getSettings().getFile(), bo3);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(preset.getFolderName(), fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getConfig().getFile(), bo3);
 			} else {
 				player.sendMessage("Failed to update BO3 " + bo3.getName());
 			}
@@ -161,7 +144,7 @@ public class EditCommand implements BaseCommand
 		return true;
 	}
 
-	protected static void cleanArea(LocalWorldGenRegion region, BOCreator.Corner min, BOCreator.Corner max)
+	protected static void cleanArea(LocalWorldGenRegion region, Corner min, Corner max)
 	{
 		for (int x1 = min.x-1; x1 <= max.x+1; x1++)
 		{
@@ -177,10 +160,8 @@ public class EditCommand implements BaseCommand
 
 	public static boolean finish(CommandSender sender)
 	{
-		if (!(sender instanceof Player))
-		{
-			sender.sendMessage("Only players can execute this command"); return true;
-		}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Only players can execute this command"); return true;}
 		Player source = (Player) sender;
 
 		EditSession session = sessionsMap.get(source);
@@ -200,7 +181,7 @@ public class EditCommand implements BaseCommand
 			session.genRegion, 
 			new SpigotNBTHelper(), 
 			session.extraBlocks, 
-			session.bo3.getSettings(), 
+			session.bo3.getConfig(),
 			session.presetFolderName,
 			OTG.getEngine().getOTGRootFolder(),
 			OTG.getEngine().getLogger(), 
@@ -212,7 +193,7 @@ public class EditCommand implements BaseCommand
 		if (bo3 != null)
 		{
 			source.sendMessage("Successfully edited BO3 " + bo3.getName());
-			OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
+			OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getConfig().getFile(), bo3);
 		} else {
 			source.sendMessage("Failed to edit BO3 " + session.bo3.getName());
 		}
@@ -246,7 +227,8 @@ public class EditCommand implements BaseCommand
 
 		if (objectName != null && presetFolderNames.contains(presetFolderName)) // We have a complete first argument, suggest object name
 		{
-			return StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName), new ArrayList<>());
+			return StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()), new ArrayList<>());
 		} else { // Suggest preset name
 			return StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList<>());
 		}
@@ -259,9 +241,9 @@ public class EditCommand implements BaseCommand
 		private final ArrayList<BO3BlockFunction> extraBlocks;
 		private final Path objectPath;
 		private final String presetFolderName;
-		private final BOCreator.Corner center;
+		private final Corner center;
 
-		public EditSession(SpigotWorldGenRegion genRegion, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, Path objectPath, String presetFolderName, BOCreator.Corner center)
+		public EditSession(SpigotWorldGenRegion genRegion, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, Path objectPath, String presetFolderName, Corner center)
 		{
 
 			this.genRegion = genRegion;
@@ -275,7 +257,7 @@ public class EditCommand implements BaseCommand
 
 	protected static void spawnAndFixObject(int x, int y, int z, BO3 bo3, ArrayList<BO3BlockFunction> extraBlocks, SpigotWorldGenRegion worldGenRegion, boolean fixObject)
 	{
-		BO3BlockFunction[] blocks = bo3.getSettings().getBlocks(0);
+		BO3BlockFunction[] blocks = bo3.getConfig().getBlocks(0);
 		
 		Random random = new Random();
 		HashSet<BlockPosition> updates = new HashSet<>();

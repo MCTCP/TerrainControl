@@ -271,20 +271,20 @@ public class OTGChunkDecorator implements IChunkDecorator
     		if(customObject instanceof BO3)
     		{
     			int y = 1;
-    			if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.highestBlock)
+    			if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestBlock)
     			{
     				 y = worldGenRegion.getHighestBlockAboveYAt(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
     			}
-    			else if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
+    			else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
     			{
     				y = worldGenRegion.getBlockAboveSolidHeight(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
     			}
-    			else if(((BO3)customObject).getSettings().getSpawnHeight() == SpawnHeightEnum.randomY)
+    			else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.randomY)
     			{
-					y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+					y = (int) (((BO3)customObject).getConfig().minHeight + (Math.random() * (((BO3)customObject).getConfig().maxHeight - ((BO3)customObject).getConfig().minHeight)));
     			}
 
-    			y += ((BO3)customObject).getSettings().getSpawnHeightOffset();
+    			y += ((BO3)customObject).getConfig().getSpawnHeightOffset();
     			// This may spawn the structure across chunk borders.
     			((BO3)customObject).spawnForced(
 					structureCache, 

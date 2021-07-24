@@ -10,6 +10,7 @@ import java.util.List;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.CustomObjectManager;
+import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3EntityFunction;
@@ -19,8 +20,11 @@ import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobject.bo3.checks.BO3Check;
+import com.pg85.otg.customobject.bo3.checks.BlockCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheckNot;
+import com.pg85.otg.customobject.bofunctions.BlockFunction;
+import com.pg85.otg.customobject.bofunctions.BranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
@@ -50,7 +54,7 @@ public class BO3Config extends CustomObjectConfigFile
 	
 	public String author;
 	public String description;
-	ConfigMode settingsMode;
+
 	boolean tree;
 	int frequency;
 	double rarity;
@@ -103,7 +107,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/*
 	 * Creates a BO3Config from a file.
 	 */
-	protected BO3Config(SettingsReaderBO4 reader, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	public BO3Config(SettingsReaderBO4 reader, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		super(reader);
 		init(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -118,7 +122,7 @@ public class BO3Config extends CustomObjectConfigFile
 	 *
 	 * @return A clone BO3Config, used for templates in BO3Creator
 	 */
-	protected BO3Config cloneConfigValues(SettingsReaderBO4 newReader)
+	public BO3Config cloneConfigValues(SettingsReaderBO4 newReader)
 	{
 		BO3Config clone = new BO3Config(newReader);
 		clone.author = author;
@@ -170,7 +174,7 @@ public class BO3Config extends CustomObjectConfigFile
 
 	private void readResources(ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws InvalidConfigException
 	{
-		List<BO3BlockFunction> tempBlocksList = new ArrayList<BO3BlockFunction>();
+		List<BlockFunction<?>> tempBlocksList = new ArrayList<>();
 		List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
 		List<BO3BranchFunction> tempBranchesList = new ArrayList<BO3BranchFunction>();
 		List<BO3EntityFunction> tempEntitiesList = new ArrayList<BO3EntityFunction>();
@@ -233,12 +237,12 @@ public class BO3Config extends CustomObjectConfigFile
 		this.spawnerFunctions[0] = tempSpawnerList.toArray(new BO3SpawnerFunction[tempSpawnerList.size()]);
 	}
 
-	public void setBranches(List<BO3BranchFunction> branches)
+	public void setBranches(List<BranchFunction<?>> branches)
 	{
 		this.branches[0] = branches.toArray(new BO3BranchFunction[branches.size()]);
 	}
 
-	protected void extractBlocks(List<BO3BlockFunction> tempBlocksList)
+	public void extractBlocks(List<BlockFunction<?>> tempBlocksList)
 	{
 		this.blocksX = new byte[4][tempBlocksList.size()];
 		this.blocksY = new short[4][tempBlocksList.size()];
@@ -255,7 +259,7 @@ public class BO3Config extends CustomObjectConfigFile
 
 		for (int i = 0; i < tempBlocksList.size(); i++)
 		{
-			BO3BlockFunction block = tempBlocksList.get(i);
+			BO3BlockFunction block = (BO3BlockFunction) tempBlocksList.get(i);
 			// We can probably just break if null?
 			if (block != null)
 			{
@@ -298,7 +302,14 @@ public class BO3Config extends CustomObjectConfigFile
 	{
 		return this.spawnHeightOffset;
 	}
-	
+
+	@Override
+	public BlockFunction<?>[] getBlockFunctions(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	{
+		BO3BlockFunction[] blocks = getBlocks(0);
+		return Arrays.copyOf(blocks, blocks.length);
+	}
+
 	public BO3BlockFunction[] getBlocks(int rotation)
 	{
 		BO3BlockFunction[] blocksOTGPlus = new BO3BlockFunction[this.blocksX[rotation].length];
@@ -760,7 +771,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/**
 	 * Rotates all the blocks and all the checks
 	 */
-	protected void rotateBlocksAndChecks(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void rotateBlocksAndChecks(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (int i = 1; i < 4; i++)
 		{
@@ -854,5 +865,39 @@ public class BO3Config extends CustomObjectConfigFile
 			}
 		}
 		return true;
+	}
+
+	// Sets the first bounding box. Can only be done while BO3 is initializing
+	public void setBoundingBox(BoundingBox box)
+	{
+		this.boundingBoxes[0] = box;
+	}
+
+	public void getSettingsFromBO2(BO2 bo2)
+	{
+		if (bo2.spawnAboveGround && !bo2.spawnUnderGround)
+		{
+			this.spawnHeight = SpawnHeightEnum.highestSolidBlock;
+		}
+		else if (bo2.spawnUnderGround)
+		{
+			this.spawnHeight = SpawnHeightEnum.randomY;
+		}
+
+		this.tree = bo2.canSpawnAsTree();
+		this.rotateRandomly = bo2.canRotateRandomly();
+		this.minHeight = bo2.spawnElevationMin;
+		this.maxHeight = bo2.spawnElevationMax-1;
+		this.settingsMode = ConfigMode.WriteWithoutComments;
+		this.maxPercentageOutsideSourceBlock = (int) bo2.collisionPercentage;
+	}
+
+	// Used in updating a BO2 to a BO3; need to run rotateBlocksAndChecks after using.
+	public void addBlockCheckFromBO2(MaterialSet spawnOnBlockType)
+	{
+		int l = this.bo3Checks[0].length;
+		BO3Check[] checks = Arrays.copyOf(this.bo3Checks[0], l+1);
+		checks[l] = new BlockCheck(0, -1, 0, spawnOnBlockType);
+		this.bo3Checks[0] = checks;
 	}
 }

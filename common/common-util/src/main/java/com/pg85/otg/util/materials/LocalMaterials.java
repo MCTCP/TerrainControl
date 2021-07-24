@@ -9,9 +9,9 @@ public class LocalMaterials
 	{
 		return resourceDomain + ":" + resourcePath;
 	}
-	
+
 	// Block names used in OTG code as default values
-	
+
 	public static final String AIR_NAME = getRegistryKey("air");
 	public static final String GRASS_NAME = getRegistryKey("grass_block");
 	public static final String DIRT_NAME = getRegistryKey("dirt");
@@ -23,12 +23,15 @@ public class LocalMaterials
 	public static final String PACKED_ICE_NAME = getRegistryKey("packed_ice");
 	public static final String SNOW_BLOCK_NAME = getRegistryKey("snow_block");
 	public static final String QUARTZ_BLOCK_NAME = getRegistryKey("quartz_block");
-	
-	// Blocks used in OTG code, these must be initialised by 
+
+	// Blocks used in OTG code, these must be initialised by
 	// the forge/spigot classes extending this class.
 
 	public static LocalMaterialData AIR;
 	public static LocalMaterialData CAVE_AIR;
+	public static LocalMaterialData STRUCTURE_VOID;
+	public static LocalMaterialData COMMAND_BLOCK;
+	public static LocalMaterialData STRUCTURE_BLOCK;
 
 	// Block of grass
 	public static LocalMaterialData GRASS;

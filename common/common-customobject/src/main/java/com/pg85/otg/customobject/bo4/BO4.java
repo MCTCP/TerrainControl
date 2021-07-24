@@ -13,9 +13,11 @@ import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
+import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
+import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
@@ -65,11 +67,18 @@ public class BO4 implements StructuredCustomObject
 		return name;
 	}
 
+	@Override
 	public BO4Config getConfig()
 	{
 		return config;
 	}
-	
+
+	@Override
+	public ObjectType getType()
+	{
+		return ObjectType.BO4;
+	}
+
 	@Override
 	public boolean onEnable(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
@@ -154,7 +163,27 @@ public class BO4 implements StructuredCustomObject
 	{
 		return getConfig().isCollidable();
 	}
-	
+
+	@Override
+	public BoundingBox getBoundingBox(Rotation north)
+	{
+		if (this.config.boundingBoxes[0] == null)
+		{
+			BoundingBox box = BoundingBox.newEmptyBox();
+			box.expandToFit(this.config.getminX(), this.config.getminY(), this.config.getminZ());
+			box.expandToFit(this.config.getmaxX(), this.config.getmaxY(), this.config.getmaxZ());
+			this.config.boundingBoxes[0] = box;
+			box = box.rotate();
+			this.config.boundingBoxes[1] = box;
+			box = box.rotate();
+			this.config.boundingBoxes[2] = box;
+			box = box.rotate();
+			this.config.boundingBoxes[3] = box;
+		}
+
+		return this.config.boundingBoxes[north.getRotationId()];
+	}
+
 	// BO4's should always spawn within decoration bounds, so there is no SpawnForced, only TrySpawnAt
 	public boolean trySpawnAt(String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, boolean doBiomeConfigReplaceBlocks)
 	{

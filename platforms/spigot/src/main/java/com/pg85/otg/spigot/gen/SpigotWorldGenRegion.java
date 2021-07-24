@@ -18,6 +18,7 @@ import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
 
@@ -370,11 +371,16 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			}
 
 			BlockPosition pos = new BlockPosition(x, y, z);
+			// Notify world: (2 | 16) == update client, don't update observers
 			this.worldGenRegion.setTypeAndData(pos, ((SpigotMaterialData) material).internalBlock(), 2 | 16);
 
 			if (material.isLiquid())
 			{
 				this.worldGenRegion.getFluidTickList().a(pos, ((SpigotMaterialData)material).internalBlock().getFluid().getType(), 0);
+			}
+			else if (material.isMaterial(LocalMaterials.COMMAND_BLOCK))
+			{
+				this.worldGenRegion.getBlockTickList().a(pos, ((SpigotMaterialData)material).internalBlock().getBlock(), 0);
 			}
 
 			if (nbt != null)

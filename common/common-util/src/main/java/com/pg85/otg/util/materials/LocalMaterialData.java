@@ -207,4 +207,6 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	public abstract boolean equals(Object other);
 	
 	public abstract int hashCode();
+
+	public abstract LocalMaterialData legalOrPersistentLeaves();
 }

@@ -30,6 +30,18 @@ public class BlockCheck extends BO3Check
 		this.toCheck = readMaterials(args, 3, materialReader);
 	}
 
+	// The normal constructor, as used by CustomObjectConfigFunction::create
+	public BlockCheck() {}
+
+	// A specific constructor used when converting BO2's to BO3's
+	public BlockCheck (int x, int y, int z, MaterialSet toCheck)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.toCheck = toCheck;
+	}
+
 	@Override
 	public String makeString()
 	{
