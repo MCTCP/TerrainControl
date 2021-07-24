@@ -34,28 +34,36 @@ public class LiquidResource extends FrequencyResourceBase
 		this.minAltitude = readInt(args.get(3), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
 		this.maxAltitude = readInt(args.get(4), this.minAltitude, Constants.WORLD_HEIGHT - 1);
 		this.sourceBlocks = readMaterials(args, 5, materialReader);
+		System.out.println("LiquidResource constructed: (Material:" + this.material + ", Freq:" + this.frequency + ", Rarity:" + this.rarity + ", Min Altitude:" + this.minAltitude + ", Max Altitude:" + this.maxAltitude + ", Source Blocks:" + this.sourceBlocks);
 	}
 
 	@Override
 	public void spawn(IWorldGenRegion worldGenRegion, Random rand, int x, int z)
 	{
+		System.out.println("Attempting to Spawn Liquid() at " + x + ", " + z);
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-
+		System.out.println("Y value: " + y);
 		LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y + 1, z);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
+			System.out.println("WorldMaterial Null Above");
+			System.out.println("WorldMaterial: " + worldMaterial);
 			return;
 		}
 		
 		worldMaterial = worldGenRegion.getMaterial(x, y - 1, z);
 		if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
 		{
+			System.out.println("WorldMaterial Null Below");
+			System.out.println("WorldMaterial: " + worldMaterial);
 			return;
 		}
 
 		worldMaterial = worldGenRegion.getMaterial(x, y, z);
-		if (worldMaterial == null || !worldMaterial.isAir() || !this.sourceBlocks.contains(worldMaterial))
+		if (worldMaterial == null || (!worldMaterial.isAir() && !this.sourceBlocks.contains(worldMaterial)))
 		{
+			System.out.println("WorldMaterial Null Same");
+			System.out.println("WorldMaterial: " + worldMaterial);
 			return;
 		}
 
@@ -63,23 +71,28 @@ public class LiquidResource extends FrequencyResourceBase
 		int airCount = 0;
 
 		worldMaterial = worldGenRegion.getMaterial(x - 1, y, z);
+		System.out.println("Block x - 1: " + worldMaterial);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
 		worldMaterial = worldGenRegion.getMaterial(x + 1, y, z);
+		System.out.println("Block x + 1: " + worldMaterial);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
 		worldMaterial = worldGenRegion.getMaterial(x, y, z - 1);
+		System.out.println("Block z - 1: " + worldMaterial);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
 		worldMaterial = worldGenRegion.getMaterial(x, y, z + 1);
+		System.out.println("Block z + 1: " + worldMaterial);
 		sourceCount = (worldMaterial != null && this.sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
 		airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
 		if ((sourceCount == 3) && (airCount == 1))
 		{
+			System.out.println(">>> SETTING BLOCK...");
 			worldGenRegion.setBlock(x, y, z, this.material);
 		}
 	}
