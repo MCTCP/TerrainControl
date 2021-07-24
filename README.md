@@ -5,12 +5,13 @@ OpenTerrainGenerator for MC 1.16.x is under development, alpha builds are availa
 OTG 1.16.x 0.1.0 will be the first public beta release for 1.16.x, available via CurseForge. Once 0.1.0 is released, the 1.16.4 branch will be promoted to default/master. See the milestones for open issues/progress.
 
 ### Team OTG
-- PeeGee85
-- MCPitman
-- Authvin
-- Josh
-- SuperCoder
-- Wahrheit
+* <a href="https://github.com/PG85">PG85</a>
+* MCPitman
+* <a href="https://github.com/authvin">Authvin</a>
+* <a href="https://github.com/Coll1234567">Josh</a>
+* <a href="https://github.com/SuperCoder7979">SuperCoder79</a>
+* Wahrheit
+* <a href="https://github.com/FrankTCA">Frank</a>
 
 We're always looking for people to contribute or collaborate with. For OTG 1.16, we've completely cleaned up and overhauled the codebase with the aim of making things more modular, so developers and collaborators can implement new settings and modes such as terrain generation noise. If you'd like to contribute, collaborate or become part of Team OTG, join us on the OTG Discord!
 
@@ -26,11 +27,14 @@ We're always looking for people to contribute or collaborate with. For OTG 1.16,
 * [Discord](https://discord.com/invite/UXzdVTH)
 * [Installation](https://openterraingen.fandom.com/wiki/Installing_OTG) for Spigot and Forge
 
-## Original developers (TerrainControl, PhoenixTerrainMod, BiomeTerrainMod)
+## Original developers
 
 OpenTerrainGenerator is a fork of Terrain Control, which is the successor to <a href="http://www.minecraftforum.net/topic/313991-phoenixterrainmod/">PhoenixTerrainMod</a>, which was based on <a href="http://www.minecraftforum.net/topic/71565-biomemod/">BiomeTerrainMod</a>. 
 
-* <a href="https://github.com/rutgerkok">Rutgerkok</a>
-* <a href="https://github.com/Timethor">Timethor</a>
-* <a href="https://github.com/oloflarsson">Oloflarsson</a>
-* <a href="http://dev.bukkit.org/profiles/Khoorn/">Khoorn</a> (known as <a href="https://github.com/Wickth">Wickth</a> on GitHub)
+* Buycruss       - BiomeTerrainMod
+* R-T-B          - PhoenixTerrainMod
+* <a href="http://dev.bukkit.org/profiles/Khoorn/">Khoorn - TerrainControl</a> (known as <a href="https://github.com/Wickth">Wickth</a> on GitHub)
+* <a href="https://github.com/oloflarsson">Oloflarsson/Cayorion - TerrainControl</a>
+* <a href="https://github.com/Timethor">Timethor - TerrainControl</a>
+* <a href="https://github.com/rutgerkok">Rutgerkok - TerrainControl</a>
+* <a href="https://github.com/bloodmc">BloodMC - TerrainControl</a>
