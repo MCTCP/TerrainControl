@@ -2,7 +2,7 @@
 
 OpenTerrainGenerator for MC 1.16.x is under development, alpha builds are available in the dev-releases channel of the OTG Discord.
 
-OTG 1.16.x 0.1.0 will be the first public beta release for 1.16.x, available via CurseForge. Once 0.1.0 is released, the 1.16.4 branch will be promoted to default/master.
+OTG 1.16.x 0.1.0 will be the first public beta release for 1.16.x, available via CurseForge. Once 0.1.0 is released, the 1.16.4 branch will be promoted to default/master. See the milestones for open issues/progress.
 
 ### Team OTG
 - PeeGee85
@@ -12,7 +12,7 @@ OTG 1.16.x 0.1.0 will be the first public beta release for 1.16.x, available via
 - SuperCoder
 - Wahrheit
 
-We're always looking for people to contribute or collaborate with. For OTG 1.16, we've completely cleaned up and overhauled the codebase with the aim of making things more modular, so developers and collaborators can implement new settings and modes such as terrain generation noise. If you'd like to contribute, collaborate or become part of Team OTG, join us on the OTG Discord.
+We're always looking for people to contribute or collaborate with. For OTG 1.16, we've completely cleaned up and overhauled the codebase with the aim of making things more modular, so developers and collaborators can implement new settings and modes such as terrain generation noise. If you'd like to contribute, collaborate or become part of Team OTG, join us on the OTG Discord!
 
 ## Installation / building
 
