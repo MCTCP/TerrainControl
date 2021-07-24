@@ -14,10 +14,7 @@ import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3EntityFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ModDataFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobject.bo3.checks.BO3Check;
 import com.pg85.otg.customobject.bo3.checks.BlockCheck;
@@ -99,9 +96,6 @@ public class BO3Config extends CustomObjectConfigFile
 
 	BoundingBox[] boundingBoxes = new BoundingBox[4];
 
-	BO3ParticleFunction[][] particleFunctions = new BO3ParticleFunction[4][];
-	BO3SpawnerFunction[][] spawnerFunctions = new BO3SpawnerFunction[4][];
-	BO3ModDataFunction[][] modDataFunctions = new BO3ModDataFunction[4][];
 	BO3EntityFunction[][] entityFunctions = new BO3EntityFunction[4][];
 
 	/*
@@ -153,9 +147,6 @@ public class BO3Config extends CustomObjectConfigFile
 		clone.branches[0] = this.branches[0].clone(); //new BO3BranchFunction[0];
 		clone.boundingBoxes[0] = this.boundingBoxes[0].clone(); // BoundingBox.newEmptyBox();
 		clone.entityFunctions[0] = this.entityFunctions[0].clone(); // new BO3EntityFunction[0];
-		clone.particleFunctions[0] = this.particleFunctions[0].clone(); // new BO3ParticleFunction[0];
-		clone.modDataFunctions[0] = this.modDataFunctions[0].clone(); // new BO3ModDataFunction[0];
-		clone.spawnerFunctions[0] = this.spawnerFunctions[0].clone(); //new BO3SpawnerFunction[0];
 
 		return clone;
 	}
@@ -178,9 +169,6 @@ public class BO3Config extends CustomObjectConfigFile
 		List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
 		List<BO3BranchFunction> tempBranchesList = new ArrayList<BO3BranchFunction>();
 		List<BO3EntityFunction> tempEntitiesList = new ArrayList<BO3EntityFunction>();
-		List<BO3ModDataFunction> tempModDataList = new ArrayList<BO3ModDataFunction>();
-		List<BO3ParticleFunction> tempParticlesList = new ArrayList<BO3ParticleFunction>();
-		List<BO3SpawnerFunction> tempSpawnerList = new ArrayList<BO3SpawnerFunction>();
 
 		BoundingBox box = BoundingBox.newEmptyBox();
 
@@ -210,18 +198,6 @@ public class BO3Config extends CustomObjectConfigFile
 					{
 						tempEntitiesList.add((BO3EntityFunction) res);
 					}
-					else if (res instanceof BO3ParticleFunction)
-					{
-						tempParticlesList.add((BO3ParticleFunction) res);
-					}
-					else if (res instanceof BO3ModDataFunction)
-					{
-						tempModDataList.add((BO3ModDataFunction) res);
-					}
-					else if (res instanceof BO3SpawnerFunction)
-					{
-						tempSpawnerList.add((BO3SpawnerFunction) res);
-					}
 				}
 			}
 		}
@@ -232,9 +208,6 @@ public class BO3Config extends CustomObjectConfigFile
 		this.branches[0] = tempBranchesList.toArray(new BO3BranchFunction[tempBranchesList.size()]);
 		this.boundingBoxes[0] = box;
 		this.entityFunctions[0] = tempEntitiesList.toArray(new BO3EntityFunction[tempEntitiesList.size()]);
-		this.particleFunctions[0] = tempParticlesList.toArray(new BO3ParticleFunction[tempParticlesList.size()]);
-		this.modDataFunctions[0] = tempModDataList.toArray(new BO3ModDataFunction[tempModDataList.size()]);
-		this.spawnerFunctions[0] = tempSpawnerList.toArray(new BO3SpawnerFunction[tempSpawnerList.size()]);
 	}
 
 	public void setBranches(List<BranchFunction<?>> branches)
@@ -345,21 +318,6 @@ public class BO3Config extends CustomObjectConfigFile
 	protected BO3BranchFunction[] getbranches()
 	{
 		return this.branches[0];
-	}
-
-	public BO3ModDataFunction[] getModData()
-	{
-		return this.modDataFunctions[0];
-	}
-
-	public BO3SpawnerFunction[] getSpawnerData()
-	{
-		return this.spawnerFunctions[0];
-	}
-
-	public BO3ParticleFunction[] getParticleData()
-	{
-		return this.particleFunctions[0];
 	}
 
 	public BO3Check[] getBO3Checks()
@@ -656,104 +614,6 @@ public class BO3Config extends CustomObjectConfigFile
 		{
 			writer.function(func);
 		}
-
-		writer.bigTitle("Particles");
-		writer.comment("Forge only (this may have changed, check for updates).");
-		writer.comment(
-				"Creates an invisible particle spawner at the given location that spawns particles every x milliseconds.");
-		writer.comment("Usage: Particle(x,y,z,particleName,interval,velocityX,velocityY,velocityZ)");
-		writer.comment("velocityX, velocityY and velocityZ are optional.");
-		writer.comment("Only vanilla particle names can be used, for 1.11.2 these are;");
-		writer.comment("explode, largeexplode, hugeexplosion, fireworksSpark, bubble, splash, wake, suspended");
-		writer.comment("depthsuspend, crit, magicCrit, smoke, largesmoke, spell, instantSpell, mobSpell");
-		writer.comment("mobSpellAmbient, witchMagic, dripWater, dripLava, angryVillager, happyVillager");
-		writer.comment("townaura, note, portal, enchantmenttable, flame, lava, footstep, cloud, reddust");
-		writer.comment("snowballpoof,  snowshovel, slime, heart, barrier, iconcrack, blockcrack, blockdust");
-		writer.comment("droplet, take, mobappearance, dragonbreath, endRod, damageIndicator, sweepAttack");
-		writer.comment("fallingdust, totem, spit.");
-		writer.comment(
-				"velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
-
-		for (BO3ParticleFunction func : Arrays.asList(this.particleFunctions[0]))
-		{
-			writer.function(func);
-		}
-
-		writer.bigTitle("Spawners");
-		writer.comment("Forge only (this may have changed, check for updates).");
-		writer.comment(
-				"Creates an invisible entity spawner at the given location that spawns entities every x seconds.");
-		writer.comment(
-				"Entities can only spawn if their spawn requirements are met (zombies/skeletons only spawn in the dark etc). Max entity count for the server is ignored, each spawner has its own maxCount setting.");
-		writer.comment(
-				"Usage: Spawner(x,y,z,entityName,nbtFileName,groupSize,interval,spawnChance,maxCount,despawnTime,velocityX,velocityY,velocityZ,yaw,pitch)");
-		writer.comment("nbtFileName, despawnTime, velocityX, velocityY, velocityZ, yaw and pitch are optional");
-		writer.comment(
-				"Example Spawner(0, 0, 0, Villager, 1, 5, 100, 5) or Spawner(0, 0, 0, Villager, villager1.txt, 1, 5, 100, 5) or Spawner(0, 0, 0, Villager, 1, 5, 100, 5, 30, 1, 1, 1, 0, 0)");
-		writer.comment(
-				"entityName - Name of the entity to spawn, use /otg entities to get a list of entities that can be used as entityName, this includes entities added by other mods and non-living entities.");
-		writer.comment("nbtFileName - A .txt file with nbt data (such as myentityinfo.txt).");
-		writer.comment(
-				"In the text file you can use the same mob spawning parameters used with the /summon command to equip the");
-		writer.comment(
-				"entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
-		writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
-		writer.comment("*Note: Unlike Block(), for Spawner() .nbt files don't work, only .txt files work.");
-		writer.comment("groupSize - Number of entities that should spawn for each successful spawn attempt.");
-		writer.comment("interval - Time in seconds between each spawn attempt.");
-		writer.comment(
-				"spawnChance - For each spawn attempt, the chance between 0-100 that the spawn attempt will succeed.");
-		writer.comment(
-				"maxCount - The maximum amount of this kind of entity that can exist within 32 blocks. If there are already maxCount or more entities of this type in a 32 radius this spawner will not spawn anything.");
-		writer.comment(
-				"despawnTime - After despawnTime seconds, if there is no player within 32 blocks of the entity it will despawn..");
-		writer.comment(
-				"velocityX,velocityY,velocityZ,yaw,pitch - Spawn the enemy with the given velocity and angle, handy for making traps and launchers (shooting arrows and fireballs etc).");
-
-		for (BO3SpawnerFunction func : Arrays.asList(this.spawnerFunctions[0]))
-		{
-			writer.function(func);
-		}
-
-		// ModData
-		writer.bigTitle("ModData");
-		writer.comment("Forge only.");
-		writer.comment("Use the ModData() tag to include data that other mods can use");
-		writer.comment(
-				"Mod makers can use ModData and the /otg GetModData command to test IMC communications between OTG");
-		writer.comment("and their mod.");
-		writer.comment("Normal users can use it to spawn some mobs and blocks on command.");
-		writer.comment("ModData(x,y,z,\"ModName\", \"MyModDataAsText\"");
-		writer.comment("Example: ModData(x,y,z,MyCystomNPCMod,SpawnBobHere/WithAPotato/And50Health)");
-		writer.comment(
-				"Try not to use exotic/reserved characters, like brackets and comma's etc, this stuff isn't fool-proof.");
-		writer.comment(
-				"Also, use this only to store IDs/object names etc for your mod, DO NOT include things like character dialogue,");
-		writer.comment(
-				"messages on signs, loot lists etc in this file. As much as possible just store id's/names here and store all the data related to those id's/names in your own mod.");
-		writer.comment("OTG has some built in ModData commands for basic mob and block spawning.");
-		writer.comment("These are mostly just a demonstration for mod makers to show how ModData.");
-		writer.comment("can be used by other mods.");
-		writer.comment("For mob spawning in OTG use: ModData(x,y,z,OTG,mob/MobType/Count/Persistent/Name)");
-		writer.comment("mob: Makes OTG recognise this as a mob spawning command.");
-		writer.comment("MobType: Lower-case, no spaces. Any vanilla mob like dragon, skeleton, wither, villager etc");
-		writer.comment("Count: The number of mobs to spawn");
-		writer.comment("Persistent (true/false): Should the mobs never de-spawn? If set to true the mob will get a");
-		writer.comment("name-tag ingame so you can recognise it.");
-		writer.comment("Name: A name-tag for the monster/npc.");
-		writer.comment("Example: ModData(0,0,0,OTG,villager/1/true/Bob)");
-		writer.comment("To spawn blocks using ModData use: ModData(x,y,z,OTG,block/material)");
-		writer.comment("block: Makes OTG recognise this as a block spawning command.");
-		writer.comment("material: id or text, custom blocks can be added using ModName:MaterialName.");
-		writer.comment("To send all ModData within a radius in chunks around the player to the specified mod");
-		writer.comment("use this console command: /otg GetModData ModName Radius");
-		writer.comment("ModName: name of the mod, for OTG commands use OTG ");
-		writer.comment("Radius (optional): Radius in chunks around the player.");
-
-		for (BO3ModDataFunction func : Arrays.asList(this.modDataFunctions[0]))
-		{
-			writer.function(func);
-		}
 	}
 
 	@Override
@@ -823,24 +683,6 @@ public class BO3Config extends CustomObjectConfigFile
 			for (int j = 0; j < this.entityFunctions[i].length; j++)
 			{
 				this.entityFunctions[i][j] = this.entityFunctions[i - 1][j].rotate();
-			}
-
-			this.particleFunctions[i] = new BO3ParticleFunction[this.particleFunctions[i - 1].length];
-			for (int j = 0; j < this.particleFunctions[i].length; j++)
-			{
-				this.particleFunctions[i][j] = this.particleFunctions[i - 1][j].rotate();
-			}
-
-			this.spawnerFunctions[i] = new BO3SpawnerFunction[this.spawnerFunctions[i - 1].length];
-			for (int j = 0; j < this.spawnerFunctions[i].length; j++)
-			{
-				this.spawnerFunctions[i][j] = this.spawnerFunctions[i - 1][j].rotate();
-			}
-
-			this.modDataFunctions[i] = new BO3ModDataFunction[this.modDataFunctions[i - 1].length];
-			for (int j = 0; j < this.modDataFunctions[i].length; j++)
-			{
-				this.modDataFunctions[i][j] = this.modDataFunctions[i - 1][j].rotate();
 			}
 		}
 	}

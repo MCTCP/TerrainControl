@@ -15,18 +15,17 @@ import com.pg85.otg.util.helpers.StreamHelper;
  * Represents an entity in a BO3.
  */
 public class BO4EntityFunction extends EntityFunction<BO4Config>
-{	
+{
 	public BO4EntityFunction() { }
-	
+
 	private BO4EntityFunction(BO4Config holder)
 	{
 		this.holder = holder;
 	}
-	
+
 	public BO4EntityFunction rotate(Rotation rotation)
 	{
 		BO4EntityFunction rotatedBlock = new BO4EntityFunction(this.getHolder());
-
 		BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
 
 		rotatedBlock.x = rotatedCoords.getX();
@@ -71,7 +70,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 	public static BO4EntityFunction fromStream(BO4Config holder, ByteBuffer buffer, ILogger logger) throws IOException
 	{
 		BO4EntityFunction entityFunction = new BO4EntityFunction(holder);
-				
+
 		entityFunction.x = buffer.getInt();
 		entityFunction.y = buffer.getInt();
 		entityFunction.z = buffer.getInt();
@@ -85,7 +84,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 			entityFunction.processNameTagOrFileName(entityFunction.originalNameTagOrNBTFileName, logger);
 		}
 		entityFunction.rotation = 0;
-		
+
 		return entityFunction;
 	}
 }

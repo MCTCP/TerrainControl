@@ -7,10 +7,7 @@ import com.pg85.otg.customobject.CustomObjectLoader;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BranchFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4EntityFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ModDataFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4ParticleFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
-import com.pg85.otg.customobject.bo4.bo4function.BO4SpawnerFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4WeightedBranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.interfaces.ILogger;
@@ -30,12 +27,6 @@ public class BO4Loader implements CustomObjectLoader
 		registry.registerConfigFunction("RB", BO4RandomBlockFunction.class);
 		registry.registerConfigFunction("Entity", BO4EntityFunction.class);
 		registry.registerConfigFunction("E", BO4EntityFunction.class);
-		registry.registerConfigFunction("Particle", BO4ParticleFunction.class);
-		registry.registerConfigFunction("P", BO4ParticleFunction.class);
-		registry.registerConfigFunction("Spawner", BO4SpawnerFunction.class);
-		registry.registerConfigFunction("S", BO4SpawnerFunction.class);
-		registry.registerConfigFunction("ModData", BO4ModDataFunction.class);
-		registry.registerConfigFunction("MD", BO4ModDataFunction.class);
 	}
 	
 	@Override

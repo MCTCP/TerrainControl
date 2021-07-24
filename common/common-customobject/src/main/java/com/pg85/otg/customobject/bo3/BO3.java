@@ -11,9 +11,6 @@ import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3EntityFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ModDataFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3ParticleFunction;
-import com.pg85.otg.customobject.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobject.bo3.checks.BO3Check;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
@@ -439,104 +436,15 @@ public class BO3 implements StructuredCustomObject
 	{
 		HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
 
-		HashSet<BO3ModDataFunction> newModDataInObject = new HashSet<BO3ModDataFunction>();
-		BO3ModDataFunction[] modDataInObject = this.settings.modDataFunctions[rotation.getRotationId()];
-		for (BO3ModDataFunction modData : modDataInObject)
-		{
-			BO3ModDataFunction newModData = new BO3ModDataFunction();
-
-			newModData.y = y + modData.y;
-			newModData.x = x + modData.x;
-			newModData.z = z + modData.z;
-
-			newModData.modData = modData.modData;
-			newModData.modId = modData.modId;
-
-			newModDataInObject.add(newModData);
-			chunks.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
-			chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
-		}
-
-		HashSet<BO3SpawnerFunction> newSpawnerDataInObject = new HashSet<BO3SpawnerFunction>();
-		BO3SpawnerFunction[] spawnerDataInObject = settings.spawnerFunctions[rotation.getRotationId()];
-		for (BO3SpawnerFunction spawnerData : spawnerDataInObject)
-		{
-			BO3SpawnerFunction newSpawnerData = new BO3SpawnerFunction();
-
-			newSpawnerData.y = y + spawnerData.y;
-			newSpawnerData.x = x + spawnerData.x;
-			newSpawnerData.z = z + spawnerData.z;
-
-			newSpawnerData.mobName = spawnerData.mobName;
-			newSpawnerData.originalnbtFileName = spawnerData.originalnbtFileName;
-			newSpawnerData.nbtFileName = spawnerData.nbtFileName;
-			newSpawnerData.groupSize = spawnerData.groupSize;
-			newSpawnerData.interval = spawnerData.interval;
-			newSpawnerData.spawnChance = spawnerData.spawnChance;
-			newSpawnerData.maxCount = spawnerData.maxCount;
-
-			newSpawnerData.despawnTime = spawnerData.despawnTime;
-
-			newSpawnerData.velocityX = spawnerData.velocityX;
-			newSpawnerData.velocityY = spawnerData.velocityY;
-			newSpawnerData.velocityZ = spawnerData.velocityZ;
-
-			newSpawnerData.velocityXSet = spawnerData.velocityXSet;
-			newSpawnerData.velocityYSet = spawnerData.velocityYSet;
-			newSpawnerData.velocityZSet = spawnerData.velocityZSet;
-
-			newSpawnerData.yaw = spawnerData.yaw;
-			newSpawnerData.pitch = spawnerData.pitch;
-
-			newSpawnerDataInObject.add(newSpawnerData);
-			chunks.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
-			chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
-		}
-
-		HashSet<BO3ParticleFunction> newParticleDataInObject = new HashSet<BO3ParticleFunction>();
-		BO3ParticleFunction[] particleDataInObject = this.settings.particleFunctions[rotation.getRotationId()];
-		for (BO3ParticleFunction particleData : particleDataInObject)
-		{
-			BO3ParticleFunction newParticleData = new BO3ParticleFunction();
-
-			newParticleData.y = y + particleData.y;
-			newParticleData.x = x + particleData.x;
-			newParticleData.z = z + particleData.z;
-
-			newParticleData.particleName = particleData.particleName;
-
-			newParticleData.interval = particleData.interval;
-
-			newParticleData.velocityX = particleData.velocityX;
-			newParticleData.velocityY = particleData.velocityY;
-			newParticleData.velocityZ = particleData.velocityZ;
-
-			newParticleData.velocityXSet = particleData.velocityXSet;
-			newParticleData.velocityYSet = particleData.velocityYSet;
-			newParticleData.velocityZSet = particleData.velocityZSet;
-
-			newParticleDataInObject.add(newParticleData);
-			chunks.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
-			chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
-		}
-
 		// StructureCache can be null for non-otg worlds, when using /otg spawn/edit/export.
 		if (structure != null && structureCache != null)
 		{
-			structure.modDataManager.modData.addAll(newModDataInObject);
-			structure.particlesManager.particleData.addAll(newParticleDataInObject);
-			structure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
-
 			for (ChunkCoordinate structureCoord : chunks)
 			{
 				structureCache.addBo3ToStructureCache(structureCoord, structure, true);
 			}
 		} else if (structureCache != null)  {
 			CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(worldGenRegion.getPresetFolderName(), this, this.getName(), Rotation.NORTH, x, (short) 0, z));
-			placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
-			placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
-			placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
-
 			for (ChunkCoordinate structureCoord : chunksCustomObject)
 			{
 				structureCache.addBo3ToStructureCache(structureCoord, placeHolderStructure, false);			

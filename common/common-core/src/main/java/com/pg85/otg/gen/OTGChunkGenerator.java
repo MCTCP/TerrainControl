@@ -573,7 +573,8 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 								structureX = 0;
 								structureY = 0;
 								structureZ = 0;
-								for(density = density / 2.0D - density * density * density / 24.0D; structureIterator.hasNext(); density += getNoiseWeight(structureX, structureY, structureZ) * 0.8D) {
+								for(density = density / 2.0D - density * density * density / 24.0D; structureIterator.hasNext(); density += getNoiseWeight(structureX, structureY, structureZ) * 0.8D)
+								{
 									structure = structureIterator.next();
 									structureX = Math.max(0, Math.max(structure.minX - realX, realX - structure.maxX));
 									structureY = realY - (structure.minY + (structure.useDelta ? structure.delta : 0));
@@ -582,7 +583,8 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 								structureIterator.back(structures.size());
 
 								// Iterate through jigsawws to add density
-								while(junctionsIterator.hasNext()) {
+								while(junctionsIterator.hasNext())
+								{
 									junction = junctionsIterator.next();
 									sourceX = realX - junction.sourceX;
 									sourceY = realY - junction.groundY;
