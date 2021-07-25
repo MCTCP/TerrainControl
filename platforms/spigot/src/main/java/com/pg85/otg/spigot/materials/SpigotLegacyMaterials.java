@@ -210,10 +210,7 @@ public class SpigotLegacyMaterials
 				return null;
 			}
 		}
-		catch (NumberFormatException ignored)
-		{
-
-		}
+		catch (NumberFormatException ignored) { }
 
 		try
 		{

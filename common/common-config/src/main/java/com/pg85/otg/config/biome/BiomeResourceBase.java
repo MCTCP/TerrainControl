@@ -8,9 +8,7 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 
-/**
- * Represents a BiomeConfig ResourceQueue resource.
- */
+/** Represents a BiomeConfig ResourceQueue resource. */
 public abstract class BiomeResourceBase extends ConfigFunction<IBiomeConfig>
 {
 	static BiomeResourceBase createResource(IBiomeConfig config, ILogger logger, IMaterialReader materialReader, Class<? extends BiomeResourceBase> clazz, Object... args)
@@ -28,7 +26,8 @@ public abstract class BiomeResourceBase extends ConfigFunction<IBiomeConfig>
 			throw new RuntimeException(e);
 		}
 	}
-	
-	// Children must implement this constructor, or createResource will fail
+
+	// We're using reflection to match constructors for resources, so resource classes must implement this 
+	// constructor or createResource / com.pg85.otg.config.biome.BiomeResourcesManager.getConfigFunction() will fail. 
 	public BiomeResourceBase(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) { }
 }
