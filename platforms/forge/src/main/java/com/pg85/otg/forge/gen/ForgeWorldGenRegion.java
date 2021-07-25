@@ -45,6 +45,7 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 
+// TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	protected final ISeedReader worldGenRegion;
@@ -132,6 +133,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}
 
+	// TODO: Only used by resources using 3x3 decoration atm (so icebergs). Align all resources
+	// to use 3x3, make them use the decoration cache and remove this method.
 	@Override
 	public LocalMaterialData getMaterialDirect(int x, int y, int z)
 	{
@@ -330,9 +333,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		return -1;
 	}
 
-	// Only used by new 1.16 resources that use the 3x3 decoration area.
-	// Once we've updated to 3x3, should remove this and use 
-	// decorationBiomeCache and decorationArea for everything.
+	// TODO: Only used by resources using 3x3 decoration atm (so icebergs). Align all resources
+	// to use 3x3, make them use the decoration cache and remove this method.
 	@Override
 	public void setBlockDirect(int x, int y, int z, LocalMaterialData material)
 	{

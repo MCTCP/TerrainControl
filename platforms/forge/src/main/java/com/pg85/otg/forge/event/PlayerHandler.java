@@ -8,6 +8,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+// Only used to track players in otg portals atm.
 @EventBusSubscriber(modid = Constants.MOD_ID_SHORT)
 public class PlayerHandler
 {

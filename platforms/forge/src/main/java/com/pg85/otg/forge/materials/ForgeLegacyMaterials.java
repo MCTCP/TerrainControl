@@ -256,7 +256,7 @@ class ForgeLegacyMaterials
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.defaultBlockState();
 			case "pg85":
-				return Blocks.ZOMBIE_HEAD.defaultBlockState();
+				return Blocks.SHROOMLIGHT.defaultBlockState();
 			case "supercoder":
 				return Blocks.CAKE.defaultBlockState();
 			case "authvin":
@@ -267,6 +267,8 @@ class ForgeLegacyMaterials
 				return Blocks.LECTERN.defaultBlockState();
 			case "lordsmellypants":
 				return Blocks.FLOWER_POT.defaultBlockState();
+			case "frank":
+				return Blocks.JUKEBOX.defaultBlockState();
 			default:
 				return null;
 		}
@@ -278,7 +280,7 @@ class ForgeLegacyMaterials
 		{
 			return null;
 		}
-	
+
 		try
 		{
 			int blockId = Integer.parseInt(blockName);

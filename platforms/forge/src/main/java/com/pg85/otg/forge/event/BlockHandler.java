@@ -26,6 +26,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
 
+// Only used for portal ignition logic atm.
 @EventBusSubscriber(modid = Constants.MOD_ID_SHORT)
 public class BlockHandler
 {

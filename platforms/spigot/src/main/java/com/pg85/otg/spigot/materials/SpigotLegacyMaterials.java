@@ -176,7 +176,7 @@ public class SpigotLegacyMaterials
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.getBlockData();
 			case "pg85":
-				return Blocks.ZOMBIE_HEAD.getBlockData();
+				return Blocks.SHROOMLIGHT.getBlockData();
 			case "supercoder":
 				return Blocks.CAKE.getBlockData();
 			case "authvin":
@@ -187,6 +187,8 @@ public class SpigotLegacyMaterials
 				return Blocks.LECTERN.getBlockData();
 			case "lordsmellypants":
 				return Blocks.FLOWER_POT.getBlockData();
+			case "frank":
+				return Blocks.JUKEBOX.getBlockData();				
 			default:
 				return null;
 		}

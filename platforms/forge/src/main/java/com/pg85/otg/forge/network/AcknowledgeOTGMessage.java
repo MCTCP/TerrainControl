@@ -10,13 +10,9 @@ public class AcknowledgeOTGMessage implements OTGLoginMessage
 {
 	private int loginIndex;
 
-	public AcknowledgeOTGMessage()
-	{
-	}
+	public AcknowledgeOTGMessage() { }
 
-	public static void serialize(AcknowledgeOTGMessage msg, PacketBuffer buf)
-	{
-	}
+	public static void serialize(AcknowledgeOTGMessage msg, PacketBuffer buf) { }
 
 	public static AcknowledgeOTGMessage deserialize(PacketBuffer buf)
 	{

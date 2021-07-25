@@ -15,10 +15,8 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 
 /**
- * Contains data for a dimension created from a preset, with world creation / O menu settings applied.
- * Saved and loaded with the world.
- * * May also be used for ModPack Configs in the future, hence the yaml code.
- * TODO: Read/Write from bytestream when saving with world data.
+ * Used for Forge MP at world creation, defines the overworld/nether/end and any custom dimensions for a world.
+ * May also be used for ModPack Configs in the future, hence the yaml code.
  */
 public class DimensionConfig
 {

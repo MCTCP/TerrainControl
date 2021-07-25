@@ -102,5 +102,4 @@ public class Preset
 	{
 		return this.description;
 	}
-
 }

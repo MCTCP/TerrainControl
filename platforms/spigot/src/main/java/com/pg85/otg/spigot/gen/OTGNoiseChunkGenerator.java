@@ -42,7 +42,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
 		(p_236091_0_) -> p_236091_0_
 			.group(
-				Codec.STRING.fieldOf("otg_preset_name").forGetter(
+				Codec.STRING.fieldOf("preset_folder_name").forGetter(
 					(p_236090_0_) -> p_236090_0_.presetFolderName
 				),
 				// BiomeProvider -> WorldChunkManager
@@ -419,7 +419,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// TODO: Not doing this ignores any SurfaceBuilderss registered to this biome. We may have to enable this for non-otg biomes / non-otg surfacebuilders?
 	}
 
-	// Carves caves and ravines
+	// Carvers: Caves and ravines
+
 	// GenerationStage -> WorldGenStage, Carver -> Features
 	@Override
 	public void doCarving (long seed, BiomeManager biomeManager, IChunkAccess chunk, WorldGenStage.Features stage)
