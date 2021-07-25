@@ -10,6 +10,7 @@ import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
@@ -37,7 +38,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			this.rarities[pos] = readRarity(args.get(i + 2));
 			pos++;
 		}
-		totalRarity = readRarity(args.get(args.size() - 1));
+		totalRarity = StringHelper.readDouble(args.get(args.size() - 1), 0.000001, Integer.MAX_VALUE);
 	}
 
 	@Override

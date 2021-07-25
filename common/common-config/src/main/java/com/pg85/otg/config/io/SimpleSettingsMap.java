@@ -35,7 +35,7 @@ public final class SimpleSettingsMap implements SettingsMap
 	/**
 	 * Creates a new settings reader.
 	 * @param name		Name of the config file, like "WorldConfig" or "Taiga".
-	 * @param isNewConfig True if this config is newly created.
+	 * //@param isNewConfig True if this config is newly created.
 	 */
 	public SimpleSettingsMap(String name)
 	{
