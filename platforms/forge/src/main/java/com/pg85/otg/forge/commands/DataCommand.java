@@ -4,41 +4,51 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class DataCommand implements BaseCommand
+public class DataCommand extends BaseCommand
 {
-	private static final String USAGE = "Usage: /otg data <type>";
-	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
-			"biome",
-			"block",
-			"entity",
-			"sound",
-			"particle",
-			"configured_feature"
-	));
+	
+	public DataCommand() {
+		this.name = "data";
+		this.helpMessage = "Dumps various types of game data to files for preset development.";
+		this.usage = "/otg data <type>";
+		this.detailedHelp = new String[] { 
+				"<type>: The type of data to dump.",
+				" - biome: All registered biomes.",
+				" - block: All registered blocks.",
+				" - entity: All registered entities.",
+				" - sound: All registered sounds.",
+				" - particle: All registered particles.",
+				" - configured_feature: All registered configured features (Used to decorate biomes during worldgen)."
+			};
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("data")
 			.executes(context -> execute(context.getSource(), ""))
-				.then(Commands.argument("type", StringArrayArgument.with(DATA_TYPES))
+				.then(Commands.argument("type", new DataTypeArgument())
 					.executes((context -> execute(context.getSource(), context.getArgument("type", String.class)))
 				)
 			)
@@ -75,7 +85,7 @@ public class DataCommand implements BaseCommand
 				worldGenRegistry = source.getServer().registryAccess().registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 				break;
 			default:
-				source.sendSuccess(new StringTextComponent(USAGE), false);
+				source.sendSuccess(new StringTextComponent(getUsage()), false);
 				return 0;
 		}
 
@@ -106,5 +116,28 @@ public class DataCommand implements BaseCommand
 			}
 		}).start();
 		return 0;
+	}
+	
+	public static class DataTypeArgument implements ArgumentType<String>
+	{
+		private final String[] options = new String[]
+		{ "biome", "block", "entity", "sound", "particle", "configured_feature" };
+
+		public static DataTypeArgument create()
+		{
+			return new DataTypeArgument();
+		}
+
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			return ISuggestionProvider.suggest(options, builder);
+		}
 	}
 }

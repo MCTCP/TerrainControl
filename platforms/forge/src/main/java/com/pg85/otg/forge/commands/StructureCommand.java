@@ -21,8 +21,14 @@ import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.storage.FolderName;
 
-public class StructureCommand implements BaseCommand
+public class StructureCommand extends BaseCommand
 {
+	public StructureCommand() {
+		this.name = "structure";
+		this.helpMessage = "Displays information about BO4 structures in your current chunk.";
+		this.usage = "/otg structure";
+	}
+	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{

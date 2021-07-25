@@ -37,8 +37,19 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.storage.FolderName;
 
-public class SpawnCommand implements BaseCommand
+public class SpawnCommand extends BaseCommand
 {
+	public SpawnCommand() {
+		this.name = "spawn";
+		this.helpMessage = "Spawns a structure from a specific preset.";
+		this.usage = "/otg spawn <preset> <object> [location] [force]";
+		this.detailedHelp = new String[] { 
+				"<preset>: The name of the preset to look for the object in, or global to check GlobalObjects.",
+				"<object>: The name of the object to spawn.",
+				"[location]: The x, y, and z location to spawn the object at, defaults to your position.",
+				"[force]: Whether to force the object to spawn regardless of conditions."
+			};
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)

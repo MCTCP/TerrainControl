@@ -51,9 +51,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-public class ExportCommand implements BaseCommand
+public class ExportCommand extends BaseCommand
 {
 	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
+	
+	public ExportCommand() {
+		this.name = "export";
+		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
+		this.usage = "Please see /otg help export.";
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)

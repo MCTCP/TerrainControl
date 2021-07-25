@@ -24,6 +24,10 @@ public class PresetArgument implements ArgumentType<String>
 	{
 		this.global = global;
 	}
+	
+	public static PresetArgument create() {
+		return new PresetArgument(true);
+	}
 
 	@Override
 	public String parse(StringReader reader) throws CommandSyntaxException

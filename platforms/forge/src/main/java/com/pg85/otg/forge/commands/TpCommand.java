@@ -19,11 +19,21 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.server.ServerWorld;
 
-public class TpCommand implements BaseCommand
+public class TpCommand extends BaseCommand
 {
-	private static final String USAGE = "Usage: /otg tp <biome name> [range]";
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
 			object -> new TranslationTextComponent("commands.locatebiome.notFound", object));
+	
+	public TpCommand() {
+		this.name = "tp";
+		this.helpMessage = "Teleports you to a specific OTG biome.";
+		this.usage = "/otg tp <biome> [range]";
+		this.detailedHelp = new String[] { 
+				"<biome>: The name of the biome to teleport to.",
+				"[range]: The radius in blocks to search for the target biome, defaults to 10000.",
+				"Note: large numbers will make the command take a long time."
+			};
+	}
 
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
@@ -74,7 +84,7 @@ public class TpCommand implements BaseCommand
 
 	private int showHelp(CommandSource source)
 	{
-		source.sendSuccess(new StringTextComponent(USAGE), false);
+		source.sendSuccess(new StringTextComponent(getUsage()), false);
 		return 0;
 	}
 }
