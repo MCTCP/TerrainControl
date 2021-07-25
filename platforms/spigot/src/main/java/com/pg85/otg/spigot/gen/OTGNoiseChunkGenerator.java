@@ -27,7 +27,6 @@ import net.minecraft.server.v1_16_R3.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.spigotmc.SpigotWorldConfig;
 
 import javax.annotation.Nullable;
 
@@ -72,7 +71,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final String presetFolderName;
 	private final Preset preset;
 	private final StructureSettings structSettings;
-	private volatile boolean injected;
+
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
 
@@ -135,138 +134,39 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.structSettings;
 	}
 
+	// Code borrowed from ChunkGenerator.java
 	@Override
-	public void createStructures(IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i) {
+	public void createStructures(IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i)
+	{
 		ChunkCoordIntPair chunkcoordintpair = ichunkaccess.getPos();
 		BiomeBase biomebase = this.b.getBiome((chunkcoordintpair.x << 2) + 2, 0, (chunkcoordintpair.z << 2) + 2);
-		this.a(StructureFeatures.k, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
-		Iterator iterator = biomebase.e().a().iterator();
+		this.createSingleStructure(StructureFeatures.k, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
 
-		while(iterator.hasNext()) {
-			Supplier<StructureFeature<?, ?>> supplier = (Supplier)iterator.next();
-			StructureFeature<?, ?> structurefeature = (StructureFeature)supplier.get();
-			if (StructureFeature.c == StructureGenerator.STRONGHOLD) {
-				synchronized(structurefeature) {
-					this.a(structurefeature, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
+		for (Supplier<StructureFeature<?, ?>> supplier : biomebase.e().a())
+		{
+			StructureFeature<?, ?> structurefeature = supplier.get();
+			if (structurefeature.d == StructureGenerator.STRONGHOLD)
+			{
+				synchronized(structurefeature)
+				{
+					this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
 				}
 			} else {
-				this.a(structurefeature, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
+				this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i, chunkcoordintpair, biomebase);
 			}
 		}
-
 	}
 
 	// This is janky... but it works. THX Authvin
-	private void a(StructureFeature<?, ?> structurefeature, IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i, ChunkCoordIntPair chunkcoordintpair, BiomeBase biomebase) {
+	private void createSingleStructure(StructureFeature<?, ?> structurefeature, IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i, ChunkCoordIntPair chunkcoordintpair, BiomeBase biomebase)
+	{
 		StructureStart<?> structurestart = structuremanager.a(SectionPosition.a(ichunkaccess.getPos(), 0), structurefeature.d, ichunkaccess);
 		int j = structurestart != null ? structurestart.j() : 0;
 		StructureSettingsFeature structuresettingsfeature = this.structSettings.a(structurefeature.d);
-		if (structuresettingsfeature != null) {
+		if (structuresettingsfeature != null)
+		{
 			StructureStart<?> structurestart1 = structurefeature.a(iregistrycustom, this, this.b, definedstructuremanager, i, chunkcoordintpair, biomebase, j, structuresettingsfeature);
 			structuremanager.a(SectionPosition.a(ichunkaccess.getPos(), 0), structurefeature.d, structurestart1, ichunkaccess);
-		}
-
-	}
-
-	private void updateStructureSettings(World world, StructureSettings settings) {
-		if (!this.injected) {
-			synchronized(settings) {
-				if (!this.injected) {
-					Map<StructureGenerator<?>, StructureSettingsFeature> original = settings.a();
-					Map<StructureGenerator<?>, StructureSettingsFeature> updated = new HashMap();
-					SpigotWorldConfig conf = world.spigotConfig;
-
-					Map.Entry entry;
-					StructureSettingsFeature feature;
-					int seed;
-					for(Iterator var8 = original.entrySet().iterator(); var8.hasNext(); updated.put((StructureGenerator)entry.getKey(), new StructureSettingsFeature(feature.a(), feature.b(), seed))) {
-						entry = (Map.Entry)var8.next();
-						String name = IRegistry.STRUCTURE_FEATURE.getKey((StructureGenerator)entry.getKey()).getKey();
-						feature = (StructureSettingsFeature)entry.getValue();
-						seed = feature.c();
-						switch(name.hashCode()) {
-							case -1606796090:
-								if (name.equals("endcity")) {
-									seed = conf.endCitySeed;
-								}
-								break;
-							case -1342343896:
-								if (name.equals("swamp_hut")) {
-									seed = conf.swampSeed;
-								}
-								break;
-							case -767287346:
-								if (name.equals("jungle_pyramid")) {
-									seed = conf.jungleSeed;
-								}
-								break;
-							case -317934649:
-								if (name.equals("monument")) {
-									seed = conf.monumentSeed;
-								}
-								break;
-							case -133189701:
-								if (name.equals("pillager_outpost")) {
-									seed = conf.outpostSeed;
-								}
-								break;
-							case 88800038:
-								if (name.equals("desert_pyramid")) {
-									seed = conf.desertSeed;
-								}
-								break;
-							case 100145518:
-								if (name.equals("igloo")) {
-									seed = conf.iglooSeed;
-								}
-								break;
-							case 176653641:
-								if (name.equals("ocean_ruin")) {
-									seed = conf.oceanSeed;
-								}
-								break;
-							case 460367020:
-								if (name.equals("village")) {
-									seed = conf.villageSeed;
-								}
-								break;
-							case 481037086:
-								if (name.equals("fortress")) {
-									seed = conf.fortressSeed;
-								}
-								break;
-							case 487782972:
-								if (name.equals("bastion_remnant")) {
-									seed = conf.bastionSeed;
-								}
-								break;
-							case 835798799:
-								if (name.equals("mansion")) {
-									seed = conf.mansionSeed;
-								}
-								break;
-							case 1035681380:
-								if (name.equals("ruined_portal")) {
-									seed = conf.portalSeed;
-								}
-								break;
-							case 1183281686:
-								if (name.equals("shipwreck")) {
-									seed = conf.shipwreckSeed;
-								}
-								break;
-							case 1374700947:
-								if (name.equals("nether_fossil")) {
-									seed = conf.fossilSeed;
-								}
-						}
-					}
-
-					original.clear();
-					original.putAll(updated);
-					this.injected = true;
-				}
-			}
 		}
 	}
 
