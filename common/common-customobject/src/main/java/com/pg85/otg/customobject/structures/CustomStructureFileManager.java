@@ -576,10 +576,7 @@ public class CustomStructureFileManager
 						}
 					} else {
 						dos.writeBoolean(false);
-						dos.writeBoolean(false);
-						dos.writeBoolean(false);
-						dos.writeBoolean(false);
-					}					
+					}
 				}
 			}
 		} catch (IOException e1) {
@@ -942,10 +939,6 @@ public class CustomStructureFileManager
 						smoothingAreasToSpawn.put(chunkCoord, smoothingAreaLines);
 					}
 				}
-
-				buffer.get(); // Used to be particles
-				buffer.get(); // Used to be spawners
-				buffer.get(); // Used to be moddata
 
 				CustomStructure structure;
 				if(isBO4Enabled)
