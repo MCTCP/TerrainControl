@@ -31,6 +31,8 @@ import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+// Allows users to configure different trees that spawn
+// from saplings, including modded saplings and BO2/BO3 trees.
 @EventBusSubscriber(modid = Constants.MOD_ID_SHORT)
 public class SaplingHandler
 {

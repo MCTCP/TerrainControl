@@ -7,6 +7,7 @@ import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 
+// TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public abstract class LocalWorldGenRegion implements IWorldGenRegion
 {
 	protected final String presetFolderName;

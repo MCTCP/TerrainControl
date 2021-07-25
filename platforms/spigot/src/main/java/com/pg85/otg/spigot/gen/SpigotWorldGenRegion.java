@@ -26,6 +26,7 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
+// TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	protected final GeneratorAccessSeed worldGenRegion;
@@ -113,6 +114,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return this.chunkGenerator.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
+	// TODO: Only used by resources using 3x3 decoration atm (so icebergs). Align all resources
+	// to use 3x3, make them use the decoration cache and remove this method.
 	@Override
 	public LocalMaterialData getMaterialDirect(int x, int y, int z)
 	{
@@ -311,9 +314,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return -1;
 	}
 
-	// Only used by new 1.16 resources that use the 3x3 decoration area.
-	// Once we've updated to 3x3, should remove this and use 
-	// decorationBiomeCache and decorationArea for everything.
+	// TODO: Only used by resources using 3x3 decoration atm (so icebergs). Align all resources
+	// to use 3x3, make them use the decoration cache and remove this method.
 	@Override
 	public void setBlockDirect(int x, int y, int z, LocalMaterialData material)
 	{

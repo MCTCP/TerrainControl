@@ -16,9 +16,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 	private Map<String, BiomeSettingSyncWrapper> syncMap = new HashMap<>();
 	private int loginIndex;
 
-	public PacketSyncBiomeSettings()
-	{
-	}
+	public PacketSyncBiomeSettings() { }
 
 	public PacketSyncBiomeSettings(Map<String, BiomeSettingSyncWrapper> syncMap)
 	{
@@ -43,7 +41,6 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		{
 			String key = buffer.readUtf();
 			BiomeSettingSyncWrapper wrapper = new BiomeSettingSyncWrapper(buffer);
-
 			packet.syncMap.putIfAbsent(key, wrapper);
 		}
 		return packet;
@@ -59,7 +56,6 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 			String biomeName = buffer.readUtf();
 			String key = Constants.MOD_ID_SHORT + ":" + preset + "." + biomeName;
 			BiomeSettingSyncWrapper wrapper = new BiomeSettingSyncWrapper(buffer);
-
 			packet.syncMap.putIfAbsent(key, wrapper);
 		}
 		return packet;
@@ -73,7 +69,6 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		// forever.
 		OTGClientSyncManager.LOGIN.reply(new AcknowledgeOTGMessage(), context.get());
 		context.get().setPacketHandled(true);
-
 		context.get().enqueueWork(() -> Minecraft.getInstance().levelRenderer.allChanged());
 	}
 
@@ -88,5 +83,4 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 	{
 		this.loginIndex = loginIndex;
 	}
-
 }

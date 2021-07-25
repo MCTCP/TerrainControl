@@ -58,6 +58,9 @@ public abstract class LocalPresetLoader
 		return materialReader;
 	}
 
+	// Creates a preset-specific materialreader, have to do this
+	// only when loading each preset since each preset may have
+	// its own block fallbacks / block dictionaries.
 	protected abstract IMaterialReader createMaterialReader();
 
 	public abstract void registerBiomes();

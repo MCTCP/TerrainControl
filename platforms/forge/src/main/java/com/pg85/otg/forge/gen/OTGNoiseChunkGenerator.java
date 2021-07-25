@@ -302,7 +302,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	// Carves caves and ravines
+	// Carvers: Caves and ravines
+
 	@Override
 	public void applyCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{
@@ -378,7 +379,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// Forge code injected into NoiseChunkGenerator
 		List<MobSpawnInfo.Spawners> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structureManager, entityClassification, blockPos);
-		if (spawns != null) return spawns;
+		if (spawns != null)
+		{
+			return spawns;
+		}
 		//
 
 		return super.getMobsAt(biome, structureManager, entityClassification, blockPos);

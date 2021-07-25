@@ -66,7 +66,7 @@ public class ReedResource extends FrequencyResourceBase
 			worldGenRegion.setBlock(x, y + y1, z, this.material);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{

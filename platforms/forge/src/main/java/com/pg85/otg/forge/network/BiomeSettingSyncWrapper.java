@@ -12,15 +12,14 @@ import net.minecraft.network.PacketBuffer;
 
 public class BiomeSettingSyncWrapper
 {
-	private float fogDensity;
-	private ColorSet grassColorControl;
-	private ColorSet foliageColorControl;
-	private ColorSet waterColorControl;
+	private final float fogDensity;
+	private final ColorSet grassColorControl;
+	private final ColorSet foliageColorControl;
+	private final ColorSet waterColorControl;
 
 	public BiomeSettingSyncWrapper(IBiomeConfig config)
 	{
 		this.fogDensity = config.getFogDensity();
-
 		this.grassColorControl = config.getGrassColorControl();
 		this.foliageColorControl = config.getFoliageColorControl();
 		this.waterColorControl = config.getWaterColorControl();
@@ -54,7 +53,6 @@ public class BiomeSettingSyncWrapper
 			waterColors.add(new ColorThreshold(buffer.readInt(), buffer.readFloat()));
 		}
 		this.waterColorControl = new SimpleColorSet(waterColors);
-
 	}
 
 	public float getFogDensity()

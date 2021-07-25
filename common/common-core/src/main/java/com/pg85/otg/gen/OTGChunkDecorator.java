@@ -255,8 +255,8 @@ public class OTGChunkDecorator implements IChunkDecorator
 	
 	private void handleBO3AtSpawn(IWorldGenRegion worldGenRegion, ChunkCoordinate targetChunk, String bo3AtSpawn, String presetFolderName, Path otgRootFolder, ILogger logger, CustomStructureCache structureCache, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{	
-        // If a BO3AtSpawn has been defined, spawn it.
-    	CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(
+		// If a BO3AtSpawn has been defined, spawn it.
+		CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(
 			bo3AtSpawn,
 			presetFolderName,
 			otgRootFolder,
@@ -264,39 +264,39 @@ public class OTGChunkDecorator implements IChunkDecorator
 			customObjectManager,
 			materialReader,
 			customObjectResourcesManager,
-			modLoadedChecker    			
+			modLoadedChecker
 		);
-    	if(customObject != null)
-    	{
-    		if(customObject instanceof BO3)
-    		{
-    			int y = 1;
-    			if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestBlock)
-    			{
-    				 y = worldGenRegion.getHighestBlockAboveYAt(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
-    			}
-    			else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
-    			{
-    				y = worldGenRegion.getBlockAboveSolidHeight(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
-    			}
-    			else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.randomY)
-    			{
+		if(customObject != null)
+		{
+			if(customObject instanceof BO3)
+			{
+				int y = 1;
+				if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestBlock)
+				{
+					y = worldGenRegion.getHighestBlockAboveYAt(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
+				}
+				else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.highestSolidBlock)
+				{
+					y = worldGenRegion.getBlockAboveSolidHeight(targetChunk.getBlockX() + 15, targetChunk.getBlockZ() + 15) - 1;
+				}
+				else if(((BO3)customObject).getConfig().getSpawnHeight() == SpawnHeightEnum.randomY)
+				{
 					y = (int) (((BO3)customObject).getConfig().minHeight + (Math.random() * (((BO3)customObject).getConfig().maxHeight - ((BO3)customObject).getConfig().minHeight)));
-    			}
+				}
 
-    			y += ((BO3)customObject).getConfig().getSpawnHeightOffset();
-    			// This may spawn the structure across chunk borders.
-    			((BO3)customObject).spawnForced(
-					structureCache, 
-					worldGenRegion, 
-					this.rand, 
-					Rotation.NORTH, 
-					targetChunk.getBlockX() + 16 + ((BO3)customObject).getXOffset(Rotation.NORTH), 
-					y, 
-					targetChunk.getBlockZ() + 16 + ((BO3)customObject).getZOffset(Rotation.NORTH), 
+				y += ((BO3)customObject).getConfig().getSpawnHeightOffset();
+				// This may spawn the structure across chunk borders.
+				((BO3)customObject).spawnForced(
+					structureCache,
+					worldGenRegion,
+					this.rand,
+					Rotation.NORTH,
+					targetChunk.getBlockX() + 16 + ((BO3)customObject).getXOffset(Rotation.NORTH),
+					y,
+					targetChunk.getBlockZ() + 16 + ((BO3)customObject).getZOffset(Rotation.NORTH),
 					true
 				);
-    		}
-    	}		
+			}
+		}
 	}
 }
