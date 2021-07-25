@@ -20,6 +20,11 @@ public class BiomeObjectArgument implements ArgumentType<String>
 {
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
 
+	public static BiomeObjectArgument create() {
+		return new BiomeObjectArgument();
+	}
+
+	
 	@Override
 	public String parse(StringReader reader) throws CommandSyntaxException
 	{

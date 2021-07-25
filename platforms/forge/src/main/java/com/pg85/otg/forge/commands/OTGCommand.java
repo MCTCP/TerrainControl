@@ -5,9 +5,14 @@ import java.util.Set;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.pg85.otg.forge.commands.arguments.BiomeNameArgument;
+import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
+import com.pg85.otg.forge.commands.arguments.PresetArgument;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
 
 public class OTGCommand
 {
@@ -40,5 +45,11 @@ public class OTGCommand
 		}
 		
 		dispatcher.register(commandBuilder);
+	}
+	
+	public static void registerArguments() {
+		ArgumentTypes.register("biome_name", BiomeNameArgument.class, new ArgumentSerializer<>(BiomeNameArgument::create));
+		ArgumentTypes.register("preset", PresetArgument.class, new ArgumentSerializer<>(PresetArgument::create));
+		ArgumentTypes.register("biome_object", BiomeObjectArgument.class, new ArgumentSerializer<>(BiomeObjectArgument::create));
 	}
 }

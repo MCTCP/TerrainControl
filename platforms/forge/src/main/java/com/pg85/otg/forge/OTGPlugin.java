@@ -63,6 +63,8 @@ public class OTGPlugin
 		// Deferred registers
 		OTGPortalPois.poi.register(modEventBus);
 		OTGPortalBlocks.blocks.register(modEventBus);
+		
+		OTGCommand.registerArguments();
 	}
 
 	// OTG World Type MP: Register the OTG world type. 

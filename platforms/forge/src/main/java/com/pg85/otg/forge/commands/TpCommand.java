@@ -1,15 +1,12 @@
 package com.pg85.otg.forge.commands;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
+import com.pg85.otg.forge.commands.arguments.BiomeNameArgument;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 
 import net.minecraft.command.CommandSource;
@@ -21,7 +18,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class TpCommand implements BaseCommand
 {
@@ -29,16 +25,12 @@ public class TpCommand implements BaseCommand
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
 			object -> new TranslationTextComponent("commands.locatebiome.notFound", object));
 
-	List<String> biomes = ForgeRegistries.BIOMES.getKeys().stream()
-			.filter(key -> key.getNamespace().equals(Constants.MOD_ID_SHORT))
-			.map(key -> key.getPath()).collect(Collectors.toList());
-
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("tp")
 			.executes(context -> showHelp(context.getSource()))
-				.then(Commands.argument("biome", StringArrayArgument.with(biomes))
+				.then(Commands.argument("biome", new BiomeNameArgument())
 					.executes(context -> locateBiome(context.getSource(), StringArgumentType.getString(context, "biome"), 10000))
 						.then(Commands.argument("range", IntegerArgumentType.integer(0))
 							.executes(context -> locateBiome(context.getSource(), StringArgumentType.getString(context, "biome"), IntegerArgumentType.getInteger(context, "range")))))

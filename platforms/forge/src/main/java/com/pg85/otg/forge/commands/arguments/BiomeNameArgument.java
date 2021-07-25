@@ -2,6 +2,7 @@ package com.pg85.otg.forge.commands.arguments;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -9,30 +10,20 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.pg85.otg.constants.Constants;
 
 import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class StringArrayArgument implements ArgumentType<String>
+public class BiomeNameArgument implements ArgumentType<String>
 {
-	private final String[] options;
-
-	private StringArrayArgument(String[] options)
-	{
-		this.options = options;
-	}
+	List<String> biomes = ForgeRegistries.BIOMES.getKeys().stream()
+			.filter(key -> key.getNamespace().equals(Constants.MOD_ID_SHORT))
+			.map(ResourceLocation::getPath).collect(Collectors.toList());
 	
-	public static StringArrayArgument create() {
-		return new StringArrayArgument(new String[0]);
-	}
-
-	public static StringArrayArgument with(String... options)
-	{
-		return new StringArrayArgument(options);
-	}
-	
-	public static StringArrayArgument with(List<String> options)
-	{
-		return new StringArrayArgument(options.toArray(new String[0]));
+	public static BiomeNameArgument create() {
+		return new BiomeNameArgument();
 	}
 
 	@Override
@@ -44,6 +35,6 @@ public class StringArrayArgument implements ArgumentType<String>
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 	{
-		return ISuggestionProvider.suggest(options, builder);
+		return ISuggestionProvider.suggest(biomes, builder);
 	}
 }

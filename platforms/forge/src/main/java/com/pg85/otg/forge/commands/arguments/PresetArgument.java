@@ -22,7 +22,6 @@ public class PresetArgument implements ArgumentType<String>
 
 	public PresetArgument(boolean global)
 	{
-
 		this.global = global;
 	}
 
