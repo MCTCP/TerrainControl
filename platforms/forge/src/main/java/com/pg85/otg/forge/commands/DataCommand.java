@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,6 +28,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class DataCommand extends BaseCommand
 {
+	private static final String[] DATA_TYPES = new String[]
+			{ "biome", "block", "entity", "sound", "particle", "configured_feature" };
 	
 	public DataCommand() {
 		this.name = "data";
@@ -48,7 +51,8 @@ public class DataCommand extends BaseCommand
 	{
 		builder.then(Commands.literal("data")
 			.executes(context -> execute(context.getSource(), ""))
-				.then(Commands.argument("type", new DataTypeArgument())
+				.then(Commands.argument("type", StringArgumentType.word())
+					.suggests(this::suggestTypes)
 					.executes((context -> execute(context.getSource(), context.getArgument("type", String.class)))
 				)
 			)
@@ -58,7 +62,6 @@ public class DataCommand extends BaseCommand
 	public int execute(CommandSource source, String type)
 	{
 		// /otg data music
-		// /otg data sound
 
 		// worldgen registries aren't wrapped by forge so we need to use another object here
 		IForgeRegistry<?> registry = null;
@@ -100,17 +103,22 @@ public class DataCommand extends BaseCommand
 			try
 			{
 				Path root = OTG.getEngine().getOTGRootFolder();
-				String fileName = root.toString() + File.separator + "data-output-" + type + ".txt".toLowerCase();
-				File output = new File(fileName);
+				File folder = new File(root.toString() + File.separator + "output");
+				if (!folder.exists())
+				{
+					folder.mkdirs();
+				}
+
+				String fileName = "data-output-" + type + ".txt".toLowerCase();
+				File output = new File(folder, fileName);
 				FileWriter writer = new FileWriter(output);
 				for (ResourceLocation key : set)
 				{
-					writer.write(key.toString()+"\n");
+					writer.write(key.toString() + "\n");
 				}
 				writer.close();
-				source.sendSuccess(new StringTextComponent("File exported as "+fileName), true);
-			}
-			catch (IOException e)
+				source.sendSuccess(new StringTextComponent("File exported as " + output.getPath()), true);
+			} catch (IOException e)
 			{
 				e.printStackTrace();
 			}
@@ -118,26 +126,9 @@ public class DataCommand extends BaseCommand
 		return 0;
 	}
 	
-	public static class DataTypeArgument implements ArgumentType<String>
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
 	{
-		private final String[] options = new String[]
-		{ "biome", "block", "entity", "sound", "particle", "configured_feature" };
-
-		public static DataTypeArgument create()
-		{
-			return new DataTypeArgument();
-		}
-
-		@Override
-		public String parse(StringReader reader) throws CommandSyntaxException
-		{
-			return reader.readString();
-		}
-
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
-		{
-			return ISuggestionProvider.suggest(options, builder);
-		}
+		return ISuggestionProvider.suggest(DATA_TYPES, builder);
 	}
 }

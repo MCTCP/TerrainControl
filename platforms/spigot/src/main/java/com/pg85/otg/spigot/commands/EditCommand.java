@@ -1,13 +1,32 @@
 package com.pg85.otg.spigot.commands;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
 import com.pg85.otg.OTG;
-import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
@@ -18,24 +37,21 @@ import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
+
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-public class EditCommand implements BaseCommand
+public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Player, EditSession> sessionsMap = new HashMap<>();
+	
+	public EditCommand() {
+		this.name = "edit";
+		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
+		this.usage = "Please see /otg help edit.";
+	}
 
 	public boolean execute(CommandSender sender, String[] args)
 	{

@@ -1,5 +1,13 @@
 package com.pg85.otg.spigot.commands;
 
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.Player;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -10,19 +18,17 @@ import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
+import com.pg85.otg.util.ChunkCoordinate;
 
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.entity.Player;
-
-public class StructureCommand implements BaseCommand
+public class StructureCommand extends BaseCommand
 {
+	public StructureCommand() {
+		this.name = "structure";
+		this.helpMessage = "Displays information about BO4 structures in your current chunk.";
+		this.usage = "/otg structure";
+	}
+	
 	public boolean execute(CommandSender sender, String[] args)
 	{
 		if (!(sender instanceof Player))

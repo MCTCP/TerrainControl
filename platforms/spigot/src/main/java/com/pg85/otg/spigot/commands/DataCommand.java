@@ -20,9 +20,8 @@ import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
 import net.minecraft.server.v1_16_R3.RegistryGeneration;
 
-public class DataCommand implements BaseCommand
+public class DataCommand extends BaseCommand
 {
-	private static final String USAGE = "Usage: /otg data <type>";
 	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
 			"biome",
 			"block",
@@ -31,6 +30,22 @@ public class DataCommand implements BaseCommand
 			"particle",
 			"configured_feature"
 	));
+	
+	public DataCommand() {
+		this.name = "data";
+		this.helpMessage = "Dumps various types of game data to files for preset development.";
+		this.usage = "/otg data <type>";
+		this.detailedHelp = new String[] { 
+				"<type>: The type of data to dump.",
+				" - biome: All registered biomes.",
+				" - block: All registered blocks.",
+				" - entity: All registered entities.",
+				" - sound: All registered sounds.",
+				" - particle: All registered particles.",
+				" - dimension: All registered dimensions.",
+				" - configured_feature: All registered configured features (Used to decorate biomes during worldgen)."
+			};
+	}
 
 	public boolean execute(CommandSender sender, String[] args)
 	{
@@ -38,7 +53,7 @@ public class DataCommand implements BaseCommand
 		// /otg data sound
 		if (args.length != 1)
 		{
-			sender.sendMessage(USAGE);
+			sender.sendMessage(getUsage());
 			sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
 			return true;
 		}
@@ -74,17 +89,22 @@ public class DataCommand implements BaseCommand
 			try
 			{
 				Path root = OTG.getEngine().getOTGRootFolder();
-				String fileName = root.toString() + File.separator + "data-output-" + args[0] + ".txt".toLowerCase();
-				File output = new File(fileName);
+				File folder = new File(root.toString() + File.separator + "output");
+				if (!folder.exists())
+				{
+					folder.mkdirs();
+				}
+
+				String fileName = "data-output-" + args[0] + ".txt".toLowerCase();
+				File output = new File(folder, fileName);
 				FileWriter writer = new FileWriter(output);
 				for (MinecraftKey key : set)
 				{
-					writer.write(key.toString()+"\n");
+					writer.write(key.toString() + "\n");
 				}
 				writer.close();
-				sender.sendMessage("File exported as "+fileName);
-			}
-			catch (IOException e)
+				sender.sendMessage("File exported as " + output.getPath());
+			} catch (IOException e)
 			{
 				e.printStackTrace();
 			}

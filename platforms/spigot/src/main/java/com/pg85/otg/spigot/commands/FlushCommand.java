@@ -10,8 +10,14 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-public class FlushCommand implements BaseCommand
-{
+public class FlushCommand extends BaseCommand
+{	
+	public FlushCommand() {
+		this.name = "flush";
+		this.helpMessage = "Clears all loaded objects, forcing them to be reloaded from disk.";
+		this.usage = "/otg flush";
+	}
+	
 	public boolean execute(CommandSender sender, String[] args)
 	{
 		if (!(sender instanceof Player))

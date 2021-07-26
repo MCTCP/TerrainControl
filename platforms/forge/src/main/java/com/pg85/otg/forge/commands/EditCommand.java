@@ -8,11 +8,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
@@ -53,6 +57,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
@@ -65,6 +70,9 @@ public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
 	
+	private static final String[] FLAGS = new String[]
+	{ "-nofix", "-update" };
+	
 	public EditCommand() {
 		this.name = "edit";
 		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
@@ -76,9 +84,12 @@ public class EditCommand extends BaseCommand
 	{
 		builder.then(Commands.literal("edit")
 			.executes(this::help).then(
-				Commands.argument("preset", new PresetArgument(true)).executes(this::execute).then(
-					Commands.argument("object", new BiomeObjectArgument()).executes(this::execute).then(
-						Commands.argument("flags", FlagsArgument.with("-nofix", "-update")).executes(this::execute)
+				Commands.argument("preset", StringArgumentType.word()).executes(this::execute)
+				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+					Commands.argument("object", StringArgumentType.word()).executes(this::execute)
+					.suggests(BiomeObjectArgument::suggest
+						).then(
+						Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
 					)
 				)
 			)
@@ -88,8 +99,9 @@ public class EditCommand extends BaseCommand
 		builder.then(Commands.literal("finishedit")
 			.executes(this::finish));
 		builder.then(Commands.literal("update").then(
-			Commands.argument("preset", new PresetArgument(false))
-				.executes(this::update)));
+			Commands.argument("preset", StringArgumentType.word())
+			.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
+			.executes(this::update)));
 	}
 
 	public int execute(CommandContext<CommandSource> context)
@@ -654,6 +666,12 @@ public class EditCommand extends BaseCommand
 			center.z + box.getMinZ() + box.getDepth()));
 		region.setCenter(center);
 		return region;
+	}
+	
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
 
 	private static final HashSet<LocalMaterialData> gravityBlocksSet = Stream.of(

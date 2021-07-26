@@ -2,15 +2,12 @@ package com.pg85.otg.forge.commands;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.pg85.otg.forge.commands.DataCommand.DataTypeArgument;
 import com.pg85.otg.forge.commands.HelpCommand.CommandArgument;
-import com.pg85.otg.forge.commands.MapCommand.MapTypeArgument;
-import com.pg85.otg.forge.commands.arguments.BiomeNameArgument;
 import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
+import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 
 import net.minecraft.command.CommandSource;
@@ -55,12 +52,7 @@ public class OTGCommand
 	}
 	
 	public static void registerArguments() {
-		ArgumentTypes.register("biome_name", BiomeNameArgument.class, new ArgumentSerializer<>(BiomeNameArgument::create));
-		ArgumentTypes.register("preset", PresetArgument.class, new ArgumentSerializer<>(PresetArgument::create));
-		ArgumentTypes.register("biome_object", BiomeObjectArgument.class, new ArgumentSerializer<>(BiomeObjectArgument::create));
-		ArgumentTypes.register("map_type", MapTypeArgument.class, new ArgumentSerializer<>(MapTypeArgument::create));
-		ArgumentTypes.register("data_type", DataTypeArgument.class, new ArgumentSerializer<>(DataTypeArgument::create));
-		ArgumentTypes.register("command_name", CommandArgument.class, new ArgumentSerializer<>(CommandArgument::create));
+		ArgumentTypes.register("flags", FlagsArgument.class, new ArgumentSerializer<>(FlagsArgument::create));
 	}
 	
 	public static List<BaseCommand> getCommands() {

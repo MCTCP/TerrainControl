@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
@@ -56,14 +57,16 @@ public class SpawnCommand extends BaseCommand
 	{
 		builder.then(Commands.literal("spawn")
 			.then(
-				Commands.argument("preset", new PresetArgument(true)).then(
-					Commands.argument("object", new BiomeObjectArgument()).executes(
+				Commands.argument("preset", StringArgumentType.word())
+				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+					Commands.argument("object", StringArgumentType.word()).executes(
 						context -> SpawnCommand.execute(
 							context.getSource(),
 							context.getArgument("preset", String.class),
 							context.getArgument("object", String.class),
 							Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
-							false)
+							false))
+						.suggests(BiomeObjectArgument::suggest
 					).then(
 						Commands.argument("location", BlockPosArgument.blockPos())
 							.executes(

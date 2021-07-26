@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -42,6 +43,9 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class MapCommand extends BaseCommand
 {
+	
+	private static final String[] MAP_TYPES = new String[]
+	{ "biomes", "terrain" };
 	private static final Object queueLock = new Object();
 	private static final Object imgLock = new Object();
 	
@@ -67,8 +71,9 @@ public class MapCommand extends BaseCommand
 			.executes(
 				context -> map(context.getSource(), "", 2048, 2048, 0)
 				).then(
-					Commands.argument("type", new MapTypeArgument()).executes(
-							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0)
+					Commands.argument("type", StringArgumentType.word()).executes(
+							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0))
+							.suggests(this::suggestTypes
 					).then(
 						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
 							(context) -> map(context.getSource(), StringArgumentType.getString(context, "type"), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"), 1)
@@ -370,6 +375,12 @@ public class MapCommand extends BaseCommand
 			return new HighestBlockInfo((ForgeMaterialData)LocalMaterials.AIR, 63);
 		}
 	}
+	
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(MAP_TYPES, builder);
+	}
 		
 	public class HighestBlockInfo
 	{
@@ -380,29 +391,6 @@ public class MapCommand extends BaseCommand
 		{
 			this.material = material;
 			this.y = y;
-		}
-	}
-	
-	public static class MapTypeArgument implements ArgumentType<String>
-	{
-		private final String[] options = new String[]
-		{ "biomes", "terrain" };
-
-		public static MapTypeArgument create()
-		{
-			return new MapTypeArgument();
-		}
-
-		@Override
-		public String parse(StringReader reader) throws CommandSyntaxException
-		{
-			return reader.readString();
-		}
-
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
-		{
-			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 }
