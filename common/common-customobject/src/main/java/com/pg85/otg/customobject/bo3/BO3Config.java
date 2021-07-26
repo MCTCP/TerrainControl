@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -308,7 +309,6 @@ public class BO3Config extends CustomObjectConfigFile
 			block.material = this.blocksMaterial[rotation][i];
 			block.nbtName = this.blocksMetaDataName[i];
 			block.nbt = this.blocksMetaDataTag[i];
-
 			blocksOTGPlus[i] = block;
 		}
 

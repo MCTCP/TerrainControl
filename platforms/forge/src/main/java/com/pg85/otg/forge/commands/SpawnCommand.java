@@ -270,6 +270,7 @@ public class SpawnCommand extends BaseCommand
 			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Error during spawn command: ");
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during spawn command: ", (Object[])e.getStackTrace()));
+			e.printStackTrace();
 		}
 		return 0;
 	}
