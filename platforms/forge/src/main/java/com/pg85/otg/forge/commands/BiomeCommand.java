@@ -8,8 +8,14 @@ import net.minecraft.command.Commands;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-public class BiomeCommand implements BaseCommand
+public class BiomeCommand extends BaseCommand
 {	
+	public BiomeCommand() {
+		this.name = "biome";
+		this.helpMessage = "Displays information about the biome you are in.";
+		this.usage = "/otg biome";
+	}
+	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{

@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
@@ -37,22 +38,35 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.storage.FolderName;
 
-public class SpawnCommand implements BaseCommand
+public class SpawnCommand extends BaseCommand
 {
+	public SpawnCommand() {
+		this.name = "spawn";
+		this.helpMessage = "Spawns a structure from a specific preset.";
+		this.usage = "/otg spawn <preset> <object> [location] [force]";
+		this.detailedHelp = new String[] { 
+				"<preset>: The name of the preset to look for the object in, or global to check GlobalObjects.",
+				"<object>: The name of the object to spawn.",
+				"[location]: The x, y, and z location to spawn the object at, defaults to your position.",
+				"[force]: Whether to force the object to spawn regardless of conditions."
+			};
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("spawn")
 			.then(
-				Commands.argument("preset", new PresetArgument(true)).then(
-					Commands.argument("object", new BiomeObjectArgument()).executes(
+				Commands.argument("preset", StringArgumentType.word())
+				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+					Commands.argument("object", StringArgumentType.word()).executes(
 						context -> SpawnCommand.execute(
 							context.getSource(),
 							context.getArgument("preset", String.class),
 							context.getArgument("object", String.class),
 							Objects.requireNonNull(context.getSource().getEntity()).blockPosition(),
-							false)
+							false))
+						.suggests(BiomeObjectArgument::suggest
 					).then(
 						Commands.argument("location", BlockPosArgument.blockPos())
 							.executes(

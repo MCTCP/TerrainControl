@@ -29,10 +29,24 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.IBlockData;
 
-public class MapCommand implements BaseCommand
+public class MapCommand extends BaseCommand
 {
-	
 	private static final List<String> TYPES = new ArrayList<>(Arrays.asList("biomes", "terrain"));
+	
+	public MapCommand() {
+		this.name = "map";
+		this.helpMessage = "Generates an image of the biome or terrain layout.";
+		this.usage = "/otg map <biomes/terrain> [width] [height] [threads]";
+		this.detailedHelp = new String[] { 
+				"<biomes/terrain>: The type of map to create.",
+				" - biomes: Creates an image using the color specified in each biome's config file.",
+				" - terrain: Creates an image using the colours of the blocks shaded to show the altitude of the terrain.",
+				"[width]: Image width in pixels.",
+				"[height]: Image height in pixels.",
+				"[threads]: The number of threads to use while rendering the image."
+				
+			};
+	}
 	
 	public boolean execute(CommandSender sender, String[] args)
 	{

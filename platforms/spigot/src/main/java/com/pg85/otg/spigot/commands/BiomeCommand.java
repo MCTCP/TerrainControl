@@ -16,8 +16,14 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
-public class BiomeCommand implements BaseCommand
-{
+public class BiomeCommand extends BaseCommand
+{	
+	public BiomeCommand() {
+		this.name = "biome";
+		this.helpMessage = "Displays information about the biome you are in.";
+		this.usage = "/otg biome";
+	}
+	
 	@Override
 	public boolean execute(CommandSender sender, String[] args)
 	{

@@ -22,10 +22,10 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.gen.MCWorldGenRegion;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
@@ -42,9 +42,15 @@ import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 
-public class ExportCommand implements BaseCommand
+public class ExportCommand extends BaseCommand
 {
 	protected static final HashMap<Player, Region> playerSelectionMap = new HashMap<>();
+	
+	public ExportCommand() {
+		this.name = "export";
+		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
+		this.usage = "Please see /otg help export.";
+	}
 
 	public boolean execute(CommandSender sender, String[] args)
 	{

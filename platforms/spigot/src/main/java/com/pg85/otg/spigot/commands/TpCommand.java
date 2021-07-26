@@ -23,10 +23,21 @@ import net.minecraft.server.v1_16_R3.MinecraftKey;
 import net.minecraft.server.v1_16_R3.ResourceKey;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
-public class TpCommand implements BaseCommand
+public class TpCommand extends BaseCommand
 {
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
 			object -> new ChatMessage("commands.locatebiome.notFound", object));
+
+	public TpCommand()
+	{
+		this.name = "tp";
+		this.helpMessage = "Teleports you to a specific OTG biome.";
+		this.usage = "/otg tp <biome> [range]";
+		this.detailedHelp = new String[]
+		{ "<biome>: The name of the biome to teleport to.",
+				"[range]: The radius in blocks to search for the target biome, defaults to 10000.",
+				"Note: large numbers will make the command take a long time." };
+	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args)

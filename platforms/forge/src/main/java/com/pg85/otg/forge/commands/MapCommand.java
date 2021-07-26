@@ -9,16 +9,23 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.forge.commands.arguments.StringArrayArgument;
 import com.pg85.otg.forge.gen.ForgeChunkBuffer;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -30,15 +37,32 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-public class MapCommand implements BaseCommand
+public class MapCommand extends BaseCommand
 {
+	
+	private static final String[] MAP_TYPES = new String[]
+	{ "biomes", "terrain" };
 	private static final Object queueLock = new Object();
 	private static final Object imgLock = new Object();
 	
-	private static final String USAGE = "Usage: /otg map <biomes/terrain>";
+	public MapCommand() {
+		this.name = "map";
+		this.helpMessage = "Generates an image of the biome or terrain layout.";
+		this.usage = "/otg map <biomes/terrain> [width] [height] [threads]";
+		this.detailedHelp = new String[] { 
+				"<biomes/terrain>: The type of map to create.",
+				" - biomes: Creates an image using the color specified in each biome's config file.",
+				" - terrain: Creates an image using the colours of the blocks shaded to show the altitude of the terrain.",
+				"[width]: Image width in pixels.",
+				"[height]: Image height in pixels.",
+				"[threads]: The number of threads to use while rendering the image."
+				
+			};
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
@@ -47,8 +71,9 @@ public class MapCommand implements BaseCommand
 			.executes(
 				context -> map(context.getSource(), "", 2048, 2048, 0)
 				).then(
-					Commands.argument("type", StringArrayArgument.with(new String[] {"biomes", "terrain" })).executes(
-							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0)
+					Commands.argument("type", StringArgumentType.word()).executes(
+							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0))
+							.suggests(this::suggestTypes
 					).then(
 						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
 							(context) -> map(context.getSource(), StringArgumentType.getString(context, "type"), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"), 1)
@@ -71,7 +96,7 @@ public class MapCommand implements BaseCommand
 			case "terrain":
 				return mapTerrain(source, width, height, threads);
 			default:
-				source.sendSuccess(new StringTextComponent(USAGE), false);
+				source.sendSuccess(new StringTextComponent(getUsage()), false);
 				return 0;
 		}
 	}
@@ -349,6 +374,12 @@ public class MapCommand implements BaseCommand
 			}
 			return new HighestBlockInfo((ForgeMaterialData)LocalMaterials.AIR, 63);
 		}
+	}
+	
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(MAP_TYPES, builder);
 	}
 		
 	public class HighestBlockInfo

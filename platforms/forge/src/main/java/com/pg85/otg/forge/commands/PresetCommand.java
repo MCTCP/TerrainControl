@@ -7,8 +7,14 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 
-public class PresetCommand implements BaseCommand
+public class PresetCommand extends BaseCommand
 {
+	public PresetCommand() {
+		this.name = "preset";
+		this.helpMessage = "Displays information about the current world's preset.";
+		this.usage = "/otg preset";
+	}
+	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{

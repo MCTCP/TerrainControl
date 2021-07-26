@@ -2,26 +2,35 @@ package com.pg85.otg.forge.commands;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.BO3;
+import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
-import com.pg85.otg.customobject.util.Corner;
-import com.pg85.otg.customobject.CustomObject;
-import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobject.util.BoundingBox;
+import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
@@ -36,7 +45,6 @@ import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.presets.Preset;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
@@ -46,32 +54,42 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.server.ServerWorld;
 
-public class EditCommand implements BaseCommand
+public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
+	
+	private static final String[] FLAGS = new String[]
+	{ "-nofix", "-update" };
+	
+	public EditCommand() {
+		this.name = "edit";
+		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
+		this.usage = "Please see /otg help edit.";
+	}
 
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("edit")
 			.executes(this::help).then(
-				Commands.argument("preset", new PresetArgument(true)).executes(this::execute).then(
-					Commands.argument("object", new BiomeObjectArgument()).executes(this::execute).then(
-						Commands.argument("flags", FlagsArgument.with("-nofix", "-update")).executes(this::execute)
+				Commands.argument("preset", StringArgumentType.word()).executes(this::execute)
+				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+					Commands.argument("object", StringArgumentType.word()).executes(this::execute)
+					.suggests(BiomeObjectArgument::suggest
+						).then(
+						Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
 					)
 				)
 			)
@@ -81,8 +99,9 @@ public class EditCommand implements BaseCommand
 		builder.then(Commands.literal("finishedit")
 			.executes(this::finish));
 		builder.then(Commands.literal("update").then(
-			Commands.argument("preset", new PresetArgument(false))
-				.executes(this::update)));
+			Commands.argument("preset", StringArgumentType.word())
+			.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
+			.executes(this::update)));
 	}
 
 	public int execute(CommandContext<CommandSource> context)
@@ -647,6 +666,12 @@ public class EditCommand implements BaseCommand
 			center.z + box.getMinZ() + box.getDepth()));
 		region.setCenter(center);
 		return region;
+	}
+	
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
 
 	private static final HashSet<LocalMaterialData> gravityBlocksSet = Stream.of(

@@ -10,8 +10,14 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 
-public class FlushCommand implements BaseCommand
+public class FlushCommand extends BaseCommand
 {	
+	public FlushCommand() {
+		this.name = "flush";
+		this.helpMessage = "Clears all loaded objects, forcing them to be reloaded from disk.";
+		this.usage = "/otg flush";
+	}
+	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{

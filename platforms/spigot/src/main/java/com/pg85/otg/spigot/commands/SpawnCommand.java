@@ -31,8 +31,20 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-public class SpawnCommand implements BaseCommand
+public class SpawnCommand extends BaseCommand
 {
+	public SpawnCommand() {
+		this.name = "spawn";
+		this.helpMessage = "Spawns a structure from a specific preset.";
+		this.usage = "/otg spawn <preset> <object> [location] [force]";
+		this.detailedHelp = new String[] { 
+				"<preset>: The name of the preset to look for the object in, or global to check GlobalObjects.",
+				"<object>: The name of the object to spawn.",
+				"[location]: The x, y, and z location to spawn the object at, defaults to your position.",
+				"[force]: Whether to force the object to spawn regardless of conditions."
+			};
+	}
+
 	public boolean execute(CommandSender sender, String[] args)
 	{
 		Map<String, String> strings = CommandUtil.parseArgs(args, false);

@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -25,7 +27,6 @@ import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
-import com.pg85.otg.forge.commands.arguments.BOTypeArgument;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
@@ -51,9 +52,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-public class ExportCommand implements BaseCommand
+public class ExportCommand extends BaseCommand
 {
 	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
+	
+	private static final String[] FLAGS = new String[]
+	{ "-o", "-a", "-b" };
+	
+	public ExportCommand() {
+		this.name = "export";
+		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
+		this.usage = "Please see /otg help export.";
+	}
 	
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
@@ -62,19 +72,23 @@ public class ExportCommand implements BaseCommand
 			Commands.literal("export").executes(this::execute).then(
 				Commands.argument("name", StringArgumentType.string()).executes(this::execute).then(
 					// Skip center block
-					Commands.argument("preset", new PresetArgument(true)).executes(this::execute).then(
-						Commands.argument("type", new BOTypeArgument(false)).executes(this::execute).then(
+					Commands.argument("preset", StringArgumentType.word()).executes(this::execute)
+					.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+						Commands.argument("type", StringArgumentType.word()).executes(this::execute)
+						.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
 							Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-								Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(this::execute)
+								Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
 							)
 						)
 					)
 				).then(
 					Commands.argument("center", BlockStateArgument.block()).executes(this::execute).then(
-						Commands.argument("preset", new PresetArgument(true)).executes(this::execute).then(
-							Commands.argument("type", new BOTypeArgument(false)).executes(this::execute).then(
+						Commands.argument("preset", StringArgumentType.word()).executes(this::execute)
+						.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+							Commands.argument("type", StringArgumentType.word()).executes(this::execute)
+							.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
 								Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-									Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(this::execute)
+									Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
 								)
 							)
 						)
@@ -150,7 +164,6 @@ public class ExportCommand implements BaseCommand
 			{
 				objectName = context.getArgument("name", String.class);
 				presetName = context.getArgument("preset", String.class);
-				type = context.getArgument("type", ObjectType.class);
 				templateName = context.getArgument("template", String.class);
 				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
 				String flags = context.getArgument("flags", String.class);
@@ -160,6 +173,17 @@ public class ExportCommand implements BaseCommand
 			}
 			catch (IllegalArgumentException ignored)
 			{} // We can deal with any of these not being there
+			
+			String raw = context.getArgument("type", String.class);
+			try
+			{
+				type = ObjectType.valueOf(raw);
+			}
+			catch (IllegalArgumentException ex)
+			{
+				source.sendFailure(new StringTextComponent("Invalid object type: " + raw));
+				return 0;
+			}
 
 			if (presetName == null || presetName.equalsIgnoreCase("global"))
 			{
@@ -483,6 +507,25 @@ public class ExportCommand implements BaseCommand
 			playerSelectionMap.put(source.getEntity(), new Region());
 		}
 		return false;
+	}
+	
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder, boolean includeBO2)
+	{
+		Set<String> set = Stream.of(ObjectType.values())
+				.map(ObjectType::getType)
+				.collect(Collectors.toSet());
+			if (!includeBO2)
+			{
+				set.remove("BO2");
+			}
+			return ISuggestionProvider.suggest(set, builder);
+	}
+	
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
+			SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
 	
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
