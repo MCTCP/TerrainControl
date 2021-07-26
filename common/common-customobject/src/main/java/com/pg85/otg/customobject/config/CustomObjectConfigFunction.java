@@ -48,6 +48,7 @@ public abstract class CustomObjectConfigFunction<T>
 	public static final <T> CustomObjectConfigFunction<T> create(T holder, Class<? extends CustomObjectConfigFunction<T>> clazz, ILogger logger, IMaterialReader materialReader, Object... args)
 	{
 		List<String> stringArgs = new ArrayList<String>(args.length);
+		System.out.println(">> Args: " + stringArgs);
 		for (Object arg : args)
 		{
 			stringArgs.add("" + arg);

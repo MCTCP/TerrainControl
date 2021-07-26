@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -242,6 +243,7 @@ public class BO3Config extends CustomObjectConfigFile
 				this.blocksMaterial[0][i] = block.material;
 				this.blocksMetaDataName[i] = block.nbtName;
 				this.blocksMetaDataTag[i] = block.nbt;
+				System.out.println("> Block: " + block.material);
 
 				if (block instanceof BO3RandomBlockFunction)
 				{
@@ -308,7 +310,6 @@ public class BO3Config extends CustomObjectConfigFile
 			block.material = this.blocksMaterial[rotation][i];
 			block.nbtName = this.blocksMetaDataName[i];
 			block.nbt = this.blocksMetaDataTag[i];
-
 			blocksOTGPlus[i] = block;
 		}
 

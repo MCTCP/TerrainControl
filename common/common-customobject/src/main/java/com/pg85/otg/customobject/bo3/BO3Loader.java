@@ -15,6 +15,7 @@ import com.pg85.otg.customobject.bo3.checks.ModCheck;
 import com.pg85.otg.customobject.bo3.checks.ModCheckNot;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -140,6 +141,7 @@ public class BO3Loader implements CustomObjectLoader
 
 		if(metadata != null)
 		{
+
 			// The file can be structured in two ways:
 			// 1. chest.nbt with all the contents directly in it
 			// 2. chest.nbt with a Compound tag in it with all the data
