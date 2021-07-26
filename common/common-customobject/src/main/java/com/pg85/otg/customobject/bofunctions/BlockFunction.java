@@ -12,6 +12,7 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 /**
@@ -27,7 +28,6 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 	@Override
 	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		System.out.println("Args: " + args);
 		assureSize(4, args);
 		// Those limits are arbitrary, LocalWorld.setBlock will limit it
 		// correctly based on what chunks can be accessed
@@ -47,13 +47,16 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 			nbt = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), logger);
 			if (nbt != null)
 			{
+				if (nbt.getTag("Items") == null) {
+					return;
+				}
 				for (NamedBinaryTag item : (NamedBinaryTag[]) nbt.getTag("Items").getValue()) {
 					if (item.getTag("id").getType() == NamedBinaryTag.Type.TAG_Short) {
 						short val = (short)item.getTag("id").getValue();
 						item.removeSubTag(item.getTag("id"));
 						NamedBinaryTag[] newItemValue = new NamedBinaryTag[((NamedBinaryTag[])item.getValue()).length + 1];
 						System.arraycopy(item.getValue(), 0, newItemValue, 0, newItemValue.length - 1);
-						String strVal = materialReader.readMaterial(Short.toString(val)).getName();
+						String strVal = "minecraft:" + LegacyMaterials.blockNameFromLegacyBlockId(val);
 						newItemValue[newItemValue.length-2] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_String, "id", strVal);
 						newItemValue[newItemValue.length-1] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, "", null);
 						item.setValue(newItemValue);

@@ -243,7 +243,6 @@ public class BO3Config extends CustomObjectConfigFile
 				this.blocksMaterial[0][i] = block.material;
 				this.blocksMetaDataName[i] = block.nbtName;
 				this.blocksMetaDataTag[i] = block.nbt;
-				System.out.println("> Block: " + block.material);
 
 				if (block instanceof BO3RandomBlockFunction)
 				{
