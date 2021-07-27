@@ -1,6 +1,6 @@
-package com.pg85.otg.util.materials;
+package com.pg85.otg.util.minecraft;
 
-public class LegacyMaterials
+public class BlockNames
 {
 	public static String blockNameFromLegacyBlockId(int id)
 	{

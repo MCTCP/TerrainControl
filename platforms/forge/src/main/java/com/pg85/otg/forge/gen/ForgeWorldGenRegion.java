@@ -805,7 +805,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Implement this.
 		return true;
 	}
-	
+
 	// Edit command
 	// TODO: We already have getMaterial/setBlock, rename/refactor these
 	// so it's clear they are/should be used only in a specific context.

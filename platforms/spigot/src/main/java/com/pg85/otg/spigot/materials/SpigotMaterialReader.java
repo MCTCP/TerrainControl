@@ -8,9 +8,9 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
-import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
+import com.pg85.otg.util.minecraft.BlockNames;
 
 import net.minecraft.server.v1_16_R3.ArgumentBlock;
 import net.minecraft.server.v1_16_R3.Block;
@@ -119,7 +119,7 @@ public class SpigotMaterialReader implements IMaterialReader
 					blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length() - 2);
 				}
 				int blockId = Integer.parseInt(blockNameCorrected);
-				String fromLegacyIdName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+				String fromLegacyIdName = BlockNames.blockNameFromLegacyBlockId(blockId);
 				if (fromLegacyIdName != null)
 				{
 					blockNameCorrected = fromLegacyIdName;
@@ -156,7 +156,7 @@ public class SpigotMaterialReader implements IMaterialReader
 			try
 			{
 				int blockId = Integer.parseInt(blockNameOrId);
-				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+				blockNameOrId = BlockNames.blockNameFromLegacyBlockId(blockId);
 			} catch (NumberFormatException ignored) { }
 
 			try
