@@ -5,7 +5,6 @@ import com.pg85.otg.spigot.OTGPlugin;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 
-import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.generator.ChunkGenerator;

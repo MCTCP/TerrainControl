@@ -30,18 +30,17 @@ import java.util.*;
  * calculated by finding the branches of one object, then finding the branches
  * of those branches, etc., until
  * {@link BO3#getMaxBranchDepth()} is reached.
- *
  */
 public class BO3CustomStructure extends CustomStructure
 {
 	private SpawnHeightEnum height;
 	private int maxBranchDepth;
-	
+
 	public BO3CustomStructure(BO3CustomStructureCoordinate start)
 	{
 		this.start = start;
 	}
-	
+
 	public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		StructuredCustomObject object = (StructuredCustomObject)start.getObject(otgRootFolder, worldGenRegion.getLogger(), customObjectManager, materialReader, manager, modLoadedChecker);
