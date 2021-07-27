@@ -653,7 +653,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			// Create entity without nbt data
 			try {
-				entity = type2.create(worldGenRegion.getLevel());
+				entity = type2.create(this.worldGenRegion.getLevel());
 			} catch (Exception exception) {
 	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 	            {
@@ -673,7 +673,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	    	}
 		} else {
 			// Create entity with nbt data
-	        entity = EntityType.loadEntityRecursive(nbtTagCompound, worldGenRegion.getLevel(), (entity1) ->
+	        entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) ->
 	        {
 	        	entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
 	            return entity1;
@@ -696,7 +696,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         		{
         			// Create entity without nbt data
         			try {
-        				entity = type2.create(worldGenRegion.getLevel());
+        				entity = type2.create(this.worldGenRegion.getLevel());
         			} catch (Exception exception) {
         				return;
         			}
@@ -708,7 +708,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         	    	}
         		} else {
         			// Create entity with nbt data
-        	        entity = EntityType.loadEntityRecursive(nbtTagCompound, worldGenRegion.getLevel(), (entity1) -> {
+        	        entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) -> {
         	        	entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
         	            return entity1;
         	         });
@@ -719,12 +719,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
             	}
             }
 
-			BlockPos blockpos = new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ());
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
 			if (entity instanceof MobEntity)
 			{
 		        // If the block is a solid block or entity is a fish out of water, cancel
-		        LocalMaterialData block = ForgeMaterialData.ofBlockState(worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
+		        LocalMaterialData block = ForgeMaterialData.ofBlockState(this.worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
 		        if (
 		    		block.isSolid() ||
 		    		(
@@ -745,7 +744,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 		        // Appease Forge
 				MobEntity mobentity = (MobEntity)entity;
-				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, worldGenRegion, entityData.getX(), blockpos.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
+				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, this.worldGenRegion, entityData.getX(), entityData.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
 				{
 		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 		            {
@@ -764,8 +763,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				mobentity.setPersistenceRequired();
 
 				ILivingEntityData ilivingentitydata = null;
-				ilivingentitydata = mobentity.finalizeSpawn(worldGenRegion, worldGenRegion.getCurrentDifficultyAt(mobentity.blockPosition()), SpawnReason.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
-				worldGenRegion.addFreshEntityWithPassengers(mobentity);
+				ilivingentitydata = mobentity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), SpawnReason.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				this.worldGenRegion.addFreshEntityWithPassengers(mobentity);
 			}
         }
 	}
