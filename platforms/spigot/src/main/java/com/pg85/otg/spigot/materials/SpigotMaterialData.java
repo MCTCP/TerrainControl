@@ -95,13 +95,11 @@ public class SpigotMaterialData extends LocalMaterialData
 		} else {
 			if(this.blockData != this.blockData.getBlock().getBlockData())
 			{
-				this.name = this.blockData.toString()
-					.replace("Block{", "")
-					.replace("}", "");
+				this.name = this.blockData.toString().replace("Block{", "").replace("}", "");
 			} else {
-				this.name = this.blockData.getBlock().r().toString();
+				this.name = this.blockData.toString().substring(0, this.blockData.toString().indexOf("}")).replace("Block{", "");
 			}
-		}
+		}		
 		return this.name;
 	}
 
