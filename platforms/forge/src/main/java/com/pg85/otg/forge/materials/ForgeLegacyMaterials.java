@@ -3,7 +3,7 @@ package com.pg85.otg.forge.materials;
 import com.pg85.otg.OTG;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
-import com.pg85.otg.util.materials.LegacyMaterials;
+import com.pg85.otg.util.minecraft.BlockNames;
 
 import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BannerBlock;
@@ -284,7 +284,7 @@ class ForgeLegacyMaterials
 		try
 		{
 			int blockId = Integer.parseInt(blockName);
-			blockName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+			blockName = BlockNames.blockNameFromLegacyBlockId(blockId);
 			if(blockName == null)
 			{
 				return null;

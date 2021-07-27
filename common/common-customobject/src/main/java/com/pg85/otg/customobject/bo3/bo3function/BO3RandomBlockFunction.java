@@ -11,8 +11,8 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.BlockNames;
 
 public class BO3RandomBlockFunction extends BO3BlockFunction
 {
@@ -125,7 +125,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 							item.removeSubTag(item.getTag("id"));
 							NamedBinaryTag[] newItemValue = new NamedBinaryTag[((NamedBinaryTag[])item.getValue()).length + 1];
 							System.arraycopy(item.getValue(), 0, newItemValue, 0, newItemValue.length - 1);
-							String strVal = "minecraft:" + LegacyMaterials.blockNameFromLegacyBlockId(val);
+							String strVal = "minecraft:" + BlockNames.blockNameFromLegacyBlockId(val);
 							newItemValue[newItemValue.length-2] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_String, "id", strVal);
 							newItemValue[newItemValue.length-1] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, "", null);
 							item.setValue(newItemValue);
