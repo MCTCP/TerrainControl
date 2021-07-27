@@ -56,7 +56,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 	}
 	
 	public void writeToStream(DataOutput stream) throws IOException
-	{		
+	{
 		stream.writeInt(this.x);
 		stream.writeInt(this.y);
 		stream.writeInt(this.z);		

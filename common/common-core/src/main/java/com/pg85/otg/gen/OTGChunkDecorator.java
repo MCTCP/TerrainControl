@@ -170,7 +170,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 			worldGenRegion.getWorldConfig().getBO3AtSpawn().trim().length() > 0
 		)
 		{
-			handleBO3AtSpawn(worldGenRegion, chunkCoord, worldGenRegion.getWorldConfig().getBO3AtSpawn(), worldGenRegion.getPresetFolderName(), otgRootFolder, logger, structureCache, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+			handleBO3AtSpawn(worldGenRegion, chunkCoord, worldGenRegion.getWorldConfig().getBO3AtSpawn(), worldGenRegion.getPresetFolderName(), otgRootFolder, structureCache, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 		}
 		
 		long startTimeAll = System.currentTimeMillis();
@@ -180,7 +180,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 			long startTime = System.currentTimeMillis();
 			if (res instanceof ICustomObjectResource)
 			{
-				((ICustomObjectResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				((ICustomObjectResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 				if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 				{
 					logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Processing resource " + res.toString() + " in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
@@ -188,7 +188,7 @@ public class OTGChunkDecorator implements IChunkDecorator
 			}
 			else if (res instanceof ICustomStructureResource)
 			{
-				((ICustomStructureResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, logger, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
+				((ICustomStructureResource)res).processForChunkDecoration(structureCache, worldGenRegion, this.rand, otgRootFolder, customObjectManager, materialReader, customObjectResourcesManager, modLoadedChecker);
 				if(logger.getLogCategoryEnabled(LogCategory.PERFORMANCE) && (System.currentTimeMillis() - startTime) > 50)
 				{
 					logger.log(LogLevel.WARN, LogCategory.PERFORMANCE, "Warning: Processing resource " + res.toString() + " in biome " + biomeConfig.getName() + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
@@ -253,14 +253,14 @@ public class OTGChunkDecorator implements IChunkDecorator
 		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
-	private void handleBO3AtSpawn(IWorldGenRegion worldGenRegion, ChunkCoordinate targetChunk, String bo3AtSpawn, String presetFolderName, Path otgRootFolder, ILogger logger, CustomStructureCache structureCache, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	private void handleBO3AtSpawn(IWorldGenRegion worldGenRegion, ChunkCoordinate targetChunk, String bo3AtSpawn, String presetFolderName, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{	
 		// If a BO3AtSpawn has been defined, spawn it.
 		CustomObject customObject = customObjectManager.getGlobalObjects().getObjectByName(
 			bo3AtSpawn,
 			presetFolderName,
 			otgRootFolder,
-			logger,
+			worldGenRegion.getLogger(),
 			customObjectManager,
 			materialReader,
 			customObjectResourcesManager,

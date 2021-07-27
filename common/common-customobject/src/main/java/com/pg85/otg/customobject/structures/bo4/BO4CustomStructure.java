@@ -2332,7 +2332,7 @@ public class BO4CustomStructure extends CustomStructure
 					structureCache.markRegionForSaving(chunkCoordinate.toRegionCoord());					
 					return;
 				} else {
-					this.entitiesManager.spawnEntities(worldGenRegion, objectConfig.getEntityData(), coordObject, chunkCoordinate);
+					this.entitiesManager.spawnEntities(worldGenRegion, objectConfig.getEntityData(), coordObject, chunkCoordinate, structureCache, logger);
 					coordObject.isSpawned = true;
 				}
 			}

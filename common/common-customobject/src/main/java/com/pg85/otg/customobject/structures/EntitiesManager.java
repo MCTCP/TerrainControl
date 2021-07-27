@@ -1,13 +1,14 @@
 package com.pg85.otg.customobject.structures;
 
 import com.pg85.otg.customobject.bofunctions.EntityFunction;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
 public class EntitiesManager
 {
-	public void spawnEntities(IWorldGenRegion worldGenRegion, EntityFunction<?>[] entityDataInObject, CustomStructureCoordinate coordObject, ChunkCoordinate chunkCoordinate)
+	public void spawnEntities(IWorldGenRegion worldGenRegion, EntityFunction<?>[] entityDataInObject, CustomStructureCoordinate coordObject, ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, ILogger logger)
 	{
 		for(int i = 0; i < entityDataInObject.length; i++)
 		{
