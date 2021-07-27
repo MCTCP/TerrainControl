@@ -621,9 +621,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// Check for any .txt or .nbt file containing nbt data for the entity
 		CompoundNBT nbtTagCompound = null;
 		if(
-			entityData.getNameTagOrNBTFileName() != null && 
+			entityData.getNameTagOrNBTFileName() != null &&
 			(
-				entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt") 
+				entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt")
 				|| entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".nbt")
 			)
 		)
@@ -643,13 +643,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				// Specify which type of entity to spawn
 				nbtTagCompound.putString("id", entityData.getResourceLocation());
 			}
-			// Get NBT compound from provided string
 			else if (entityData.getNBTTag() != null)
 			{
 				nbtTagCompound = NBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
 			}
 		}
-		
+
 		if(nbtTagCompound == null)
 		{
 			// Create entity without nbt data
@@ -658,7 +657,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			} catch (Exception exception) {
 	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());	                
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());
 	            }
 				return;
 			}
@@ -666,7 +665,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	    	{
 	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");	                
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
 	            }
 	        	return;
 	    	} else {
@@ -683,7 +682,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	    	{
 	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");	                
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
 	            }
 	        	return;
 	    	}
@@ -724,13 +723,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
 			if (entity instanceof MobEntity)
 			{
-		        // If the block is a solid block or entity is a fish out of water, cancel.
+		        // If the block is a solid block or entity is a fish out of water, cancel
 		        LocalMaterialData block = ForgeMaterialData.ofBlockState(worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
 		        if (
-		    		block.isSolid() || 
+		    		block.isSolid() ||
 		    		(
 		        		(
-		    				entity.getClassification(false) == EntityClassification.WATER_CREATURE 
+		    				entity.getClassification(false) == EntityClassification.WATER_CREATURE
 		    				|| entity instanceof GuardianEntity
 						)
 		        		&& !block.isLiquid()
@@ -739,18 +738,18 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		        {
 		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 		            {
-		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");	                
+		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");
 		            }
 		            continue;
 		        }
-		        
+
 		        // Appease Forge
 				MobEntity mobentity = (MobEntity)entity;
 				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, worldGenRegion, entityData.getX(), blockpos.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
 				{
 		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 		            {
-		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Forge prevented spawning for Entity() " + entityData.makeString() + ", a mod or setting is likely preventing mob spawns.");	                
+		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Forge prevented spawning for Entity() " + entityData.makeString() + ", a mod or setting is likely preventing mob spawns.");
 		            }
 					continue;
 				}
@@ -761,7 +760,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
                 {
                     entity.setCustomName(new StringTextComponent(nameTag));
                 }
-                // Make sure Entity() mobs don't de-spawn, regardless of nbt data.
+                // Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobentity.setPersistenceRequired();
 
 				ILivingEntityData ilivingentitydata = null;
@@ -770,7 +769,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
         }
 	}
-	
+
 	@Override
 	public void placeDungeon(Random random, int x, int y, int z)
 	{
