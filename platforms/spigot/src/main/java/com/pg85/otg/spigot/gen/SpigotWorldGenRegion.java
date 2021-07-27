@@ -7,6 +7,7 @@ import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.IEntityFunction;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
@@ -59,6 +60,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = null;
 	}
+	
+	@Override
+	public ILogger getLogger()
+	{
+		return OTG.getEngine().getLogger();
+	}	
 	
 	@Override
 	public long getSeed()

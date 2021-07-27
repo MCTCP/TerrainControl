@@ -71,7 +71,7 @@ class TreeObject implements CustomObject
 	{
 		return worldGenRegion.placeTree(type, random, x, y, z);
 	}
-	
+
 	@Override
 	public boolean spawnForced(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, boolean allowReplaceBlocks)
 	{
