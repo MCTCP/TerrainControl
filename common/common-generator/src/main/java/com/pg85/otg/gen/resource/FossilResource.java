@@ -1,6 +1,5 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.config.biome.BiomeResourceBase;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -12,9 +11,9 @@ import com.pg85.otg.util.helpers.RandomHelper;
 import java.util.List;
 import java.util.Random;
 
-public final class FossilResource extends BiomeResourceBase implements IBasicResource
+public final class FossilResource extends FrequencyResourceBase
 {
-	private final int chance;
+	private final int rarity;
 	private final int maxAltitude;
 	private final int minAltitude;
 	
@@ -23,7 +22,8 @@ public final class FossilResource extends BiomeResourceBase implements IBasicRes
 		super(biomeConfig, args, logger, materialReader);
 		assureSize(1, args);
 
-		this.chance = readInt(args.get(0), 1, Integer.MAX_VALUE);
+		this.frequency = 1;
+		this.rarity = readInt(args.get(0), 1, Integer.MAX_VALUE);
 		this.minAltitude = readInt(args.get(1), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
 		this.maxAltitude = readInt(args.get(2), minAltitude, Constants.WORLD_HEIGHT - 1);		
 	}
@@ -31,13 +31,18 @@ public final class FossilResource extends BiomeResourceBase implements IBasicRes
 	@Override
 	public void spawnForChunkDecoration(IWorldGenRegion worldGenRegion, Random random, ILogger logger, IMaterialReader materialReader)
 	{
-		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);		
-		worldGenRegion.placeFossil(random, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX(), y, worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ(), this.chance);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Fossil(" + this.chance + "," + this.minAltitude + "," + this.maxAltitude + ")";
+		return "Fossil(" + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + ")";
+	}
+
+	@Override
+	public void spawn(IWorldGenRegion world, Random random, int x, int z)
+	{
+		int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);		
+		world.placeFossil(random, world.getDecorationArea().getChunkBeingDecoratedCenterX(), y, world.getDecorationArea().getChunkBeingDecoratedCenterZ());
 	}
 }

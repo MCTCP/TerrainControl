@@ -68,7 +68,7 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
 			}
 			else if(holder instanceof IWorldConfig)
 			{
-				// Any WorldConfig resource should have a constructor that conforms to this method signature				
+				// Every WorldConfig resource should have a constructor that conforms to this method signature				
 				constructor = clazz.getConstructor(IWorldConfig.class, List.class, ILogger.class, IMaterialReader.class);				
 			}
 			return (ConfigFunction<T>) constructor.newInstance(holder, args, logger, materialReader);

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Represents an entity in a BO3.
  */
-public abstract class EntityFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T> implements IEntityFunction<T>
+public abstract class EntityFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T> implements IEntityFunction
 {
 	public int y;
 	public String name = "";
@@ -28,6 +28,42 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 	public NamedBinaryTag namedBinaryTag = null;
 	public int rotation = 0;
 	private String metaDataTag;
+	
+	@Override
+	public double getX()
+	{
+		return this.x;
+	}
+	@Override
+	public int getY()
+	{
+		return this.y;
+	}	
+	@Override
+	public double getZ()
+	{
+		return this.z;
+	}	
+	@Override
+	public int getGroupSize()
+	{
+		return this.groupSize;
+	}	
+	@Override
+	public String getNameTagOrNBTFileName()
+	{
+		return this.nameTagOrNBTFileName;
+	}	
+	@Override
+	public String getResourceLocation()
+	{
+		return this.resourceLocation;
+	}
+	@Override
+	public NamedBinaryTag getNBTTag()
+	{
+		return this.namedBinaryTag;
+	}
 	
 	@Override
 	public void load(List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException

@@ -369,10 +369,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE, chunkZ * Constants.CHUNK_SIZE);
 			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
-			WorldEntitySpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);
+			WorldEntitySpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);			
 		}
 	}
-
+	
 	// Mob spawning on chunk tick
 	@Override
 	public List<MobSpawnInfo.Spawners> getMobsAt(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)

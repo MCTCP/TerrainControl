@@ -7,8 +7,10 @@ import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.IEntityFunction;
+import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
+import com.pg85.otg.spigot.util.JsonToNBT;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
@@ -20,6 +22,7 @@ import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
+
 import net.minecraft.server.v1_16_R3.*;
 
 import java.text.MessageFormat;
@@ -59,6 +62,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = null;
 	}
+	
+	@Override
+	public ILogger getLogger()
+	{
+		return OTG.getEngine().getLogger();
+	}	
 	
 	@Override
 	public long getSeed()
@@ -545,21 +554,185 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void spawnEntity (IEntityFunction<?> newEntityData)
+	public void spawnEntity (IEntityFunction entityData)
 	{
-		// TODO: Implement this.
+        if (entityData.getY() < Constants.WORLD_DEPTH || entityData.getY() >= Constants.WORLD_HEIGHT)
+        {
+            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+            {
+                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to spawn mob for Entity() " + entityData.makeString() + ", y position out of bounds");
+            }
+            return;
+        }
+
+        // Fetch entity type for Entity() mob name
+		Entity entity = null;
+		Optional<EntityTypes<?>> type1 = EntityTypes.a(entityData.getResourceLocation().toString());
+		EntityTypes<?> type2 = null;
+		if(type1.isPresent())
+		{
+			type2 = type1.get();
+		} else {
+            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+            {
+                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse mob for Entity() " + entityData.makeString() + ", mob type could not be found.");
+            }
+			return;
+		}
+
+		// Check for any .txt or .nbt file containing nbt data for the entity
+		NBTTagCompound nbtTagCompound = null;
+		if(
+			entityData.getNameTagOrNBTFileName() != null &&
+			(
+				entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt")
+				|| entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".nbt")
+			)
+		)
+		{
+			nbtTagCompound = new NBTTagCompound();
+			if (entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt"))
+			{
+				try {
+					nbtTagCompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+				} catch (Exception e) {
+		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+		            {
+		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse nbt for Entity() " + entityData.makeString() + ", file: " + entityData.getNameTagOrNBTFileName());
+		            }
+					return;
+				}
+				// Specify which type of entity to spawn
+				nbtTagCompound.setString("id", entityData.getResourceLocation());
+			}
+			else if (entityData.getNBTTag() != null)
+			{
+				nbtTagCompound = SpigotNBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
+			}
+		}
+
+		if(nbtTagCompound == null)
+		{
+			// Create entity without nbt data
+			try {
+				entity = type2.a(this.worldGenRegion.getMinecraftWorld());
+			} catch (Exception exception) {
+	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+	            {
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());
+	            }
+				return;
+			}
+	        if (entity == null)
+	    	{
+	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+	            {
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
+	            }
+	        	return;
+	    	} else {
+				entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+	    	}
+		} else {
+			// Create entity with nbt data
+	        entity = EntityTypes.a(nbtTagCompound, this.worldGenRegion.getMinecraftWorld(), (entity1) ->
+	        {
+	        	entity1.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+	            return entity1;
+	        });
+	        if (entity == null)
+	    	{
+	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+	            {
+	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
+	            }
+	        	return;
+	    	}
+		}
+		// Create and spawn entities according to group size
+        for (int r = 0; r < entityData.getGroupSize(); r++)
+        {
+            if(r != 0)
+            {
+        		if(nbtTagCompound == null)
+        		{
+        			// Create entity without nbt data
+        			try {
+        				entity = type2.a(this.worldGenRegion.getMinecraftWorld());
+        			} catch (Exception exception) {
+        				return;
+        			}
+        	        if (entity == null)
+        	    	{
+        	        	return;
+        	    	} else {
+        				entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+        	    	}
+        		} else {
+        			// Create entity with nbt data
+        	        entity = EntityTypes.a(nbtTagCompound, this.worldGenRegion.getMinecraftWorld(), (entity1) -> {
+        	        	entity1.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+        	            return entity1;
+        	         });
+        		}
+                if (entity == null)
+            	{
+                	return;
+            	}
+            }
+
+			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
+			if (entity instanceof EntityInsentient)
+			{
+		        // If the block is a solid block or entity is a fish out of water, cancel
+		        LocalMaterialData block = SpigotMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())));
+		        if (
+		    		block.isSolid() ||
+		    		(
+		        		(
+		    				((EntityInsentient)entity).getMonsterType() == EnumMonsterType.WATER_MOB
+		    				|| entity instanceof EntityGuardian
+						)
+		        		&& !block.isLiquid()
+		    		)
+		        )
+		        {
+		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+		            {
+		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");
+		            }
+		            continue;
+		        }
+
+		        // Appease Forge
+		        EntityInsentient mobEntity = (EntityInsentient)entity;
+
+				// Attach nametag if one was provided via Entity()
+				String nameTag = entityData.getNameTagOrNBTFileName();
+                if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+                {
+                    entity.setCustomName(new ChatComponentText(nameTag));
+                }
+                // Make sure Entity() mobs don't de-spawn, regardless of nbt data
+                mobEntity.setPersistent();
+
+				GroupDataEntity ilivingentitydata = null;
+				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				this.worldGenRegion.j(mobEntity);
+			}
+        }
 	}
 
 	@Override
-	public void placeDungeon (Random random, int x, int y, int z, int range, int count)
+	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).d(range).a().b(count).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
+		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
 	}
 
 	@Override
-	public void placeFossil(Random random, int x, int y, int z, int chance)
+	public void placeFossil(Random random, int x, int y, int z)
 	{
-		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(chance).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
+		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
 	}
 
 	@Override
@@ -660,9 +833,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
 		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE_WG, internalX, internalZ);
-		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves); 
+		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}
-	
+
 	@Override
 	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{

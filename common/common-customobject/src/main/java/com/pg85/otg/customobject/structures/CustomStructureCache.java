@@ -59,7 +59,7 @@ public class CustomStructureCache
 	// not yet decorated branches) is assembled from WorldInfoChunks when loaded from disk.
 	// WorldInfoChunks is used as little as possible, due to its size and slowness.
 	private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
-
+	
 	public CustomStructureCache(String presetFolderName, Path worldSaveDir, long worldSeed, boolean isBO4Enabled, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
@@ -148,7 +148,7 @@ public class CustomStructureCache
 		this.bo3StructureCache.clear();
 	}
 
-	public BO3CustomStructure getBo3StructureStart(IWorldGenRegion worldGenRegion, Random worldRandom, int chunkX, int chunkZ, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO3CustomStructure getBo3StructureStart(IWorldGenRegion worldGenRegion, Random worldRandom, int chunkX, int chunkZ, Path otgRootFolder, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 		BO3CustomStructure structureStart = bo3StructureCache.get(chunkCoord);
@@ -169,10 +169,10 @@ public class CustomStructureCache
 
 		if (structureGen != null)
 		{
-			BO3CustomStructureCoordinate customObject = getRandomObjectCoordinate(structureGen, worldGenRegion, random, chunkX, chunkZ, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+			BO3CustomStructureCoordinate customObject = getRandomObjectCoordinate(structureGen, worldGenRegion, random, chunkX, chunkZ, otgRootFolder, customObjectManager, materialReader, manager, modLoadedChecker);
 			if (customObject != null)
 			{
-				structureStart = new BO3CustomStructure(worldGenRegion, customObject, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+				structureStart = new BO3CustomStructure(worldGenRegion, customObject, otgRootFolder, customObjectManager, materialReader, manager, modLoadedChecker);
 				bo3StructureCache.put(chunkCoord, structureStart);
 				return structureStart;
 			}
@@ -182,25 +182,25 @@ public class CustomStructureCache
 	}
 	
 	// TODO: Taken from structuregen, duplicate code, clean this up.
-	private BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if (structureGen.isEmpty())
 		{
 			return null;
 		}
-		for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
+		for (int objectNumber = 0; objectNumber < structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, worldGenRegion.getLogger(), customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
 		{
 			if (random.nextDouble() * 100.0 < structureGen.getObjectChance(objectNumber))
 			{
-				IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
+				IStructuredCustomObject object = structureGen.getObjects(worldGenRegion.getPresetFolderName(), otgRootFolder, worldGenRegion.getLogger(), customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
 				if(object != null && object instanceof BO3)
 				{
 					return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetFolderName(), worldGenRegion.getWorldConfig().getUseOldBO3StructureRarity(), random, chunkX, chunkZ);
 				} else {
-					if(logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					if(worldGenRegion.getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
 						IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
-						logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
+						worldGenRegion.getLogger().log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + structureGen.getObjectName(objectNumber));
 					}
 				}
 			}
