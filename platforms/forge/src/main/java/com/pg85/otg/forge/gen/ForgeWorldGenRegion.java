@@ -594,16 +594,16 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void spawnEntity(IEntityFunction entityData)
 	{
-        if (entityData.getY() < Constants.WORLD_DEPTH || entityData.getY() >= Constants.WORLD_HEIGHT)
-        {
-            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-            {
-                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to spawn mob for Entity() " + entityData.makeString() + ", y position out of bounds");
-            }
-            return;
-        }
-
-        // Fetch entity type for Entity() mob name
+		if (entityData.getY() < Constants.WORLD_DEPTH || entityData.getY() >= Constants.WORLD_HEIGHT)
+		{
+			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to spawn mob for Entity() " + entityData.makeString() + ", y position out of bounds");
+			}
+			return;
+		}
+		
+		// Fetch entity type for Entity() mob name
 		Entity entity = null;
 		Optional<EntityType<?>> type1 = EntityType.byString(entityData.getResourceLocation().toString());
 		EntityType<?> type2 = null;
@@ -611,13 +611,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			type2 = type1.get();
 		} else {
-            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-            {
-                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse mob for Entity() " + entityData.makeString() + ", mob type could not be found.");
-            }
+			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+			{
+				this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse mob for Entity() " + entityData.makeString() + ", mob type could not be found.");
+			}
 			return;
 		}
-
+		
 		// Check for any .txt or .nbt file containing nbt data for the entity
 		CompoundNBT nbtTagCompound = null;
 		if(
@@ -634,10 +634,10 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				try {
 					nbtTagCompound = JsonToNBT.parseTag(entityData.getMetaData());
 				} catch (CommandSyntaxException e) {
-		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-		            {
-		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse nbt for Entity() " + entityData.makeString() + ", file: " + entityData.getNameTagOrNBTFileName());
-		            }
+					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse nbt for Entity() " + entityData.makeString() + ", file: " + entityData.getNameTagOrNBTFileName());
+					}
 					return;
 				}
 				// Specify which type of entity to spawn
@@ -648,125 +648,125 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				nbtTagCompound = NBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
 			}
 		}
-
+		
 		if(nbtTagCompound == null)
 		{
 			// Create entity without nbt data
 			try {
 				entity = type2.create(this.worldGenRegion.getLevel());
 			} catch (Exception exception) {
-	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());
-	            }
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());
+				}
 				return;
 			}
-	        if (entity == null)
-	    	{
-	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
-	            }
-	        	return;
-	    	} else {
+			if (entity == null)
+			{
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
+				}
+				return;
+			} else {
 				entity.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-	    	}
+			}
 		} else {
 			// Create entity with nbt data
-	        entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) ->
-	        {
-	        	entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-	            return entity1;
-	        });
-	        if (entity == null)
-	    	{
-	            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-	            {
-	                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
-	            }
-	        	return;
-	    	}
+			entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) ->
+			{
+				entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+				return entity1;
+			});
+			if (entity == null)
+			{
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+				{
+					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
+				}
+				return;
+			}
 		}
 		// Create and spawn entities according to group size
-        for (int r = 0; r < entityData.getGroupSize(); r++)
-        {
-            if(r != 0)
-            {
-        		if(nbtTagCompound == null)
-        		{
-        			// Create entity without nbt data
-        			try {
-        				entity = type2.create(this.worldGenRegion.getLevel());
-        			} catch (Exception exception) {
-        				return;
-        			}
-        	        if (entity == null)
-        	    	{
-        	        	return;
-        	    	} else {
-        				entity.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-        	    	}
-        		} else {
-        			// Create entity with nbt data
-        	        entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) -> {
-        	        	entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-        	            return entity1;
-        	         });
-        		}
-                if (entity == null)
-            	{
-                	return;
-            	}
-            }
-
+		for (int r = 0; r < entityData.getGroupSize(); r++)
+		{
+			if(r != 0)
+			{
+				if(nbtTagCompound == null)
+				{
+					// Create entity without nbt data
+					try {
+						entity = type2.create(this.worldGenRegion.getLevel());
+					} catch (Exception exception) {
+						return;
+					}
+					if (entity == null)
+					{
+						return;
+					} else {
+						entity.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+					}
+				} else {
+					// Create entity with nbt data
+					entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) -> {
+						entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+						return entity1;
+					});
+				}
+				if (entity == null)
+				{
+					return;
+				}
+			}
+			
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
 			if (entity instanceof MobEntity)
 			{
-		        // If the block is a solid block or entity is a fish out of water, cancel
-		        LocalMaterialData block = ForgeMaterialData.ofBlockState(this.worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
-		        if (
-		    		block.isSolid() ||
-		    		(
-		        		(
-		    				entity.getClassification(false) == EntityClassification.WATER_CREATURE
-		    				|| entity instanceof GuardianEntity
+				// If the block is a solid block or entity is a fish out of water, cancel
+				LocalMaterialData block = ForgeMaterialData.ofBlockState(this.worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
+				if (
+					block.isSolid() ||
+					(
+						(
+							entity.getClassification(false) == EntityClassification.WATER_CREATURE
+							|| entity instanceof GuardianEntity
 						)
-		        		&& !block.isLiquid()
-		    		)
-		        )
-		        {
-		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-		            {
-		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");
-		            }
-		            continue;
-		        }
-
-		        // Appease Forge
+						&& !block.isLiquid()
+					)
+				)
+				{
+					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");
+					}
+					continue;
+				}
+				
+				// Appease Forge
 				MobEntity mobentity = (MobEntity)entity;
 				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, this.worldGenRegion, entityData.getX(), entityData.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
 				{
-		            if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-		            {
-		                this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Forge prevented spawning for Entity() " + entityData.makeString() + ", a mod or setting is likely preventing mob spawns.");
-		            }
+					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					{
+						this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Forge prevented spawning for Entity() " + entityData.makeString() + ", a mod or setting is likely preventing mob spawns.");
+					}
 					continue;
 				}
-
+				
 				// Attach nametag if one was provided via Entity()
 				String nameTag = entityData.getNameTagOrNBTFileName();
-                if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
-                {
-                    entity.setCustomName(new StringTextComponent(nameTag));
-                }
-                // Make sure Entity() mobs don't de-spawn, regardless of nbt data
+				if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+				{
+					entity.setCustomName(new StringTextComponent(nameTag));
+				}
+				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobentity.setPersistenceRequired();
-
+				
 				ILivingEntityData ilivingentitydata = null;
 				ilivingentitydata = mobentity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), SpawnReason.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
 				this.worldGenRegion.addFreshEntityWithPassengers(mobentity);
 			}
-        }
+		}
 	}
 
 	@Override
