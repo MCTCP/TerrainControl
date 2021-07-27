@@ -5,10 +5,12 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.google.gson.JsonSyntaxException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
+import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
@@ -29,12 +31,20 @@ import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.monster.GuardianEntity;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
@@ -580,13 +590,148 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return true;
 		}
 	}
-	
-	@Override
-	public void spawnEntity(IEntityFunction<?> newEntityData)
-	{
-		// TODO: Implement this.
-	}
 
+	@Override
+	public void spawnEntity(IEntityFunction entityData)
+	{
+        if (entityData.getY() < 0 || entityData.getY() >= 256)
+        {
+            //if(OTG.getPluginConfig().spawnLog)
+            {
+                //OTG.log(LogMarker.ERROR, "Failed to spawn mob " + entityData.name + ", spawn position out of bounds");
+            }
+            return;
+        }
+
+		Entity entity = null;
+		Optional<EntityType<?>> type1 = EntityType.byString(entityData.getResourceLocation().toString());
+		EntityType<?> type2 = null;
+		if(type1.isPresent())
+		{
+			type2 = type1.get();
+		} else {
+			return;
+		}
+
+		CompoundNBT nbtTagCompound = null;
+		if(
+			entityData.getNameTagOrNBTFileName() != null && 
+			(
+				entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt") 
+				|| entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".nbt")
+			)
+		)
+		{
+			nbtTagCompound = new CompoundNBT();
+			if (entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt"))
+			{
+				try {
+					nbtTagCompound = JsonToNBT.parseTag(entityData.getMetaData());
+				} catch (CommandSyntaxException e) {
+					e.printStackTrace();
+					return;
+				}
+				// Specify which type of entity to spawn
+				nbtTagCompound.putString("id", entityData.getResourceLocation());
+			}
+			// Get NBT compound from provided string
+			else if (entityData.getNBTTag() != null)
+			{
+				nbtTagCompound = NBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
+			}
+		}
+		
+		if(nbtTagCompound == null)
+		{
+			try {
+				entity = type2.create(worldGenRegion.getLevel());
+			} catch (Exception exception) {
+				return;
+			}
+	        if (entity == null)
+	    	{
+	        	return;
+	    	} else {
+				entity.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+	    	}
+		} else {
+	        entity = EntityType.loadEntityRecursive(nbtTagCompound, worldGenRegion.getLevel(), (p_218914_1_) -> {
+	            p_218914_1_.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+	            return p_218914_1_;
+	         });
+	        if (entity == null)
+	    	{
+	        	return;
+	    	}	        
+		}
+        for (int r = 0; r < entityData.getGroupSize(); r++)
+        {
+            if(r != 0)
+            {
+        		if(nbtTagCompound == null)
+        		{
+        			try {
+        				entity = type2.create(worldGenRegion.getLevel());
+        			} catch (Exception exception) {
+        				return;
+        			}
+        	        if (entity == null)
+        	    	{
+        	        	return;
+        	    	} else {
+        				entity.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+        	    	}        			
+        		} else {
+        	        entity = EntityType.loadEntityRecursive(nbtTagCompound, worldGenRegion.getLevel(), (p_218914_1_) -> {
+        	            p_218914_1_.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+        	            return p_218914_1_;
+        	         });
+        		}
+                if (entity == null)
+            	{
+                	return;
+            	}                
+            }
+
+			BlockPos blockpos = new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ());			
+			if (entity instanceof MobEntity)
+			{
+		        // If either the block is a solid block, or entity is a fish out of water, then we cancel
+		        LocalMaterialData block = ForgeMaterialData.ofBlockState(worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
+		        if (
+		    		block.isSolid() || 
+		    		(
+		        		(
+		    				entity.getClassification(false) == EntityClassification.WATER_CREATURE 
+		    				|| entity instanceof GuardianEntity
+						)
+		        		&& !block.isLiquid()
+		    		)
+		        )
+		        {
+		            continue;
+		        }
+
+				MobEntity mobentity = (MobEntity)entity;
+				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, worldGenRegion, entityData.getX(), blockpos.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
+				{
+					continue;
+				}
+
+				String nameTag = entityData.getNameTagOrNBTFileName();
+                if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+                {
+                    entity.setCustomName(new StringTextComponent(nameTag));
+                }
+				mobentity.setPersistenceRequired(); // Make sure mobs don't de-spawn
+
+				ILivingEntityData ilivingentitydata = null;
+				ilivingentitydata = mobentity.finalizeSpawn(worldGenRegion, worldGenRegion.getCurrentDifficultyAt(mobentity.blockPosition()), SpawnReason.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				worldGenRegion.addFreshEntityWithPassengers(mobentity);
+			}
+        }
+	}
+	
 	@Override
 	public void placeDungeon(Random random, int x, int y, int z)
 	{

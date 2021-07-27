@@ -7,7 +7,7 @@ import com.pg85.otg.interfaces.IEntityFunction;
 /**
  * Represents an entity in a BO3.
  */
-public class BO3EntityFunction extends EntityFunction<BO3Config> implements IEntityFunction<BO3Config>
+public class BO3EntityFunction extends EntityFunction<BO3Config> implements IEntityFunction
 {
 	public BO3EntityFunction rotate()
 	{

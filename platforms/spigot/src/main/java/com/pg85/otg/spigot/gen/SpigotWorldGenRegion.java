@@ -552,7 +552,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void spawnEntity (IEntityFunction<?> newEntityData)
+	public void spawnEntity (IEntityFunction newEntityData)
 	{
 		// TODO: Implement this.
 	}
