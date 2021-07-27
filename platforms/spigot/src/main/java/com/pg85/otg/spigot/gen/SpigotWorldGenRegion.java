@@ -558,15 +558,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void placeDungeon (Random random, int x, int y, int z, int range, int count)
+	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).d(range).a().b(count).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
+		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
 	}
 
 	@Override
-	public void placeFossil(Random random, int x, int y, int z, int chance)
+	public void placeFossil(Random random, int x, int y, int z)
 	{
-		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(chance).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
+		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
 	}
 
 	@Override

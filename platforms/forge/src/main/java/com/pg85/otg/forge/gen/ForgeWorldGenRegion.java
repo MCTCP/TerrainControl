@@ -588,15 +588,15 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void placeDungeon(Random random, int x, int y, int z, int range, int count)
+	public void placeDungeon(Random random, int x, int y, int z)
 	{
-		Feature.MONSTER_ROOM.configured(IFeatureConfig.NONE).range(range).squared().count(count).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.MONSTER_ROOM.configured(IFeatureConfig.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
-	public void placeFossil(Random random, int x, int y, int z, int chance)
+	public void placeFossil(Random random, int x, int y, int z)
 	{
-		Feature.FOSSIL.configured(IFeatureConfig.NONE).chance(chance).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.FOSSIL.configured(IFeatureConfig.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
@@ -628,7 +628,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// Edit command
 	// TODO: We already have getMaterial/setBlock, rename/refactor these
 	// so it's clear they are/should be used only in a specific context.
-	
+
 	public void setBlockState(BlockPos blockpos, BlockState blockstate1, int i)
 	{
 		worldGenRegion.setBlock(blockpos, blockstate1, i);

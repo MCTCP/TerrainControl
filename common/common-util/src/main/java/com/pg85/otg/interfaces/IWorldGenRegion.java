@@ -11,6 +11,7 @@ import com.pg85.otg.util.minecraft.TreeType;
 
 public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 {
+	ILogger getLogger();
 	IPluginConfig getPluginConfig();
 	IWorldConfig getWorldConfig();
 	String getPresetFolderName();
@@ -41,8 +42,8 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 	void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);
 	void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ReplaceBlockMatrix replaceBlocksMatrix);
 	void spawnEntity(IEntityFunction<?> newEntityData);
-	void placeDungeon(Random random, int x, int y, int z, int range, int count);
-	void placeFossil(Random random, int x, int y, int z, int chance);
+	void placeDungeon(Random random, int x, int y, int z);
+	void placeFossil(Random random, int x, int y, int z);
 	void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
 	boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 	DecorationArea getDecorationArea();
@@ -51,5 +52,5 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 
 	LocalMaterialData getMaterialWithoutLoading(int x, int y, int z);
 	int getHighestBlockYAtWithoutLoading(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
-	boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
+	boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);	
 }
