@@ -12,4 +12,5 @@ public interface IEntityFunction
 	public String getResourceLocation();
 	public String getMetaData();
 	NamedBinaryTag getNBTTag();
+	public String makeString();
 }
