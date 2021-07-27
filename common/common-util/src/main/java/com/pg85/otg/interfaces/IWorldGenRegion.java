@@ -41,7 +41,7 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 	void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag);
 	void setBlock(int x, int y, int z, LocalMaterialData material, ReplaceBlockMatrix replaceBlocksMatrix);
 	void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ReplaceBlockMatrix replaceBlocksMatrix);
-	void spawnEntity(IEntityFunction<?> newEntityData);
+	void spawnEntity(IEntityFunction newEntityData);
 	void placeDungeon(Random random, int x, int y, int z);
 	void placeFossil(Random random, int x, int y, int z);
 	void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
