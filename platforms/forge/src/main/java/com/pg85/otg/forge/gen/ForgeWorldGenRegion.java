@@ -10,7 +10,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
@@ -645,7 +644,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 			else if (entityData.getNBTTag() != null)
 			{
-				nbtTagCompound = NBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
+				nbtTagCompound = ForgeNBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
 			}
 		}
 		
