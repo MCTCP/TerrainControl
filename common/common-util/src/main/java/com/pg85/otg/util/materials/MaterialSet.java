@@ -1,13 +1,12 @@
 package com.pg85.otg.util.materials;
 
-import com.pg85.otg.exceptions.InvalidConfigException;
-import com.pg85.otg.interfaces.IMaterialReader;
-import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.materials.MaterialSetEntry;
-
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import com.pg85.otg.exceptions.InvalidConfigException;
+import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.util.helpers.StringHelper;
 
 /**
  * A material set that accepts special values such as "All" or "Solid". These
