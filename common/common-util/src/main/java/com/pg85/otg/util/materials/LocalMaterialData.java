@@ -10,7 +10,6 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 {
 	protected String rawEntry;
 	protected boolean isBlank = false;
-	protected boolean checkedFallbacks = false;
 	protected boolean parsedDefaultMaterial = false;
 	protected LocalMaterialData[] rotations = new LocalMaterialData[] {this, null, null, null};
 	protected LocalMaterialData rotated = null;
