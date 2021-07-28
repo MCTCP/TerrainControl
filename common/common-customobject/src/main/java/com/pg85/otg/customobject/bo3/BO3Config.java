@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.CustomObjectManager;
@@ -26,10 +27,10 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
-import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.BO3Enums.ExtrudeMode;
 import com.pg85.otg.customobject.util.BO3Enums.OutsideSourceBlock;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
+import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
@@ -403,10 +404,6 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("maximum branch depth for this objects.");
 		writer.setting(BO3Settings.MAX_BRANCH_DEPTH, this.maxBranchDepth);
 
-		writer.comment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
-		writer.comment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
-		writer.setting(BO3Settings.EXCLUDED_BIOMES, this.excludedBiomes);
-
 		// Sourceblock
 		writer.bigTitle("Source block settings");
 
@@ -463,7 +460,6 @@ public class BO3Config extends CustomObjectConfigFile
 		this.maxHeight = readSettings(BO3Settings.MAX_HEIGHT, logger, null, null);
 		this.maxHeight = this.maxHeight < this.minHeight ? this.minHeight : this.maxHeight;
 		this.maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH, logger, null, null);
-		this.excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES, logger, null, null));
 
 		this.sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS, logger, materialReader, manager);
 		this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, logger, null, null);
