@@ -2,6 +2,7 @@ package com.pg85.otg.customobject;
 
 import java.io.File;
 
+import com.pg85.otg.customobject.util.NBTHelper;
 import com.pg85.otg.interfaces.ILogger;
 
 public interface CustomObjectLoader
@@ -18,5 +19,9 @@ public interface CustomObjectLoader
 	/**
 	 * Called whenever Open Terrain Generator is being shut down / reloaded.
 	 */
-	public void onShutdown();
+	public default void onShutdown()
+	{
+		// Clean up the cache
+		NBTHelper.clearCache();
+	}
 }
