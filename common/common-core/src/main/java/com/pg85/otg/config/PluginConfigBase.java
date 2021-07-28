@@ -45,13 +45,13 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	{
 		return this.workerThreads;
 	}
-	
+
 	@Override
 	public boolean getDeveloperModeEnabled()
 	{
 		return this.developerMode;
 	}
-	
+
 	@Override
 	public boolean logCustomObjects()
 	{

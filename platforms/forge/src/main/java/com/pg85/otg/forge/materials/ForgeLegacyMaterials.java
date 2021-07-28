@@ -222,6 +222,7 @@ class ForgeLegacyMaterials
 			case "wood_step":
 				return Blocks.OAK_SLAB.defaultBlockState();
 			case "thin_glass":
+			case "stained_glass_pane":				
 				return Blocks.GLASS_PANE.defaultBlockState();
 			case "stone_plate":
 				return Blocks.STONE_PRESSURE_PLATE.defaultBlockState();
@@ -252,7 +253,7 @@ class ForgeLegacyMaterials
 				return Blocks.END_STONE_BRICKS.defaultBlockState();
 			case "end_stone":
 			case "ender_stone":
-				return Blocks.END_STONE.defaultBlockState();
+				return Blocks.END_STONE.defaultBlockState();			
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.defaultBlockState();
 			case "pg85":

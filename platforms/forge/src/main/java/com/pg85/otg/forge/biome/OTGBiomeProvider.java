@@ -87,6 +87,7 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 	{
 		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 		{
+			OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
 			((ForgeEngine)OTG.getEngine()).reloadPreset(presetFolderName, registry);
 		}
 		
