@@ -33,9 +33,8 @@ public class GrassResource  extends BiomeResourceBase implements IBasicResource
 		super(biomeConfig, args, logger, materialReader);
 		assureSize(5, args);
 
-		// The syntax for the first to arguments used to be blockId,blockData
-		// Then it became plantType,unusedParam (plantType can still be
-		// blockId:blockData)
+		// The syntax for the first two arguments used to be blockId,blockData
+		// Then it became plantType,unusedParam (plantType can still be blockId:blockData)
 		// Now it is plantType,groupOption
 		this.groupOption = GroupOption.NotGrouped;
 		String secondArgument = args.get(1);
@@ -45,8 +44,7 @@ public class GrassResource  extends BiomeResourceBase implements IBasicResource
 			readInt(secondArgument, 0, 16);
 			// If so, parse it
 			this.plant = PlantType.getPlant(args.get(0) + ":" + secondArgument, materialReader);
-		} catch (InvalidConfigException e)
-		{
+		} catch (InvalidConfigException e) {
 			// Nope, second argument is not a number
 			this.plant = PlantType.getPlant(args.get(0), materialReader);
 			if (secondArgument.equalsIgnoreCase(GroupOption.Grouped.toString()))
