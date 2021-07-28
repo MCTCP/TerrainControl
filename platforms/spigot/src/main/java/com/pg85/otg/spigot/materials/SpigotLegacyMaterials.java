@@ -142,8 +142,9 @@ public class SpigotLegacyMaterials
 			case "wood_step":
 				return Blocks.OAK_SLAB.getBlockData();
 			case "thin_glass":
-			case "stained_glass_pane":
 				return Blocks.GLASS_PANE.getBlockData();
+			case "stained_glass_pane":
+				return Blocks.WHITE_STAINED_GLASS_PANE.getBlockData();
 			case "stone_plate":
 				return Blocks.STONE_PRESSURE_PLATE.getBlockData();
 			case "wood_plate":

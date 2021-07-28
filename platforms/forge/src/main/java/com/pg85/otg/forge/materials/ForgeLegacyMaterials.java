@@ -222,8 +222,9 @@ class ForgeLegacyMaterials
 			case "wood_step":
 				return Blocks.OAK_SLAB.defaultBlockState();
 			case "thin_glass":
-			case "stained_glass_pane":				
 				return Blocks.GLASS_PANE.defaultBlockState();
+			case "stained_glass_pane":				
+				return Blocks.WHITE_STAINED_GLASS_PANE.defaultBlockState();
 			case "stone_plate":
 				return Blocks.STONE_PRESSURE_PLATE.defaultBlockState();
 			case "wood_plate":
