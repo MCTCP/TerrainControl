@@ -7,9 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
+import com.pg85.otg.customobject.util.NBTHelper;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -98,7 +98,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 				// Maybe it's a NBT file?
 
 				// Get the file
-				NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile(), logger);
+				NamedBinaryTag metaData = NBTHelper.loadMetadata(args.get(i), this.getHolder().getFile(), logger);
 				if (metaData != null)
 				{
 					metaDataNames[blockCount] = args.get(i);
@@ -321,7 +321,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 			if(rbf.metaDataNames[i] != null)
 			{
 				// Get the file
-				NamedBinaryTag metaData = BO3Loader.loadMetadata(rbf.metaDataNames[i], file, logger);
+				NamedBinaryTag metaData = NBTHelper.loadMetadata(rbf.metaDataNames[i], file, logger);
 						
 				if (metaData != null)
 				{

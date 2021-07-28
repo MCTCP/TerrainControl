@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
+import com.pg85.otg.customobject.util.NBTHelper;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
@@ -141,7 +141,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
 		if(rbf.nbtName != null)
 		{
 			// Get the file
-			rbf.nbt = BO3Loader.loadMetadata(rbf.nbtName, file, logger);
+			rbf.nbt = NBTHelper.loadMetadata(rbf.nbtName, file, logger);
 			if(rbf.nbt == null)
 			{
 				rbf.nbtName = null;

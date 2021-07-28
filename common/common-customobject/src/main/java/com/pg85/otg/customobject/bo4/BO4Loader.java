@@ -28,13 +28,10 @@ public class BO4Loader implements CustomObjectLoader
 		registry.registerConfigFunction("Entity", BO4EntityFunction.class);
 		registry.registerConfigFunction("E", BO4EntityFunction.class);
 	}
-	
+
 	@Override
 	public CustomObject loadFromFile(String objectName, File file, ILogger logger)
 	{
-			return new BO4(objectName, file);
+		return new BO4(objectName, file);
 	}
-
-	@Override
-	public void onShutdown() { }
 }

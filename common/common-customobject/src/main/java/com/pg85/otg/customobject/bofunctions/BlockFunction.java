@@ -3,9 +3,9 @@ package com.pg85.otg.customobject.bofunctions;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.customobject.bo3.BO3Loader;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
+import com.pg85.otg.customobject.util.NBTHelper;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -44,7 +44,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 		if (args.size() >= 5)
 		{
 			// Code that converts legacy block ids inside chests - Frank
-			nbt = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), logger);
+			nbt = NBTHelper.loadMetadata(args.get(4), getHolder().getFile(), logger);
 			if (nbt != null)
 			{
 				if (nbt.getTag("Items") == null) {
