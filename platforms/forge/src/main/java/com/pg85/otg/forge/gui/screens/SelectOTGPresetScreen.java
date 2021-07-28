@@ -143,7 +143,7 @@ public class SelectOTGPresetScreen extends Screen
 			public PresetEntry(Preset p_i232272_2_)
 			{
 				this.preset = p_i232272_2_;
-				this.field_243282_c = new StringTextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Vanilla / Modded" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
+				this.field_243282_c = new StringTextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Non-OTG" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
 			}
 
 			@Override
