@@ -32,11 +32,11 @@ import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
-import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.nbt.LocalNBTHelper;
 
 import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
