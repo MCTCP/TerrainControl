@@ -89,8 +89,14 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 		{
 			OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
 			((ForgeEngine)OTG.getEngine()).reloadPreset(presetFolderName, registry);
+		} else {
+			// Recreate Biome objects and fire Forge BiomeLoadedEvent to allow other mods to enrich otg biomes 
+			// with decoration features, structure features and mob spawns. Need to do this here to make sure 
+			// modded features get registered on existing world load. 
+			// TODO: Fix Forge biome registration so hopefully none of this is necessary, use deferredregister (wasn't working before)?
+			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).reRegisterBiomes(presetFolderName, registry);
 		}
-		
+
 		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
 		if(biomesForPreset == null)
 		{

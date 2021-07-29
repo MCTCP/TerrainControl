@@ -146,8 +146,7 @@ public class OTGDimensionType extends DimensionType
 				dimConfig.OverWorld.PresetFolderName, new OTGBiomeProvider(dimConfig.OverWorld.PresetFolderName, seed, false, false, biomesRegistry), seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "overworld"));
-			addDimension(dimConfig.OverWorld.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, dimTypeRegistryKey);
+			addDimension(dimConfig.OverWorld.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, DimensionType.OVERWORLD_LOCATION);
 		}
 		if(dimConfig.Nether != null && dimConfig.Nether.PresetFolderName != null)
 		{
@@ -155,8 +154,7 @@ public class OTGDimensionType extends DimensionType
 					dimConfig.Nether.PresetFolderName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : seed, false, false, biomesRegistry), dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "the_nether"));
-			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, dimTypeRegistryKey);
+			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, DimensionType.NETHER_LOCATION);
 		}
 		if(dimConfig.End != null && dimConfig.End.PresetFolderName != null)
 		{
@@ -164,8 +162,7 @@ public class OTGDimensionType extends DimensionType
 					dimConfig.End.PresetFolderName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimConfig.End.Seed != 1l ? dimConfig.End.Seed : seed, false, false, biomesRegistry), dimConfig.End.Seed != 1l ? dimConfig.End.Seed : seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
 			);
-			RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "the_end"));
-			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.END, chunkGenerator, dimTypeRegistryKey);
+			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.END, chunkGenerator, DimensionType.END_LOCATION);
 		}
 		if(dimConfig.Dimensions != null)
 		{
@@ -234,7 +231,6 @@ public class OTGDimensionType extends DimensionType
 		
 		Dimension dimension = dimensions.get(dimRegistryKey);
 		Supplier<DimensionType> supplier = () -> {
-			// TODO: Is this supposed to be a fallback? Normally falls back to dimensionTypeRegistry.getOrThrow(DimensionType.OVERWORLD_LOCATION)
 			return dimension == null ? dimensionTypeRegistry.getOrThrow(dimTypeRegistryKey) : dimension.type();
 		};
 		dimensions.register(dimRegistryKey, new Dimension(supplier, chunkGenerator), Lifecycle.stable());		
@@ -265,8 +261,15 @@ public class OTGDimensionType extends DimensionType
 	        } catch (IOException e) { e.printStackTrace(); }
 		}
 
-		folder = new File(datapackFolder + File.separator + "otg" + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator);
-		file = new File(datapackFolder + File.separator + "otg" + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator + dimName + ".json");
+		if(dimName.equals("overworld") || dimName.equals("the_end") || dimName.equals("the_nether"))
+		{		
+			folder = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator + "data" + File.separator + "minecraft" + File.separator + "dimension_type" + File.separator);
+			file = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator + "data" + File.separator + "minecraft" + File.separator + "dimension_type" + File.separator + dimName + ".json");
+		} else {
+			folder = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator);
+			file = new File(datapackFolder + File.separator + Constants.MOD_ID_SHORT + File.separator + "data" + File.separator + Constants.MOD_ID_SHORT + File.separator + "dimension_type" + File.separator + dimName + ".json");			
+		}
+		
 		if(!folder.exists())
 		{
 			folder.mkdirs();
