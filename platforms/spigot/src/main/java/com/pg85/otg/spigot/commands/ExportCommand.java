@@ -81,7 +81,7 @@ public class ExportCommand extends BaseCommand
 
 		// Get region
 		Region region = playerSelectionMap.get(player);
-		if (region == null || region.getLow() == null) {
+		if (region == null || region.getLow() == null || region.getHigh() == null) {
 			sender.sendMessage("Please mark two corners with /otg region mark"); return true;}
 
 		// Get preset
