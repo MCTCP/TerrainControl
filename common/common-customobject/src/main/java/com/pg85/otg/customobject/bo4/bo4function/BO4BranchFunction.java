@@ -224,7 +224,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
 		String configFunctionString = StreamHelper.readStringFromBuffer(buffer);
 		int bracketIndex = configFunctionString.indexOf('(');
 		String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
-		List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));		
+		List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
 		branchFunction.load(args, logger, materialReader);
 		return branchFunction;
 	}

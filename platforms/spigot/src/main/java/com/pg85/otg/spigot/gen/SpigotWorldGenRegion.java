@@ -632,6 +632,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				return;
 			} else {
 				entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+				worldGenRegion.addAllEntities(entity);
 			}
 		} else {
 			// Create entity with nbt data
@@ -648,6 +649,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				}
 				return;
 			}
+			worldGenRegion.addAllEntities(entity);
 		}
 		// Create and spawn entities according to group size
 		for (int r = 0; r < entityData.getGroupSize(); r++)
@@ -668,6 +670,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					} else {
 						entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
 					}
+					worldGenRegion.addAllEntities(entity);
 				} else {
 					// Create entity with nbt data
 					entity = EntityTypes.a(nbtTagCompound, this.worldGenRegion.getMinecraftWorld(), (entity1) ->
@@ -675,6 +678,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 						entity1.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
 						return entity1;
 					});
+					worldGenRegion.addAllEntities(entity);
 				}
 				if (entity == null)
 				{
@@ -715,9 +719,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				}
 				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobEntity.setPersistent();
-				
-				GroupDataEntity ilivingentitydata = null;
-				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+
 				this.worldGenRegion.j(mobEntity);
 			}
 		}
