@@ -9,15 +9,15 @@ import java.util.Random;
 
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
-import com.pg85.otg.customobject.util.NBTHelper;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.nbt.NBTHelper;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {

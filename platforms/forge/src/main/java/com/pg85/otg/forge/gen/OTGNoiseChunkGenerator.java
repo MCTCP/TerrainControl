@@ -121,7 +121,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final OTGChunkDecorator chunkDecorator;
 	private final Preset preset;
 	private CustomStructureCache structureCache; // TODO: Move this?
-	
+
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		this(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
@@ -134,7 +134,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
-	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(String presetFolderName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -159,12 +158,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1,((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
-	
+
 	public ICachedBiomeProvider getCachedBiomeProvider()
 	{
 		return this.internalGenerator.getCachedBiomeProvider();
 	}
-	
+
 	public void saveStructureCache()
 	{
 		if (this.chunkDecorator.getIsSaveRequired() && this.structureCache != null)
@@ -184,10 +183,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		return new OTGNoiseChunkGenerator(this.preset.getFolderName(), this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
 	}
-
+	
 	// Base terrain gen
 
-	// Generates the base terrain for a chunk.
+	// Generates the base terrain for a chunk.	
 	@Override
 	public void fillFromNoise(IWorld world, StructureManager manager, IChunk chunk)
 	{
@@ -204,7 +203,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (cachedChunk != null)
 		{
 			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunk, cachedChunk);
-		} else {
+		} else {			
 			// Setup jigsaw data
 			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
@@ -336,7 +335,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int worldZ = worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE;
 		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	      
+		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	
 		//	
 
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
@@ -358,7 +357,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
-	@SuppressWarnings("deprecation")
 	@Override
 	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
 	{

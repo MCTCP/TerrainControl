@@ -7,9 +7,9 @@ import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.server.v1_16_R3.*;
 

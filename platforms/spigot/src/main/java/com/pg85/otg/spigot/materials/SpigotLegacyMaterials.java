@@ -1007,7 +1007,7 @@ public class SpigotLegacyMaterials
 	{
 		int facing = getBits(data, 0, 3);
 		int powered = getBit(data, 3);
-		BlockPropertyAttachPosition face = facing == 0 || facing == 7 ? BlockPropertyAttachPosition.CEILING : facing == 1 || facing == 2 || facing == 3 || facing == 4 ? BlockPropertyAttachPosition.WALL : facing == 5 || facing == 6 ? BlockPropertyAttachPosition.FLOOR : BlockPropertyAttachPosition.FLOOR;
+		BlockPropertyAttachPosition face = facing == 0 || facing == 7 ? BlockPropertyAttachPosition.CEILING : facing == 1 || facing == 2 || facing == 3 || facing == 4 ? BlockPropertyAttachPosition.WALL : BlockPropertyAttachPosition.FLOOR;
 
 		switch (material)
 		{

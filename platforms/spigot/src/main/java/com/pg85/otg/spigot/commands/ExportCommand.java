@@ -32,11 +32,11 @@ import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
-import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.nbt.LocalNBTHelper;
 
 import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -93,13 +93,10 @@ public class ExportCommand extends BaseCommand
 		Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
 		// Check for existing file
-		if (!overwrite)
+		if (!overwrite && new File(objectPath.toFile(), objectName + ".bo3").exists())
 		{
-			if (new File(objectPath.toFile(), objectName + ".bo3").exists())
-			{
-				sender.sendMessage("File already exists, run command with flag '-o' to overwrite"); 
-				return true;
-			}
+			sender.sendMessage("File already exists, run command with flag '-o' to overwrite"); 
+			return true;
 		}
 		
 		// Get required pieces
@@ -242,12 +239,9 @@ public class ExportCommand extends BaseCommand
 			objectPath = presetFolder.resolve(Constants.WORLD_OBJECTS_FOLDER);
 		}
 
-		if (!objectPath.toFile().exists())
+		if (!objectPath.toFile().exists() && objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
 		{
-			if (objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
-			{
-				objectPath = objectPath.resolve("..").resolve("WorldObjects");
-			}
+			objectPath = objectPath.resolve("..").resolve("WorldObjects");
 		}
 		return objectPath;
 	}

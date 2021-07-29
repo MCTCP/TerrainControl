@@ -26,6 +26,7 @@ public class OTGCreateWorldScreen extends CreateWorldScreen
 		return new OTGCreateWorldScreen(
 			parent,
 			new OTGWorldOptionsScreen(
+					// TODO NPE if parent is null?
 				parent.parent.worldGenSettingsComponent.registryHolder(),
 				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
 					type -> type.create(

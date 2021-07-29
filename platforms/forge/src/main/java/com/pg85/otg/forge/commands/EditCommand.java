@@ -1,6 +1,5 @@
 package com.pg85.otg.forge.commands;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,18 +204,19 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	private String getFoldersFromObject(StructuredCustomObject object, Path objectPath)
-	{
-		String name = object.getName();
-		Path filePath = object.getConfig().getFile().toPath();
-
-		String folders = filePath.toString();
-		folders = folders.replace(name, "");
-		folders = folders.replace(objectPath.toString(), "");
-		if (folders.startsWith("/")) folders = folders.substring(1);
-		if (folders.endsWith(File.separator)) folders = folders.substring(0, folders.length()-1);
-		return folders;
-	}
+	// TODO Unused?
+//	private String getFoldersFromObject(StructuredCustomObject object, Path objectPath)
+//	{
+//		String name = object.getName();
+//		Path filePath = object.getConfig().getFile().toPath();
+//
+//		String folders = filePath.toString();
+//		folders = folders.replace(name, "");
+//		folders = folders.replace(objectPath.toString(), "");
+//		if (folders.startsWith("/")) folders = folders.substring(1);
+//		if (folders.endsWith(File.separator)) folders = folders.substring(0, folders.length()-1);
+//		return folders;
+//	}
 
 	private Runnable getExportRunnable(ObjectType type, ExportCommand.Region region, Corner center, StructuredCustomObject object,
 									   LocalWorldGenRegion worldGenRegion, Path exportPath, List<BlockFunction<?>> extraBlocks,
@@ -678,9 +678,10 @@ public class EditCommand extends BaseCommand
 		LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL
 	).collect(Collectors.toCollection(HashSet::new));
 
-	private static final HashSet<LocalMaterialData> liquidsSet = Stream.of(
-		LocalMaterials.WATER, LocalMaterials.LAVA
-	).collect(Collectors.toCollection(HashSet::new));
+// TODO unused?
+//	private static final HashSet<LocalMaterialData> liquidsSet = Stream.of(
+//		LocalMaterials.WATER, LocalMaterials.LAVA
+//	).collect(Collectors.toCollection(HashSet::new));
 
 	private static final HashSet<ResourceLocation> updateMap = Stream.of(
 		"oak_fence",
