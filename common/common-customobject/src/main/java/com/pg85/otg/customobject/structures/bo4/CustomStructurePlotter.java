@@ -16,7 +16,6 @@ import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.CustomStructureFileManager;
 import com.pg85.otg.customobject.structures.PlottedChunksRegion;
-import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICustomStructureGen;
