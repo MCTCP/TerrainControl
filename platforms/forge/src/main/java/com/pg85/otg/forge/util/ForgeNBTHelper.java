@@ -2,11 +2,11 @@ package com.pg85.otg.forge.util;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.util.bo3.LocalNBTHelper;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+import com.pg85.otg.util.nbt.LocalNBTHelper;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
