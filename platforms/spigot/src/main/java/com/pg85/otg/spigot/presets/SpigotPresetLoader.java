@@ -75,7 +75,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 	}
 
 	@Override
-	public void registerBiomes ()
+	public void registerBiomes()
 	{
 		for (Preset preset : this.presets.values())
 		{

@@ -1,4 +1,4 @@
-package com.pg85.otg.customobject.util;
+package com.pg85.otg.util.nbt;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pg85.otg.interfaces.ILogger;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 

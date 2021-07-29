@@ -29,19 +29,13 @@ public class OTGGui
 		{
 			// TODO: Clean this up, we don't use this anymore since it doesn't take into account our world creation 
 			// screen's settings and may cause a hiccup due to presets being loaded when selecting the otg world type.
-			// Ignoring this may break things like pregenerator mods though?
+			// Ignoring this may break things like pregenerator mods though? Test and remove if safe.
 
-			// Provide our custom chunk generator, biome provider and dimension settings.
-			//if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
-			///{
-				//return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD));
-			//} else {
-				// If no presets are installed, return the default chunkgenerator / biomeprovider
-				return new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, () ->
-				{
-					return dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD);
-				});
-			//}
+			// Return the default chunkgenerator / biomeprovider
+			return new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, () ->
+			{
+				return dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD);
+			});
 		}
 	};
 
