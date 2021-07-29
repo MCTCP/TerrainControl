@@ -207,9 +207,9 @@ public class ExportCommand extends BaseCommand
 			}
 
 			Region region = playerSelectionMap.get(source.getEntity());
-			if (region == null || region.getMin() == null)
+			if (region == null || region.getMin() == null || region.getMax() == null)
 			{
-				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
+				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark and /otg region mark 2"), false);
 				return 0;
 			}
 
@@ -593,6 +593,9 @@ public class ExportCommand extends BaseCommand
 
 		public Corner getMin()
 		{
+			if (pos1 == null || pos2 == null) {
+				return null;
+			}
 			return new Corner(
 				Math.min(pos1.getX(), pos2.getX()),
 				Math.min(pos1.getY(), pos2.getY()),
@@ -602,6 +605,9 @@ public class ExportCommand extends BaseCommand
 
 		public Corner getMax()
 		{
+			if (pos1 == null || pos2 == null) {
+				return null;
+			}
 			return new Corner(
 				Math.max(pos1.getX(), pos2.getX()),
 				Math.max(pos1.getY(), pos2.getY()),
