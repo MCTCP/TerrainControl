@@ -719,9 +719,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				}
 				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobEntity.setPersistent();
-				
-				GroupDataEntity ilivingentitydata = null;
-				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+
 				this.worldGenRegion.j(mobEntity);
 			}
 		}
