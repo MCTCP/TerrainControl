@@ -15,13 +15,13 @@ import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.server.v1_16_R3.*;
 
@@ -720,7 +720,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobEntity.setPersistent();
 
-				this.worldGenRegion.j(mobEntity);
+				GroupDataEntity ilivingentitydata = null;
+				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				this.worldGenRegion.addAllEntities(mobEntity);
 			}
 		}
 	}

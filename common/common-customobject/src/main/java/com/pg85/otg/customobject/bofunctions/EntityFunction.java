@@ -6,10 +6,10 @@ import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.IEntityFunction;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityNames;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import java.io.*;
 import java.util.List;

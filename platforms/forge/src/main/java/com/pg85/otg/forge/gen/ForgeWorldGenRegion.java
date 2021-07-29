@@ -19,13 +19,13 @@ import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -751,7 +751,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					}
 					continue;
 				}
-				
+
 				// Attach nametag if one was provided via Entity()
 				String nameTag = entityData.getNameTagOrNBTFileName();
 				if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
