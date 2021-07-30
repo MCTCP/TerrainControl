@@ -152,8 +152,8 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 						}
 					}
 
-					if (nbt.getTag("Item") != null) {
-						String val = (String) nbt.getTag("Item").getValue();
+					if (metaData.getTag("Item") != null) {
+						String val = (String) metaData.getTag("Item").getValue();
 						this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
 					}
 
