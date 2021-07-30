@@ -25,11 +25,15 @@ import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +95,21 @@ public class ObjectCreator extends BOCreator
 		// Make new BO with the given blocks
 		CustomObjectConfigFile config = makeNewConfig(type, template, objectName, type.getObjectFilePathFromName(objectName, exportPath),
 			max, min, center, blocks, null, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
+
+		// Rename old file, make it .backup
+		if (config.getFile().exists())
+		{
+			Path path = config.getFile().toPath();
+			try
+			{
+				Files.move(path, path.resolveSibling(objectName+"."+type.getType()+".backup"));
+			}
+			catch (IOException e)
+			{
+				logger.log(LogLevel.ERROR, LogCategory.MAIN, "Failed to rename old file "+path.getFileName());
+				logger.printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
+			}
+		}
 
 		switch (type)
 		{

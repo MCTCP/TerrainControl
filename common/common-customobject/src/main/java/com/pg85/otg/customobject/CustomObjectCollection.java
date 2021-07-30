@@ -224,6 +224,17 @@ public class CustomObjectCollection
 		return files == null ? null : new ArrayList<>(files.keySet());
 	}
 
+	public File getTemplateFileForPreset(String presetFolderName, String templateName, ILogger logger, Path otgRootPath)
+	{
+		HashMap<String, File> files = boTemplateFilesPerPreset.get(presetFolderName);
+		if (files == null)
+		{
+			indexPresetObjectsFolder(presetFolderName, logger, otgRootPath);
+			files = customObjectFilesPerPreset.get(presetFolderName);
+		}
+		return files == null ? null : files.get(templateName);
+	}
+
 	public ArrayList<String> getGlobalObjectNames(ILogger logger, Path otgRootPath)
 	{
 		if (customObjectFilesGlobalObjects == null)
@@ -553,9 +564,9 @@ public class CustomObjectCollection
 						}
 					}
 				}
-				else if (searchDir.getName().toLowerCase().endsWith("bo3template"))
+				else if (searchDir.getName().toLowerCase().matches(".+\\.bo[34]template"))
 				{
-					templateFiles.put(searchDir.getName().toLowerCase(Locale.ROOT).replace(".bo3template", ""), searchDir);
+					templateFiles.put(searchDir.getName().toLowerCase(Locale.ROOT).replaceAll("\\.bo[34]template", ""), searchDir);
 				}
 			}
 		}

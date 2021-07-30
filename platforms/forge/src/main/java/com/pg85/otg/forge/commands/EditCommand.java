@@ -134,14 +134,14 @@ public class EditCommand extends BaseCommand
 				return 0;
 			}
 
-			StructuredCustomObject object = getStructuredObject(objectName, presetFolderName);
-			if (object == null)
+			StructuredCustomObject inputObject = getStructuredObject(objectName, presetFolderName);
+			if (inputObject == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);
 				return 0;
 			}
 
-			ObjectType type = object.getType();
+			ObjectType type = inputObject.getType();
 
 			Preset preset = ExportCommand.getPresetOrDefault(presetFolderName);
 			if (preset == null)
@@ -153,7 +153,7 @@ public class EditCommand extends BaseCommand
 			// Use ForgeWorldGenRegion as a wrapper for the world that ObjectCreator can interact with
 			ForgeWorldGenRegion worldGenRegion = getWorldGenRegion(preset, source.getLevel());
 
-			ExportCommand.Region region = getRegionFromObject(source.getEntity().blockPosition(), object);
+			ExportCommand.Region region = getRegionFromObject(source.getEntity().blockPosition(), inputObject);
 			Corner center = region.getCenter();
 
 			// Prepare area for spawning
@@ -163,62 +163,60 @@ public class EditCommand extends BaseCommand
 			// -- Spawn and update --
 
 			// Spawn code, taken and modified from BO3.java :: spawnForced()
-			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, object, worldGenRegion, doFixing,
+			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, inputObject, worldGenRegion, doFixing,
 				presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
 				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
 			// Save the object and clean the area
-
+			Path path = ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder())
+				.resolve(getFoldersFromObject(inputObject));
 			if (immediate)
 			{
-				Path path = ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder());
-				// TODO: Make Edit put the object back where it found it
-				// TODO: When editing an object, rename the old file to <name>.bo3.backup
-				// path = path.resolve(getFoldersFromObject(object, path));
-				new Thread(getExportRunnable(type, region, center, object, worldGenRegion, path,
+				new Thread(getExportRunnable(type, region, center, inputObject, worldGenRegion, path,
 					extraBlocks, presetFolderName, true, source)).start();
-			} else {
-				// Store the info, wait for /otg finishedit
-				sessionsMap.put(source.getEntity(), new EditSession(type, worldGenRegion, object, extraBlocks,
-					ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder()), preset.getFolderName(), center));
-				source.sendSuccess(new StringTextComponent("You can now edit the object"), false);
-				source.sendSuccess(new StringTextComponent("To change the area of the object, use /otg region"), false);
-				source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
-				source.sendSuccess(new StringTextComponent("To cancel, do /otg canceledit"), false);
-
-				if (!extraBlocks.isEmpty())
-					source.sendSuccess(new StringTextComponent("This object's center cannot be moved"), false);
-
-				ExportCommand.playerSelectionMap.put(source.getEntity(), region);
+				return 0;
 			}
+			// Store the info, wait for /otg finishedit
+			sessionsMap.put(source.getEntity(), new EditSession(type, worldGenRegion, inputObject, extraBlocks,
+				path, preset.getFolderName(), center));
+			source.sendSuccess(new StringTextComponent("You can now edit the object"), false);
+			source.sendSuccess(new StringTextComponent("To change the area of the object, use /otg region"), false);
+			source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
+			source.sendSuccess(new StringTextComponent("To cancel, do /otg canceledit"), false);
+
+			if (!extraBlocks.isEmpty())
+				source.sendSuccess(new StringTextComponent("This object's center cannot be moved"), false);
+
+			ExportCommand.playerSelectionMap.put(source.getEntity(), region);
 		}
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check the logs."), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: "+e.getClass().getName() + " - " +e.getMessage());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, s.toString());
-			}
+			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
 		return 0;
 	}
 
-	// TODO Unused?
-//	private String getFoldersFromObject(StructuredCustomObject object, Path objectPath)
-//	{
-//		String name = object.getName();
-//		Path filePath = object.getConfig().getFile().toPath();
-//
-//		String folders = filePath.toString();
-//		folders = folders.replace(name, "");
-//		folders = folders.replace(objectPath.toString(), "");
-//		if (folders.startsWith("/")) folders = folders.substring(1);
-//		if (folders.endsWith(File.separator)) folders = folders.substring(0, folders.length()-1);
-//		return folders;
-//	}
+	private String getFoldersFromObject(StructuredCustomObject object)
+	{
+		Path filePath = object.getConfig().getFile().toPath();
+		Path parent = filePath.getParent();
+		StringBuilder sb = new StringBuilder();
+		// Search down to the Objects folder
+		while (
+			!parent.getFileName().toString().equalsIgnoreCase("WorldObjects") &&
+			!parent.getFileName().toString().equalsIgnoreCase("Objects") &&
+			!parent.getFileName().toString().equalsIgnoreCase("GlobalObjects")
+		) {
+			sb.insert(0, "/");
+			sb.insert(0, parent.getFileName());
+			parent = parent.getParent();
+		}
+		return sb.toString();
+	}
 
-	private Runnable getExportRunnable(ObjectType type, ExportCommand.Region region, Corner center, StructuredCustomObject object,
+	private Runnable getExportRunnable(ObjectType type, ExportCommand.Region region, Corner center, StructuredCustomObject inputObject,
 									   LocalWorldGenRegion worldGenRegion, Path exportPath, List<BlockFunction<?>> extraBlocks,
 									   String presetFolderName, boolean verbose, CommandSource source)
 	{
@@ -238,13 +236,13 @@ public class EditCommand extends BaseCommand
 				region.getMax(),
 				center,
 				null,
-				object.getName(),
+				inputObject.getName(),
 				false,
 				exportPath,
 				worldGenRegion,
 				new ForgeNBTHelper(),
 				extraBlocks,
-				object.getConfig(),
+				inputObject.getConfig(),
 				presetFolderName,
 				OTG.getEngine().getOTGRootFolder(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
@@ -253,10 +251,10 @@ public class EditCommand extends BaseCommand
 
 			if (verbose && fixedObject != null)
 			{
-				source.sendSuccess(new StringTextComponent("Successfully updated "+type.getType()+" " + object.getName()), false);
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName().toLowerCase(Locale.ROOT), fixedObject.getConfig().getFile(), object);
+				source.sendSuccess(new StringTextComponent("Successfully updated "+type.getType()+" " + inputObject.getName()), false);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName().toLowerCase(Locale.ROOT), fixedObject.getConfig().getFile(), inputObject);
 			} else if (verbose) {
-				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + object.getName()), false);
+				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
 			}
 			cleanArea(worldGenRegion, region.getMin(), region.getMax(), false);
 		};
@@ -320,7 +318,6 @@ public class EditCommand extends BaseCommand
 		{
 			EditSession session = sessionsMap.get(source.getEntity());
 			ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
-
 
 			if (session == null)
 			{
@@ -556,16 +553,16 @@ public class EditCommand extends BaseCommand
 			String objectName = objectNameList.remove(0);
 
 			// get object
-			StructuredCustomObject object = getStructuredObject(objectName, presetFolderName);
-			if (object == null)
+			StructuredCustomObject inputObject = getStructuredObject(objectName, presetFolderName);
+			if (inputObject == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);
 				return;
 			}
 
-			ObjectType type = object.getType();
+			ObjectType type = inputObject.getType();
 
-			ExportCommand.Region region = getRegionFromObject(pos, object);
+			ExportCommand.Region region = getRegionFromObject(pos, inputObject);
 			Corner center = region.getCenter();
 
 			// cleanArea
@@ -573,11 +570,11 @@ public class EditCommand extends BaseCommand
 
 			// Spawn and fix object
 
-			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, object, worldGenRegion, true,
+			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, inputObject, worldGenRegion, true,
 				presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
 				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
-			Thread t = new Thread(getExportRunnable(type, region, center, object, worldGenRegion, fixedObjectFolderPath,
+			Thread t = new Thread(getExportRunnable(type, region, center, inputObject, worldGenRegion, fixedObjectFolderPath.resolve(getFoldersFromObject(inputObject)),
 				extraBlocks, presetFolderName, false, source));
 			t.start();
 
@@ -677,11 +674,6 @@ public class EditCommand extends BaseCommand
 	private static final HashSet<LocalMaterialData> gravityBlocksSet = Stream.of(
 		LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL
 	).collect(Collectors.toCollection(HashSet::new));
-
-// TODO unused?
-//	private static final HashSet<LocalMaterialData> liquidsSet = Stream.of(
-//		LocalMaterials.WATER, LocalMaterials.LAVA
-//	).collect(Collectors.toCollection(HashSet::new));
 
 	private static final HashSet<ResourceLocation> updateMap = Stream.of(
 		"oak_fence",

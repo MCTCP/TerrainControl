@@ -266,9 +266,8 @@ public class ExportCommand extends BaseCommand
 			StructuredCustomObject template = (StructuredCustomObject) OTG.getEngine().getCustomObjectManager().getObjectLoaders()
 				.get(type.getType().toLowerCase())
 				.loadFromFile(templateName,
-					type.getObjectFilePathFromName(
-						type.getFileNameForTemplate(templateName),
-						objectPath).toFile(),
+					OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplateFileForPreset(
+						presetName, templateName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()),
 					OTG.getEngine().getLogger()
 				);
 
