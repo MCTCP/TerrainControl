@@ -22,7 +22,7 @@ public class DimensionConfig
 {
 	// Use capitals since we're serialising to yaml and want to make it look nice.
 	public int Version;
-	public OTGOverWorld OverWorld;
+	public OTGOverWorld Overworld;
 	public OTGDimension Nether;
 	public OTGDimension End;
 	public List<OTGDimension> Dimensions = new ArrayList<>();
@@ -53,7 +53,7 @@ public class DimensionConfig
 	        }
 	        DimensionConfig loadedConfig = fromYamlString(content);
 	        dimConfig.Version = loadedConfig.Version;
-	        dimConfig.OverWorld = loadedConfig.OverWorld;
+	        dimConfig.Overworld = loadedConfig.Overworld;
 	        dimConfig.Nether = loadedConfig.Nether;
 	        dimConfig.End = loadedConfig.End;
 	        dimConfig.Dimensions = loadedConfig.Dimensions;
