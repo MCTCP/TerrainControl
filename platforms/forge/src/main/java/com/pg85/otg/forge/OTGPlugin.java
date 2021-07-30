@@ -89,16 +89,19 @@ public class OTGPlugin
 		// Register the OTG world type and any OTG GUI's for the world creation screen.
 		OTGGui.init();
 	}
-	
+
 	@SubscribeEvent
 	public static void registerBiomes(RegistryEvent.Register<Biome> event)
 	{
 		// Start OpenTerrainGenerator engine, loads all presets.
 		// Done here so that file indexing happens after presetpacker has unpacked its preset
 		OTG.startEngine(new ForgeEngine());
+
 		// Register all biomes
+		// TODO: Use proper Forge way of registering biomes, we're not using
+		// deferredregister (wasn't working before) or event.getRegistry().register atm.
 		OTG.getEngine().getPresetLoader().registerBiomes();
-		
+
 		// Fog & colors networking/handlers
 		OTGClientSyncManager.setup();
 		MultipleColorHandler.setup();

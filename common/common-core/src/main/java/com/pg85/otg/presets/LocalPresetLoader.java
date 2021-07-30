@@ -64,7 +64,7 @@ public abstract class LocalPresetLoader
 	protected abstract IMaterialReader createMaterialReader();
 
 	public abstract void registerBiomes();
-
+	
 	protected abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String inheritMobsBiomeName);
 	
 	public Preset getPresetByShortNameOrFolderName(String name)

@@ -131,7 +131,7 @@ public abstract class OTGEngine
 		this.biomeResourcesManager = new BiomeResourcesManager(configFunctions);
 
 		// Load presets
-		
+
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, this.logger);
 	}
 
