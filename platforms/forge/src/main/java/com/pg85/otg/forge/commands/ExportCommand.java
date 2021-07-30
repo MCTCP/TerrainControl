@@ -227,7 +227,7 @@ public class ExportCommand extends BaseCommand
 
 			Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
 
-			if (!overwrite)
+			if (!overwrite && new File(objectPath.toFile(), objectName + ".bo3").exists())
 			{
 				if (new File(objectPath.toFile(), objectName + "." + type.getType()).exists())
 				{
@@ -343,12 +343,9 @@ public class ExportCommand extends BaseCommand
 			objectPath = presetFolder.resolve(Constants.WORLD_OBJECTS_FOLDER);
 		}
 
-		if (!objectPath.toFile().exists())
+		if (!objectPath.toFile().exists() && objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
 		{
-			if (objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
-			{
-				objectPath = objectPath.resolve("..").resolve("WorldObjects");
-			}
+			objectPath = objectPath.resolve("..").resolve("WorldObjects");
 		}
 		return objectPath;
 	}
