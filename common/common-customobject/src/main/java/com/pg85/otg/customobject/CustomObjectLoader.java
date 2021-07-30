@@ -2,7 +2,7 @@ package com.pg85.otg.customobject;
 
 import java.io.File;
 
-import com.pg85.otg.customobject.util.NBTHelper;
+import com.pg85.otg.util.nbt.NBTHelper;
 import com.pg85.otg.interfaces.ILogger;
 
 public interface CustomObjectLoader

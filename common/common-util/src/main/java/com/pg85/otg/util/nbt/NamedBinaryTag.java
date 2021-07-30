@@ -1,4 +1,4 @@
-package com.pg85.otg.util.bo3;
+package com.pg85.otg.util.nbt;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

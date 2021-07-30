@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;

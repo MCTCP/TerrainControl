@@ -35,7 +35,7 @@ import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.DefaultStructurePart;

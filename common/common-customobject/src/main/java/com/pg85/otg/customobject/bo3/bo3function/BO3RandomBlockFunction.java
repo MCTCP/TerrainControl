@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.customobject.bo3.BO3Config;
-import com.pg85.otg.customobject.util.NBTHelper;
+import com.pg85.otg.util.nbt.NBTHelper;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.BlockNames;
 
@@ -115,22 +115,49 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 				NamedBinaryTag metaData = NBTHelper.loadMetadata(args.get(i), this.getHolder().getFile(), logger);
 				if (metaData != null)
 				{
-					if (metaData.getTag("Items") == null) {
-						continue;
-					}
-					// Code that converts legacy block ids inside chests - Frank
-					for (NamedBinaryTag item : (NamedBinaryTag[]) metaData.getTag("Items").getValue()) {
-						if (item.getTag("id").getType() == NamedBinaryTag.Type.TAG_Short) {
-							short val = (short)item.getTag("id").getValue();
-							item.removeSubTag(item.getTag("id"));
-							NamedBinaryTag[] newItemValue = new NamedBinaryTag[((NamedBinaryTag[])item.getValue()).length + 1];
-							System.arraycopy(item.getValue(), 0, newItemValue, 0, newItemValue.length - 1);
-							String strVal = "minecraft:" + BlockNames.blockNameFromLegacyBlockId(val);
-							newItemValue[newItemValue.length-2] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_String, "id", strVal);
-							newItemValue[newItemValue.length-1] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, "", null);
-							item.setValue(newItemValue);
+					if (metaData.getTag("Items") != null) {
+						for (NamedBinaryTag item : (NamedBinaryTag[]) metaData.getTag("Items").getValue()) {
+							if (item.getTag("id").getType() == NamedBinaryTag.Type.TAG_Short) {
+								short val = (short)item.getTag("id").getValue();
+								item.removeSubTag(item.getTag("id"));
+								NamedBinaryTag[] newItemValue = new NamedBinaryTag[((NamedBinaryTag[])item.getValue()).length + 1];
+								System.arraycopy(item.getValue(), 0, newItemValue, 0, newItemValue.length - 1);
+								String strVal = "minecraft:" + BlockNames.blockNameFromLegacyBlockId(val);
+								newItemValue[newItemValue.length-2] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_String, "id", strVal);
+								newItemValue[newItemValue.length-1] = new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, "", null);
+								item.setValue(newItemValue);
+							}
 						}
 					}
+					if (metaData.getTag("SkullType") != null) {
+						byte val = (byte)metaData.getTag("SkullType").getValue();
+						switch ((int)val) {
+							case 1:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:wither_skeleton_skull");
+								break;
+							case 2:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:zombie_head");
+								break;
+							case 3:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:player_head");
+								break;
+							case 4:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:creeper_head");
+								break;
+							case 5:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:dragon_head");
+								break;
+							default:
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:skeleton_skull");
+						}
+					}
+
+					if (nbt.getTag("Item") != null) {
+						String val = (String) nbt.getTag("Item").getValue();
+						this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+					}
+
+					// Code that converts legacy block ids inside chests - Frank
 					metaDataNames[blockCount] = args.get(i);
 					metaDataTags[blockCount] = metaData;
 				}
