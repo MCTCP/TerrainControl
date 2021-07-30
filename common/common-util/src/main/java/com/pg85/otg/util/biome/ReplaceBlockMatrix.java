@@ -88,7 +88,7 @@ public class ReplaceBlockMatrix
 		 *			not be larger than
 		 *			{@link ReplaceBlockMatrix#maxHeight}.
 		 */
-		public ReplacedBlocksInstruction(LocalMaterialData from, LocalMaterialData to, int minHeight, int maxHeight)
+		public ReplacedBlocksInstruction(LocalMaterialBase from, LocalMaterialData to, int minHeight, int maxHeight)
 		{
 			this.from = from;
 			this.to = to;
@@ -96,6 +96,11 @@ public class ReplaceBlockMatrix
 			this.maxHeight = maxHeight;
 		}
 
+		public ReplacedBlocksInstruction clone()
+		{
+			return new ReplacedBlocksInstruction(this.from, this.to, this.minHeight, this.maxHeight);
+		}
+		
 		public LocalMaterialBase getFrom()
 		{
 			return from;
@@ -225,7 +230,7 @@ public class ReplaceBlockMatrix
 				}
 				if(instruction.from.isTag())
 				{
-					targetsAtHeight.targetsWithBlockTags.add(instruction);					
+					targetsAtHeight.targetsWithBlockTags.add(instruction.clone());
 				} else {
 					targetsAtHeight.targetsWithBlockData.put(instruction.from.hashCode(), instruction.to);
 				}

@@ -45,7 +45,7 @@ public class SelectOTGPresetScreen extends Screen
 		for(Preset preset : presetList)
 		{
 			if(
-				(dimId == 0 || preset.getFolderName() != currentSelection.OverWorld.PresetFolderName) &&
+				(dimId == 0 || preset.getFolderName() != currentSelection.Overworld.PresetFolderName) &&
 				(dimId == 1 || preset.getFolderName() != currentSelection.Nether.PresetFolderName) &&
 				(dimId == 2 || preset.getFolderName() != currentSelection.End.PresetFolderName)
 			)
@@ -159,14 +159,14 @@ public class SelectOTGPresetScreen extends Screen
 				{
 					if(this.preset == null && SelectOTGPresetScreen.this.dimId == 0)
 					{
-						SelectOTGPresetScreen.this.currentSelection.OverWorld = new OTGOverWorld(null, -1l, null, null);
+						SelectOTGPresetScreen.this.currentSelection.Overworld = new OTGOverWorld(null, -1l, null, null);
 						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCreateWorldScreen.create(SelectOTGPresetScreen.this.parent));
 					} else {
 						OTGDimension otgDim = new OTGDimension(this.preset == null ? null : this.preset.getFolderName(), -1l);
 						switch(SelectOTGPresetScreen.this.dimId)
 						{
 							case 0:
-								SelectOTGPresetScreen.this.currentSelection.OverWorld = new OTGOverWorld(this.preset == null ? null : this.preset.getFolderName(), -1l, null, null);
+								SelectOTGPresetScreen.this.currentSelection.Overworld = new OTGOverWorld(this.preset == null ? null : this.preset.getFolderName(), -1l, null, null);
 								break;
 							case 1:
 								SelectOTGPresetScreen.this.currentSelection.Nether = otgDim;
