@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +16,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -28,7 +26,6 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
-import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
@@ -44,8 +41,6 @@ import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.presets.Preset;
-import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -94,13 +89,9 @@ public class EditCommand extends BaseCommand
 			)
 		);
 		builder.then(Commands.literal("canceledit")
-			.executes(this::cancel));
+			.executes(this::cancelSession));
 		builder.then(Commands.literal("finishedit")
 			.executes(this::finish));
-		builder.then(Commands.literal("update").then(
-			Commands.argument("preset", StringArgumentType.word())
-			.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
-			.executes(this::update)));
 	}
 
 	public int execute(CommandContext<CommandSource> context)
@@ -143,7 +134,7 @@ public class EditCommand extends BaseCommand
 
 			ObjectType type = inputObject.getType();
 
-			Preset preset = ExportCommand.getPresetOrDefault(presetFolderName);
+			Preset preset = ObjectUtils.getPresetOrDefault(presetFolderName);
 			if (preset == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetFolderName == null ? "" : presetFolderName)), false);
@@ -153,12 +144,12 @@ public class EditCommand extends BaseCommand
 			// Use ForgeWorldGenRegion as a wrapper for the world that ObjectCreator can interact with
 			ForgeWorldGenRegion worldGenRegion = getWorldGenRegion(preset, source.getLevel());
 
-			ExportCommand.Region region = getRegionFromObject(source.getEntity().blockPosition(), inputObject);
+			RegionCommand.Region region = ObjectUtils.getRegionFromObject(source.getEntity().blockPosition(), inputObject);
 			Corner center = region.getCenter();
 
 			// Prepare area for spawning
 
-			cleanArea(worldGenRegion, region.getMin(), region.getMax(), true);
+			ObjectUtils.cleanArea(worldGenRegion, region.getMin(), region.getMax(), true);
 
 			// -- Spawn and update --
 
@@ -168,12 +159,12 @@ public class EditCommand extends BaseCommand
 				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
 			// Save the object and clean the area
-			Path path = ExportCommand.getObjectPath(isGlobal ? null : preset.getPresetFolder())
-				.resolve(getFoldersFromObject(inputObject));
+			Path path = ObjectUtils.getObjectFolderPath(isGlobal ? null : preset.getPresetFolder())
+				.resolve(ObjectUtils.getFoldersFromObject(inputObject));
 			if (immediate)
 			{
-				new Thread(getExportRunnable(type, region, center, inputObject, worldGenRegion, path,
-					extraBlocks, presetFolderName, true, source)).start();
+				new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, source, worldGenRegion
+				)).start();
 				return 0;
 			}
 			// Store the info, wait for /otg finishedit
@@ -187,7 +178,7 @@ public class EditCommand extends BaseCommand
 			if (!extraBlocks.isEmpty())
 				source.sendSuccess(new StringTextComponent("This object's center cannot be moved"), false);
 
-			ExportCommand.playerSelectionMap.put(source.getEntity(), region);
+			RegionCommand.playerSelectionMap.put(source.getEntity(), region);
 		}
 		catch (Exception e)
 		{
@@ -198,69 +189,7 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	private String getFoldersFromObject(StructuredCustomObject object)
-	{
-		Path filePath = object.getConfig().getFile().toPath();
-		Path parent = filePath.getParent();
-		StringBuilder sb = new StringBuilder();
-		// Search down to the Objects folder
-		while (
-			!parent.getFileName().toString().equalsIgnoreCase("WorldObjects") &&
-			!parent.getFileName().toString().equalsIgnoreCase("Objects") &&
-			!parent.getFileName().toString().equalsIgnoreCase("GlobalObjects")
-		) {
-			sb.insert(0, "/");
-			sb.insert(0, parent.getFileName());
-			parent = parent.getParent();
-		}
-		return sb.toString();
-	}
-
-	private Runnable getExportRunnable(ObjectType type, ExportCommand.Region region, Corner center, StructuredCustomObject inputObject,
-									   LocalWorldGenRegion worldGenRegion, Path exportPath, List<BlockFunction<?>> extraBlocks,
-									   String presetFolderName, boolean verbose, CommandSource source)
-	{
-		return () -> {
-			// Wait for tree to finish
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			StructuredCustomObject fixedObject = ObjectCreator.createObject(
-				type,
-				region.getMin(),
-				region.getMax(),
-				center,
-				null,
-				inputObject.getName(),
-				false,
-				exportPath,
-				worldGenRegion,
-				new ForgeNBTHelper(),
-				extraBlocks,
-				inputObject.getConfig(),
-				presetFolderName,
-				OTG.getEngine().getOTGRootFolder(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-
-			if (verbose && fixedObject != null)
-			{
-				source.sendSuccess(new StringTextComponent("Successfully updated "+type.getType()+" " + inputObject.getName()), false);
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName().toLowerCase(Locale.ROOT), fixedObject.getConfig().getFile(), inputObject);
-			} else if (verbose) {
-				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
-			}
-			cleanArea(worldGenRegion, region.getMin(), region.getMax(), false);
-		};
-	}
-
-	private ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerWorld level)
+	protected static ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerWorld level)
 	{
 		if(level.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
@@ -279,9 +208,9 @@ public class EditCommand extends BaseCommand
 		}
 	}
 
-	private StructuredCustomObject getStructuredObject(String objectName, String presetFolderName)
+	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName)
 	{
-		CustomObject objectToSpawn = SpawnCommand.getObject(objectName, presetFolderName);
+		CustomObject objectToSpawn = ObjectUtils.getObject(objectName, presetFolderName);
 
 		if (objectToSpawn instanceof StructuredCustomObject)
 		{
@@ -308,7 +237,6 @@ public class EditCommand extends BaseCommand
 			}
 		}
 		return null;
-
 	}
 
 	public int finish(CommandContext<CommandSource> context)
@@ -317,14 +245,14 @@ public class EditCommand extends BaseCommand
 		try
 		{
 			EditSession session = sessionsMap.get(source.getEntity());
-			ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
+			RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
 
 			if (session == null)
 			{
 				source.sendSuccess(new StringTextComponent("No active session, do '/otg edit' to start one"), false);
 				return 0;
 			}
-			else if (isOutsideBounds(region, session.type))
+			else if (ObjectUtils.isOutsideBounds(region, session.type))
 			{
 				source.sendSuccess(new StringTextComponent("Selection is too big! Maximum size is 16x16 for BO4 and 32x32 for BO3"), false);
 				return 0;
@@ -341,7 +269,7 @@ public class EditCommand extends BaseCommand
 			} else {
 				source.sendSuccess(new StringTextComponent("Failed to edit "+session.type.getType()+" " + session.object.getName()), false);
 			}
-			cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
+			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
 			sessionsMap.put(source.getEntity(), null);
 		}
 		catch (Exception e)
@@ -352,7 +280,7 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	public static StructuredCustomObject exportFromSession(EditSession session, ExportCommand.Region region)
+	public static StructuredCustomObject exportFromSession(EditSession session, RegionCommand.Region region)
 	{
 		return ObjectCreator.createObject(
 			session.type,
@@ -378,33 +306,15 @@ public class EditCommand extends BaseCommand
 		);
 	}
 
-	public static boolean isOutsideBounds(ExportCommand.Region region, ObjectType type)
-	{
-		Corner min = region.getMin();
-		Corner max = region.getMax();
-		int xlen = Math.abs(max.x - min.x);
-		int zlen = Math.abs(max.z - min.z);
-		switch (type)
-		{
-			case BO3:
-				return xlen > 31 || zlen > 31;
-			case BO4:
-				return xlen > 15 || zlen > 15;
-			case BO2:
-			default:
-				return false;
-		}
-	}
-
-	public int cancel(CommandContext<CommandSource> context)
+	public int cancelSession(CommandContext<CommandSource> context)
 	{
 		CommandSource source = context.getSource();
 		EditSession session = sessionsMap.get(source.getEntity());
-		ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
+		RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
 
 		if (session != null && region != null)
 		{
-			cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
+			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
 			sessionsMap.put(source.getEntity(), null);
 			source.sendSuccess(new StringTextComponent("Edit session cancelled"), false);
 		} else {
@@ -501,121 +411,6 @@ public class EditCommand extends BaseCommand
 		return unspawnedBlocks;
 	}
 
-	protected static void cleanArea(LocalWorldGenRegion region, Corner min, Corner max, boolean preparing)
-	{
-		for (int x1 = min.x-1; x1 <= max.x+1; x1++)
-		{
-			for (int z1 = min.z-1; z1 <= max.z+1; z1++)
-			{
-				for (int y1 = min.y-1; y1 <= max.y+1; y1++)
-				{
-					if (preparing)
-					{
-						region.setBlock(x1, y1, z1, LocalMaterials.STRUCTURE_VOID);
-					} else {
-						region.setBlock(x1, y1, z1, LocalMaterials.AIR);
-					}
-				}
-			}
-		}
-	}
-
-	private int update(CommandContext<CommandSource> context)
-	{
-		// Get preset
-		String presetFolderName = context.getArgument("preset", String.class);
-		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
-		CommandSource source = context.getSource();
-
-		if (preset == null)
-		{
-			context.getSource().sendSuccess(new StringTextComponent("Could not find preset '"+presetFolderName+"'"), false);
-			return 0;
-		}
-
-		// Get list of BO's
-		List<String> objectNameList = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
-
-		// Create folder for the fixed objects to be exported to
-		Path fixedObjectFolderPath = preset.getPresetFolder()
-			.resolve(
-				preset.getPresetFolder().resolve("WorldObjects").toFile().exists() ?
-				"WorldObjects" :
-				Constants.WORLD_OBJECTS_FOLDER
-			).resolve("Updated Objects");
-		fixedObjectFolderPath.toFile().mkdirs();
-
-		ForgeWorldGenRegion worldGenRegion = getWorldGenRegion(preset, source.getLevel());
-
-		BlockPos pos = source.getEntity().blockPosition();
-
-		Runnable updateIteration = ()-> {
-			String objectName = objectNameList.remove(0);
-
-			// get object
-			StructuredCustomObject inputObject = getStructuredObject(objectName, presetFolderName);
-			if (inputObject == null)
-			{
-				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);
-				return;
-			}
-
-			ObjectType type = inputObject.getType();
-
-			ExportCommand.Region region = getRegionFromObject(pos, inputObject);
-			Corner center = region.getCenter();
-
-			// cleanArea
-			cleanArea(worldGenRegion, region.getMin(), region.getMax(), true);
-
-			// Spawn and fix object
-
-			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, inputObject, worldGenRegion, true,
-				presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-
-			Thread t = new Thread(getExportRunnable(type, region, center, inputObject, worldGenRegion, fixedObjectFolderPath.resolve(getFoldersFromObject(inputObject)),
-				extraBlocks, presetFolderName, false, source));
-			t.start();
-
-			try
-			{
-				t.join();
-			}
-			catch (InterruptedException e)
-			{
-				OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
-			}
-		};
-
-		// -- Thread --
-		new Thread(() -> {
-			int totalLength = objectNameList.size();
-			int interval;
-			int count = 0;
-			if (totalLength < 100)
-			{
-				interval = 20;
-			} else {
-				interval = totalLength / 7;
-			}
-			source.sendSuccess(new StringTextComponent("Starting object updating! Please don't move away from the immediate area").withStyle(TextFormatting.GREEN), false);
-			while (!objectNameList.isEmpty())
-			{
-				count++;
-				updateIteration.run();
-				if (count % interval == 0)
-				{
-					int percent = (int) ((double) count / (double) totalLength) *100;
-					//TODO: The progress never updates past 0, find out why
-					source.sendSuccess(new StringTextComponent("Progress: "+percent+"% complete").withStyle(TextFormatting.BLUE), false);
-				}
-			}
-			source.sendSuccess(new StringTextComponent("Finished updating!").withStyle(TextFormatting.GREEN), false);
-		}).start();
-		return 0;
-	}
-
 	public int help(CommandContext<CommandSource> context)
 	{
 		context.getSource().sendSuccess(new StringTextComponent("To use the edit command:").withStyle(TextFormatting.LIGHT_PURPLE), false);
@@ -629,47 +424,13 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	protected static ExportCommand.Region getRegionFromObject(BlockPos pos, StructuredCustomObject object)
-	{
-		ExportCommand.Region region = new ExportCommand.Region();
-		BoundingBox box = object.getBoundingBox(Rotation.NORTH);
-		// Make the object not spawn on top of the player
-
-		pos = pos.offset(3, 0, 3);
-
-		int lowestElevation = pos.getY() + box.getMinY();
-		int highestElevation = pos.getY() + box.getMinY() + box.getHeight();
-
-		int yshift = 0;
-
-		if (lowestElevation <= Constants.WORLD_DEPTH+1)
-		{
-			yshift = (-lowestElevation) + 2;
-		}
-		else if (highestElevation >= Constants.WORLD_HEIGHT)
-		{
-			yshift = highestElevation - Constants.WORLD_HEIGHT;
-		}
-
-		Corner center = new Corner(pos.getX() + 2 + (box.getWidth() / 2), pos.getY() + yshift, pos.getZ() + 2 + (box.getDepth() / 2));
-
-		region.setPos(new BlockPos(
-			center.x + box.getMinX(),
-			lowestElevation + yshift,
-			center.z + box.getMinZ()));
-		region.setPos(new BlockPos(
-			center.x + box.getMinX() + box.getWidth(),
-			highestElevation + yshift,
-			center.z + box.getMinZ() + box.getDepth()));
-		region.setCenter(center);
-		return region;
-	}
-	
 	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
 			SuggestionsBuilder builder)
 	{
 		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
+
+	// These maps are used to figure out what blocks to update
 
 	private static final HashSet<LocalMaterialData> gravityBlocksSet = Stream.of(
 		LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL

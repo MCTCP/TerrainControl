@@ -101,7 +101,7 @@ public class SpawnCommand extends BaseCommand
 		try
 		{
 			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
-			CustomObject objectToSpawn = getObject(objectName, presetName);
+			CustomObject objectToSpawn = ObjectUtils.getObject(objectName, presetName);
 
 			if (objectToSpawn == null)
 			{
@@ -109,7 +109,7 @@ public class SpawnCommand extends BaseCommand
 				return 0;
 			}
 
-			Preset preset = ExportCommand.getPresetOrDefault(presetName);
+			Preset preset = ObjectUtils.getPresetOrDefault(presetName);
 			ForgeWorldGenRegion genRegion;
 			if(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 			{
@@ -275,20 +275,4 @@ public class SpawnCommand extends BaseCommand
 		return 0;
 	}
 
-	public static CustomObject getObject(String objectName, String presetFolderName)
-	{
-		if (presetFolderName == null)
-		{
-			presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
-		}
-		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
-			objectName,
-			presetFolderName,
-			OTG.getEngine().getOTGRootFolder(),
-			OTG.getEngine().getLogger(),
-			OTG.getEngine().getCustomObjectManager(),
-			OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
-			OTG.getEngine().getCustomObjectResourcesManager(),
-			OTG.getEngine().getModLoadedChecker());
-	}
 }

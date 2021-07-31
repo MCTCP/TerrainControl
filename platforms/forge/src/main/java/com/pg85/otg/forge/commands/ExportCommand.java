@@ -3,7 +3,6 @@ package com.pg85.otg.forge.commands;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -14,7 +13,6 @@ import java.util.stream.Stream;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,7 +20,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
@@ -46,15 +43,13 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class ExportCommand extends BaseCommand
 {
-	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
+
 	
 	private static final String[] FLAGS = new String[]
 	{ "-o", "-a", "-b" };
@@ -62,7 +57,7 @@ public class ExportCommand extends BaseCommand
 	public ExportCommand() {
 		this.name = "export";
 		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
-		this.usage = "Please see /otg help export.";
+		this.usage = "Please see /otg export help.";
 	}
 	
 	@Override
@@ -97,38 +92,6 @@ public class ExportCommand extends BaseCommand
 			).then(
 				Commands.literal("help").executes(context -> helpMessage(context.getSource()))
 			)
-		).then(
-			Commands.literal("region").then(
-				Commands.literal("mark").executes(
-					context -> mark(context.getSource())
-				).then(Commands.argument("point",new RegionMarkerArgument()).executes(
-					context -> mark(context.getSource(), context.getArgument("point", String.class))
-				))
-			).then(
-				Commands.literal("clear").executes(
-					context ->clear(context.getSource())
-				)
-			).then(
-				Commands.literal("expand").then(
-					Commands.argument("direction", new DirectionArgument(true)).then(
-						Commands.argument("value", IntegerArgumentType.integer()).executes(
-							context -> expand(context.getSource(),
-								context.getArgument("direction", String.class),
-								context.getArgument("value", Integer.class))
-						)
-					)
-				)
-			).then(
-				Commands.literal("shrink").then(
-					Commands.argument("direction", new DirectionArgument(true)).then(
-						Commands.argument("value", IntegerArgumentType.integer()).executes(
-							context -> shrink(context.getSource(),
-								context.getArgument("direction", String.class),
-								context.getArgument("value", Integer.class))
-						)
-					)
-				)
-			)	
 		);
 	}
 
@@ -147,7 +110,7 @@ public class ExportCommand extends BaseCommand
 			String objectName = "";
 			BlockState centerBlockState;
 			String presetName = null;
-			ObjectType type = ObjectType.BO3; // Defaults to BO3 for simplicity
+			ObjectType type; // Defaults to BO3 for simplicity
 			String templateName = "default";
 			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false;
 
@@ -194,7 +157,6 @@ public class ExportCommand extends BaseCommand
 
 			if (objectName.equalsIgnoreCase(""))
 			{
-				//source.sendSuccess(new StringTextComponent("Please specify a name for the object"), false);
 				source.sendSuccess(new StringTextComponent("Usage: /otg export <object name> (center block) [preset] [type] [template] [-a -b -o]").withStyle(TextFormatting.LIGHT_PURPLE), false);
 				source.sendSuccess(new StringTextComponent("Do /otg export help for more info"), false);
 				return 0;
@@ -206,26 +168,26 @@ public class ExportCommand extends BaseCommand
 				return 0;
 			}
 
-			Region region = playerSelectionMap.get(source.getEntity());
+			RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
 			if (region == null || region.getMin() == null || region.getMax() == null)
 			{
-				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark and /otg region mark 2"), false);
+				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
 				return 0;
 			}
 
-			if (EditCommand.isOutsideBounds(region, type))
+			if (ObjectUtils.isOutsideBounds(region, type))
 			{
 				isStructure = true;
 			}
 
-			Preset preset = getPresetOrDefault(presetName);
+			Preset preset = ObjectUtils.getPresetOrDefault(presetName);
 			if (preset == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false);
 				return 0;
 			}
 
-			Path objectPath = getObjectPath(isGlobal ? null : preset.getPresetFolder());
+			Path objectPath = ObjectUtils.getObjectFolderPath(isGlobal ? null : preset.getPresetFolder());
 
 			if (!overwrite && new File(objectPath.toFile(), objectName + ".bo3").exists())
 			{
@@ -321,42 +283,12 @@ public class ExportCommand extends BaseCommand
 				source.sendSuccess(new StringTextComponent("Failed to create " + type.getType() + " " + objectName), false);
 			}
 		} catch (Exception e) {
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check the logs"), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Error during export command: "+e.getClass().getName());
-			for (StackTraceElement s : e.getStackTrace())
-			{
-				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, s.toString());
-			}
+			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
 
 		return 0;
-	}
-
-	protected static Path getObjectPath(Path presetFolder)
-	{
-		Path objectPath;
-		if (presetFolder == null)
-		{
-			objectPath = OTG.getEngine().getGlobalObjectsFolder();
-		} else {
-			objectPath = presetFolder.resolve(Constants.WORLD_OBJECTS_FOLDER);
-		}
-
-		if (!objectPath.toFile().exists() && objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
-		{
-			objectPath = objectPath.resolve("..").resolve("WorldObjects");
-		}
-		return objectPath;
-	}
-
-	protected static Preset getPresetOrDefault(String presetFolderName)
-	{
-		if (presetFolderName == null)
-		{
-			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
-		} else {
-			return OTG.getEngine().getPresetLoader().getPresetByShortNameOrFolderName(presetFolderName);
-		}
 	}
 
 	public int helpMessage(CommandSource source)
@@ -371,138 +303,6 @@ public class ExportCommand extends BaseCommand
 		source.sendSuccess(new StringTextComponent("    - Templates are not loaded as objects"), false);
 		source.sendSuccess(new StringTextComponent(" - There are three flags; -a for Air blocks, -b for Branches, -o for Override"), false);
 		return 0;
-	}
-
-	public int mark(CommandSource source)
-	{
-		if (checkForNonPlayer(source)) return 0;
-		playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition());
-		source.sendSuccess(new StringTextComponent("Position marked"), false);
-		return 0;
-	}
-
-	public int mark(CommandSource source, String input)
-	{
-		if (checkForNonPlayer(source)) return 0;
-		Region r = playerSelectionMap.get(source.getEntity());
-		switch(input)
-		{
-			case "min":
-			case "pos1":
-			case "1":
-			{
-				r.setPos1(source.getEntity().blockPosition());
-				source.sendSuccess(new StringTextComponent("Point 1 marked"), false);
-				return 0;
-			}
-			case "max":
-			case "pos2":
-			case "2":
-			{
-				r.setPos2(source.getEntity().blockPosition());
-				source.sendSuccess(new StringTextComponent("Point 2 marked"), false);
-				return 0;
-			}
-			case "center":
-			{
-				r.setCenter(Region.cornerFromBlockPos(source.getEntity().blockPosition()));
-				source.sendSuccess(new StringTextComponent("Center marked"), false);
-				return 0;
-			}
-			default:
-			{
-				source.sendSuccess(new StringTextComponent(input + " is not recognized"), false);
-				return 0;
-			}
-		}
-	}
-
-	public int clear(CommandSource source)
-	{
-		if (checkForNonPlayer(source)) return 0;
-		playerSelectionMap.get(source.getEntity()).clear();
-		source.sendSuccess(new StringTextComponent("Position cleared"), false);
-		return 0;
-	}
-
-	public int expand(CommandSource source, String direction, Integer value)
-	{
-		if (checkForNonPlayer(source)) return 0;
-		Region region = playerSelectionMap.get(source.getEntity());
-		if (region.getMax() == null)
-		{
-			source.sendSuccess(new StringTextComponent("Please mark two positions before modifying or exporting the region"), false);
-			return 0;
-		}
-
-		switch (direction)
-		{
-			case "south": // positive Z
-				if (region.pos2.getZ() >= region.pos1.getZ())
-					region.setPos2(region.pos2.south(value));
-				else
-					region.setPos1(region.pos1.south(value));
-				break;
-			case "north": // negative Z
-				if (region.pos2.getZ() < region.pos1.getZ())
-					region.setPos2(region.pos2.north(value));
-				else
-					region.setPos1(region.pos1.north(value));
-				break;
-			case "east": // positive X
-				if (region.pos2.getX() >= region.pos1.getX())
-					region.setPos2(region.pos2.east(value));
-				else
-					region.setPos1(region.pos1.east(value));
-				break;
-			case "west": // negative X
-				if (region.pos2.getX() < region.pos1.getX())
-					region.setPos2(region.pos2.west(value));
-				else
-					region.setPos1(region.pos1.west(value));
-				break;
-			case "up": // positive y
-				if (region.pos2.getY() >= region.pos1.getY())
-					region.setPos2(region.pos2.above(value));
-				else
-					region.setPos1(region.pos1.above(value));
-				break;
-			case "down": // negative y
-				if (region.pos2.getY() < region.pos1.getY())
-					region.setPos2(region.pos2.below(value));
-				else
-					region.setPos1(region.pos1.below(value));
-				break;
-			default:
-				source.sendSuccess(new StringTextComponent("Unrecognized direction " + direction), false);
-				return 0;
-		}
-
-		source.sendSuccess(new StringTextComponent("Region modified"), false);
-		return 0;
-	}
-
-	public int shrink(CommandSource source, String direction, Integer value)
-	{
-		if (checkForNonPlayer(source)) return 0;
-
-		expand(source, direction, -value);
-
-		return 0;
-	}
-
-	private static boolean checkForNonPlayer(CommandSource source)
-	{
-		if (!(source.getEntity() instanceof ServerPlayerEntity))
-		{
-			source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
-			return true;
-		}
-		if (!playerSelectionMap.containsKey(source.getEntity()))
-		{
-			playerSelectionMap.put(source.getEntity(), new Region());
-		}
-		return false;
 	}
 	
 	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
@@ -554,123 +354,6 @@ public class ExportCommand extends BaseCommand
 			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
 			list.add("default");
 			return ISuggestionProvider.suggest(list.stream(), builder);
-		}
-	}
-
-	public static class Region
-	{
-		private BlockPos pos1 = null;
-		private BlockPos pos2 = null;
-		private Corner center = null;
-		private boolean flip = true;
-
-		public void setPos(BlockPos blockPos)
-		{
-			// alternate between setting min and max
-			// Flip initializes as true, meaning we set min first
-			if (flip)
-				pos1 = blockPos;
-			else
-				pos2 = blockPos;
-			flip = !flip;
-		}
-
-		public static Corner cornerFromBlockPos(BlockPos blockPos)
-		{
-			return new Corner(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-		}
-
-		public void clear()
-		{
-			pos1 = null;
-			pos2 = null;
-			center = null;
-		}
-
-		public Corner getMin()
-		{
-			if (pos1 == null || pos2 == null) {
-				return null;
-			}
-			return new Corner(
-				Math.min(pos1.getX(), pos2.getX()),
-				Math.min(pos1.getY(), pos2.getY()),
-				Math.min(pos1.getZ(), pos2.getZ())
-				);
-		}
-
-		public Corner getMax()
-		{
-			if (pos1 == null || pos2 == null) {
-				return null;
-			}
-			return new Corner(
-				Math.max(pos1.getX(), pos2.getX()),
-				Math.max(pos1.getY(), pos2.getY()),
-				Math.max(pos1.getZ(), pos2.getZ())
-			);
-		}
-
-		public void setPos1(BlockPos pos)
-		{
-			flip = false;
-			this.pos1 = pos;
-		}
-
-		public void setPos2(BlockPos pos)
-		{
-			flip = true;
-			this.pos2 = pos;
-		}
-
-		public Corner getCenter()
-		{
-			return center;
-		}
-
-		public void setCenter(Corner center)
-		{
-			this.center = center;
-		}
-	}
-	
-	private static class DirectionArgument implements ArgumentType<String>
-	{
-		private final String[] options;
-
-		public DirectionArgument(boolean vertical)
-		{
-			if (vertical) options = new String[]{"north", "south", "east", "west", "up", "down"};
-			else options = new String[]{"north", "south", "east", "west"};
-		}
-
-		@Override
-		public String parse(StringReader reader) throws CommandSyntaxException
-		{
-			return reader.readString();
-		}
-
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
-		{
-			return ISuggestionProvider.suggest(options, builder);
-		}
-	}
-
-	private static class RegionMarkerArgument implements ArgumentType<String>
-	{
-		private final String[] options = new String[] {"1", "2", "center"};
-
-		@Override
-		public String parse(StringReader reader) throws CommandSyntaxException
-		{
-			return reader.readString();
-		}
-
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
-		{
-			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 }

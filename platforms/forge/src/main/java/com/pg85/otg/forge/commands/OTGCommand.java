@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.commands;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -31,8 +32,10 @@ public class OTGCommand
 		commands.add(new SpawnCommand());
 		commands.add(new EditCommand());
 		commands.add(new ExportCommand());
+		commands.add(new RegionCommand());
+		commands.add(new UpdateCommand());
 		
-		commands.sort((commandA, commandB) -> commandA.getName().compareTo(commandB.getName()));
+		commands.sort(Comparator.comparing(BaseCommand::getName));
 
 		LiteralArgumentBuilder<CommandSource> commandBuilder = Commands.literal("otg").requires(
 				(context) -> context.hasPermission(2)
