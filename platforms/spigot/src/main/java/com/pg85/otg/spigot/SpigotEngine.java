@@ -34,6 +34,11 @@ public class SpigotEngine extends OTGEngine
 		super.onStart();
 	}
 
+	public JavaPlugin getPlugin()
+	{
+		return this.plugin;
+	}
+
 	@Override
 	public File getJarFile()
 	{

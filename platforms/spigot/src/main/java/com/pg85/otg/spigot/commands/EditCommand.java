@@ -210,7 +210,7 @@ public class EditCommand extends BaseCommand
 	public List<String> onTabComplete(CommandSender sender, String[] args)
 	{
 		Map<String, String> strings = CommandUtil.parseArgs(args, true);
-		if (strings.size() > 3)
+		if (strings.size() >= 3)
 		{
 			return FLAGS;
 		}

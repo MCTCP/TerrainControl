@@ -92,24 +92,26 @@ public class ObjectCreator extends BOCreator
 		// Add extra blocks in (from updating, mainly)
 		if (extraBlocks != null) blocks.addAll(extraBlocks);
 
-		// Make new BO with the given blocks
-		CustomObjectConfigFile config = makeNewConfig(type, template, objectName, type.getObjectFilePathFromName(objectName, exportPath),
-			max, min, center, blocks, null, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
-
+		Path destinationPath = type.getObjectFilePathFromName(objectName, exportPath);
 		// Rename old file, make it .backup
-		if (config.getFile().exists())
+		if (destinationPath.toFile().exists())
 		{
-			Path path = config.getFile().toPath();
+			Path backupPath = destinationPath.resolveSibling(objectName+"."+type.getType()+".backup");
 			try
 			{
-				Files.move(path, path.resolveSibling(objectName+"."+type.getType()+".backup"));
+				if (backupPath.toFile().exists()) Files.delete(backupPath);
+				Files.move(destinationPath, backupPath);
 			}
 			catch (IOException e)
 			{
-				logger.log(LogLevel.ERROR, LogCategory.MAIN, "Failed to rename old file "+path.getFileName());
+				logger.log(LogLevel.ERROR, LogCategory.MAIN, "Failed to rename old file "+destinationPath.getFileName());
 				logger.printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 			}
 		}
+
+		// Make new BO with the given blocks
+		CustomObjectConfigFile config = makeNewConfig(type, template, objectName, destinationPath,
+			max, min, center, blocks, null, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
 
 		switch (type)
 		{

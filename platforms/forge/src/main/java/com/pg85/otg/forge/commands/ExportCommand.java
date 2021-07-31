@@ -202,11 +202,12 @@ public class ExportCommand extends BaseCommand
 					(highCorner.z - lowCorner.z) / 2 + lowCorner.z);
 
 			// Fetch template or default settings
+			File templateFile = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplateFileForPreset(
+				presetName, templateName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
 			StructuredCustomObject template = (StructuredCustomObject) OTG.getEngine().getCustomObjectManager().getObjectLoaders()
 				.get(type.getType().toLowerCase())
 				.loadFromFile(templateName,
-					OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplateFileForPreset(
-						presetName, templateName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()),
+					templateFile != null ? templateFile : new File(type.getFileNameForTemplate(templateName)),
 					OTG.getEngine().getLogger()
 				);
 
