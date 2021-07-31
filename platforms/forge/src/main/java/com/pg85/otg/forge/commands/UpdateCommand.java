@@ -67,7 +67,7 @@ public class UpdateCommand extends BaseCommand
 			).resolve("Updated Objects");
 		fixedObjectFolderPath.toFile().mkdirs();
 
-		ForgeWorldGenRegion worldGenRegion = EditCommand.getWorldGenRegion(preset, source.getLevel());
+		ForgeWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel());
 
 		BlockPos pos = source.getEntity().blockPosition();
 

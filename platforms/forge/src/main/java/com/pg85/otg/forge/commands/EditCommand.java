@@ -32,8 +32,6 @@ import com.pg85.otg.forge.commands.arguments.BiomeObjectArgument;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.forge.gen.MCWorldGenRegion;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.interfaces.ICustomObjectManager;
@@ -58,7 +56,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.server.ServerWorld;
 
 public class EditCommand extends BaseCommand
 {
@@ -142,7 +139,7 @@ public class EditCommand extends BaseCommand
 			}
 
 			// Use ForgeWorldGenRegion as a wrapper for the world that ObjectCreator can interact with
-			ForgeWorldGenRegion worldGenRegion = getWorldGenRegion(preset, source.getLevel());
+			ForgeWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel());
 
 			RegionCommand.Region region = ObjectUtils.getRegionFromObject(source.getEntity().blockPosition(), inputObject);
 			Corner center = region.getCenter();
@@ -187,25 +184,6 @@ public class EditCommand extends BaseCommand
 			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
 		return 0;
-	}
-
-	protected static ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerWorld level)
-	{
-		if(level.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
-		{
-			return new ForgeWorldGenRegion(
-				preset.getFolderName(),
-				preset.getWorldConfig(),
-				level,
-				(OTGNoiseChunkGenerator)level.getChunkSource().getGenerator()
-			);
-		} else {
-			return new MCWorldGenRegion(
-				preset.getFolderName(),
-				preset.getWorldConfig(),
-				level
-			);
-		}
 	}
 
 	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName)
@@ -275,7 +253,8 @@ public class EditCommand extends BaseCommand
 		catch (Exception e)
 		{
 			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check logs."), false);
-			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Edit command encountered an error: ", (Object[])e.getStackTrace()));
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: ");
+			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
 		return 0;
 	}

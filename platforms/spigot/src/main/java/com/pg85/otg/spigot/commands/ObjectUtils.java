@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.commands;
+package com.pg85.otg.spigot.commands;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -9,18 +9,18 @@ import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
-import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.forge.gen.MCWorldGenRegion;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.spigot.gen.MCWorldGenRegion;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
+import com.pg85.otg.spigot.gen.SpigotWorldGenRegion;
+import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -140,16 +140,17 @@ public class ObjectUtils
 
 	/** Gets a region large enough to fit an object, positioned away from the player
 	 *
-	 * @param pos The position of the player
+	 * @param loc The position of the player
 	 * @param object The object to be spawned
 	 */
-	protected static RegionCommand.Region getRegionFromObject(BlockPos pos, StructuredCustomObject object)
+	protected static RegionCommand.Region getRegionFromObject(Location loc, StructuredCustomObject object)
 	{
+		BlockPosition pos = new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 		RegionCommand.Region region = new RegionCommand.Region();
 		BoundingBox box = object.getBoundingBox(Rotation.NORTH);
 		// Make the object not spawn on top of the player
 
-		pos = pos.offset(3, 0, 3);
+		pos = pos.b(3, 0, 3);
 
 		int lowestElevation = pos.getY() + box.getMinY();
 		int highestElevation = pos.getY() + box.getMinY() + box.getHeight();
@@ -167,11 +168,11 @@ public class ObjectUtils
 
 		Corner center = new Corner(pos.getX() + 2 + (box.getWidth() / 2), pos.getY() + yshift, pos.getZ() + 2 + (box.getDepth() / 2));
 
-		region.setPos(new BlockPos(
+		region.setPos(new BlockPosition(
 			center.x + box.getMinX(),
 			lowestElevation + yshift,
 			center.z + box.getMinZ()));
-		region.setPos(new BlockPos(
+		region.setPos(new BlockPosition(
 			center.x + box.getMinX() + box.getWidth(),
 			highestElevation + yshift,
 			center.z + box.getMinZ() + box.getDepth()));
@@ -214,7 +215,7 @@ public class ObjectUtils
 	 * @param verbose Whether to print a success/fail message, as well as whether to register the object after creation
 	 */
 	protected static Runnable getExportRunnable(ObjectType type, RegionCommand.Region region, Corner center, StructuredCustomObject inputObject,
-												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, CommandSource source, LocalWorldGenRegion worldGenRegion)
+												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, Player source, LocalWorldGenRegion worldGenRegion)
 	{
 		return () -> {
 			// Wait for tree to finish
@@ -236,7 +237,7 @@ public class ObjectUtils
 				false,
 				exportPath,
 				worldGenRegion,
-				new ForgeNBTHelper(),
+				new SpigotNBTHelper(),
 				extraBlocks,
 				inputObject.getConfig(),
 				presetFolderName,
@@ -247,30 +248,32 @@ public class ObjectUtils
 
 			if (verbose && fixedObject != null)
 			{
-				source.sendSuccess(new StringTextComponent("Successfully updated " + type.getType() + " " + inputObject.getName()), false);
+				source.sendMessage("Successfully updated " + type.getType() + " " + inputObject.getName());
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName().toLowerCase(Locale.ROOT), fixedObject.getConfig().getFile(), inputObject);
 			} else if (verbose) {
-				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
+				source.sendMessage("Failed to update "+type.getType()+" " + inputObject.getName());
 			}
 			cleanArea(worldGenRegion, region.getMin(), region.getMax(), false);
 		};
 	}
 
-	protected static ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerWorld level)
+	protected static SpigotWorldGenRegion getWorldGenRegion(Preset preset, CraftWorld level)
 	{
-		if(level.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
+		if (level.getGenerator() instanceof OTGSpigotChunkGen)
 		{
-			return new ForgeWorldGenRegion(
+			return new SpigotWorldGenRegion(
 				preset.getFolderName(),
 				preset.getWorldConfig(),
-				level,
-				(OTGNoiseChunkGenerator)level.getChunkSource().getGenerator()
+				level.getHandle(),
+				((OTGSpigotChunkGen) level.getGenerator()).generator
 			);
-		} else {
+		}
+		else
+		{
 			return new MCWorldGenRegion(
 				preset.getFolderName(),
 				preset.getWorldConfig(),
-				level
+				level.getHandle()
 			);
 		}
 	}

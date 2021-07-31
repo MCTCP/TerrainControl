@@ -110,7 +110,7 @@ public class ExportCommand extends BaseCommand
 			String objectName = "";
 			BlockState centerBlockState;
 			String presetName = null;
-			ObjectType type; // Defaults to BO3 for simplicity
+			ObjectType type = ObjectType.BO3; // Defaults to BO3 for simplicity
 			String templateName = "default";
 			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false;
 
@@ -127,26 +127,18 @@ public class ExportCommand extends BaseCommand
 			{
 				objectName = context.getArgument("name", String.class);
 				presetName = context.getArgument("preset", String.class);
+				String raw = context.getArgument("type", String.class);
+				type = ObjectType.valueOf(raw);
 				templateName = context.getArgument("template", String.class);
 				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
 				String flags = context.getArgument("flags", String.class);
+
 				overwrite = flags.contains("-o");
 				isStructure = flags.contains("-b");
 				includeAir = flags.contains("-a");
 			}
 			catch (IllegalArgumentException ignored)
 			{} // We can deal with any of these not being there
-			
-			String raw = context.getArgument("type", String.class);
-			try
-			{
-				type = ObjectType.valueOf(raw);
-			}
-			catch (IllegalArgumentException ex)
-			{
-				source.sendFailure(new StringTextComponent("Invalid object type: " + raw));
-				return 0;
-			}
 
 			if (presetName == null || presetName.equalsIgnoreCase("global"))
 			{
@@ -198,22 +190,7 @@ public class ExportCommand extends BaseCommand
 				}
 			}
 
-			ForgeWorldGenRegion genRegion;
-			if(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
-			{
-				genRegion = new ForgeWorldGenRegion(
-					preset.getFolderName(),
-					preset.getWorldConfig(),
-					source.getLevel(),
-					(OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()
-				);
-			} else {
-				genRegion = new MCWorldGenRegion(
-					preset.getFolderName(),
-					preset.getWorldConfig(),
-					source.getLevel()
-				);
-			}
+			ForgeWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel());
 
 			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
 			Corner lowCorner = region.getMin();
@@ -255,7 +232,7 @@ public class ExportCommand extends BaseCommand
 				includeAir,
 				isStructure,
 				objectPath,
-				genRegion,
+				worldGenRegion,
 				nbtHelper,
 				null,
 				template.getConfig(),
