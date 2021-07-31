@@ -40,15 +40,13 @@ import java.util.stream.Stream;
 
 public class EditCommand extends BaseCommand
 {
-	private static final HashMap<Player, EditCommand.EditSession> sessionsMap = new HashMap();
+	private static final HashMap<Player, EditCommand.EditSession> sessionsMap = new HashMap<>();
 	private static final List<String> FLAGS = Arrays.asList("-nofix", "-update");
 	private static final HashSet<LocalMaterialData> gravityBlocksSet;
-	private static final HashSet<MinecraftKey> updateMap;
 
 	static
 	{
 		gravityBlocksSet = Stream.of(LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL).collect(Collectors.toCollection(HashSet::new));
-		updateMap = Stream.of("oak_fence", "birch_fence", "nether_brick_fence", "spruce_fence", "jungle_fence", "acacia_fence", "dark_oak_fence", "iron_door", "oak_door", "spruce_door", "birch_door", "jungle_door", "acacia_door", "dark_oak_door", "glass_pane", "white_stained_glass_pane", "orange_stained_glass_pane", "magenta_stained_glass_pane", "light_blue_stained_glass_pane", "yellow_stained_glass_pane", "lime_stained_glass_pane", "pink_stained_glass_pane", "gray_stained_glass_pane", "light_gray_stained_glass_pane", "cyan_stained_glass_pane", "purple_stained_glass_pane", "blue_stained_glass_pane", "brown_stained_glass_pane", "green_stained_glass_pane", "red_stained_glass_pane", "black_stained_glass_pane", "purpur_stairs", "oak_stairs", "cobblestone_stairs", "brick_stairs", "stone_brick_stairs", "nether_brick_stairs", "spruce_stairs", "sandstone_stairs", "birch_stairs", "jungle_stairs", "quartz_stairs", "acacia_stairs", "dark_oak_stairs", "prismarine_stairs", "prismarine_brick_stairs", "dark_prismarine_stairs", "red_sandstone_stairs", "polished_granite_stairs", "smooth_red_sandstone_stairs", "mossy_stone_brick_stairs", "polished_diorite_stairs", "mossy_cobblestone_stairs", "end_stone_brick_stairs", "stone_stairs", "smooth_sandstone_stairs", "smooth_quartz_stairs", "granite_stairs", "andesite_stairs", "red_nether_brick_stairs", "polished_andesite_stairs", "diorite_stairs", "cobblestone_wall", "mossy_cobblestone_wall", "brick_wall", "prismarine_wall", "red_sandstone_wall", "mossy_stone_brick_wall", "granite_wall", "stone_brick_wall", "nether_brick_wall", "andesite_wall", "red_nether_brick_wall", "sandstone_wall", "end_stone_brick_wall", "diorite_wall", "iron_bars", "trapped_chest", "chest", "redstone_wire", "oak_leaves", "spruce_leaves", "birch_leaves", "jungle_leaves", "acacia_leaves", "dark_oak_leaves").map(MinecraftKey::new).collect(Collectors.toCollection(HashSet::new));
 	}
 
 	public EditCommand()
@@ -91,7 +89,8 @@ public class EditCommand extends BaseCommand
 
 		for (BlockFunction<?> block : blocks)
 		{
-			if (fixObject && block.material != null && updateMap.contains(((SpigotMaterialData) block.material).internalBlock().getBlock().r()))
+			if (fixObject && block.material != null &&
+				updateMap.contains(((SpigotMaterialData) block.material).internalBlock().getBlock().r()))
 			{
 				updates.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
 			}
@@ -223,11 +222,14 @@ public class EditCommand extends BaseCommand
 			String objectName = strings.get("2");
 			if (presetFolderName == null)
 			{
-				return new ArrayList(presetFolderNames);
+				return new ArrayList<>(presetFolderNames);
 			}
 			else
 			{
-				return objectName != null && presetFolderNames.contains(presetFolderName) ? (List) StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()), new ArrayList()) : (List) StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList());
+				// This was what the decompiler gave me back, and it works so I'm leaving it -auth
+				return objectName != null && presetFolderNames.contains(presetFolderName)
+					   ? StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()), new ArrayList<>())
+					   : StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList<>());
 			}
 		}
 	}
@@ -328,4 +330,93 @@ public class EditCommand extends BaseCommand
 			this.originalCenterPoint = originalCenterPoint;
 		}
 	}
+	private static final HashSet<MinecraftKey> updateMap = Stream.of(
+		"blocks/oak_fence",
+		"blocks/birch_fence",
+		"blocks/nether_brick_fence",
+		"blocks/spruce_fence",
+		"blocks/jungle_fence",
+		"blocks/acacia_fence",
+		"blocks/dark_oak_fence",
+		"blocks/iron_door",
+		"blocks/oak_door",
+		"blocks/spruce_door",
+		"blocks/birch_door",
+		"blocks/jungle_door",
+		"blocks/acacia_door",
+		"blocks/dark_oak_door",
+		"blocks/glass_pane",
+		"blocks/white_stained_glass_pane",
+		"blocks/orange_stained_glass_pane",
+		"blocks/magenta_stained_glass_pane",
+		"blocks/light_blue_stained_glass_pane",
+		"blocks/yellow_stained_glass_pane",
+		"blocks/lime_stained_glass_pane",
+		"blocks/pink_stained_glass_pane",
+		"blocks/gray_stained_glass_pane",
+		"blocks/light_gray_stained_glass_pane",
+		"blocks/cyan_stained_glass_pane",
+		"blocks/purple_stained_glass_pane",
+		"blocks/blue_stained_glass_pane",
+		"blocks/brown_stained_glass_pane",
+		"blocks/green_stained_glass_pane",
+		"blocks/red_stained_glass_pane",
+		"blocks/black_stained_glass_pane",
+		"blocks/purpur_stairs",
+		"blocks/oak_stairs",
+		"blocks/cobblestone_stairs",
+		"blocks/brick_stairs",
+		"blocks/stone_brick_stairs",
+		"blocks/nether_brick_stairs",
+		"blocks/spruce_stairs",
+		"blocks/sandstone_stairs",
+		"blocks/birch_stairs",
+		"blocks/jungle_stairs",
+		"blocks/quartz_stairs",
+		"blocks/acacia_stairs",
+		"blocks/dark_oak_stairs",
+		"blocks/prismarine_stairs",
+		"blocks/prismarine_brick_stairs",
+		"blocks/dark_prismarine_stairs",
+		"blocks/red_sandstone_stairs",
+		"blocks/polished_granite_stairs",
+		"blocks/smooth_red_sandstone_stairs",
+		"blocks/mossy_stone_brick_stairs",
+		"blocks/polished_diorite_stairs",
+		"blocks/mossy_cobblestone_stairs",
+		"blocks/end_stone_brick_stairs",
+		"blocks/stone_stairs",
+		"blocks/smooth_sandstone_stairs",
+		"blocks/smooth_quartz_stairs",
+		"blocks/granite_stairs",
+		"blocks/andesite_stairs",
+		"blocks/red_nether_brick_stairs",
+		"blocks/polished_andesite_stairs",
+		"blocks/diorite_stairs",
+		"blocks/cobblestone_wall",
+		"blocks/mossy_cobblestone_wall",
+		"blocks/brick_wall",
+		"blocks/prismarine_wall",
+		"blocks/red_sandstone_wall",
+		"blocks/mossy_stone_brick_wall",
+		"blocks/granite_wall",
+		"blocks/stone_brick_wall",
+		"blocks/nether_brick_wall",
+		"blocks/andesite_wall",
+		"blocks/red_nether_brick_wall",
+		"blocks/sandstone_wall",
+		"blocks/end_stone_brick_wall",
+		"blocks/diorite_wall",
+		"blocks/iron_bars",
+		"blocks/trapped_chest",
+		"blocks/chest",
+		"blocks/redstone_wire",
+		"blocks/oak_leaves",
+		"blocks/spruce_leaves",
+		"blocks/birch_leaves",
+		"blocks/jungle_leaves",
+		"blocks/acacia_leaves",
+		"blocks/dark_oak_leaves")
+		.map(MinecraftKey::new)
+		.collect(Collectors.toCollection(HashSet::new));
 }

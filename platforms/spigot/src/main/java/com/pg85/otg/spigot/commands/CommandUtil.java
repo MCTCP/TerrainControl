@@ -46,19 +46,28 @@ public class CommandUtil
 					str = reader.readString();
 				}
 
-				if (str.matches("-[a-z0-9]+")) // if str is a single line flag
+				if (reader.getCursor() < input.length() && reader.peek() == ':')
 				{
-					argsMap.put(str, "");
-					continue;
+					reader.skip();
+					str = str + ':' + reader.readString();
 				}
 
-				if (str.matches("--[a-z0-9]+")) // if str is a double line flag, means it has a payload
+				if (str.startsWith("-"))
 				{
-					if (reader.canRead())
+					if (str.startsWith("--")) // if str is a double line flag, means it has a payload
 					{
-						argsMap.put(str, reader.readString());
+						if (reader.canRead())
+						{
+							argsMap.put(str, reader.readString());
+						}
+						continue;
 					}
-					continue;
+
+					if (str.startsWith("-")) // if str is a single line flag
+					{
+						argsMap.put(str, "");
+						continue;
+					}
 				}
 
 				argsMap.put((index++) + "", str);
