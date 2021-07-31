@@ -679,7 +679,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Cactus(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"CustomObject(Object[,AnotherObject[,...]])",
 			"CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])",
-			"Dungeon(Range,Count,MinAltitude,MaxAltitude)", "Fossil(Chance,MinAltitude,MaxAltitude)",
+			"Dungeon(Rarity,MinAltitude,MaxAltitude)", "Fossil(Rarity,MinAltitude,MaxAltitude)",
 			"Grass(PlantType,Grouped/NotGrouped,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])",
 			"IceSpike(BlockName,IceSpikeType,Frequency,Rarity,MinAltitude,MaxAltitude,Blocksource[,BlockSource2,...])",
 			"Liquid(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
