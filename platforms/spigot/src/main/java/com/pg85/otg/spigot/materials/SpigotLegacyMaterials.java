@@ -11,6 +11,10 @@ public class SpigotLegacyMaterials
 {
 	static IBlockData fromLegacyBlockName (String oldBlockName)
 	{
+		if (oldBlockName.matches("minecraft:[A-Za-z]+:[0-9]+")) {
+			int stateId = Integer.parseInt(oldBlockName.split(":")[2]);
+			return fromLegacyBlockNameOrIdWithData(oldBlockName.split(":")[1], stateId);
+		}
 		switch (oldBlockName)
 		{
 			// TODO: These minecraft:xxx blocks no longer exist, so cannot be parsed by mc.
@@ -27,6 +31,7 @@ public class SpigotLegacyMaterials
 			case "stationary_lava":
 				return Blocks.LAVA.getBlockData();
 			case "stained_clay":
+				return Blocks.WHITE_TERRACOTTA.getBlockData();
 			case "hard_clay":
 				return Blocks.TERRACOTTA.getBlockData();
 			case "step":

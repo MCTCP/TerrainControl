@@ -88,6 +88,8 @@ public class ForgeMaterialReader implements IMaterialReader
 		{
 			return null;
 		}
+
+		if (input.matches("minecraft:[A-Za-z_]+:[0-9]+")) input = input.split(":")[1] + ":" + input.split(":")[2];
 		
 		// Try parsing as an internal Minecraft name
 		// This is so that things like "minecraft:stone" aren't parsed

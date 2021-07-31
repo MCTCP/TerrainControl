@@ -95,6 +95,10 @@ class ForgeLegacyMaterials
 	// TODO: Don't need any names here that match 1.16's
 	static BlockState fromLegacyBlockName(String oldBlockName)
 	{
+		if (oldBlockName.matches("minecraft:[A-Za-z]+:[0-9]+")) {
+			int stateId = Integer.parseInt(oldBlockName.split(":")[2]);
+			return fromLegacyBlockNameOrIdWithData(oldBlockName.split(":")[1], stateId);
+		}
 		switch(oldBlockName)
 		{
 			// TODO: These minecraft:xxx blocks no longer exist, so cannot be parsed by mc.
@@ -111,6 +115,7 @@ class ForgeLegacyMaterials
 			case "stationary_lava":
 				return Blocks.LAVA.defaultBlockState();
 			case "stained_clay":
+				return Blocks.WHITE_TERRACOTTA.defaultBlockState();
 			case "hard_clay":
 				return Blocks.TERRACOTTA.defaultBlockState();
 			case "step":
