@@ -137,7 +137,7 @@ public class WorldStandardValues extends Settings
 		CREATE_DRAGON_FLIGHT = booleanSetting("CreateDragonFight", false),
 		PIGLIN_SAFE = booleanSetting("PiglinSafe", false),
 		BED_WORKS = booleanSetting("BedWorks", true),
-		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", false),
+		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", true),
 		HAS_RAIDS = booleanSetting("HasRaids", true),
 
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
