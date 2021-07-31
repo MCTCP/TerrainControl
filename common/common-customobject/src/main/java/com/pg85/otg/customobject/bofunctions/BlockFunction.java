@@ -61,47 +61,46 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 						}
 					}
 				}
-				nbtName = args.get(4);
-			}
-			if (nbt.getTag("SkullType") != null) {
-				byte val = (byte)nbt.getTag("SkullType").getValue();
-				switch ((int)val) {
-					case 1:
-						this.material = materialReader.readMaterial("minecraft:wither_skeleton_skull");
-						break;
-					case 2:
-						this.material = materialReader.readMaterial("minecraft:zombie_head");
-						break;
-					case 3:
-						this.material = materialReader.readMaterial("minecraft:player_head");
-						break;
-					case 4:
-						this.material = materialReader.readMaterial("minecraft:creeper_head");
-						break;
-					case 5:
-						this.material = materialReader.readMaterial("minecraft:dragon_head");
-						break;
-					default:
-						this.material = materialReader.readMaterial("minecraft:skeleton_skull");
-				}
-			}
 
-			if (nbt.getTag("Item") != null) {
-				if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_String) {
-					String val = (String) nbt.getTag("Item").getValue();
-					this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
-				} else if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_Int) {
-					String val = materialReader.readMaterial(Integer.toString(((int)nbt.getTag("Item").getValue()))).getName();
-					if (val.split(":").length > 1) {
-						this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
-					} else {
-						this.material = materialReader.readMaterial("minecraft:potted_" + val);
+				if (nbt.getTag("SkullType") != null) {
+					byte val = (byte)nbt.getTag("SkullType").getValue();
+					switch ((int)val) {
+						case 1:
+							this.material = materialReader.readMaterial("minecraft:wither_skeleton_skull");
+							break;
+						case 2:
+							this.material = materialReader.readMaterial("minecraft:zombie_head");
+							break;
+						case 3:
+							this.material = materialReader.readMaterial("minecraft:player_head");
+							break;
+						case 4:
+							this.material = materialReader.readMaterial("minecraft:creeper_head");
+							break;
+						case 5:
+							this.material = materialReader.readMaterial("minecraft:dragon_head");
+							break;
+						default:
+							this.material = materialReader.readMaterial("minecraft:skeleton_skull");
 					}
 				}
-				 /*
-				 * The following commented-out code is a testemant to Frank's stupidity.
-				 * To anyone reading this, Frank is a complete and total idiot.
-				  */
+
+				if (nbt.getTag("Item") != null) {
+					if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_String) {
+						String val = (String) nbt.getTag("Item").getValue();
+						this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+					} else if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_Int) {
+						String val = materialReader.readMaterial(Integer.toString(((int)nbt.getTag("Item").getValue()))).getName();
+						if (val.split(":").length > 1) {
+							this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+						} else {
+							this.material = materialReader.readMaterial("minecraft:potted_" + val);
+						}
+					}
+					/*
+					 * The following commented-out code is a testemant to Frank's stupidity.
+					 * To anyone reading this, Frank is a complete and total idiot.
+					 */
 				 /*if (val.equals("minecraft:cactus")) {
 				 	this.material = materialReader.readMaterial("minecraft:potted_cactus");
 				 } else if (val.equals("minecraft:dandelion")) {
@@ -137,7 +136,11 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 				 } else if (val.equals("minecraft:birch_sapling")) {
 				 	this.material = materialReader.readMaterial("minecraft:potted_birch_sapling");
 				 } else if (val.equals("minecraft:"))*/
+				}
+
+				nbtName = args.get(4);
 			}
+
 		}
 	}
 
