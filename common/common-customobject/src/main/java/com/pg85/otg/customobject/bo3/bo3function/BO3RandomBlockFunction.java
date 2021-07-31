@@ -153,8 +153,17 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
 					}
 
 					if (metaData.getTag("Item") != null) {
-						String val = (String) metaData.getTag("Item").getValue();
-						this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+						if (metaData.getTag("Item").getType() == NamedBinaryTag.Type.TAG_String) {
+							String val = (String) metaData.getTag("Item").getValue();
+							this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+						} else if (metaData.getTag("Item").getType() == NamedBinaryTag.Type.TAG_Int) {
+							String val = materialReader.readMaterial(Integer.toString(((int)metaData.getTag("Item").getValue()))).getName();
+							if (val.split(":").length > 1) {
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
+							} else {
+								this.blocks[blockCount] = materialReader.readMaterial("minecraft:potted_" + val);
+							}
+						}
 					}
 
 					// Code that converts legacy block ids inside chests - Frank
