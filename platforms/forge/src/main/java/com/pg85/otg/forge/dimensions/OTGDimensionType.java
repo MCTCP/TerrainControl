@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.dimensions;
 
 import java.util.OptionalLong;
+import java.util.Random;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,7 +52,6 @@ import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.registries.ForgeRegistries;
-import scala.util.Random;
 
 public class OTGDimensionType extends DimensionType
 {
@@ -151,7 +151,7 @@ public class OTGDimensionType extends DimensionType
 		}
 		if(dimConfig.Nether != null && dimConfig.Nether.PresetFolderName != null)
 		{
-			long dimSeed = dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : new Random().nextLong(Long.MAX_VALUE);
+			long dimSeed = dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 					dimConfig.Nether.PresetFolderName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
@@ -160,7 +160,7 @@ public class OTGDimensionType extends DimensionType
 		}
 		if(dimConfig.End != null && dimConfig.End.PresetFolderName != null)
 		{
-			long dimSeed = dimConfig.End.Seed != -1l ? dimConfig.End.Seed : new Random().nextLong(Long.MAX_VALUE);
+			long dimSeed = dimConfig.End.Seed != -1l ? dimConfig.End.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 					dimConfig.End.PresetFolderName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
@@ -173,7 +173,7 @@ public class OTGDimensionType extends DimensionType
 			{
 				if(otgDim.PresetFolderName != null)
 				{
-					long dimSeed = otgDim.Seed != -1l ? otgDim.Seed : new Random().nextLong(Long.MAX_VALUE);
+					long dimSeed = otgDim.Seed != -1l ? otgDim.Seed : new Random().nextLong();
 					ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 						otgDim.PresetFolderName, new OTGBiomeProvider(otgDim.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 						() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?

@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import org.apache.commons.lang3.StringUtils;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.client.Minecraft;
