@@ -134,6 +134,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
+	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(String presetFolderName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -142,7 +143,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
-		
+
 		this.worldSeed = seed;
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);		
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
@@ -357,6 +358,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
+	@SuppressWarnings("deprecation")
 	@Override
 	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
 	{

@@ -14,7 +14,6 @@ import com.pg85.otg.presets.Preset;
 
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.text.ITextComponent;
@@ -28,18 +27,16 @@ public class SelectOTGPresetScreen extends Screen
 {
 	private static final ITextComponent SELECT_PRESET = new TranslationTextComponent("otg.createWorld.customize.preset");
 	private final CreateOTGDimensionsScreen parent;
-	private final CreateWorldScreen createWorldScreen;
 	private final ArrayList<Preset> presetList = new ArrayList<>();
 	private SelectOTGPresetScreen.PresetList guiPresetList;
 	private final int dimId;
 	private final DimensionConfig currentSelection;
 	private Preset selectedPreset;
 
-	public SelectOTGPresetScreen(CreateOTGDimensionsScreen parent, CreateWorldScreen createWorldScreen, DimensionConfig currentSelection, int dimId)
+	public SelectOTGPresetScreen(CreateOTGDimensionsScreen parent, DimensionConfig currentSelection, int dimId)
 	{
 		super(new TranslationTextComponent("otg.createWorld.customize.title"));
 		this.parent = parent;
-		this.createWorldScreen = createWorldScreen;
 		ArrayList<Preset> presetList = OTG.getEngine().getPresetLoader().getAllPresets();
 		this.presetList.add(0, null);
 		for(Preset preset : presetList)

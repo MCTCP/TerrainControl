@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class ExportCommand extends BaseCommand
 {
 	protected static final Function<String, String> filterNamesWithSpaces = (name) -> name.contains(" ") ? "\"" + name + "\"" : name;
