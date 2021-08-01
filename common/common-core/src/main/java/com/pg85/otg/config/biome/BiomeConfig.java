@@ -390,7 +390,7 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.header1("Biome Identity");
 
 		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.templateForBiome,
-			"Can be used in 2 ways:" +
+			"Can be used in 2 ways:",
 			"1. Enter the registry name of a non-OTG biome to use that biome for biome generation",
 			"and chunk decoration, instead of OTG registering its own biome for this BiomeConfig.",
 			"Example: minecraft:plains",

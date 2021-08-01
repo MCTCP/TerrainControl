@@ -413,7 +413,7 @@ public class WorldConfig extends WorldConfigBase
 			"GroupName - must be unique, choose something descriptive.",
 			"Size - from 0 to GenerationDepth. Lower number = larger. All biomes in the group must be smaller (higher BiomeSize number) or equal to this value.",
 			"Rarity - relative spawn chance.",
-			"BiomeName - names of the biome that spawn in the group. Must match the name of a corresponding biome config. Case sensitive.",
+			"BiomeName - Name of a corresponding biome config. Case sensitive.",
 			"Tags/Categories - Instead of BiomeName, Forge Biome Dictionary id's and/or MC Biome Categories. ",
 			"OTG fetches all registered non-OTG biomes that match the specified category/tags and adds them to the biome group.",
 			"A BiomeConfig using TemplateForBiome that targets the biome must exist, or the biome is skipped.",
