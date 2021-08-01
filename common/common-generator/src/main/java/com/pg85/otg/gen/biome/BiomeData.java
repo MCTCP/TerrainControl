@@ -7,7 +7,6 @@ import java.util.Map;
 public class BiomeData
 {
 	public final int id;
-	public final String name;
 	public final int rarity;
 	public final int biomeSize;
 	public float biomeTemperature;
@@ -20,10 +19,9 @@ public class BiomeData
 	public final List<Integer> onlyBorderNearBiomes = new ArrayList<Integer>();
 	public final List<Integer> notBorderNearBiomes = new ArrayList<Integer>();
 
-	public BiomeData(int id, String name, int rarity, int biomeSize, float biomeTemperature, List<String> configIsleInBiomes, List<String> configBorderInBiomes, List<String> configOnlyBorderNearBiomes, List<String> configNotBorderNearBiomes)
+	public BiomeData(int id, int rarity, int biomeSize, float biomeTemperature, List<String> configIsleInBiomes, List<String> configBorderInBiomes, List<String> configOnlyBorderNearBiomes, List<String> configNotBorderNearBiomes)
 	{
 		this.id = id;
-		this.name = name;
 		this.rarity = rarity;
 		this.biomeSize = biomeSize;
 		this.biomeTemperature = biomeTemperature;
@@ -71,7 +69,7 @@ public class BiomeData
 
 	public BiomeData clone()
 	{
-		BiomeData clone = new BiomeData(this.id, this.name, this.rarity, this.biomeSize, this.biomeTemperature, new ArrayList<>(this.configIsleInBiomes), new ArrayList<>(this.configBorderInBiomes), new ArrayList<>(this.configOnlyBorderNearBiomes), new ArrayList<>(this.configNotBorderNearBiomes));		
+		BiomeData clone = new BiomeData(this.id, this.rarity, this.biomeSize, this.biomeTemperature, new ArrayList<>(this.configIsleInBiomes), new ArrayList<>(this.configBorderInBiomes), new ArrayList<>(this.configOnlyBorderNearBiomes), new ArrayList<>(this.configNotBorderNearBiomes));		
 		for(Integer integer : this.isleInBiomes)
 		{
 			clone.isleInBiomes.add(integer.intValue());

@@ -173,11 +173,10 @@ public class BiomeLayerData
 
 		if (oceanBiomeConfig == null)
 		{
-			this.oceanBiomeData = new BiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+			this.oceanBiomeData = new BiomeData(0, 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
 		} else {
 			this.oceanBiomeData = new BiomeData(
-				0, 
-				oceanBiomeConfig.getName(), 
+				0,
 				oceanBiomeConfig.getBiomeRarity(), 
 				oceanBiomeConfig.getBiomeSize(), 
 				oceanBiomeConfig.getBiomeTemperature(), 
@@ -245,8 +244,8 @@ public class BiomeLayerData
 				}
 			}
 		}
-		
-		this.biomeColorMap = biomeColorMap;		
+
+		this.biomeColorMap = biomeColorMap;
 		this.riverBiomes = new int[biomes.length];
 		for(IBiome biome : biomes)
 		{

@@ -1,8 +1,8 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
-import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldConfig;
@@ -13,7 +13,6 @@ import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Biomes are spawned in groups so that biomes of the same type are near each
@@ -28,7 +27,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	private String name;
 	private int groupRarity;
 	private int generationDepth = 0;
-	public Map<String, IBiome> biomes = new LinkedHashMap<String, IBiome>(32);
+	private final List<String> biomes = new ArrayList<String>();
 
 	/**
 	 * Loads the biome group using the provided settings.
@@ -47,7 +46,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
 		for (String biome : readBiomes(args, 3))
 		{
-			this.biomes.put(biome, null);
+			this.biomes.add(biome);
 		}
 	}
 
@@ -66,14 +65,19 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		this.groupRarity = rarity;
 		for (String biome : biomes)
 		{
-			this.biomes.put(biome, null);
+			this.biomes.add(biome);
 		}
 	}
 
+	public List<String> getBiomes()
+	{
+		return this.biomes;
+	}
+	
 	@Override
 	public String toString()
 	{
-		return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes.keySet(), ", ") + ")";
+		return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes, ", ") + ")";
 	}
 
 	/**
@@ -105,12 +109,19 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	 */
 	void filterBiomes(ArrayList<String> customBiomeNames, ILogger logger)
 	{
-		for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
+		for (Iterator<String> it = this.biomes.iterator(); it.hasNext();)
 		{
 			String biomeName = it.next();
 			if(biomeName != null && biomeName.trim().length() > 0)
 			{
-				if (BiomeRegistryNames.Contain(biomeName) || customBiomeNames.contains(biomeName))
+				if (
+					BiomeRegistryNames.Contain(biomeName) || 
+					customBiomeNames.contains(biomeName) ||
+					biomeName.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+					biomeName.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||					
+					biomeName.toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+					biomeName.toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
+				)
 				{
 					continue;
 				}
@@ -132,7 +143,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	 */
 	public boolean containsBiome(String name)
 	{
-		return this.biomes.containsKey(name);
+		return this.biomes.contains(name);
 	}
 
 	/**
@@ -161,56 +172,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	public int getGroupId()
 	{
 		return this.groupId;
-	}
-
-	private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, IBiome>>();
-	public SortedMap<Integer, IBiome> getDepthMapOrHigher(int depth)
-	{		
-		TreeMap<Integer, IBiome> map = cachedDepthMapOrHigher.get(new Integer(depth));
-		if(map != null)
-		{
-			return map;
-		}
-		
-		int cumulativeBiomeRarity = 0;
-		map = new TreeMap<Integer, IBiome>();
-		for (Entry<String, IBiome> biome : this.biomes.entrySet())
-		{															//>>	When depth given is negative, include all biomes in group
-			if (biome.getValue().getBiomeConfig().getBiomeSize() >= depth || depth < 0)
-			{
-				cumulativeBiomeRarity += biome.getValue().getBiomeConfig().getBiomeRarity();
-				map.put(cumulativeBiomeRarity, biome.getValue());
-			}
-		}
-		
-		cachedDepthMapOrHigher.put(new Integer(depth), map);
-		
-		return map;
-	}
-
-	private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMaps = new HashMap<Integer, TreeMap<Integer, IBiome>>();
-	SortedMap<Integer, IBiome> getDepthMap(int depth)
-	{
-		TreeMap<Integer, IBiome> map = cachedDepthMaps.get(new Integer(depth));
-		if(map != null)
-		{
-			return map;
-		}
-		
-		int cumulativeBiomeRarity = 0;
-		map = new TreeMap<Integer, IBiome>();
-		for (Entry<String, IBiome> biome : this.biomes.entrySet())
-		{															//>>	When depth given is negative, include all biomes in group
-			if (biome.getValue().getBiomeConfig().getBiomeSize() == depth || depth < 0)
-			{
-				cumulativeBiomeRarity += biome.getValue().getBiomeConfig().getBiomeRarity();
-				map.put(cumulativeBiomeRarity, biome.getValue());
-			}
-		}
-		
-		cachedDepthMaps.put(new Integer(depth), map);
-		
-		return map;
 	}
 
 	public int getGroupRarity()

@@ -198,4 +198,8 @@ public interface IBiomeConfig
 	
 	ISaplingSpawner getSaplingGen(SaplingType type);
 	ISaplingSpawner getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk);
+	
+	// Misc
+	
+	public IBiomeConfig createTemplateBiome();
 }
