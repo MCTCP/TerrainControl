@@ -63,6 +63,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	// Biome settings
 	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
+	protected List<String> blackListedBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
 	protected boolean oldGroupRarity;
 	protected int generationDepth;
@@ -599,6 +600,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public ArrayList<String> getWorldBiomes()
 	{
 		return this.worldBiomes;
+	}
+	
+	@Override
+	public List<String> getBlackListedBiomes()
+	{
+		return this.blackListedBiomes;
 	}
 	
 	@Override
