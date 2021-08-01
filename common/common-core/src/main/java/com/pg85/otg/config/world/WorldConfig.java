@@ -409,7 +409,7 @@ public class WorldConfig extends WorldConfigBase
 			"Biome groups group similar biomes together so that they spawn next to each other.", 
 			"Only standard biomes are required to be part of biome groups, isle, border and river biomes are configured separately.",
 			"",
-			"Syntax: BiomeGroup(GroupName, GroupSize, GroupRarity, BiomeName or Tags/Categories[, AnotherName[, ...]])",
+			"Syntax: BiomeGroup(GroupName, GroupSize, GroupRarity, BiomeName or Tags/Categories[, AnotherName[, ...]], minTemperature, maxTemperature)",
 			"GroupName - must be unique, choose something descriptive.",
 			"Size - from 0 to GenerationDepth. Lower number = larger. All biomes in the group must be smaller (higher BiomeSize number) or equal to this value.",
 			"Rarity - relative spawn chance.",
@@ -421,6 +421,9 @@ public class WorldConfig extends WorldConfigBase
 			"Adds 2 entries; all plains biomes in the overworld, all hot+dry biomes. Biomes are never added twice.",
 			"- Use space as an AND operator, in the above example \"category.plains tag.overworld\" matches biomes with category plains AND tag overworld.",
 			"- \"category.\" and \"tag.\" exclude minecraft biomes, use \"mccategory.\" or \"mctag.\" to include them.",
+			"MinTemperature/MaxTemperature - Optional, when using Tags/Categories, only biomes within this temperature range are used.",
+			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry, -1.0, 1.0)",
+			"Same example as before, but only includes biomes with temperature between -1.0 and 1.0.",
 			"Note:", 
 			"If using BiomeMode: Normal, there are no limitations on the number of biome groups you can have or their names.",
 			"If using BiomeMode: NoGroups, only two biome group names are valid, NormalBiomes and IceBiomes, other groups are ignored. Only the size and rarity of the group named IceBiomes will be used, the size and rarity of the NormalBiomes group is ignored."

@@ -17,6 +17,8 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.api.distmarker.Dist;
@@ -36,45 +38,71 @@ public class CreateOTGDimensionsScreen extends Screen
 	private Button removeDimButton;
 	private Button editDimButton;
 	
+	private boolean uiLocked = false;
+	private static DimensionConfig modpackConfig;
+	
 	public CreateOTGDimensionsScreen(CreateWorldScreen parent, Consumer<OTGDimensionSettingsContainer> dimensionConfigConsumer)
 	{
-		super(new TranslationTextComponent("otg.createDimensions.customize.title"));
+		super(setTitle());
 		this.parent = parent;
 		this.dimensionConfigConsumer = dimensionConfigConsumer;
-		this.currentSelection = new DimensionConfig();
-		this.currentSelection.Overworld = new OTGOverWorld(null, -1, null, null);
-		this.currentSelection.Nether = new OTGDimension(null, -1);
-		this.currentSelection.End = new OTGDimension(null, -1);
+		
+		if(modpackConfig == null)
+		{
+			this.currentSelection = new DimensionConfig();
+			this.currentSelection.Overworld = new OTGOverWorld(null, -1, null, null);
+			this.currentSelection.Nether = new OTGDimension(null, -1);
+			this.currentSelection.End = new OTGDimension(null, -1);
+		} else {
+			this.currentSelection = modpackConfig;
+			this.uiLocked = true;
+		}
 	}
 
+	private static TextComponent setTitle()
+	{
+		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
+		modpackConfig = DimensionConfig.fromDisk("Modpack");
+
+		if(modpackConfig == null || modpackConfig.ModpackName == null)
+		{
+			return new TranslationTextComponent("otg.createDimensions.customize.title");
+		} else {
+			return new StringTextComponent(modpackConfig.ModpackName);
+		}
+	}
+	
 	protected void init()
 	{
 		this.columnType = new TranslationTextComponent("otg.createDimensions.customize.dimension");
 		this.columnHeight = new TranslationTextComponent("otg.createDimensions.customize.preset");
 		this.list = new CreateOTGDimensionsScreen.DetailsList();
 		this.children.add(this.list);
-		
-		this.addDimButton = this.addButton(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
-			this.currentSelection.Dimensions.add(new OTGDimension(null, -1l));
-			this.list.resetRows();
-			this.updateButtonValidity();
-		}));
 
-		this.removeDimButton = this.addButton(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
-			if (this.hasValidSelection() && this.currentSelection.Dimensions.size() > this.list.getSelected().dimId - 3)
-			{
-				this.currentSelection.Dimensions.remove(this.list.getSelected().dimId - 3);
+		if(!this.uiLocked)
+		{
+			this.addDimButton = this.addButton(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
+				this.currentSelection.Dimensions.add(new OTGDimension(null, -1l));
 				this.list.resetRows();
 				this.updateButtonValidity();
-			}
-		}));
-		
-		this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
-			if (this.hasValidSelection())
-			{
-				this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
-			}
-		}));
+			}));
+	
+			this.removeDimButton = this.addButton(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
+				if (this.hasValidSelection() && this.currentSelection.Dimensions.size() > this.list.getSelected().dimId - 3)
+				{
+					this.currentSelection.Dimensions.remove(this.list.getSelected().dimId - 3);
+					this.list.resetRows();
+					this.updateButtonValidity();
+				}
+			}));
+			
+			this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
+				if (this.hasValidSelection())
+				{
+					this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
+				}
+			}));
+		}
 		
 		// Done
 		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, DialogTexts.GUI_DONE, (p_213010_1_) -> {
@@ -92,9 +120,12 @@ public class CreateOTGDimensionsScreen extends Screen
 
 	private void updateButtonValidity()
 	{
-		this.removeDimButton.active = this.hasValidSelection();
-		this.editDimButton.active = this.hasValidSelection();
-		this.addDimButton.active = this.list.children().size() <= 13;
+		if(!this.uiLocked)
+		{
+			this.removeDimButton.active = this.hasValidSelection();
+			this.editDimButton.active = this.hasValidSelection();
+			this.addDimButton.active = this.list.children().size() <= 13;
+		}
 	}
 
 	private boolean hasValidSelection()
@@ -125,13 +156,13 @@ public class CreateOTGDimensionsScreen extends Screen
 		{
 			super(CreateOTGDimensionsScreen.this.minecraft, CreateOTGDimensionsScreen.this.width, CreateOTGDimensionsScreen.this.height, 43, CreateOTGDimensionsScreen.this.height - 60, 24);
 
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Overworld", currentSelection.Overworld.PresetFolderName == null ? "Non-OTG": currentSelection.Overworld.PresetFolderName, 0));
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Nether", currentSelection.Nether.PresetFolderName == null ? "Vanilla" : currentSelection.Nether.PresetFolderName, 1));
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("End", currentSelection.End.PresetFolderName == null ? "Vanilla" : currentSelection.End.PresetFolderName, 2));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Overworld", CreateOTGDimensionsScreen.this.currentSelection.Overworld.PresetFolderName == null ? CreateOTGDimensionsScreen.this.currentSelection.Overworld.NonOTGWorldType != null ? CreateOTGDimensionsScreen.this.currentSelection.Overworld.NonOTGWorldType : "Non-OTG": CreateOTGDimensionsScreen.this.currentSelection.Overworld.PresetFolderName, 0));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Nether", CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName, 1));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("End", CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName, 2));
 			int dimId = 3;
 			for(OTGDimension dim : currentSelection.Dimensions)
 			{
-				this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry(dim.PresetFolderName == null ? "DIM-" + dimId : dim.PresetFolderName, dim.PresetFolderName == null ? "None" : dim.PresetFolderName, dimId));
+				this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("OTG " + (dimId - 2), dim.PresetFolderName == null ? "None" : dim.PresetFolderName, dimId));
 				dimId++;
 			}
 		}
@@ -157,13 +188,13 @@ public class CreateOTGDimensionsScreen extends Screen
 			int i = this.children().indexOf(this.getSelected());
 			this.clearEntries();
 
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Overworld", currentSelection.Overworld.PresetFolderName == null ? "Non-OTG" : currentSelection.Overworld.PresetFolderName, 0));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Overworld", currentSelection.Overworld.PresetFolderName == null ? currentSelection.Overworld.NonOTGWorldType != null ? currentSelection.Overworld.NonOTGWorldType : "Non-OTG" : currentSelection.Overworld.PresetFolderName, 0));
 			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Nether", currentSelection.Nether.PresetFolderName == null ? "Vanilla" : currentSelection.Nether.PresetFolderName, 1));
 			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("End", currentSelection.End.PresetFolderName == null ? "Vanilla" : currentSelection.End.PresetFolderName, 2));
 			int dimId = 3;
 			for(OTGDimension dim : currentSelection.Dimensions)
 			{
-				this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry(dim.PresetFolderName == null ? "DIM-" + dimId : dim.PresetFolderName, dim.PresetFolderName == null ? "None" : dim.PresetFolderName, dimId));
+				this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("OTG " + (dimId - 2), dim.PresetFolderName == null ? "None" : dim.PresetFolderName, dimId));
 				dimId++;
 			}
 
@@ -198,7 +229,7 @@ public class CreateOTGDimensionsScreen extends Screen
 
 			public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_)
 			{
-				if (p_231044_5_ == 0)
+				if (p_231044_5_ == 0 && !CreateOTGDimensionsScreen.this.uiLocked)
 				{
 					DetailsList.this.setSelected(this);
 					if(this.dimId <= 2) // We need to be able to select custom dims, so we can delete them.
