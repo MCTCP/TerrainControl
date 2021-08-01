@@ -26,4 +26,24 @@ public class MCBiomeResourceLocation implements IBiomeResourceLocation
 	{
 		return String.format("%s%s%s", this.domain, ":", this.path);
 	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+		if (!(other instanceof MCBiomeResourceLocation))
+		{
+			return false;
+		}
+		return ((MCBiomeResourceLocation)other).toResourceLocationString().equals(this.toResourceLocationString());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return toResourceLocationString().hashCode();
+	}
 }

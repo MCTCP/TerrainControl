@@ -390,31 +390,35 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.header1("Biome Identity");
 
 		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.templateForBiome,
-			"Can be used in 2 ways:" + 
+			"Can be used in 2 ways:" +
 			"1. Enter the registry name of a non-OTG biome to use that biome for biome generation",
 			"and chunk decoration, instead of OTG registering its own biome for this BiomeConfig.",
 			"Example: minecraft:plains",
 			"2. Enter a list of biome dictionary tags and/or biome categories, OTG will look up all",
-			"registered biomes that match ALL tags and categories and link them to this biomeconfig.",
-			"For example: category.plains, tag.overworld",
-			"Minecraft biomes are excluded when using \"category.\" or \"tag.\". To allow mc biomes, use \"mccategory.\" or \"mctag.\".",			
-			"OTG generates the terrain for the biome as configured in this file, but allows the biome to spawn its own resources and mobs,",
-			"and apply some of its settings. Because of this, the following OTG settings cannot be used:",
-			"- Mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
-			"What can be configured via this file: ", 
-			" - Biome generator settings.", 
+			"registered biomes that match all tags and categories and link them to this biomeconfig.",
+			"For example: \"category.plains, tag.hot\" targets 2 separate tags.",
+			"Using space for OR: \"category.plains tag.nether, category.plains tag.end\" targets plains in the nether and end.",
+			"Minecraft biomes are excluded when using \"category.\" or \"tag.\". To include mc biomes, use \"mccategory.\" or \"mctag.\".",
+			"",
+			"OTG generates the terrain for the biome as configured in this file and spawns resources, but also allows the biome to spawn ",
+			"its own resources and mobs and apply its settings. Because of this, the following OTG settings cannot be used:",
+			"- Colors, Mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
+			"What can be configured: ",
+			" - Biome generator settings.",
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
 
 		writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,
 			"Forge Biome Dictionary tags used by other mods to identify a biome and",
-			"place modded blocks, items and mobs in it.", "Example: HOT, DRY, SANDY, OVERWORLD");
+			"place modded blocks, items and mobs in it.", "Example: HOT, DRY, SANDY, OVERWORLD",
+			"TemplateForBiome biomes inherit these from the targeted biomes.");
 
 		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.settings.biomeCategory,
 			"Set a category for this biome, used by vanilla for... something",
 			"Accepts one of the following values:",
-			"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether");
+			"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether",
+			"TemplateForBiome biomes inherits this from the targeted biomes.");
 
 		writer.header1("Biome placement");
 
