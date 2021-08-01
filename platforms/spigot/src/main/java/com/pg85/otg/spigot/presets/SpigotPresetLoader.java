@@ -167,7 +167,6 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					biomesAtDepth.add(
 						new BiomeData(
 							otgBiomeId,
-							biomeConfig.getName(),
 							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
 							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(),
 							biomeConfig.getBiomeTemperature(),
@@ -188,7 +187,6 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					biomesAtDepth.add(
 						new BiomeData(
 							otgBiomeId,
-							biomeConfig.getName(),
 							biomeConfig.getBiomeRarity(),
 							worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(),
 							biomeConfig.getBiomeTemperature(),
@@ -244,8 +242,8 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				float totalTemp = 0;
 
 				// Add each biome to the group
-				for (String biome : group.biomes.keySet())
-				{
+				for (String biome : group.getBiomes())
+				{					
 					MinecraftKey location = new MinecraftKey(new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
 					IBiomeConfig config = biomeConfigsByRegistryKey.get(location.toString());
 					if (config == null)
@@ -256,7 +254,6 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					// Make and add the generation data
 					BiomeData newBiomeData = new BiomeData(
 						config.getOTGBiomeId(),
-						config.getName(),
 						config.getBiomeRarity(),
 						config.getBiomeSize(),
 						config.getBiomeTemperature(),
@@ -287,7 +284,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					}
 				}
 
-				bg.avgTemp = totalTemp / group.biomes.size();
+				bg.avgTemp = totalTemp / group.getBiomes().size();
 
 				int groupSize = group.getGenerationDepth();
 

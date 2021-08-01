@@ -45,163 +45,168 @@ import com.pg85.otg.util.minecraft.SaplingType;
  */
 abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
-	// Misc
-
 	private IBiomeResourceLocation registryKey;
-	private boolean replacedBlocksInited = false;
-	
-	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
-	// use a parent object that holds both, like a worldgenregion.
-	protected IWorldConfig worldConfig;
-	
-	// Identity
-	
-	protected String templateForBiome;
-	protected String biomeCategory;
 	private int otgBiomeId;
-	
-	// Inheritance
-	
-	protected List<String> biomeDictTags;	
-	
-	// Placement
-	
-	protected int biomeSize;
-	protected int biomeRarity;
-	protected int biomeColor;
-	protected List<String> isleInBiome;
-	protected int biomeSizeWhenIsle;
-	protected int biomeRarityWhenIsle;
-	protected List<String> biomeIsBorder;
-	protected List<String> onlyBorderNear;
-	protected List<String> notBorderNear;
-	protected int biomeSizeWhenBorder;
 
-	// Height / volatility
+	// Settings container, used so we can copy a biomeconfig while 
+	// changing only its id and registry key, used for non-otg 
+	// biomes in otg worlds.
+	protected SettingsContainer settings = new SettingsContainer();	
+	class SettingsContainer
+	{
+		// Misc
+		protected boolean replacedBlocksInited = false;
+		
+		// TODO: Ideally, don't contain worldConfig within biomeconfig,  
+		// use a parent object that holds both, like a worldgenregion.
+		protected IWorldConfig worldConfig;
+		
+		// Identity
+		
+		protected String templateForBiome;
+		protected String biomeCategory;
+		
+		// Inheritance
+		
+		protected List<String> biomeDictTags;	
+		
+		// Placement
+		
+		protected int biomeSize;
+		protected int biomeRarity;
+		protected int biomeColor;
+		protected List<String> isleInBiome;
+		protected int biomeSizeWhenIsle;
+		protected int biomeRarityWhenIsle;
+		protected List<String> biomeIsBorder;
+		protected List<String> onlyBorderNear;
+		protected List<String> notBorderNear;
+		protected int biomeSizeWhenBorder;
 	
-	protected float biomeHeight;
-	protected float biomeVolatility;
-	protected int smoothRadius;
-	protected int CHCSmoothRadius;
-	protected double maxAverageHeight;
-	protected double maxAverageDepth;
-	protected double volatility1;
-	protected double volatility2;
-	protected double volatilityWeight1;
-	protected double volatilityWeight2;	
-	protected boolean disableBiomeHeight;
-	protected double[] chcData;
+		// Height / volatility
+		
+		protected float biomeHeight;
+		protected float biomeVolatility;
+		protected int smoothRadius;
+		protected int CHCSmoothRadius;
+		protected double maxAverageHeight;
+		protected double maxAverageDepth;
+		protected double volatility1;
+		protected double volatility2;
+		protected double volatilityWeight1;
+		protected double volatilityWeight2;	
+		protected boolean disableBiomeHeight;
+		protected double[] chcData;
+		
+		// Rivers
+		
+		protected String riverBiome;
+		
+		// Blocks
+		
+		protected LocalMaterialData stoneBlock;
+		protected LocalMaterialData surfaceBlock;
+		protected LocalMaterialData underWaterSurfaceBlock;
+		protected LocalMaterialData groundBlock;
+		protected LocalMaterialData sandStoneBlock;
+		protected LocalMaterialData redSandStoneBlock;
+		protected SurfaceGenerator surfaceAndGroundControl;
+		protected ReplaceBlockMatrix replacedBlocks;
+		
+		// Water / lava / freezing
+		
+		protected boolean useWorldWaterLevel;
+		protected int waterLevelMax;
+		protected int waterLevelMin;
+		protected LocalMaterialData waterBlock;
+		protected LocalMaterialData iceBlock;
+		protected LocalMaterialData packedIceBlock;
+		protected LocalMaterialData snowBlock;
+		protected LocalMaterialData cooledLavaBlock;
 	
-	// Rivers
+		// Visuals and weather
+		
+		protected float biomeTemperature;
+		protected boolean useFrozenOceanTemperature;
+		protected float biomeWetness;
+		protected int grassColor;
+		protected ColorSet grassColorControl;
+		protected GrassColorModifier grassColorModifier;
+		protected int foliageColor;	
+		protected ColorSet foliageColorControl;
+		protected int skyColor;
+		protected int waterColor;
+		protected ColorSet waterColorControl;
+		protected int fogColor;
+		protected float fogDensity;
+		protected int waterFogColor;
+		protected String particleType;
+		protected float particleProbability;
 	
-	protected String riverBiome;
+		// Music and sounds
+		
+		protected String music;
+		protected int musicMinDelay;
+		protected int musicMaxDelay;
+		protected boolean replaceCurrentMusic;
+		protected String ambientSound;
+		protected String moodSound;
+		protected int moodSoundDelay;
+		protected int moodSearchRange;
+		protected double moodOffset;
+		protected String additionsSound;
+		protected double additionsTickChance;
+		
+		// Custom structures
+		
+		protected List<CustomStructureResource> customStructures = new ArrayList<CustomStructureResource>(); // Used as a cache for fast querying, not saved
+		private ICustomStructureGen structureGen;
 	
-	// Blocks
-	
-	protected LocalMaterialData stoneBlock;
-	protected LocalMaterialData surfaceBlock;
-	protected LocalMaterialData underWaterSurfaceBlock;
-	protected LocalMaterialData groundBlock;
-	protected LocalMaterialData sandStoneBlock;
-	protected LocalMaterialData redSandStoneBlock;
-	protected SurfaceGenerator surfaceAndGroundControl;
-	protected ReplaceBlockMatrix replacedBlocks;
-	
-	// Water / lava / freezing
-	
-	protected boolean useWorldWaterLevel;
-	protected int waterLevelMax;
-	protected int waterLevelMin;
-	protected LocalMaterialData waterBlock;
-	protected LocalMaterialData iceBlock;
-	protected LocalMaterialData packedIceBlock;
-	protected LocalMaterialData snowBlock;
-	protected LocalMaterialData cooledLavaBlock;
-
-	// Visuals and weather
-	
-	protected float biomeTemperature;
-	protected boolean useFrozenOceanTemperature;
-	protected float biomeWetness;
-	protected int grassColor;
-	protected ColorSet grassColorControl;
-	protected GrassColorModifier grassColorModifier;
-	protected int foliageColor;	
-	protected ColorSet foliageColorControl;
-	protected int skyColor;
-	protected int waterColor;
-	protected ColorSet waterColorControl;
-	protected int fogColor;
-	protected float fogDensity;
-	protected int waterFogColor;
-	protected String particleType;
-	protected float particleProbability;
-
-	// Music and sounds
-	
-	protected String music;
-	protected int musicMinDelay;
-	protected int musicMaxDelay;
-	protected boolean replaceCurrentMusic;
-	protected String ambientSound;
-	protected String moodSound;
-	protected int moodSoundDelay;
-	protected int moodSearchRange;
-	protected double moodOffset;
-	protected String additionsSound;
-	protected double additionsTickChance;
-	
-	// Custom structures
-	
-	protected List<CustomStructureResource> customStructures = new ArrayList<CustomStructureResource>(); // Used as a cache for fast querying, not saved
-	private ICustomStructureGen structureGen;
-
-	// Vanilla structures
-	
-	protected boolean strongholdsEnabled;
-	protected boolean oceanMonumentsEnabled;	
-	protected boolean woodLandMansionsEnabled;
-	protected boolean netherFortressesEnabled;
-	protected int villageSize;
-	protected VillageType villageType;
-	protected RareBuildingType rareBuildingType;
-	protected MineshaftType mineshaftType = MineshaftType.normal;	
-	protected boolean buriedTreasureEnabled;
-	protected boolean shipWreckEnabled;
-	protected boolean shipWreckBeachedEnabled;
-	protected boolean pillagerOutpostEnabled;
-	protected boolean bastionRemnantEnabled;
-	protected boolean netherFossilEnabled;
-	protected boolean endCityEnabled;
-	protected float mineshaftProbability;
-	protected RuinedPortalType ruinedPortalType;
-	protected OceanRuinsType oceanRuinsType;
-	protected float oceanRuinsLargeProbability;
-	protected float oceanRuinsClusterProbability;
-	protected float buriedTreasureProbability;
-	protected int pillagerOutpostSize;
-	protected int bastionRemnantSize;	
-	
-	// Mob spawning
-	
-	protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();	
-	
-	// Resources
-	
-	protected List<ConfigFunction<IBiomeConfig>> resourceQueue = new ArrayList<ConfigFunction<IBiomeConfig>>();
-	
-	// Saplings
-	
-	protected Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(SaplingType.class);
-	protected Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
-	protected Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();
-	
-	//
+		// Vanilla structures
+		
+		protected boolean strongholdsEnabled;
+		protected boolean oceanMonumentsEnabled;	
+		protected boolean woodLandMansionsEnabled;
+		protected boolean netherFortressesEnabled;
+		protected int villageSize;
+		protected VillageType villageType;
+		protected RareBuildingType rareBuildingType;
+		protected MineshaftType mineshaftType = MineshaftType.normal;	
+		protected boolean buriedTreasureEnabled;
+		protected boolean shipWreckEnabled;
+		protected boolean shipWreckBeachedEnabled;
+		protected boolean pillagerOutpostEnabled;
+		protected boolean bastionRemnantEnabled;
+		protected boolean netherFossilEnabled;
+		protected boolean endCityEnabled;
+		protected float mineshaftProbability;
+		protected RuinedPortalType ruinedPortalType;
+		protected OceanRuinsType oceanRuinsType;
+		protected float oceanRuinsLargeProbability;
+		protected float oceanRuinsClusterProbability;
+		protected float buriedTreasureProbability;
+		protected int pillagerOutpostSize;
+		protected int bastionRemnantSize;	
+		
+		// Mob spawning
+		
+		protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+		protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+		protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+		protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+		protected List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+		protected List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();	
+		
+		// Resources
+		
+		protected List<ConfigFunction<IBiomeConfig>> resourceQueue = new ArrayList<ConfigFunction<IBiomeConfig>>();
+		
+		// Saplings
+		
+		protected Map<SaplingType, SaplingResource> saplingGrowers = new EnumMap<SaplingType, SaplingResource>(SaplingType.class);
+		protected Map<LocalMaterialData, SaplingResource> customSaplingGrowers = new HashMap<>();
+		protected Map<LocalMaterialData, SaplingResource> customBigSaplingGrowers = new HashMap<>();
+	}
 	
 	protected BiomeConfigBase(String configName)
 	{
@@ -210,7 +215,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 
 	public List<ConfigFunction<IBiomeConfig>> getResourceQueue()
 	{
-		return this.resourceQueue;
+		return this.settings.resourceQueue;
 	}
 
 	@Override
@@ -241,47 +246,47 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
-		return this.surfaceAndGroundControl.getSurfaceBlockAtHeight(noiseProvider, this, x, y, z);
+		return this.settings.surfaceAndGroundControl.getSurfaceBlockAtHeight(noiseProvider, this, x, y, z);
 	}
 	
 	@Override
 	public LocalMaterialData getGroundBlockAtHeight(ISurfaceGeneratorNoiseProvider noiseProvider, int x, int y, int z)
 	{
-		return this.surfaceAndGroundControl.getGroundBlockAtHeight(noiseProvider, this, x, y, z);
+		return this.settings.surfaceAndGroundControl.getGroundBlockAtHeight(noiseProvider, this, x, y, z);
 	}
 		
 	@Override
 	public LocalMaterialData getDefaultGroundBlock()
 	{
-		return this.groundBlock;
+		return this.settings.groundBlock;
 	}
 	
 	private void initReplaceBlocks()
 	{
-		if(!this.replacedBlocksInited)
+		if(!this.settings.replacedBlocksInited)
 		{
 			// Multiple threads may be working with
 			// the same biome configs async, lock.
 			synchronized(this)
 			{
-				if(!this.replacedBlocksInited)
+				if(!this.settings.replacedBlocksInited)
 				{
-					this.replacedBlocks.init(
-						this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
-						this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
-						this.packedIceBlock,
-						this.snowBlock,
-						this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
-						this.stoneBlock,
-						this.groundBlock,
-						this.surfaceBlock,
-						this.underWaterSurfaceBlock,
-						this.worldConfig.getDefaultBedrockBlock(),
-						this.sandStoneBlock,
-						this.redSandStoneBlock
+					this.settings.replacedBlocks.init(
+						this.settings.useWorldWaterLevel ? this.settings.worldConfig.getCooledLavaBlock() : this.settings.cooledLavaBlock,
+						this.settings.useWorldWaterLevel ? this.settings.worldConfig.getIceBlock() : this.settings.iceBlock,
+						this.settings.packedIceBlock,
+						this.settings.snowBlock,
+						this.settings.useWorldWaterLevel ? this.settings.worldConfig.getWaterBlock() : this.settings.waterBlock,
+						this.settings.stoneBlock,
+						this.settings.groundBlock,
+						this.settings.surfaceBlock,
+						this.settings.underWaterSurfaceBlock,
+						this.settings.worldConfig.getDefaultBedrockBlock(),
+						this.settings.sandStoneBlock,
+						this.settings.redSandStoneBlock
 					);
 				}
-				this.replacedBlocksInited = true;
+				this.settings.replacedBlocksInited = true;
 			}
 		}
 	}
@@ -294,9 +299,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesSurface)
 		{
-			return this.surfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.surfaceBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.surfaceBlock;
+		return this.settings.surfaceBlock;
 	}
 	
 	@Override
@@ -304,9 +309,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesUnderWaterSurface)
 		{
-			return this.underWaterSurfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.underWaterSurfaceBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.underWaterSurfaceBlock;
+		return this.settings.underWaterSurfaceBlock;
 	}	
 	
 	@Override
@@ -314,9 +319,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesGround)
 		{
-			return this.groundBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.groundBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.groundBlock;
+		return this.settings.groundBlock;
 	}
 	
 	@Override
@@ -324,15 +329,15 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesStone)
 		{
-			return this.stoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.stoneBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.stoneBlock;
+		return this.settings.stoneBlock;
 	}
 
 	@Override
 	public LocalMaterialData getBedrockBlockReplaced(int y)
 	{
-		return this.worldConfig.getBedrockBlockReplaced(getReplaceBlocks(), y);
+		return this.settings.worldConfig.getBedrockBlockReplaced(getReplaceBlocks(), y);
 	}
 		
 	@Override
@@ -340,9 +345,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesWater)
 		{
-			return this.waterBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.waterBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.waterBlock;
+		return this.settings.waterBlock;
 	}
 	
 	@Override
@@ -350,9 +355,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesSandStone)
 		{
-			return this.sandStoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.sandStoneBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.sandStoneBlock;
+		return this.settings.sandStoneBlock;
 	}
 	
 	@Override
@@ -360,9 +365,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesIce)
 		{
-			return this.iceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.iceBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.iceBlock;
+		return this.settings.iceBlock;
 	}
 	
 	@Override
@@ -370,9 +375,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesPackedIce)
 		{
-			return this.packedIceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.packedIceBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.packedIceBlock;
+		return this.settings.packedIceBlock;
 	}
 
 	@Override
@@ -380,9 +385,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesSnow)
 		{
-			return this.snowBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.snowBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.snowBlock;
+		return this.settings.snowBlock;
 	}
 	
 	@Override
@@ -390,29 +395,29 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if(getReplaceBlocks().replacesCooledLava)
 		{
-			return this.cooledLavaBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
+			return this.settings.cooledLavaBlock.parseWithBiomeAndHeight(this.settings.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
-		return this.cooledLavaBlock;
+		return this.settings.cooledLavaBlock;
 	}
 	
 	@Override
 	public boolean hasReplaceBlocksSettings()
 	{
-		return this.replacedBlocks.hasReplaceSettings();
+		return this.settings.replacedBlocks.hasReplaceSettings();
 	}
 
 	@Override
 	public ReplaceBlockMatrix getReplaceBlocks()
 	{
 		initReplaceBlocks();
-		return this.replacedBlocks;
+		return this.settings.replacedBlocks;
 	}
 
 	@Override
 	public List<List<String>> getCustomStructureNames()
 	{
 		List<List<String>> customStructureNamesByGen = new ArrayList<>();
-		for(CustomStructureResource structureGens : this.customStructures)
+		for(CustomStructureResource structureGens : this.settings.customStructures)
 		{
 			List<String> customStructureNames = new ArrayList<>();
 			for(String objectName : structureGens.objectNames)
@@ -427,19 +432,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public List<ICustomStructureGen> getCustomStructures()
 	{
-		return new ArrayList<ICustomStructureGen>(this.customStructures);
+		return new ArrayList<ICustomStructureGen>(this.settings.customStructures);
 	}
 	
 	@Override
 	public ICustomStructureGen getStructureGen()
 	{
-		return this.structureGen;
+		return this.settings.structureGen;
 	}
 	
 	@Override
 	public void setStructureGen(ICustomStructureGen customStructureGen)
 	{
-		this.structureGen = customStructureGen;
+		this.settings.structureGen = customStructureGen;
 	}
 	
 	@Override
@@ -451,508 +456,508 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public String getTemplateForBiome()
 	{
-		return this.templateForBiome;
+		return this.settings.templateForBiome;
 	}
 
 	@Override
 	public String getBiomeCategory()
 	{
-		return this.biomeCategory;
+		return this.settings.biomeCategory;
 	}	
 			
 	@Override
 	public float getBiomeTemperature()
 	{
-		return this.biomeTemperature;
+		return this.settings.biomeTemperature;
 	}
 	
 	@Override
 	public boolean useFrozenOceanTemperature()
 	{
-		return this.useFrozenOceanTemperature;
+		return this.settings.useFrozenOceanTemperature;
 	}
 	
 	@Override
 	public float getBiomeHeight()
 	{
-		return this.biomeHeight;
+		return this.settings.biomeHeight;
 	}
 	
 	@Override
 	public float getBiomeVolatility()
 	{
-		return this.biomeVolatility;
+		return this.settings.biomeVolatility;
 	}
 	
 	@Override
 	public double getVolatility1()
 	{
-		return this.volatility1;
+		return this.settings.volatility1;
 	}
 	
 	@Override
 	public double getVolatility2()
 	{
-		return this.volatility2;
+		return this.settings.volatility2;
 	}
 	
 	@Override
 	public int getBiomeColor()
 	{
-		return this.biomeColor;
+		return this.settings.biomeColor;
 	}
 	
 	@Override
 	public List<String> getBiomeDictTags()
 	{
-		return this.biomeDictTags;
+		return this.settings.biomeDictTags;
 	}	
 	
 	@Override
 	public float getBiomeWetness()
 	{
-		return this.biomeWetness;
+		return this.settings.biomeWetness;
 	}
 	
 	@Override
 	public int getCHCSmoothRadius()
 	{
-		return this.CHCSmoothRadius;
+		return this.settings.CHCSmoothRadius;
 	}
 	
 	@Override
 	public int getSkyColor()
 	{
-		return this.skyColor;
+		return this.settings.skyColor;
 	}
 	
 	@Override
 	public int getFogColor()
 	{
-		return this.fogColor;
+		return this.settings.fogColor;
 	}
 	
 	@Override
 	public float getFogDensity()
 	{
-		return this.fogDensity;
+		return this.settings.fogDensity;
 	}
 	
 	@Override
 	public int getWaterFogColor()
 	{
-		return this.waterFogColor;
+		return this.settings.waterFogColor;
 	}
 
 	@Override
 	public int getFoliageColor()
 	{
-		return this.foliageColor;
+		return this.settings.foliageColor;
 	}
 	
 	@Override
 	public ColorSet getFoliageColorControl()
 	{
-		return this.foliageColorControl;
+		return this.settings.foliageColorControl;
 	}
 	
 	@Override
 	public int getGrassColor()
 	{
-		return this.grassColor;
+		return this.settings.grassColor;
 	}
 	
 	@Override
 	public ColorSet getGrassColorControl()
 	{
-		return this.grassColorControl;
+		return this.settings.grassColorControl;
 	}
 
 	@Override
 	public GrassColorModifier getGrassColorModifier()
 	{
-		return this.grassColorModifier;
+		return this.settings.grassColorModifier;
 	}	
 	
 	@Override
 	public int getWaterColor()
 	{
-		return this.waterColor;
+		return this.settings.waterColor;
 	}
 	
 	@Override
 	public ColorSet getWaterColorControl()
 	{
-		return this.waterColorControl;
+		return this.settings.waterColorControl;
 	}
 	
 	@Override
 	public String getParticleType()
 	{
-		return this.particleType;
+		return this.settings.particleType;
 	}
 	
 	@Override
 	public float getParticleProbability()
 	{
-		return this.particleProbability;
+		return this.settings.particleProbability;
 	}
 
 	@Override
 	public String getMusic()
 	{
-		return music;
+		return this.settings.music;
 	}
 
 	@Override
 	public int getMusicMinDelay()
 	{
-		return musicMinDelay;
+		return this.settings.musicMinDelay;
 	}
 
 	@Override
 	public int getMusicMaxDelay()
 	{
-		return musicMaxDelay;
+		return this.settings.musicMaxDelay;
 	}
 
 	@Override
 	public boolean isReplaceCurrentMusic()
 	{
-		return replaceCurrentMusic;
+		return this.settings.replaceCurrentMusic;
 	}
 
 	@Override
 	public String getAmbientSound()
 	{
-		return ambientSound;
+		return this.settings.ambientSound;
 	}
 
 	@Override
 	public String getMoodSound()
 	{
-		return moodSound;
+		return this.settings.moodSound;
 	}
 
 	@Override
 	public int getMoodSoundDelay()
 	{
-		return moodSoundDelay;
+		return this.settings.moodSoundDelay;
 	}
 
 	@Override
 	public int getMoodSearchRange()
 	{
-		return moodSearchRange;
+		return this.settings.moodSearchRange;
 	}
 
 	@Override
 	public double getMoodOffset()
 	{
-		return moodOffset;
+		return this.settings.moodOffset;
 	}
 
 	@Override
 	public String getAdditionsSound()
 	{
-		return additionsSound;
+		return this.settings.additionsSound;
 	}
 
 	@Override
 	public double getAdditionsTickChance()
 	{
-		return additionsTickChance;
+		return this.settings.additionsTickChance;
 	}
 	
 	@Override
 	public VillageType getVillageType()
 	{
-		return this.villageType;
+		return this.settings.villageType;
 	}
 	
 	@Override
 	public int getVillageSize()
 	{
-		return this.villageSize;
+		return this.settings.villageSize;
 	}
 	
 	@Override
 	public MineshaftType getMineShaftType()
 	{
-		return this.mineshaftType;
+		return this.settings.mineshaftType;
 	}
 	
 	@Override
 	public float getMineShaftProbability()
 	{
-		return this.mineshaftProbability;
+		return this.settings.mineshaftProbability;
 	}
 	
 	@Override
 	public OceanRuinsType getOceanRuinsType()
 	{
-		return this.oceanRuinsType;
+		return this.settings.oceanRuinsType;
 	}
 	
 	@Override
 	public float getOceanRuinsLargeProbability()
 	{
-		return this.oceanRuinsLargeProbability;
+		return this.settings.oceanRuinsLargeProbability;
 	}
 	
 	@Override
 	public float getOceanRuinsClusterProbability()
 	{
-		return this.oceanRuinsClusterProbability;
+		return this.settings.oceanRuinsClusterProbability;
 	}
 	
 	@Override
 	public boolean getBuriedTreasureEnabled()
 	{
-		return this.buriedTreasureEnabled;
+		return this.settings.buriedTreasureEnabled;
 	}
 	
 	@Override
 	public float getBuriedTreasureProbability()
 	{
-		return this.buriedTreasureProbability;
+		return this.settings.buriedTreasureProbability;
 	}
 
 	@Override
 	public boolean getPillagerOutpostEnabled()
 	{
-		return this.pillagerOutpostEnabled;
+		return this.settings.pillagerOutpostEnabled;
 	}
 	
 	@Override
 	public int getPillagerOutPostSize()
 	{
-		return this.pillagerOutpostSize;
+		return this.settings.pillagerOutpostSize;
 	}
 
 	@Override
 	public boolean getBastionRemnantEnabled()
 	{
-		return this.bastionRemnantEnabled;
+		return this.settings.bastionRemnantEnabled;
 	}
 	
 	@Override
 	public int getBastionRemnantSize()
 	{
-		return this.bastionRemnantSize;
+		return this.settings.bastionRemnantSize;
 	}
 		
 	@Override
 	public RareBuildingType getRareBuildingType()
 	{
-		return this.rareBuildingType;
+		return this.settings.rareBuildingType;
 	}
 	
 	@Override
 	public RuinedPortalType getRuinedPortalType()
 	{
-		return this.ruinedPortalType;
+		return this.settings.ruinedPortalType;
 	}
 	
 	@Override
 	public boolean getWoodlandMansionsEnabled()
 	{
-		return this.woodLandMansionsEnabled;
+		return this.settings.woodLandMansionsEnabled;
 	}
 	
 	@Override
 	public boolean getNetherFortressesEnabled()
 	{
-		return this.netherFortressesEnabled;
+		return this.settings.netherFortressesEnabled;
 	}
 	
 	@Override
 	public boolean getShipWreckEnabled()
 	{
-		return this.shipWreckEnabled;
+		return this.settings.shipWreckEnabled;
 	}
 
 	@Override
 	public boolean getShipWreckBeachedEnabled()
 	{
-		return this.shipWreckBeachedEnabled;
+		return this.settings.shipWreckBeachedEnabled;
 	}
 	
 	@Override
 	public boolean getNetherFossilEnabled()
 	{
-		return this.netherFossilEnabled;
+		return this.settings.netherFossilEnabled;
 	}
 	
 	@Override
 	public boolean getEndCityEnabled()
 	{
-		return this.endCityEnabled;
+		return this.settings.endCityEnabled;
 	}
 	
 	@Override
 	public boolean getStrongholdsEnabled()
 	{
-		return this.strongholdsEnabled;
+		return this.settings.strongholdsEnabled;
 	}
 	
 	@Override
 	public boolean getOceanMonumentsEnabled()
 	{
-		return this.oceanMonumentsEnabled;
+		return this.settings.oceanMonumentsEnabled;
 	}
 	
 	@Override
 	public List<WeightedMobSpawnGroup> getAmbientCreatures()
 	{
-		return this.spawnAmbientCreaturesMerged;
+		return this.settings.spawnAmbientCreaturesMerged;
 	}
 	
 	@Override
 	public List<WeightedMobSpawnGroup> getCreatures()
 	{
-		return this.spawnCreaturesMerged;
+		return this.settings.spawnCreaturesMerged;
 	}
 	
 	@Override
 	public List<WeightedMobSpawnGroup> getMonsters()
 	{
-		return this.spawnMonstersMerged;
+		return this.settings.spawnMonstersMerged;
 	}
 	
 	@Override
 	public List<WeightedMobSpawnGroup> getWaterCreatures()
 	{
-		return this.spawnWaterCreaturesMerged;
+		return this.settings.spawnWaterCreaturesMerged;
 	}
 	
 	@Override
 	public List<WeightedMobSpawnGroup> getWaterAmbientCreatures()
 	{
-		return this.spawnWaterAmbientCreaturesMerged;
+		return this.settings.spawnWaterAmbientCreaturesMerged;
 	}
 
 	@Override
 	public List<WeightedMobSpawnGroup> getMiscCreatures()
 	{
-		return this.spawnMiscCreaturesMerged;
+		return this.settings.spawnMiscCreaturesMerged;
 	}
 	
 	@Override
 	public int getBiomeRarity()
 	{
-		return this.biomeRarity;
+		return this.settings.biomeRarity;
 	}
 	
 	@Override
 	public int getBiomeSize()
 	{
-		return this.biomeSize;
+		return this.settings.biomeSize;
 	}
 	
 	@Override
 	public double getVolatilityWeight1()
 	{
-		return this.volatilityWeight1;
+		return this.settings.volatilityWeight1;
 	}
 	
 	@Override
 	public double getVolatilityWeight2()
 	{
-		return this.volatilityWeight2;
+		return this.settings.volatilityWeight2;
 	}
 	
 	@Override
 	public double getMaxAverageDepth()
 	{
-		return this.maxAverageDepth;
+		return this.settings.maxAverageDepth;
 	}
 	
 	@Override
 	public double getMaxAverageHeight()
 	{
-		return this.maxAverageHeight;
+		return this.settings.maxAverageHeight;
 	}
 	
 	@Override
 	public double getCHCData(int y)
 	{
-		return this.chcData[y];
+		return this.settings.chcData[y];
 	}
 	
 	@Override
 	public int getSmoothRadius()
 	{
-		return this.smoothRadius;
+		return this.settings.smoothRadius;
 	}
 	
 	@Override
 	public int getWaterLevelMax()
 	{
-		return this.waterLevelMax;
+		return this.settings.waterLevelMax;
 	}
 	
 	@Override
 	public int getWaterLevelMin()
 	{
-		return this.waterLevelMin;
+		return this.settings.waterLevelMin;
 	}
 	
 	@Override
 	public boolean biomeConfigsHaveReplacement()
 	{
-		return this.worldConfig.getBiomeConfigsHaveReplacement();
+		return this.settings.worldConfig.getBiomeConfigsHaveReplacement();
 	}
 	
 	@Override
 	public double getFractureHorizontal()
 	{
-		return this.worldConfig.getFractureHorizontal();
+		return this.settings.worldConfig.getFractureHorizontal();
 	}
 	
 	@Override
 	public double getFractureVertical()
 	{
-		return this.worldConfig.getFractureVertical();
+		return this.settings.worldConfig.getFractureVertical();
 	}
 	
 	@Override
 	public boolean isFlatBedrock()
 	{
-		return this.worldConfig.getIsFlatBedrock();
+		return this.settings.worldConfig.getIsFlatBedrock();
 	}
 	
 	@Override
 	public boolean isCeilingBedrock()
 	{
-		return this.worldConfig.getIsCeilingBedrock();
+		return this.settings.worldConfig.getIsCeilingBedrock();
 	}
 	
 	@Override
 	public boolean isBedrockDisabled()
 	{
-		return this.worldConfig.getBedrockDisabled();
+		return this.settings.worldConfig.getBedrockDisabled();
 	}
 
 	@Override
 	public boolean isRemoveSurfaceStone()
 	{
-		return this.worldConfig.getRemoveSurfaceStone();
+		return this.settings.worldConfig.getRemoveSurfaceStone();
 	}
 
 	@Override
 	public boolean disableBiomeHeight()
 	{
-		return this.disableBiomeHeight;
+		return this.settings.disableBiomeHeight;
 	}
 
 	@Override
 	public boolean isIsleBiome()
 	{
 		return
-			this.isleInBiome != null && 
-			this.isleInBiome.size() > 0 &&
-			this.worldConfig.getIsleBiomes().contains(this.getName())
+			this.settings.isleInBiome != null && 
+			this.settings.isleInBiome.size() > 0 &&
+			this.settings.worldConfig.getIsleBiomes().contains(this.getName())
 		;
 	}
 
@@ -960,58 +965,58 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public boolean isBorderBiome()
 	{
 		return
-			this.biomeIsBorder != null && 
-			this.biomeIsBorder.size() > 0 &&
-			this.worldConfig.getBorderBiomes().contains(this.getName())
+			this.settings.biomeIsBorder != null && 
+			this.settings.biomeIsBorder.size() > 0 &&
+			this.settings.worldConfig.getBorderBiomes().contains(this.getName())
 		;
 	}
-	
+
 	@Override
 	public List<String> getIsleInBiomes()
 	{
-		return this.isleInBiome;
+		return this.settings.isleInBiome;
 	}
 	
 	@Override
 	public List<String> getBorderInBiomes()
 	{
-		return this.biomeIsBorder;
+		return this.settings.biomeIsBorder;
 	}
 	
 	@Override
 	public List<String> getOnlyBorderNearBiomes()
 	{
-		return this.onlyBorderNear;
+		return this.settings.onlyBorderNear;
 	}	
 	
 	@Override
 	public List<String> getNotBorderNearBiomes()
 	{
-		return this.notBorderNear;
+		return this.settings.notBorderNear;
 	}
 
 	@Override
 	public int getBiomeSizeWhenIsle()
 	{
-		return this.biomeSizeWhenIsle;
+		return this.settings.biomeSizeWhenIsle;
 	}
 	
 	@Override
 	public int getBiomeRarityWhenIsle()
 	{
-		return this.biomeRarityWhenIsle;
+		return this.settings.biomeRarityWhenIsle;
 	}
 	
 	@Override
 	public int getBiomeSizeWhenBorder()
 	{
-		return this.biomeSizeWhenBorder;
+		return this.settings.biomeSizeWhenBorder;
 	}
 
 	@Override
 	public String getRiverBiome()
 	{
-		return this.riverBiome;
+		return this.settings.riverBiome;
 	}		  
 
 	/**
@@ -1051,16 +1056,16 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome)
 	{
-		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biome, x, z);
+		this.settings.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biome, x, z);
 	}
 	
 	@Override
 	public ISaplingSpawner getSaplingGen(SaplingType type)
 	{
-		SaplingResource gen = saplingGrowers.get(type);
+		SaplingResource gen = this.settings.saplingGrowers.get(type);
 		if (gen == null && type.growsTree())
 		{
-			gen = saplingGrowers.get(SaplingType.All);
+			gen = this.settings.saplingGrowers.get(SaplingType.All);
 		}
 		return gen;
 	}
@@ -1070,12 +1075,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		if (wideTrunk)
 		{
-			ISaplingSpawner spawner = customBigSaplingGrowers.get(materialData);
+			ISaplingSpawner spawner = this.settings.customBigSaplingGrowers.get(materialData);
 			if(spawner != null)
 			{
 				return spawner;
 			}
 		}
-		return customSaplingGrowers.get(materialData);
+		return this.settings.customSaplingGrowers.get(materialData);
 	}	
 }

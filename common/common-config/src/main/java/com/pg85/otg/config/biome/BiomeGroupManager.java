@@ -153,16 +153,6 @@ public final class BiomeGroupManager
 		return true;
 	}
 
-	public boolean isBiomeDepthMapEmpty(int depth)
-	{
-		for (BiomeGroup group : getGroups())
-		{
-			if (!group.getDepthMap(depth).isEmpty())
-				return false;
-		}
-		return true;
-	}
-
 	public static int getMaxRarityFromPossibles(Map<Integer, ?> map)
 	{
 		Integer[] totalRarity = map.keySet().toArray(new Integer[map.size()]);
