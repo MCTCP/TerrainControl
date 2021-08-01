@@ -198,6 +198,8 @@ public class BiomeConfig extends BiomeConfigBase
 		this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);		
 		this.settings.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
 		this.settings.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
+		this.settings.templateForBiomeMinTemp = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MIN_TEMP, logger);
+		this.settings.templateForBiomeMaxTemp = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MAX_TEMP, logger);
 		this.settings.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
 		this.settings.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, logger);
 		this.settings.smoothRadius = reader.getSetting(BiomeStandardValues.SMOOTH_RADIUS, logger);
@@ -208,7 +210,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.settings.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
 		if(this.settings.underWaterSurfaceBlock == null)
 		{
-			this.settings.underWaterSurfaceBlock = this.settings.groundBlock; 	
+			this.settings.underWaterSurfaceBlock = this.settings.groundBlock;
 		}
 		this.privateSettings.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
 		this.privateSettings.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
@@ -409,6 +411,16 @@ public class BiomeConfig extends BiomeConfigBase
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
 
+		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MIN_TEMP, this.settings.templateForBiomeMinTemp,
+			"When using biome category/tags with TemplateForBiome, the targeted biomes' temperature must be between",
+			"TemplateForBiomeMinTemp and TemplateForBiomeMaxTemp. Put both at 0 to ignore."
+		);
+		
+		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MAX_TEMP, this.settings.templateForBiomeMaxTemp,
+			"When using biome category/tags with TemplateForBiome, the targeted biomes' temperature must be between",
+			"TemplateForBiomeMinTemp and TemplateForBiomeMaxTemp. Put both at 0 to ignore."
+		);
+		
 		writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,
 			"Forge Biome Dictionary tags used by other mods to identify a biome and",
 			"place modded blocks, items and mobs in it.", "Example: HOT, DRY, SANDY, OVERWORLD",
