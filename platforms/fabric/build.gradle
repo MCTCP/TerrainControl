@@ -8,9 +8,6 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = "openterraingenerator-fabric"
 
-version = project.mod_version
-group = project.maven_group
-
 repositories {
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
@@ -67,6 +64,7 @@ java {
 jar {
 	destinationDir = new File(project.buildDir, "distributions")
     classifier = ''
+	archiveFileName = project.archivesBaseName + '-' + project.version + '.jar'
     from
     {
         project(":common:common-util").sourceSets.main.output.files

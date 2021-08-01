@@ -104,8 +104,8 @@ task createReleaseJar {
             outputStream.close()
         } else {
             println(" Skipping the release jar, as the Spigot, Fabric or Forge file failed")
-            println(" Forge exists: " + fabricFile.exists())
-			println(" Fabric exists: " + forgeFile.exists())
+            println(" Forge exists: " + forgeFile.exists())
+			println(" Fabric exists: " + fabricFile.exists())
             println(" Spigot exists: " + spigotFile.exists())
         }
     }

@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "otg-fabric.mixins.json"
   ],
 
   "depends": {
