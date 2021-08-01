@@ -27,6 +27,8 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	private String name;
 	private int groupRarity;
 	private int generationDepth = 0;
+	private double minTemp = 0;
+	private double maxTemp = 0;
 	private final List<String> biomes = new ArrayList<String>();
 
 	/**
@@ -44,6 +46,16 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		this.name = args.get(0);
 		this.generationDepth = readInt(args.get(1), 0, config.getGenerationDepth());
 		this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
+		
+		try
+		{
+			this.minTemp = readDouble(args.get(args.size() - 2), Double.MIN_VALUE, Double.MAX_VALUE);
+			this.maxTemp = readDouble(args.get(args.size() - 1), Double.MIN_VALUE, Double.MAX_VALUE);
+			args.remove(args.size() - 1);
+			args.remove(args.size() - 1);
+		}
+		catch(InvalidConfigException ex) { }
+		
 		for (String biome : readBiomes(args, 3))
 		{
 			this.biomes.add(biome);
@@ -73,11 +85,20 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 	{
 		return this.biomes;
 	}
+
+	public boolean temperatureAllowed(float baseTemperature)
+	{
+		if(this.minTemp != 0 || this.maxTemp != 0)
+		{
+			return baseTemperature >= this.minTemp && baseTemperature < this.maxTemp;
+		}
+		return true;
+	}
 	
 	@Override
 	public String toString()
 	{
-		return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes, ", ") + ")";
+		return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes, ", ") + (this.minTemp == 0 ? "" : ", " + this.minTemp)  + (this.maxTemp == 0 ? "" : ", " + this.maxTemp) + ")";
 	}
 
 	/**

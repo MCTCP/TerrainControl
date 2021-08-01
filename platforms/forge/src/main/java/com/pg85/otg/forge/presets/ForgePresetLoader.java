@@ -511,7 +511,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 								biomesForTags.addAll(
 									ForgeRegistries.BIOMES.getValues().stream()
 									.filter(
-										a -> a.getBiomeCategory() == category && 
+										a -> a.getBiomeCategory() == category &&
 										!a.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 										!blackListedBiomes.contains(a.getRegistryName().toString()) &&
 										(tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) || !a.getRegistryName().getNamespace().equals("minecraft"))
@@ -581,15 +581,18 @@ public class ForgePresetLoader extends LocalPresetLoader
 						for(RegistryKey<Biome> biomeForTag : biomesForTags)
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
-							String otgBiomeName = biome.getRegistryName().getNamespace() + "." + biome.getRegistryName().getPath();
-							for(IBiomeConfig biomeConfig : biomeConfigsByResourceLocation.values())
+							if(group.temperatureAllowed(biome.getBaseTemperature()))
 							{
-								if(
-									biomeConfig.getRegistryKey().toResourceLocationString().equals(biomeForTag.location().toString()) &&
-									!groupBiomes.containsKey(otgBiomeName)
-								)
+								String otgBiomeName = biome.getRegistryName().getNamespace() + "." + biome.getRegistryName().getPath();
+								for(IBiomeConfig biomeConfig : biomeConfigsByResourceLocation.values())
 								{
-									groupBiomes.put(otgBiomeName, biomeConfig);
+									if(
+										biomeConfig.getRegistryKey().toResourceLocationString().equals(biomeForTag.location().toString()) &&
+										!groupBiomes.containsKey(otgBiomeName)
+									)
+									{
+										groupBiomes.put(otgBiomeName, biomeConfig);
+									}
 								}
 							}
 						}

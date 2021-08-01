@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import org.apache.commons.lang3.StringUtils;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.pg85.otg.forge.gui.OTGGui;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IBidiRenderer;
@@ -32,7 +34,7 @@ public class OTGWorldOptionsScreen extends WorldOptionsScreen
 	private Button customizeTypeButton;
 	private DynamicRegistries.Impl registryHolder;
 	public DimensionGeneratorSettings settings;
-	private Optional<BiomeGeneratorTypeScreens> preset;
+	protected Optional<BiomeGeneratorTypeScreens> preset;
 	private OptionalLong seed;
 
 	public OTGWorldOptionsScreen(DynamicRegistries.Impl p_i242065_1_, DimensionGeneratorSettings p_i242065_2_, Optional<BiomeGeneratorTypeScreens> p_i242065_3_, OptionalLong p_i242065_4_)
@@ -70,6 +72,15 @@ public class OTGWorldOptionsScreen extends WorldOptionsScreen
 					}
 	
 					BiomeGeneratorTypeScreens biomegeneratortypescreens = BiomeGeneratorTypeScreens.PRESETS.get(k);
+					if(biomegeneratortypescreens == OTGGui.OTG_WORLD_TYPE)
+					{
+						k++;
+						if (k >= BiomeGeneratorTypeScreens.PRESETS.size())
+						{
+							k = 0;
+						}
+						biomegeneratortypescreens = BiomeGeneratorTypeScreens.PRESETS.get(k);
+					}
 					this.preset = Optional.of(biomegeneratortypescreens);
 					this.settings = biomegeneratortypescreens.create(this.registryHolder, this.settings.seed(), this.settings.generateFeatures(), this.settings.generateBonusChest());
 					if (this.settings.isDebug() && !Screen.hasShiftDown())

@@ -27,8 +27,6 @@ import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.forge.gen.MCWorldGenRegion;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.presets.Preset;
