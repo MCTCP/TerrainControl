@@ -1,4 +1,14 @@
-include 'common:common-util', 'common:common-config', 'common:common-customobject', 'common:common-generator', 'common:common-core', 'platforms:forge'
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+	}
+}
+
+include 'common:common-util', 'common:common-config', 'common:common-customobject', 'common:common-generator', 'common:common-core', 'platforms:forge', 'platforms:fabric'
 include 'platforms:spigot'
 findProject(':platforms:spigot')?.name = 'spigot'
 
