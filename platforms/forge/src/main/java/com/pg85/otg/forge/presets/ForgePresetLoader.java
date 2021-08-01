@@ -274,11 +274,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							for(RegistryKey<Biome> biomeForTag : biomesForTags)
 							{
-								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), preset.getFolderName());
-								if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
+								Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
+								if(biomeConfig.isWithinTemplateForBiomeTemperatureRange(biome.getBaseTemperature()))
 								{
-									biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
-									biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
+									IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), preset.getFolderName());
+									if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
+									{
+										biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
+										biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
+									}
 								}
 							}
 						} else {

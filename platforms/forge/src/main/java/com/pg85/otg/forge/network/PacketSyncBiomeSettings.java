@@ -16,7 +16,9 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 	private Map<String, BiomeSettingSyncWrapper> syncMap = new HashMap<>();
 	private int loginIndex;
 
-	public PacketSyncBiomeSettings() { }
+	public PacketSyncBiomeSettings() { 
+		this.syncMap = OTGClientSyncManager.getSyncedData();
+	}
 
 	public PacketSyncBiomeSettings(Map<String, BiomeSettingSyncWrapper> syncMap)
 	{
