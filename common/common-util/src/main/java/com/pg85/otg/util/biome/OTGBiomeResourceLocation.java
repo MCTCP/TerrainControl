@@ -72,4 +72,24 @@ public class OTGBiomeResourceLocation implements IBiomeResourceLocation
 			return String.format("%s%s%s", this.presetRegistryName, BIOME_RESOURCE_LOCATION_SEPARATOR, this.biomeName);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+		if (!(other instanceof OTGBiomeResourceLocation))
+		{
+			return false;
+		}
+		return ((OTGBiomeResourceLocation)other).toResourceLocationString().equals(this.toResourceLocationString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toResourceLocationString().hashCode();
+	}	
 }

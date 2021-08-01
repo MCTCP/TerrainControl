@@ -72,7 +72,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
 			if (this.hasValidSelection())
 			{
-				this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.parent, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
+				this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
 			}
 		}));
 		
@@ -203,7 +203,7 @@ public class CreateOTGDimensionsScreen extends Screen
 					DetailsList.this.setSelected(this);
 					if(this.dimId <= 2) // We need to be able to select custom dims, so we can delete them.
 					{
-						DetailsList.this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.parent, CreateOTGDimensionsScreen.this.currentSelection, this.dimId));
+						DetailsList.this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.dimId));
 					}
 					return true;
 				} else {

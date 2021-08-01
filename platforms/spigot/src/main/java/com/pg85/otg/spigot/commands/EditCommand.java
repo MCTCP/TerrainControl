@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("deprecation")
 public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Player, EditCommand.EditSession> sessionsMap = new HashMap<>();

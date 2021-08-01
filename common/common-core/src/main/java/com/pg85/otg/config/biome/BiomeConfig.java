@@ -90,26 +90,38 @@ public class BiomeConfig extends BiomeConfigBase
 
 	// Private fields, only used when reading/writing
 
-	private String inheritMobsBiomeName;
+	// Settings container, used so we can copy a biomeconfig while 
+	// changing only its id and registry key, used for non-otg 
+	// biomes in otg worlds.
+	private SettingsContainer privateSettings = new SettingsContainer();
+	class SettingsContainer
+	{
+		private String inheritMobsBiomeName;
+		
+		private int configWaterLevelMax;
+		private int configWaterLevelMin;
+		
+		private LocalMaterialData configWaterBlock;
+		private LocalMaterialData configIceBlock;
+		private LocalMaterialData configCooledLavaBlock;
 	
-	private int configWaterLevelMax;
-	private int configWaterLevelMin;
+		private double volatilityRaw1;
+		private double volatilityRaw2;
+		private double volatilityWeightRaw1;
+		private double volatilityWeightRaw2;
 	
-	private LocalMaterialData configWaterBlock;
-	private LocalMaterialData configIceBlock;
-	private LocalMaterialData configCooledLavaBlock;
+		private List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
+		private List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
+		private List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+		private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+		private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+		private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
+	}
 
-	private double volatilityRaw1;
-	private double volatilityRaw2;
-	private double volatilityWeightRaw1;
-	private double volatilityWeightRaw2;
-
-	private List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
-	private List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
-	private List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
-	private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
+	public BiomeConfig(String biomeName)
+	{
+		super(biomeName);
+	}
 
 	public BiomeConfig(
 		String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, 
@@ -129,161 +141,161 @@ public class BiomeConfig extends BiomeConfigBase
 
 		if (biomeConfigStub != null)
 		{
-			spawnMonsters.addAll(biomeConfigStub.getSpawner(EntityCategory.MONSTER));
-			spawnCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.CREATURE));
-			spawnWaterCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_CREATURE));
-			spawnAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.AMBIENT_CREATURE));
-			spawnWaterAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_AMBIENT));
-			spawnMiscCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.MISC));
+			this.privateSettings.spawnMonsters.addAll(biomeConfigStub.getSpawner(EntityCategory.MONSTER));
+			this.privateSettings.spawnCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.CREATURE));
+			this.privateSettings.spawnWaterCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_CREATURE));
+			this.privateSettings.spawnAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.AMBIENT_CREATURE));
+			this.privateSettings.spawnWaterAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_AMBIENT));
+			this.privateSettings.spawnMiscCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.MISC));
 
-			spawnMonstersMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MONSTER));
-			spawnCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.CREATURE));
-			spawnWaterCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_CREATURE));
-			spawnAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.AMBIENT_CREATURE));
-			spawnWaterAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_AMBIENT));
-			spawnMiscCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MISC));
+			this.settings.spawnMonstersMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MONSTER));
+			this.settings.spawnCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.CREATURE));
+			this.settings.spawnWaterCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_CREATURE));
+			this.settings.spawnAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.AMBIENT_CREATURE));
+			this.settings.spawnWaterAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_AMBIENT));
+			this.settings.spawnMiscCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MISC));
 		}
 
-		this.worldConfig = worldConfig;
+		this.settings.worldConfig = worldConfig;
 
 		this.renameOldSettings(settings, logger, materialReader);
 		this.readConfigSettings(settings, biomeResourcesManager, logger, materialReader);
 		this.validateAndCorrectSettings(presetFolder, logger);
 
 		// Set water level
-		if (this.useWorldWaterLevel)
+		if (this.settings.useWorldWaterLevel)
 		{
-			this.waterLevelMax = worldConfig.getWaterLevelMax();
-			this.waterLevelMin = worldConfig.getWaterLevelMin();
-			this.waterBlock = worldConfig.getWaterBlock();
-			this.iceBlock = worldConfig.getIceBlock();
-			this.cooledLavaBlock = worldConfig.getCooledLavaBlock();
+			this.settings.waterLevelMax = worldConfig.getWaterLevelMax();
+			this.settings.waterLevelMin = worldConfig.getWaterLevelMin();
+			this.settings.waterBlock = worldConfig.getWaterBlock();
+			this.settings.iceBlock = worldConfig.getIceBlock();
+			this.settings.cooledLavaBlock = worldConfig.getCooledLavaBlock();
 		} else {
-			this.waterLevelMax = this.configWaterLevelMax;
-			this.waterLevelMin = this.configWaterLevelMin;
-			this.waterBlock = this.configWaterBlock;
-			this.iceBlock = this.configIceBlock;
-			this.cooledLavaBlock = this.configCooledLavaBlock;
+			this.settings.waterLevelMax = this.privateSettings.configWaterLevelMax;
+			this.settings.waterLevelMin = this.privateSettings.configWaterLevelMin;
+			this.settings.waterBlock = this.privateSettings.configWaterBlock;
+			this.settings.iceBlock = this.privateSettings.configIceBlock;
+			this.settings.cooledLavaBlock = this.privateSettings.configCooledLavaBlock;
 		}
 	}
 
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
-		this.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
-		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
-		this.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, logger);
-		this.biomeRarityWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, logger);
-		this.biomeColor = reader.getSetting(BiomeStandardValues.BIOME_COLOR, logger);
-		this.riverBiome = reader.getSetting(BiomeStandardValues.RIVER_BIOME, logger);
-		this.isleInBiome = reader.getSetting(BiomeStandardValues.ISLE_IN_BIOME, logger);
-		this.biomeSizeWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, logger);
-		this.biomeIsBorder = reader.getSetting(BiomeStandardValues.BIOME_IS_BORDER, logger);
-		this.onlyBorderNear = reader.getSetting(BiomeStandardValues.ONLY_BORDER_NEAR, logger);
-		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
-		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
-		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
-		this.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);		
-		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
-		this.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
-		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
-		this.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, logger);
-		this.smoothRadius = reader.getSetting(BiomeStandardValues.SMOOTH_RADIUS, logger);
-		this.CHCSmoothRadius = reader.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, logger);		
-		this.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
-		this.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
-		this.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
-		this.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
-		if(this.underWaterSurfaceBlock == null)
+		this.settings.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
+		this.settings.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
+		this.settings.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, logger);
+		this.settings.biomeRarityWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, logger);
+		this.settings.biomeColor = reader.getSetting(BiomeStandardValues.BIOME_COLOR, logger);
+		this.settings.riverBiome = reader.getSetting(BiomeStandardValues.RIVER_BIOME, logger);
+		this.settings.isleInBiome = reader.getSetting(BiomeStandardValues.ISLE_IN_BIOME, logger);
+		this.settings.biomeSizeWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, logger);
+		this.settings.biomeIsBorder = reader.getSetting(BiomeStandardValues.BIOME_IS_BORDER, logger);
+		this.settings.onlyBorderNear = reader.getSetting(BiomeStandardValues.ONLY_BORDER_NEAR, logger);
+		this.settings.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
+		this.settings.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
+		this.settings.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
+		this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);		
+		this.settings.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
+		this.settings.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
+		this.settings.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
+		this.settings.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, logger);
+		this.settings.smoothRadius = reader.getSetting(BiomeStandardValues.SMOOTH_RADIUS, logger);
+		this.settings.CHCSmoothRadius = reader.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, logger);		
+		this.settings.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
+		this.settings.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
+		this.settings.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
+		this.settings.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
+		if(this.settings.underWaterSurfaceBlock == null)
 		{
-			this.underWaterSurfaceBlock = this.groundBlock; 	
+			this.settings.underWaterSurfaceBlock = this.settings.groundBlock; 	
 		}
-		this.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
-		this.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
-		this.packedIceBlock = reader.getSetting(BiomeStandardValues.PACKED_ICE_BLOCK, logger, materialReader);
-		this.snowBlock = reader.getSetting(BiomeStandardValues.SNOW_BLOCK, logger, materialReader);
-		this.configCooledLavaBlock = reader.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
-		this.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
-		this.sandStoneBlock = LocalMaterials.SANDSTONE;
-		this.redSandStoneBlock = LocalMaterials.RED_SANDSTONE;
-		this.surfaceAndGroundControl = reader.getSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, new SimpleSurfaceGenerator(), logger, materialReader);
-		this.useWorldWaterLevel = reader.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, logger);
-		this.configWaterLevelMax = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MAX, logger);
-		this.configWaterLevelMin = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MIN, logger);
-		this.skyColor = reader.getSetting(BiomeStandardValues.SKY_COLOR, logger);
-		this.waterColor = reader.getSetting(BiomeStandardValues.WATER_COLOR, logger);
-		this.waterColorControl = reader.getSetting(BiomeStandardValues.WATER_COLOR_CONTROL, logger);
-		this.grassColor = reader.getSetting(BiomeStandardValues.GRASS_COLOR, logger);
-		this.grassColorControl = reader.getSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, logger);
-		this.grassColorModifier = reader.getSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, logger);
-		this.foliageColor = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR, logger);
-		this.foliageColorControl = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, logger);
-		this.fogColor = reader.getSetting(BiomeStandardValues.FOG_COLOR, logger);
-		this.fogDensity = reader.getSetting(BiomeStandardValues.FOG_DENSITY, logger);
-		this.waterFogColor = reader.getSetting(BiomeStandardValues.WATER_FOG_COLOR, logger);
-		this.particleType = reader.getSetting(BiomeStandardValues.PARTICLE_TYPE, logger);
-		this.music = reader.getSetting(BiomeStandardValues.MUSIC, logger);
-		this.musicMinDelay = reader.getSetting(BiomeStandardValues.MUSIC_MIN_DELAY, logger);
-		this.musicMaxDelay = reader.getSetting(BiomeStandardValues.MUSIC_MAX_DELAY, logger);
-		this.replaceCurrentMusic = reader.getSetting(BiomeStandardValues.REPLACE_CURRENT_MUSIC, logger);
-		this.ambientSound = reader.getSetting(BiomeStandardValues.AMBIENT_SOUND, logger);
-		this.moodSound = reader.getSetting(BiomeStandardValues.MOOD_SOUND, logger);
-		this.moodSoundDelay = reader.getSetting(BiomeStandardValues.MOOD_SOUND_DELAY, logger);
-		this.moodSearchRange = reader.getSetting(BiomeStandardValues.MOOD_SEARCH_RANGE, logger);
-		this.moodOffset = reader.getSetting(BiomeStandardValues.MOOD_OFFSET, logger);
-		this.additionsSound = reader.getSetting(BiomeStandardValues.ADDITIONS_SOUND, logger);
-		this.additionsTickChance = reader.getSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, logger);
-		this.particleProbability = reader.getSetting(BiomeStandardValues.PARTICLE_PROBABILITY, logger);
-		this.volatilityRaw1 = reader.getSetting(BiomeStandardValues.VOLATILITY_1, logger);
-		this.volatilityRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_2, logger);
-		this.volatilityWeightRaw1 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1, logger);
-		this.volatilityWeightRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_2, logger);
-		this.disableBiomeHeight = reader.getSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, logger);
-		this.maxAverageHeight = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, logger);
-		this.maxAverageDepth = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, logger);
-		this.strongholdsEnabled = reader.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, logger);
-		this.oceanMonumentsEnabled = reader.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, logger);
-		this.woodLandMansionsEnabled = reader.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, logger);
-		this.netherFortressesEnabled = reader.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, logger);
-		this.villageType = reader.getSetting(BiomeStandardValues.VILLAGE_TYPE, logger);
-		this.villageSize = reader.getSetting(BiomeStandardValues.VILLAGE_SIZE, logger);		
-		this.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, logger);
-		this.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, logger);
-		this.buriedTreasureEnabled = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, logger);
-		this.shipWreckEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, logger);
-		this.shipWreckBeachedEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, logger);
-		this.pillagerOutpostEnabled = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, logger);
-		this.bastionRemnantEnabled = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, logger);
-		this.netherFossilEnabled = reader.getSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, logger);
-		this.endCityEnabled = reader.getSetting(BiomeStandardValues.END_CITY_ENABLED, logger);		
-		this.mineshaftProbability = reader.getSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, logger);
-		this.ruinedPortalType = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, logger);
-		this.oceanRuinsType = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, logger);
-		this.oceanRuinsLargeProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, logger);
-		this.oceanRuinsClusterProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, logger);
-		this.buriedTreasureProbability = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, logger);
-		this.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
-		this.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
-		this.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
-		this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
+		this.privateSettings.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
+		this.privateSettings.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
+		this.settings.packedIceBlock = reader.getSetting(BiomeStandardValues.PACKED_ICE_BLOCK, logger, materialReader);
+		this.settings.snowBlock = reader.getSetting(BiomeStandardValues.SNOW_BLOCK, logger, materialReader);
+		this.privateSettings.configCooledLavaBlock = reader.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
+		this.settings.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
+		this.settings.sandStoneBlock = LocalMaterials.SANDSTONE;
+		this.settings.redSandStoneBlock = LocalMaterials.RED_SANDSTONE;
+		this.settings.surfaceAndGroundControl = reader.getSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, new SimpleSurfaceGenerator(), logger, materialReader);
+		this.settings.useWorldWaterLevel = reader.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, logger);
+		this.privateSettings.configWaterLevelMax = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MAX, logger);
+		this.privateSettings.configWaterLevelMin = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MIN, logger);
+		this.settings.skyColor = reader.getSetting(BiomeStandardValues.SKY_COLOR, logger);
+		this.settings.waterColor = reader.getSetting(BiomeStandardValues.WATER_COLOR, logger);
+		this.settings.waterColorControl = reader.getSetting(BiomeStandardValues.WATER_COLOR_CONTROL, logger);
+		this.settings.grassColor = reader.getSetting(BiomeStandardValues.GRASS_COLOR, logger);
+		this.settings.grassColorControl = reader.getSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, logger);
+		this.settings.grassColorModifier = reader.getSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, logger);
+		this.settings.foliageColor = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR, logger);
+		this.settings.foliageColorControl = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, logger);
+		this.settings.fogColor = reader.getSetting(BiomeStandardValues.FOG_COLOR, logger);
+		this.settings.fogDensity = reader.getSetting(BiomeStandardValues.FOG_DENSITY, logger);
+		this.settings.waterFogColor = reader.getSetting(BiomeStandardValues.WATER_FOG_COLOR, logger);
+		this.settings.particleType = reader.getSetting(BiomeStandardValues.PARTICLE_TYPE, logger);
+		this.settings.music = reader.getSetting(BiomeStandardValues.MUSIC, logger);
+		this.settings.musicMinDelay = reader.getSetting(BiomeStandardValues.MUSIC_MIN_DELAY, logger);
+		this.settings.musicMaxDelay = reader.getSetting(BiomeStandardValues.MUSIC_MAX_DELAY, logger);
+		this.settings.replaceCurrentMusic = reader.getSetting(BiomeStandardValues.REPLACE_CURRENT_MUSIC, logger);
+		this.settings.ambientSound = reader.getSetting(BiomeStandardValues.AMBIENT_SOUND, logger);
+		this.settings.moodSound = reader.getSetting(BiomeStandardValues.MOOD_SOUND, logger);
+		this.settings.moodSoundDelay = reader.getSetting(BiomeStandardValues.MOOD_SOUND_DELAY, logger);
+		this.settings.moodSearchRange = reader.getSetting(BiomeStandardValues.MOOD_SEARCH_RANGE, logger);
+		this.settings.moodOffset = reader.getSetting(BiomeStandardValues.MOOD_OFFSET, logger);
+		this.settings.additionsSound = reader.getSetting(BiomeStandardValues.ADDITIONS_SOUND, logger);
+		this.settings.additionsTickChance = reader.getSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, logger);
+		this.settings.particleProbability = reader.getSetting(BiomeStandardValues.PARTICLE_PROBABILITY, logger);
+		this.privateSettings.volatilityRaw1 = reader.getSetting(BiomeStandardValues.VOLATILITY_1, logger);
+		this.privateSettings.volatilityRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_2, logger);
+		this.privateSettings.volatilityWeightRaw1 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1, logger);
+		this.privateSettings.volatilityWeightRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_2, logger);
+		this.settings.disableBiomeHeight = reader.getSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, logger);
+		this.settings.maxAverageHeight = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, logger);
+		this.settings.maxAverageDepth = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, logger);
+		this.settings.strongholdsEnabled = reader.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, logger);
+		this.settings.oceanMonumentsEnabled = reader.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, logger);
+		this.settings.woodLandMansionsEnabled = reader.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, logger);
+		this.settings.netherFortressesEnabled = reader.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, logger);
+		this.settings.villageType = reader.getSetting(BiomeStandardValues.VILLAGE_TYPE, logger);
+		this.settings.villageSize = reader.getSetting(BiomeStandardValues.VILLAGE_SIZE, logger);		
+		this.settings.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, logger);
+		this.settings.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, logger);
+		this.settings.buriedTreasureEnabled = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, logger);
+		this.settings.shipWreckEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, logger);
+		this.settings.shipWreckBeachedEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, logger);
+		this.settings.pillagerOutpostEnabled = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, logger);
+		this.settings.bastionRemnantEnabled = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, logger);
+		this.settings.netherFossilEnabled = reader.getSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, logger);
+		this.settings.endCityEnabled = reader.getSetting(BiomeStandardValues.END_CITY_ENABLED, logger);		
+		this.settings.mineshaftProbability = reader.getSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, logger);
+		this.settings.ruinedPortalType = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, logger);
+		this.settings.oceanRuinsType = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, logger);
+		this.settings.oceanRuinsLargeProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, logger);
+		this.settings.oceanRuinsClusterProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, logger);
+		this.settings.buriedTreasureProbability = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, logger);
+		this.settings.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
+		this.settings.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
+		this.settings.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
+		this.privateSettings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 
 		this.readResourceSettings(reader, biomeResourcesManager, logger, materialReader);
 		
-		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
-		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
+		this.settings.chcData = new double[this.settings.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
+		this.readHeightSettings(reader, this.settings.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
 	
 		updateLegacySettings(reader, materialReader, logger);
 	}
 
 	private void updateLegacySettings(SettingsMap reader,IMaterialReader materialReader, ILogger logger)
 	{
-		if (fogDensity == 0.5 && fogColor == BiomeStandardValues.FOG_COLOR.getDefaultValue())
+		if (this.settings.fogDensity == 0.5 && this.settings.fogColor == BiomeStandardValues.FOG_COLOR.getDefaultValue())
 		{
-			fogDensity = 0.0f;
+			this.settings.fogDensity = 0.0f;
 		}
 
-		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_GRASS_COLOR2, logger).ifPresent(set -> this.grassColorControl = set);
-		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_FOLIAGE_COLOR2, logger).ifPresent(set -> this.foliageColorControl = set);
+		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_GRASS_COLOR2, logger).ifPresent(set -> this.settings.grassColorControl = set);
+		this.readLegacyColorSetting(reader, materialReader, BiomeStandardValues.LEGACY_FOLIAGE_COLOR2, logger).ifPresent(set -> this.settings.foliageColorControl = set);
 	}
 
 	private Optional<ColorSet> readLegacyColorSetting(SettingsMap reader, IMaterialReader materialReader, Setting<String> oldSetting, ILogger logger)
@@ -338,9 +350,9 @@ public class BiomeConfig extends BiomeConfigBase
 							// Puts big custom saplings in the big list and small in the small list
 							if (sapling.wideTrunk)
 							{
-								customBigSaplingGrowers.put(sapling.saplingMaterial, sapling);
+								this.settings.customBigSaplingGrowers.put(sapling.saplingMaterial, sapling);
 							} else {
-								customSaplingGrowers.put(sapling.saplingMaterial, sapling);
+								this.settings.customSaplingGrowers.put(sapling.saplingMaterial, sapling);
 							}
 						} catch (NullPointerException e) {
 							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS))
@@ -349,7 +361,7 @@ public class BiomeConfig extends BiomeConfigBase
 							}
 						}
 					} else {
-						this.saplingGrowers.put(sapling.saplingType, sapling);
+						this.settings.saplingGrowers.put(sapling.saplingType, sapling);
 					}
 				}
 			}
@@ -362,11 +374,11 @@ public class BiomeConfig extends BiomeConfigBase
 			{
 				if (!(res instanceof SaplingResource))
 				{
-					this.resourceQueue.add(res);
+					this.settings.resourceQueue.add(res);
 				}
 				if (res instanceof CustomStructureResource)
 				{
-					this.customStructures.add((CustomStructureResource) res);
+					this.settings.customStructures.add((CustomStructureResource) res);
 				}
 			}
 		}
@@ -377,30 +389,40 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		writer.header1("Biome Identity");
 
-		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.templateForBiome,
-			"Enter the registry name of a non-OTG biome to make OTG use that biome for biome generation",
+		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.templateForBiome,
+			"Can be used in 2 ways:" +
+			"1. Enter the registry name of a non-OTG biome to use that biome for biome generation",
 			"and chunk decoration, instead of OTG registering its own biome for this BiomeConfig.",
-			"OTG will generate the base terrain for the biome, configured via this file, ",
-			"but will not override any settings registered to the biome.",
-			"Because of this, the following OTG settings cannot be used:",
-			"- Colors (foliage, grass, water, fog etc), mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
-			"What can be configured via this file: ", " - Biome generator settings.", " - Terrain settings.",
+			"Example: minecraft:plains",
+			"2. Enter a list of biome dictionary tags and/or biome categories, OTG will look up all",
+			"registered biomes that match all tags and categories and link them to this biomeconfig.",
+			"For example: \"category.plains, tag.hot\" targets 2 separate tags.",
+			"Using space for OR: \"category.plains tag.nether, category.plains tag.end\" targets plains in the nether and end.",
+			"Minecraft biomes are excluded when using \"category.\" or \"tag.\". To include mc biomes, use \"mccategory.\" or \"mctag.\".",
+			"",
+			"OTG generates the terrain for the biome as configured in this file and spawns resources, but also allows the biome to spawn ",
+			"its own resources and mobs and apply its settings. Because of this, the following OTG settings cannot be used:",
+			"- Colors, Mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
+			"What can be configured: ",
+			" - Biome generator settings.",
+			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
-			" - Any OTG settings not mentioned above that are internal to OTG and so don't rely on MC logic.",
-			"Example: minecraft:plains");
+			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.biomeDictTags,
+		writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,
 			"Forge Biome Dictionary tags used by other mods to identify a biome and",
-			"place modded blocks, items and mobs in it.", "Example: HOT, DRY, SANDY, OVERWORLD");
+			"place modded blocks, items and mobs in it.", "Example: HOT, DRY, SANDY, OVERWORLD",
+			"TemplateForBiome biomes inherit these from the targeted biomes.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.biomeCategory,
+		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.settings.biomeCategory,
 			"Set a category for this biome, used by vanilla for... something",
 			"Accepts one of the following values:",
-			"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether");
+			"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether",
+			"TemplateForBiome biomes inherits this from the targeted biomes.");
 
 		writer.header1("Biome placement");
 
-		writer.putSetting(BiomeStandardValues.BIOME_SIZE, this.biomeSize,
+		writer.putSetting(BiomeStandardValues.BIOME_SIZE, this.settings.biomeSize,
 			"Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).",
 			"Higher numbers result in a smaller biome, lower numbers a larger biome.",
 			"How this setting is used depends on the value of BiomeMode in the WorldConfig.",
@@ -412,7 +434,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"  Border biomes: " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER + " (see below)",
 			"  River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)");
 
-		writer.putSetting(BiomeStandardValues.BIOME_RARITY, this.biomeRarity,
+		writer.putSetting(BiomeStandardValues.BIOME_RARITY, this.settings.biomeRarity,
 			"Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.",
 			"Example for normal biome :",
 			"  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).",
@@ -420,44 +442,44 @@ public class BiomeConfig extends BiomeConfigBase
 			"For isle biomes see the " + BiomeStandardValues.BIOME_RARITY_WHEN_ISLE + " setting below.",
 			"Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_COLOR, this.biomeColor,
+		writer.putSetting(BiomeStandardValues.BIOME_COLOR, this.settings.biomeColor,
 			"The hexadecimal color value of this biome. Used in the output of the /otg map command,",
 			"and used in the input of BiomeMode: FromImage.");
 
 		writer.header2("Isle biomes", "To spawn a biome as an isle, first add it to the",
 			WorldStandardValues.ISLE_BIOMES + " list in the WorldConfig.", "");
 
-		writer.putSetting(BiomeStandardValues.ISLE_IN_BIOME, this.isleInBiome,
+		writer.putSetting(BiomeStandardValues.ISLE_IN_BIOME, this.settings.isleInBiome,
 			"List of biomes in which this biome will spawn as an isle.",
 			"For example, Mushroom Isles spawn inside the Ocean biome.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, this.biomeSizeWhenIsle,
+		writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, this.settings.biomeSizeWhenIsle,
 			"Size of this biome when spawned as an isle biome in BiomeMode: Normal.",
 			"Valid values range from 0 to GenerationDepth.",
 			"Larger numbers give *smaller* islands. The biome must be smaller than the biome it's going",
 			"to spawn in, so the " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " number must be larger than the "
 					+ BiomeStandardValues.BIOME_SIZE + " of the other biome.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, this.biomeRarityWhenIsle,
+		writer.putSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, this.settings.biomeRarityWhenIsle,
 			"Rarity of this biome when spawned as an isle biome in BiomeMode: Normal.");
 
 		writer.smallTitle("Border biomes", "To spawn a biome as a border, first add it to the",
 			WorldStandardValues.BORDER_BIOMES + " list in the WorldConfig.", "");
 
-		writer.putSetting(BiomeStandardValues.BIOME_IS_BORDER, this.biomeIsBorder,
+		writer.putSetting(BiomeStandardValues.BIOME_IS_BORDER, this.settings.biomeIsBorder,
 			"List of biomes this biome can be a border of.",
 			"For example, the Beach biome is a border on the Ocean biome, so",
 			"it can spawn anywhere on the border of an ocean.");
 
-		writer.putSetting(BiomeStandardValues.ONLY_BORDER_NEAR, this.onlyBorderNear,
+		writer.putSetting(BiomeStandardValues.ONLY_BORDER_NEAR, this.settings.onlyBorderNear,
 			"Whitelist of neighouring biomes that allow this border biome to spawn.");
 
-		writer.putSetting(BiomeStandardValues.NOT_BORDER_NEAR, this.notBorderNear,
+		writer.putSetting(BiomeStandardValues.NOT_BORDER_NEAR, this.settings.notBorderNear,
 			"Blacklist of neighbouring biomes that do not allow this border biome to spawn.",
 			"For example, the Beach biome will never spawn next to an Extreme Hills biome.",
 			"Only used when OnlyBorderNear is empty / not used.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, this.biomeSizeWhenBorder,
+		writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, this.settings.biomeSizeWhenBorder,
 			"Size of this biome when spawned as a border biome in BiomeMode: Normal.",
 			"Valid values range from 0 to GenerationDepth.",
 			"Larger numbers give *smaller* borders. The biome must be smaller than the biome it's going",
@@ -466,46 +488,46 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.header1("Terrain height and volatility");
 
-		writer.putSetting(BiomeStandardValues.BIOME_HEIGHT, this.biomeHeight,
+		writer.putSetting(BiomeStandardValues.BIOME_HEIGHT, this.settings.biomeHeight,
 			"BiomeHeight defines how much height will be added during terrain generation",
 			"Must be between -10.0 and 10.0",
 			"Value 0.0 is equivalent to half of map height with all other settings at defaults.");
 
-		writer.putSetting(BiomeStandardValues.BIOME_VOLATILITY, this.biomeVolatility, "Biome volatility.");
+		writer.putSetting(BiomeStandardValues.BIOME_VOLATILITY, this.settings.biomeVolatility, "Biome volatility.");
 
-		writer.putSetting(BiomeStandardValues.SMOOTH_RADIUS, this.smoothRadius,
+		writer.putSetting(BiomeStandardValues.SMOOTH_RADIUS, this.settings.smoothRadius,
 			"Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting",
 			"smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .",
 			"So if two biomes next to each other have both a smooth radius of 2, the",
 			"resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
 
-		writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, this.CHCSmoothRadius,
+		writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, this.settings.CHCSmoothRadius,
 			"Works the same way as SmoothRadius but only acts on CustomHeightControl. Must be between 0 and 32, inclusive.",
 			"Does nothing if Custom Height Control smoothing is not enabled in the world config.");
 
-		writer.putSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, this.maxAverageHeight,
+		writer.putSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, this.settings.maxAverageHeight,
 			"If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.",
 			"If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
 
-		writer.putSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, this.maxAverageDepth,
+		writer.putSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, this.settings.maxAverageDepth,
 			"If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ",
 			"If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
 
-		writer.putSetting(BiomeStandardValues.VOLATILITY_1, this.volatilityRaw1,
+		writer.putSetting(BiomeStandardValues.VOLATILITY_1, this.privateSettings.volatilityRaw1,
 			"Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.",
 			"Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
 
-		writer.putSetting(BiomeStandardValues.VOLATILITY_2, this.volatilityRaw2);
+		writer.putSetting(BiomeStandardValues.VOLATILITY_2, this.privateSettings.volatilityRaw2);
 
-		writer.putSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1, this.volatilityWeightRaw1,
+		writer.putSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1, this.privateSettings.volatilityWeightRaw1,
 			"Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
 
-		writer.putSetting(BiomeStandardValues.VOLATILITY_WEIGHT_2, this.volatilityWeightRaw2);
+		writer.putSetting(BiomeStandardValues.VOLATILITY_WEIGHT_2, this.privateSettings.volatilityWeightRaw2);
 
-		writer.putSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, this.disableBiomeHeight,
+		writer.putSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, this.settings.disableBiomeHeight,
 			"Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
 
-		writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, this.chcData,
+		writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, this.settings.chcData,
 			"List of custom height factors, 17 double entries, each controls about 7",
 			"blocks height, starting at the bottom of the world. Positive entry - larger chance of spawn blocks, negative - smaller",
 			"Values which affect your configuration may be found only experimentally. Values may be very big, like ~3000.0 depends from height",
@@ -515,23 +537,23 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.header1("Rivers");
 
-		writer.putSetting(BiomeStandardValues.RIVER_BIOME, this.riverBiome, "The biome used as the river biome.");
+		writer.putSetting(BiomeStandardValues.RIVER_BIOME, this.settings.riverBiome, "The biome used as the river biome.");
 
 		writer.header1("Blocks");
 
-		writer.putSetting(BiomeStandardValues.STONE_BLOCK, this.stoneBlock,
+		writer.putSetting(BiomeStandardValues.STONE_BLOCK, this.settings.stoneBlock,
 			"The stone block used for the biome, usually STONE.");
 
-		writer.putSetting(BiomeStandardValues.SURFACE_BLOCK, this.surfaceBlock,
+		writer.putSetting(BiomeStandardValues.SURFACE_BLOCK, this.settings.surfaceBlock,
 			"The surface block used for the biome, usually GRASS.");
 
-		writer.putSetting(BiomeStandardValues.GROUND_BLOCK, this.groundBlock,
+		writer.putSetting(BiomeStandardValues.GROUND_BLOCK, this.settings.groundBlock,
 			"The ground block used for the biome, usually DIRT.");
 		
-		writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.underWaterSurfaceBlock,
+		writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.settings.underWaterSurfaceBlock,
 			"The surface block used for the biome when underwater, usually the same as GroundBlock.");
 
-		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.surfaceAndGroundControl,
+		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.settings.surfaceAndGroundControl,
 			"Setting for biomes with more complex surface and ground blocks.",
 			"Each column in the world has a noise value from what appears to be -7 to 7.",
 			"Values near 0 are more common than values near -7 and 7. This setting is",
@@ -547,7 +569,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"like the blocks found in the Mesa biomes.",
 			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans. Iceberg accepts a normal SAGC string: \"Iceberg <SAGC>\", so you can use normal SAGC with it.");
 
-		writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks,
+		writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, this.settings.replacedBlocks,
 			"Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])", "Example :",
 			"  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)",
 			"Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ",
@@ -557,52 +579,52 @@ public class BiomeConfig extends BiomeConfigBase
 
 		writer.header2("Water / Lava & Frozen States");
 
-		writer.putSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, this.useWorldWaterLevel,
+		writer.putSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, this.settings.useWorldWaterLevel,
 			"Set this to false to use the \"Water / Lava & Frozen States\" settings of this biome.");
 
-		writer.putSetting(BiomeStandardValues.WATER_LEVEL_MAX, this.configWaterLevelMax,
+		writer.putSetting(BiomeStandardValues.WATER_LEVEL_MAX, this.privateSettings.configWaterLevelMax,
 			"Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
 
-		writer.putSetting(BiomeStandardValues.WATER_LEVEL_MIN, this.configWaterLevelMin);
+		writer.putSetting(BiomeStandardValues.WATER_LEVEL_MIN, this.privateSettings.configWaterLevelMin);
 
-		writer.putSetting(BiomeStandardValues.WATER_BLOCK, this.configWaterBlock,
+		writer.putSetting(BiomeStandardValues.WATER_BLOCK, this.privateSettings.configWaterBlock,
 			"The block used when placing water in the biome.");
 
-		writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock,
+		writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.privateSettings.configIceBlock,
 			"The block used as ice. Ice only spawns if the BiomeTemperature is low enough.");
 
-		writer.putSetting(BiomeStandardValues.PACKED_ICE_BLOCK, this.packedIceBlock,
+		writer.putSetting(BiomeStandardValues.PACKED_ICE_BLOCK, this.settings.packedIceBlock,
 			"The block used as packed ice. Packed ice only spawns when using Iceberg SurfaceAndGroundControl.");
 		
-		writer.putSetting(BiomeStandardValues.SNOW_BLOCK, this.snowBlock,
+		writer.putSetting(BiomeStandardValues.SNOW_BLOCK, this.settings.snowBlock,
 			"The block used as snow (block, not tile). Snow blocks only spawn when using Iceberg SurfaceAndGroundControl.");		
 	
-		writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
+		writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.settings.cooledLavaBlock,
 			"The block used as cooled or frozen lava.",
 			"Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
 
 		writer.header1("Visuals and weather");
 
-		writer.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature,
+		writer.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, this.settings.biomeTemperature,
 			"Biome temperature. Float value from 0.0 to 2.0.",
 			"When this value is around 0.2, snow will fall on mountain peaks above y=90.",
 			"When this value is around 0.1, the whole biome will be covered in snow and ice.",
 			"However, on default biomes, this won't do anything except changing the grass and leaves colors slightly.");
 
-		writer.putSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, this.useFrozenOceanTemperature,
+		writer.putSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, this.settings.useFrozenOceanTemperature,
 			"Set this to true to use variable temperatures within the biome based on noise.",
 			"Used for vanilla Frozen Ocean and Deep Frozen Ocean biomes to create patches of water/ice.");
 		
-		writer.putSetting(BiomeStandardValues.BIOME_WETNESS, this.biomeWetness,
+		writer.putSetting(BiomeStandardValues.BIOME_WETNESS, this.settings.biomeWetness,
 			"Biome wetness. Float value from 0.0 to 1.0.",
 			"If this biome is a custom biome, and this value is set to 0, no rain will fall.",
 			"On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
 
-		writer.putSetting(BiomeStandardValues.SKY_COLOR, this.skyColor, "Biome sky color.");
+		writer.putSetting(BiomeStandardValues.SKY_COLOR, this.settings.skyColor, "Biome sky color.");
 
-		writer.putSetting(BiomeStandardValues.WATER_COLOR, this.waterColor, "Biome water color.");
+		writer.putSetting(BiomeStandardValues.WATER_COLOR, this.settings.waterColor, "Biome water color.");
 		
-		writer.putSetting(BiomeStandardValues.WATER_COLOR_CONTROL, this.waterColorControl,
+		writer.putSetting(BiomeStandardValues.WATER_COLOR_CONTROL, this.settings.waterColorControl,
 			"Setting for biomes with more complex colors.",
 			"Each column in the world has a noise value from what appears to be -1 to 1.",
 			"Values near 0 are more common than values near -1 and 1. This setting is",
@@ -612,63 +634,63 @@ public class BiomeConfig extends BiomeConfigBase
 			"  When the noise is below -0.8, the water will be white, between -0.8 and 0",
 			"  the water will be black, and above 0 the water will be the normal " + BiomeStandardValues.WATER_COLOR + ".");
 
-		writer.putSetting(BiomeStandardValues.GRASS_COLOR, this.grassColor, "Biome grass color.");
+		writer.putSetting(BiomeStandardValues.GRASS_COLOR, this.settings.grassColor, "Biome grass color.");
 		
-		writer.putSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, this.grassColorControl, "Biome grass color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
+		writer.putSetting(BiomeStandardValues.GRASS_COLOR_CONTROL, this.settings.grassColorControl, "Biome grass color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
-		writer.putSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, this.grassColorModifier,
+		writer.putSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, this.settings.grassColorModifier,
 			"Biome grass color modifier, can be None, Swamp or DarkForest.");
 
-		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor, "Biome foliage color.");
+		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.settings.foliageColor, "Biome foliage color.");
 		
-		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
+		writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.settings.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 
-		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
-		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
+		writer.putSetting(BiomeStandardValues.FOG_COLOR, this.settings.fogColor, "Biome fog color.");
+		writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.settings.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
 
-		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
+		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.settings.waterFogColor, "Biome water fog color.");
 
-		writer.putSetting(BiomeStandardValues.PARTICLE_TYPE, this.particleType,
+		writer.putSetting(BiomeStandardValues.PARTICLE_TYPE, this.settings.particleType,
 			"Biome particle type, for example minecraft:white_ash.",
 			"Use the \"otg particles\" console command to get a list of particles.");
 
-		writer.putSetting(BiomeStandardValues.PARTICLE_PROBABILITY, this.particleProbability,
+		writer.putSetting(BiomeStandardValues.PARTICLE_PROBABILITY, this.settings.particleProbability,
 			"Biome particle probability, 0 by default.", "*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.MUSIC, this.music,
+		writer.putSetting(BiomeStandardValues.MUSIC, this.settings.music,
 			"Music for the biome, takes a resource location. Leave empty to disable. Examples: ",
 			"	Music: minecraft:music_disc.cat", "	Music: minecraft:music.nether.basalt_deltas");
 
-		writer.putSetting(BiomeStandardValues.MUSIC_MIN_DELAY, this.musicMinDelay,
+		writer.putSetting(BiomeStandardValues.MUSIC_MIN_DELAY, this.settings.musicMinDelay,
 			"Minimum delay for music to start, in ticks");
 
-		writer.putSetting(BiomeStandardValues.MUSIC_MAX_DELAY, this.musicMaxDelay,
+		writer.putSetting(BiomeStandardValues.MUSIC_MAX_DELAY, this.settings.musicMaxDelay,
 			"Maximum delay for music to start, in ticks");
 
-		writer.putSetting(BiomeStandardValues.REPLACE_CURRENT_MUSIC, this.replaceCurrentMusic,
+		writer.putSetting(BiomeStandardValues.REPLACE_CURRENT_MUSIC, this.settings.replaceCurrentMusic,
 			"Whether music replaces the current playing music in the client or not");
 
-		writer.putSetting(BiomeStandardValues.AMBIENT_SOUND, this.ambientSound,
+		writer.putSetting(BiomeStandardValues.AMBIENT_SOUND, this.settings.ambientSound,
 			"Ambient sound for the biome. Leave empty to disable. Example:",
 			"	AmbientSound: minecraft:ambient.cave");
 
-		writer.putSetting(BiomeStandardValues.MOOD_SOUND, this.moodSound,
+		writer.putSetting(BiomeStandardValues.MOOD_SOUND, this.settings.moodSound,
 			"Mood sound for the biome. Leave empty to disable. Example:",
 			"	MoodSound: minecraft:ambient.crimson_forest.mood");
 
-		writer.putSetting(BiomeStandardValues.MOOD_SOUND_DELAY, this.moodSoundDelay,
+		writer.putSetting(BiomeStandardValues.MOOD_SOUND_DELAY, this.settings.moodSoundDelay,
 			"The delay in ticks between triggering mood sound");
 
-		writer.putSetting(BiomeStandardValues.MOOD_SEARCH_RANGE, this.moodSearchRange,
+		writer.putSetting(BiomeStandardValues.MOOD_SEARCH_RANGE, this.settings.moodSearchRange,
 			"How far from the player a mood sound can play");
 
-		writer.putSetting(BiomeStandardValues.MOOD_OFFSET, this.moodOffset, "The offset of the sound event");
+		writer.putSetting(BiomeStandardValues.MOOD_OFFSET, this.settings.moodOffset, "The offset of the sound event");
 
-		writer.putSetting(BiomeStandardValues.ADDITIONS_SOUND, this.additionsSound,
+		writer.putSetting(BiomeStandardValues.ADDITIONS_SOUND, this.settings.additionsSound,
 			"Additions sound for the biome. Leave empty to disable. Example:",
 			"	AdditionsSound: minecraft:ambient.soul_sand_valley.additions");
 
-		writer.putSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, this.additionsTickChance,
+		writer.putSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, this.settings.additionsTickChance,
 			"The tick chance that the additions sound plays");
 
 		writer.header1("Resource queue", "This section controls all resources spawning during decoration.",
@@ -728,7 +750,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Vein resource: Starts an area where ores will spawn. Can be slow, so use a low Rarity (smaller than 1).",
 			"CustomStructure resource: Starts a BO3 or BO4 structure in the chunk if spawn requirements are met.",
 			"");
-		writer.addConfigFunctions(this.resourceQueue);
+		writer.addConfigFunctions(this.settings.resourceQueue);
 
 		writer.header1("Sapling resource",
 			Constants.MOD_ID + " allows you to grow your custom objects from saplings, instead",
@@ -745,89 +767,89 @@ public class BiomeConfig extends BiomeConfigBase
 			"BigJungle - for when 4 jungle saplings grow at once.",
 			"RedMushroom/BrownMushroom - will only grow when bonemeal is used.", "");
 
-		writer.addConfigFunctions(this.saplingGrowers.values());
-		writer.addConfigFunctions(this.customSaplingGrowers.values());
-		writer.addConfigFunctions(this.customBigSaplingGrowers.values());
+		writer.addConfigFunctions(this.settings.saplingGrowers.values());
+		writer.addConfigFunctions(this.settings.customSaplingGrowers.values());
+		writer.addConfigFunctions(this.settings.customBigSaplingGrowers.values());
 
 		writer.header1("Vanilla structures", "Vanilla structure settings, each structure type has a global on/off",
 			"toggle in the WorldConfig, be sure to enable it to allow biomes to", "spawn structures.",
 			"* Fossils and Dungeons count as resources, not structures.");
 
-		writer.putSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, strongholdsEnabled,
+		writer.putSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, this.settings.strongholdsEnabled,
 			"Toggles strongholds spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, woodLandMansionsEnabled,
+		writer.putSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, this.settings.woodLandMansionsEnabled,
 			"Toggles woodland mansions spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled,
+		writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, this.settings.oceanMonumentsEnabled,
 			"Toggles ocean monuments spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled,
+		writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, this.settings.netherFortressesEnabled,
 			"Toggles nether fortresses spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
+		writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, this.settings.villageType,
 			"The type of villages in this biome. Can be wood, sandstone, taiga, savanna, snowy or disabled.");
 
-		writer.putSetting(BiomeStandardValues.VILLAGE_SIZE, villageSize,
+		writer.putSetting(BiomeStandardValues.VILLAGE_SIZE, this.settings.villageSize,
 			"The size of villages in this biome, 6 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType,
+		writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, this.settings.mineshaftType,
 			"The type of mineshafts in this biome. Can be normal, mesa or disabled.");
 
-		writer.putSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, mineshaftProbability,
+		writer.putSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, this.settings.mineshaftProbability,
 			"Probability of mineshafts spawning, 0.004 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType,
+		writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, this.settings.rareBuildingType,
 			"The type of the aboveground rare building in this biome.",
 			"Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
 
-		writer.putSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, buriedTreasureEnabled,
+		writer.putSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, this.settings.buriedTreasureEnabled,
 			"Toggles buried treasure spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, buriedTreasureProbability,
+		writer.putSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, this.settings.buriedTreasureProbability,
 			"Probability of buried treasure spawning, 0.01 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, shipWreckEnabled,
+		writer.putSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, this.settings.shipWreckEnabled,
 			"Toggles shipwrecks spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, shipWreckBeachedEnabled,
+		writer.putSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, this.settings.shipWreckBeachedEnabled,
 			"Toggles beached shipwrecks spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, pillagerOutpostEnabled,
+		writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, this.settings.pillagerOutpostEnabled,
 			"Toggles pillager outposts spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, pillagerOutpostSize,
+		writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, this.settings.pillagerOutpostSize,
 			"The size of pillager outposts in this biome, 7 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, bastionRemnantEnabled,
+		writer.putSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, this.settings.bastionRemnantEnabled,
 			"Toggles bastion remnants spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, bastionRemnantSize,
+		writer.putSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, this.settings.bastionRemnantSize,
 			"The size of bastion remnants in this biome, 6 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, netherFossilEnabled,
+		writer.putSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, this.settings.netherFossilEnabled,
 			"Toggles nether fossils spawning in this biome.", "Caution: Nether fossils spawn at all heights.");
 
-		writer.putSetting(BiomeStandardValues.END_CITY_ENABLED, endCityEnabled,
+		writer.putSetting(BiomeStandardValues.END_CITY_ENABLED, this.settings.endCityEnabled,
 			"Toggles end cities spawning in this biome.");
 
-		writer.putSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, ruinedPortalType,
+		writer.putSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, this.settings.ruinedPortalType,
 			"The type of ruined portals in this biome.",
 			"Can be normal, desert, jungle, swamp, mountain, ocean, nether or disabled.");
 
-		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, oceanRuinsType,
+		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, this.settings.oceanRuinsType,
 			"The type of ocean ruins in this biome.", "Can be cold, warm or disabled.");
 
-		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, oceanRuinsLargeProbability,
+		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, this.settings.oceanRuinsLargeProbability,
 			"Probability of large ocean ruins spawning, 0.3 by default.",
 			"*TODO: Test different values and document usage.");
 
-		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, oceanRuinsClusterProbability,
+		writer.putSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, this.settings.oceanRuinsClusterProbability,
 			"Probability of ocean ruins spawning clusters, 0.9 by default.",
 			"*TODO: Test different values and document usage.");
 
@@ -850,7 +872,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"To see the mob category a mob belongs to, use /otg entities. The mob's category (if any) is listed after its name.",
 			"Also supports modded mobs, if they are of the correct mob category.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters,
+		writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.privateSettings.spawnMonsters,
 			"The monsters (blazes, cave spiders, creepers, drowned, elder guardians, ender dragons, endermen, endermites, evokers, ghasts, giants,",
 			"guardians, hoglins, husks, illusioners, magma cubes, phantoms, piglins, pillagers, ravagers, shulkers, silverfishes, skeletons, slimes,",
 			"spiders, strays, vexes, vindicators, witches, zoglins, zombies, zombie villagers, zombified piglins) that spawn in this biome.",
@@ -858,7 +880,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.spawnCreatures,
+		writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.privateSettings.spawnCreatures,
 			"The friendly creatures (bees, cats, chickens, cows, donkeys, foxes, horses, llama, mooshrooms, mules, ocelots, panda's, parrots,",
 			"pigs, polar bears, rabbits, sheep, skeleton horses, striders, trader llama's, turtles, wandering traders, wolves, zombie horses)",
 			"that spawn in this biome.",
@@ -866,31 +888,31 @@ public class BiomeConfig extends BiomeConfigBase
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.spawnWaterCreatures,
+		writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.privateSettings.spawnWaterCreatures,
 			"The water creatures (squids and dolphins) that spawn in this biome",
 			"For instance [{\"mob\": \"minecraft:squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
+		writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.privateSettings.spawnAmbientCreatures,
 			"The ambient creatures (only bats in vanila) that spawn in this biome",
 			"For instance [{\"mob\": \"minecraft:bat\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, this.spawnWaterAmbientCreatures,
+		writer.putSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, this.privateSettings.spawnWaterAmbientCreatures,
 			"The ambient water creatures (cod, pufferfish, salmon, tropical fish) that spawn in this biome",
 			"For instance [{\"mob\": \"minecraft:cod\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.SPAWN_MISC_CREATURES, this.spawnMiscCreatures,
+		writer.putSetting(BiomeStandardValues.SPAWN_MISC_CREATURES, this.privateSettings.spawnMiscCreatures,
 			"The miscellaneous creatures (iron golems, snow golems and villagers) that spawn in this biome",
 			"For instance [{\"mob\": \"minecraft:villager\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 			"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 			"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 
-		writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritMobsBiomeName,
+		writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.privateSettings.inheritMobsBiomeName,
 			"Inherit the internal mobs list of another biome. Inherited mobs can be overridden using",
 			"the mob spawn settings in this biome config. Any mob type defined in this biome config",
 			"will override inherited mob settings for the same mob in the same mob category.",
@@ -901,20 +923,20 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger)
 	{
-		this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.getGenerationDepth());
-		this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.getGenerationDepth());
-		this.biomeSizeWhenBorder = lowerThanOrEqualTo(biomeSizeWhenBorder, worldConfig.getGenerationDepth());
-		this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.getBiomeRarityScale());
-		this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.getBiomeRarityScale());
-		this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.getWorldBiomes());
-		this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.getWorldBiomes());
-		this.onlyBorderNear = filterBiomes(this.onlyBorderNear, this.worldConfig.getWorldBiomes());
-		this.notBorderNear = filterBiomes(this.notBorderNear, this.worldConfig.getWorldBiomes());
-		this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
-		this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
-		this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
-		this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
-		this.waterLevelMax = higherThanOrEqualTo(waterLevelMax, this.waterLevelMin);
+		this.settings.biomeSize = lowerThanOrEqualTo(this.settings.biomeSize, this.settings.worldConfig.getGenerationDepth());
+		this.settings.biomeSizeWhenIsle = lowerThanOrEqualTo(this.settings.biomeSizeWhenIsle, this.settings.worldConfig.getGenerationDepth());
+		this.settings.biomeSizeWhenBorder = lowerThanOrEqualTo(this.settings.biomeSizeWhenBorder, this.settings.worldConfig.getGenerationDepth());
+		this.settings.biomeRarity = lowerThanOrEqualTo(this.settings.biomeRarity, this.settings.worldConfig.getBiomeRarityScale());
+		this.settings.biomeRarityWhenIsle = lowerThanOrEqualTo(this.settings.biomeRarityWhenIsle, this.settings.worldConfig.getBiomeRarityScale());
+		this.settings.isleInBiome = filterBiomes(this.settings.isleInBiome, this.settings.worldConfig.getWorldBiomes());
+		this.settings.biomeIsBorder = filterBiomes(this.settings.biomeIsBorder, this.settings.worldConfig.getWorldBiomes());
+		this.settings.onlyBorderNear = filterBiomes(this.settings.onlyBorderNear, this.settings.worldConfig.getWorldBiomes());
+		this.settings.notBorderNear = filterBiomes(this.settings.notBorderNear, this.settings.worldConfig.getWorldBiomes());
+		this.settings.volatility1 = this.privateSettings.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.privateSettings.volatilityRaw1) + 1.0D) : this.privateSettings.volatilityRaw1 + 1.0D;
+		this.settings.volatility2 = this.privateSettings.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.privateSettings.volatilityRaw2) + 1.0D) : this.privateSettings.volatilityRaw2 + 1.0D;
+		this.settings.volatilityWeight1 = (this.privateSettings.volatilityWeightRaw1 - 0.5D) * 24.0D;
+		this.settings.volatilityWeight2 = (0.5D - this.privateSettings.volatilityWeightRaw2) * 24.0D;
+		this.settings.waterLevelMax = higherThanOrEqualTo(this.settings.waterLevelMax, this.settings.waterLevelMin);
 	}
 
 	@Override
@@ -922,5 +944,14 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		settings.renameOldSetting("DisableNotchHeightControl", BiomeStandardValues.DISABLE_BIOME_HEIGHT);
 		settings.renameOldSetting("BiomeDictId", BiomeStandardValues.BIOME_DICT_TAGS);
+	}
+	
+	@Override
+	public IBiomeConfig createTemplateBiome()
+	{
+		BiomeConfig biomeConfig = new BiomeConfig(this.configName);
+		biomeConfig.privateSettings = this.privateSettings;
+		biomeConfig.settings = this.settings;
+		return biomeConfig;
 	}
 }

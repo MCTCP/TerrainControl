@@ -183,5 +183,7 @@ public class WorldStandardValues extends Settings
 	public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting(
 		"NormalBiomes", "Desert", "Forest", "Extreme Hills", "Swampland", "Plains", "Taiga", "Jungle", "River"
 	);
+	public static final Setting<List<String>> BLACKLISTED_BIOMES = stringListSetting("BlacklistedBiomes", "");	
+	
 	public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
 }

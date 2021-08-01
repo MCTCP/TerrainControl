@@ -60,6 +60,7 @@ public interface IWorldConfig
 	// Biome settings
 
 	public ArrayList<String> getWorldBiomes();
+	public List<String> getBlackListedBiomes();
 	public int getBiomeRarityScale();
 	boolean getOldGroupRarity();
 	public int getGenerationDepth();

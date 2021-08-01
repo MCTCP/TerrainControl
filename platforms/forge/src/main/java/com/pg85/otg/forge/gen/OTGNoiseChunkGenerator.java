@@ -134,6 +134,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
+	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(String presetFolderName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
@@ -142,7 +143,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
-		
+
 		this.worldSeed = seed;
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);		
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
@@ -267,38 +268,39 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// with TemplateForBiome, we want to use registered surfacebuilders though.
 		// TODO: Disable any surface/ground block related features for Template BiomeConfigs. 
 
-		IBiomeConfig biomeConfig = this.internalGenerator.getCachedBiomeProvider().getBiomeConfig(worldGenRegion.getCenterX() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);
-
-		// TODO: Improve this check, make sure a non-otg biome is actually being used with this biomeconfig.
-		// TODO: Also, should we be checking getTemplateForBiome per column, not per chunk?
-		if(biomeConfig.getTemplateForBiome() != null && biomeConfig.getTemplateForBiome().trim().length() > 0)
+		ChunkPos chunkpos = chunk.getPos();
+		int i = chunkpos.x;
+		int j = chunkpos.z;
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
+		sharedseedrandom.setBaseChunkSeed(i, j);
+		ChunkPos chunkpos1 = chunk.getPos();
+		int chunkMinX = chunkpos1.getMinBlockX();
+		int chunkMinZ = chunkpos1.getMinBlockZ();
+		int worldX;
+		int worldZ;
+		int i2;
+		double d1;
+		IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(chunkMinX, chunkMinZ));
+		IBiome biome;
+		for(int xInChunk = 0; xInChunk < Constants.CHUNK_SIZE; ++xInChunk)
 		{
-			ChunkPos chunkpos = chunk.getPos();
-			int i = chunkpos.x;
-			int j = chunkpos.z;
-			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-			sharedseedrandom.setBaseChunkSeed(i, j);
-			ChunkPos chunkpos1 = chunk.getPos();
-			int k = chunkpos1.getMinBlockX();
-			int l = chunkpos1.getMinBlockZ();
-			int k1;
-			int l1;
-			int i2;
-			double d1;
-			IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(k, l));
-			for(int i1 = 0; i1 < Constants.CHUNK_SIZE; ++i1)
+			for(int zInChunk = 0; zInChunk < Constants.CHUNK_SIZE; ++zInChunk)
 			{
-				for(int j1 = 0; j1 < Constants.CHUNK_SIZE; ++j1)
+				worldX = chunkMinX + xInChunk;
+				worldZ = chunkMinZ + zInChunk;
+
+				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
+
+				// TODO: Improve this check, make sure a non-otg biome is actually being used with this biomeconfig.
+				if(biome.getBiomeConfig().getTemplateForBiome() != null && biome.getBiomeConfig().getTemplateForBiome().trim().length() > 0)
 				{
-					k1 = k + i1;
-					l1 = l + j1;
-					i2 = chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, i1, j1) + 1;
-					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)k1 * 0.0625D, (double)l1 * 0.0625D, 0.0625D, (double)i1 * 0.0625D) * 15.0D;
-					((ForgeBiome)biomesForChunk[i1 * Constants.CHUNK_SIZE + j1]).getBiomeBase().buildSurfaceAt(sharedseedrandom, chunk, k1, l1, i2, d1, this.defaultBlock, this.defaultFluid, this.getSeaLevel(), worldGenRegion.getSeed());
+					i2 = chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
+					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
+					((ForgeBiome)biome).getBiomeBase().buildSurfaceAt(sharedseedrandom, chunk, worldX, worldZ, i2, d1, this.defaultBlock, this.defaultFluid, this.getSeaLevel(), worldGenRegion.getSeed());
 				}
 			}
-			// Skip bedrock, OTG always handles that.
 		}
+		// Skip bedrock, OTG always handles that.
 	}
 
 	// Carvers: Caves and ravines
@@ -357,6 +359,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
+	@SuppressWarnings("deprecation")
 	@Override
 	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
 	{

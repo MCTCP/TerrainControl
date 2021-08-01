@@ -204,7 +204,9 @@ public class WorldConfig extends WorldConfigBase
 
 		// BiomeGroups requires that values like genDepth are initialized
 		readBiomeGroups(reader, biomeResourcesManager, logger, materialReader);
-
+		
+		this.blackListedBiomes = reader.getSetting(WorldStandardValues.BLACKLISTED_BIOMES, logger);
+		
 		// Terrain settings
 
 		this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL, logger);
@@ -407,12 +409,18 @@ public class WorldConfig extends WorldConfigBase
 			"Biome groups group similar biomes together so that they spawn next to each other.", 
 			"Only standard biomes are required to be part of biome groups, isle, border and river biomes are configured separately.",
 			"",
-			"Syntax: BiomeGroup(GroupName, GroupSize, GroupRarity, BiomeName[, AnotherName[, ...]])",
+			"Syntax: BiomeGroup(GroupName, GroupSize, GroupRarity, BiomeName or Tags/Categories[, AnotherName[, ...]])",
 			"GroupName - must be unique, choose something descriptive.",
 			"Size - from 0 to GenerationDepth. Lower number = larger. All biomes in the group must be smaller (higher BiomeSize number) or equal to this value.",
 			"Rarity - relative spawn chance.",
 			"BiomeName - names of the biome that spawn in the group. Must match the name of a corresponding biome config. Case sensitive.",
-			"",
+			"Tags/Categories - Instead of BiomeName, Forge Biome Dictionary id's and/or MC Biome Categories. ",
+			"OTG fetches all registered non-OTG biomes that match the specified category/tags and adds them to the biome group.",
+			"A BiomeConfig using TemplateForBiome that targets the biome must exist, or the biome is skipped.",
+			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry)",
+			"Adds 2 entries; all plains biomes in the overworld, all hot+dry biomes. Biomes are never added twice.",
+			"- Use space as an AND operator, in the above example \"category.plains tag.overworld\" matches biomes with category plains AND tag overworld.",
+			"- \"category.\" and \"tag.\" exclude minecraft biomes, use \"mccategory.\" or \"mctag.\" to include them.",
 			"Note:", 
 			"If using BiomeMode: Normal, there are no limitations on the number of biome groups you can have or their names.",
 			"If using BiomeMode: NoGroups, only two biome group names are valid, NormalBiomes and IceBiomes, other groups are ignored. Only the size and rarity of the group named IceBiomes will be used, the size and rarity of the NormalBiomes group is ignored."
@@ -420,6 +428,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.addConfigFunctions(this.biomeGroupManager.getGroups());
 
+		writer.putSetting(WorldStandardValues.BLACKLISTED_BIOMES, this.blackListedBiomes,
+			"When using biome dictionary tags and/or biome categories with biome groups, these (non-OTG) biomes are excluded. Example: minecraft:plains."
+		);
+		
 		writer.header2("Isle & Border Biomes");
 		
 		writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.isleBiomes,
