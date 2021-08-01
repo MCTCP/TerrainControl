@@ -83,23 +83,8 @@ public class SpawnCommand extends BaseCommand
 		{
 			block = player.getLocation().getBlock();
 		}
-		Preset preset = OldExportCommand.getPresetOrDefault(presetName);
-		SpigotWorldGenRegion genRegion;
-		if((((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
-		{
-			genRegion = new SpigotWorldGenRegion(
-				preset.getFolderName(), 
-				preset.getWorldConfig(), 
-				((CraftWorld)player.getWorld()).getHandle(),
-				((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator
-			);
-		} else {
-			genRegion = new MCWorldGenRegion(
-				preset.getFolderName(), 
-				preset.getWorldConfig(), 
-				((CraftWorld) player.getWorld()).getHandle()
-			);
-		}
+		Preset preset = ObjectUtils.getPresetOrDefault(presetName);
+		SpigotWorldGenRegion genRegion = ObjectUtils.getWorldGenRegion(preset, (CraftWorld) player.getWorld());
 
 		if(objectToSpawn instanceof BO4)
 		{
@@ -237,7 +222,7 @@ public class SpawnCommand extends BaseCommand
 		Map<String, String> strings = CommandUtil.parseArgs(args, true);
 		
 		Set<String> presetFolderNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream()
-			.map(OldExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
+			.map(ExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
 		presetFolderNames.add("global");
 
 		String presetFolderName = strings.get("1");

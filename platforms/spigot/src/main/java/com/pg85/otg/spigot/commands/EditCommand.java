@@ -217,7 +217,7 @@ public class EditCommand extends BaseCommand
 		}
 		else
 		{
-			Set<String> presetFolderNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream().map(OldExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
+			Set<String> presetFolderNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream().map(ExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
 			presetFolderNames.add("global");
 			String presetFolderName = strings.get("1");
 			String objectName = strings.get("2");
