@@ -140,7 +140,7 @@ public class SelectOTGPresetScreen extends Screen
 			public PresetEntry(Preset p_i232272_2_)
 			{
 				this.preset = p_i232272_2_;
-				this.field_243282_c = new StringTextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Non-OTG" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
+				this.field_243282_c = new StringTextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Non-OTG (Customize)" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
 			}
 
 			@Override
@@ -157,7 +157,7 @@ public class SelectOTGPresetScreen extends Screen
 					if(this.preset == null && SelectOTGPresetScreen.this.dimId == 0)
 					{
 						SelectOTGPresetScreen.this.currentSelection.Overworld = new OTGOverWorld(null, -1l, null, null);
-						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCreateWorldScreen.create(SelectOTGPresetScreen.this.parent));
+						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCreateWorldScreen.create(SelectOTGPresetScreen.this.parent, SelectOTGPresetScreen.this.currentSelection));
 					} else {
 						OTGDimension otgDim = new OTGDimension(this.preset == null ? null : this.preset.getFolderName(), -1l);
 						switch(SelectOTGPresetScreen.this.dimId)

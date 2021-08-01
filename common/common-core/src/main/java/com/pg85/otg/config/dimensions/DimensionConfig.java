@@ -20,25 +20,26 @@ import com.pg85.otg.constants.Constants;
  */
 public class DimensionConfig
 {
+	private boolean isModpackConfig = false;
 	// Use capitals since we're serialising to yaml and want to make it look nice.
 	public int Version;
+	public String ModpackName;
 	public OTGOverWorld Overworld;
 	public OTGDimension Nether;
 	public OTGDimension End;
 	public List<OTGDimension> Dimensions = new ArrayList<>();
 
 	// Parameterless constructor for deserialisation
-	public DimensionConfig() {}
+	public DimensionConfig() { }
 	
-	public DimensionConfig clone()
+	public boolean isModpackConfig()
 	{
-		DimensionConfig clone = new DimensionConfig();
-		return clone;
+		return this.isModpackConfig;
 	}
 	
-	public static DimensionConfig fromDisk(String presetFolderName)
-	{
-		File dimensionConfig = new File(OTG.getEngine().getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER + File.separator + presetFolderName + ".yaml");
+	public static DimensionConfig fromDisk(String fileName)
+	{		
+		File dimensionConfig = new File(OTG.getEngine().getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER + File.separator + fileName + ".yaml");
 		if(dimensionConfig.exists())
 		{
 			DimensionConfig dimConfig = new DimensionConfig();
@@ -52,12 +53,17 @@ public class DimensionConfig
 	            e.printStackTrace();
 	        }
 	        DimensionConfig loadedConfig = fromYamlString(content);
-	        dimConfig.Version = loadedConfig.Version;
-	        dimConfig.Overworld = loadedConfig.Overworld;
-	        dimConfig.Nether = loadedConfig.Nether;
-	        dimConfig.End = loadedConfig.End;
-	        dimConfig.Dimensions = loadedConfig.Dimensions;
-	        return dimConfig;
+	        if(loadedConfig != null)
+	        {
+		        dimConfig.isModpackConfig = true;
+		        dimConfig.Version = loadedConfig.Version;
+		        dimConfig.ModpackName = loadedConfig.ModpackName;
+		        dimConfig.Overworld = loadedConfig.Overworld;
+		        dimConfig.Nether = loadedConfig.Nether;
+		        dimConfig.End = loadedConfig.End;
+		        dimConfig.Dimensions = loadedConfig.Dimensions;
+		        return dimConfig;
+	        }	        
 		}
 		return null;
 	}
