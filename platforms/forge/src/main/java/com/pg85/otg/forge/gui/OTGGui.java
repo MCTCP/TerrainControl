@@ -115,18 +115,23 @@ public class OTGGui
 												existingDimSetting = new DimensionGeneratorSettings(seed, generateFeatures, generateBonusChest, DimensionGeneratorSettings.withOverworld(dimensionTypesRegistry, simpleregistry, new FlatChunkGenerator(FlatGenerationSettings.CODEC.parse(dynamic).resultOrPartial(LogManager.getLogger()::error).orElseGet(() -> {
 												return FlatGenerationSettings.getDefault(biomesRegistry);
 												}))));
+												break;
 											case "debug_all_block_states":
 												existingDimSetting = new DimensionGeneratorSettings(seed, generateFeatures, generateBonusChest, DimensionGeneratorSettings.withOverworld(dimensionTypesRegistry, simpleregistry, new DebugChunkGenerator(biomesRegistry)));
+												break;
 											case "amplified":
 												existingDimSetting = new DimensionGeneratorSettings(seed, generateFeatures, generateBonusChest, DimensionGeneratorSettings.withOverworld(dimensionTypesRegistry, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomesRegistry), seed, () -> {
 													return dimensionSettingsRegistry.getOrThrow(DimensionSettings.AMPLIFIED);
 												})));
+												break;
 											case "largebiomes":
 												existingDimSetting = new DimensionGeneratorSettings(seed, generateFeatures, generateBonusChest, DimensionGeneratorSettings.withOverworld(dimensionTypesRegistry, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, true, biomesRegistry), seed, () -> {
 													return dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD);
 												})));
+												break;
 											default:
 												existingDimSetting = new DimensionGeneratorSettings(seed, generateFeatures, generateBonusChest, DimensionGeneratorSettings.withOverworld(dimensionTypesRegistry, simpleregistry, DimensionGeneratorSettings.makeDefaultOverworld(biomesRegistry, dimensionSettingsRegistry, seed)));
+												break;
 										}
 										dimensions = existingDimSetting.dimensions();
 									}

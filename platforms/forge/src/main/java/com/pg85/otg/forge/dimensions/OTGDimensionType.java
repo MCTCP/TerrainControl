@@ -105,18 +105,23 @@ public class OTGDimensionType extends DimensionType
 						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new FlatChunkGenerator(FlatGenerationSettings.CODEC.parse(dynamic).resultOrPartial(LogManager.getLogger()::error).orElseGet(() -> {
 						return FlatGenerationSettings.getDefault(registry);
 						}))));
+						break;
 					case "debug_all_block_states":
 						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new DebugChunkGenerator(registry)));
+						break;
 					case "amplified":
 						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, registry), seed, () -> {
 							return registry1.getOrThrow(DimensionSettings.AMPLIFIED);
 						})));
+						break;
 					case "largebiomes":
 						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, true, registry), seed, () -> {
 							return registry1.getOrThrow(DimensionSettings.OVERWORLD);
 						})));
+						break;
 					default:
 						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, DimensionGeneratorSettings.makeDefaultOverworld(registry, registry1, seed)));
+						break;
 				}
 				dimensions = existingDimSetting.dimensions();
 			}
