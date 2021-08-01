@@ -52,7 +52,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 			this.minTemp = readDouble(args.get(args.size() - 2), Double.MIN_VALUE, Double.MAX_VALUE);
 			this.maxTemp = readDouble(args.get(args.size() - 1), Double.MIN_VALUE, Double.MAX_VALUE);
 			args.remove(args.size() - 1);
-			args.remove(args.size() - 2);
+			args.remove(args.size() - 1);
 		}
 		catch(InvalidConfigException ex) { }
 		
