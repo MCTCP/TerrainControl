@@ -42,6 +42,7 @@ import net.minecraft.server.v1_16_R3.ArgumentTile;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 
+@SuppressWarnings("deprecation")
 public class ExportCommand extends BaseCommand
 {
 	protected static final HashMap<Player, Region> playerSelectionMap = new HashMap<>();

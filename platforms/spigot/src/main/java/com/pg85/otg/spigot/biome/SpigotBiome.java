@@ -33,7 +33,7 @@ public class SpigotBiome implements IBiome
 	{
 		return this.biomeBase;
 	}	
-
+	
 	@Override
 	public IBiomeConfig getBiomeConfig()
 	{

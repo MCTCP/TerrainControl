@@ -43,6 +43,7 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
 
+@SuppressWarnings("deprecation")
 public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Player, EditSession> sessionsMap = new HashMap<>();

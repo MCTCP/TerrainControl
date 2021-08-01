@@ -66,7 +66,7 @@ public class ForgeBiome implements IBiome
 		this.biomeBase = biomeBase;
 		this.biomeConfig = biomeConfig;
 	}
-
+	
 	@Override
 	public float getTemperatureAt(int x, int y, int z)
 	{

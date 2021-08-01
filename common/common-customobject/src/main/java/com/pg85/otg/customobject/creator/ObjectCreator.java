@@ -144,6 +144,7 @@ public class ObjectCreator extends BOCreator
 		// Get the blocks for each branch, put them in a grid
 		//  - Make sure empty branches are ignored
 
+		@SuppressWarnings("unchecked")
 		List<BlockFunction<?>>[][] branchGrid = (List<BlockFunction<?>>[][]) new ArrayList<?>[chunksOnXAxis][chunksOnZAxis];
 
 		// Array with booleans, saying if a given branch exists
