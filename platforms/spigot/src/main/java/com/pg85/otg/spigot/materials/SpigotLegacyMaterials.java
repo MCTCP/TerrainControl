@@ -27,8 +27,10 @@ public class SpigotLegacyMaterials
 				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
 			*/	
 			case "stationary_water":
+			case "flowing_water":
 				return Blocks.WATER.getBlockData();
 			case "stationary_lava":
+			case "flowing_lava":
 				return Blocks.LAVA.getBlockData();
 			case "stained_clay":
 				return Blocks.WHITE_TERRACOTTA.getBlockData();

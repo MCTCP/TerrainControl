@@ -95,15 +95,9 @@ class ForgeLegacyMaterials
 	// TODO: Don't need any names here that match 1.16's
 	static BlockState fromLegacyBlockName(String oldBlockName)
 	{
-		if (oldBlockName.matches("minecraft:[A-Za-z]+:[0-9]+")) {
-			int stateId = Integer.parseInt(oldBlockName.split(":")[2]);
-			return fromLegacyBlockNameOrIdWithData(oldBlockName.split(":")[1], stateId);
-		}
+		
 		switch(oldBlockName)
 		{
-			// TODO: These minecraft:xxx blocks no longer exist, so cannot be parsed by mc.
-			// We should parse them here, but atm we're not falling back to legacy parsing
-			// for those blocks. Should make that work, and also handle minecraft:xxx:data.
 			/*
 			case "minecraft:silver_shulker_box":
 				return Blocks.LIGHT_GRAY_SHULKER_BOX.defaultBlockState();
@@ -111,8 +105,10 @@ class ForgeLegacyMaterials
 				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
 			*/
 			case "stationary_water":
+			case "flowing_water":
 				return Blocks.WATER.defaultBlockState();
 			case "stationary_lava":
+			case "flowing_lava":
 				return Blocks.LAVA.defaultBlockState();
 			case "stained_clay":
 				return Blocks.WHITE_TERRACOTTA.defaultBlockState();
@@ -259,7 +255,7 @@ class ForgeLegacyMaterials
 				return Blocks.END_STONE_BRICKS.defaultBlockState();
 			case "end_stone":
 			case "ender_stone":
-				return Blocks.END_STONE.defaultBlockState();			
+				return Blocks.END_STONE.defaultBlockState();
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.defaultBlockState();
 			case "pg85":
