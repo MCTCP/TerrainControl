@@ -82,13 +82,8 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	private Path tempDataPackDir;
 	@Nullable
 	private ResourcePackList tempDataPackRepository;
-	//private boolean displayOptions;
 	private Button createButton;
-	private Button modeButton;
 	private Button difficultyButton;
-	//private Button moreOptionsButton;
-	//private Button gameRulesButton;
-	//private Button dataPacksButton;
 	private Button commandsButton;
 	private ITextComponent gameModeHelp1;
 	private ITextComponent gameModeHelp2;
@@ -181,7 +176,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			this.initSeed = p_214319_1_;
 		});
 		this.children.add(this.seedEdit);
-		this.modeButton = this.addButton(
+		this.addButton(
 			new Button(i, 110, 150, 20, StringTextComponent.EMPTY, 
 				(p_214316_1_) ->
 				{
@@ -243,7 +238,6 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		);
 		this.addButton(new Button(j, 161, 150, 20, new StringTextComponent("Dimensions"), // TODO: Use translationtext
 			(p_214322_1_) -> {
-				// TOOD: Show dimensions screen
 				Optional<BiomeGeneratorTypeScreens> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
 				BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(preset);
 				biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
