@@ -676,7 +676,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		// Set data for this preset
 		this.presetGenerationData.put(preset.getFolderName(), data);
 	}
-	
+
 	@Override
 	protected void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{		
@@ -726,5 +726,5 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 		}
 		return result;
-	}	
+	}
 }
