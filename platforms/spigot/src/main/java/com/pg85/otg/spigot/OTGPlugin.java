@@ -21,12 +21,12 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
+import com.pg85.otg.spigot.events.OTGHandler;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import com.pg85.otg.spigot.networking.NetworkingListener;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
-import com.pg85.spigot.events.OTGHandler;
 
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
