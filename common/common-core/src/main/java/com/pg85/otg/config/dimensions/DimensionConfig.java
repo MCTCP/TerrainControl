@@ -28,7 +28,9 @@ public class DimensionConfig
 	public OTGDimension Nether;
 	public OTGDimension End;
 	public List<OTGDimension> Dimensions = new ArrayList<>();
-
+	public Settings Settings;
+	public GameRules GameRules;
+	
 	// Parameterless constructor for deserialisation
 	public DimensionConfig() { }
 	
@@ -43,27 +45,27 @@ public class DimensionConfig
 		if(dimensionConfig.exists())
 		{
 			DimensionConfig dimConfig = new DimensionConfig();
-	        String content = "";
-	        try
-	        {
-	            content = new String(Files.readAllBytes(dimensionConfig.toPath()));
-	        }
-	        catch (IOException e) 
-	        {
-	            e.printStackTrace();
-	        }
-	        DimensionConfig loadedConfig = fromYamlString(content);
-	        if(loadedConfig != null)
-	        {
-		        dimConfig.isModpackConfig = true;
-		        dimConfig.Version = loadedConfig.Version;
-		        dimConfig.ModpackName = loadedConfig.ModpackName;
-		        dimConfig.Overworld = loadedConfig.Overworld;
-		        dimConfig.Nether = loadedConfig.Nether;
-		        dimConfig.End = loadedConfig.End;
-		        dimConfig.Dimensions = loadedConfig.Dimensions;
-		        return dimConfig;
-	        }	        
+			String content = "";
+			try
+			{
+				content = new String(Files.readAllBytes(dimensionConfig.toPath()));
+			}
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+			DimensionConfig loadedConfig = fromYamlString(content);
+			if(loadedConfig != null)
+			{
+				dimConfig.isModpackConfig = true;
+				dimConfig.Version = loadedConfig.Version;
+				dimConfig.ModpackName = loadedConfig.ModpackName;
+				dimConfig.Overworld = loadedConfig.Overworld;
+				dimConfig.Nether = loadedConfig.Nether;
+				dimConfig.End = loadedConfig.End;
+				dimConfig.Dimensions = loadedConfig.Dimensions;
+				return dimConfig;
+			}
 		}
 		return null;
 	}
@@ -127,5 +129,48 @@ public class DimensionConfig
 			this.PresetFolderName = presetFolderName;
 			this.Seed = seed;
 		}
+	}
+
+	public class Settings
+	{
+		public boolean generateStructures;
+		public boolean bonusChest;
+	}
+	
+	public class GameRules
+	{
+		public boolean doFireTick;
+		public boolean mobGriefing;
+		public boolean keepInventory;
+		public boolean doMobSpawning;
+		public boolean doMobLoot;
+		public boolean doTileDrops;
+		public boolean doEntityDrops;
+		public boolean commandBlockOutput;
+		public boolean naturalRegeneration;
+		public boolean doDaylightCycle;
+		public boolean logAdminCommands;
+		public boolean showDeathMessages;
+		public int randomTickSpeed;
+		public boolean sendCommandFeedback;
+		public boolean reducedDebugInfo; 
+		public boolean spectatorsGenerateChunks;
+		public int spawnRadius;
+		public boolean disableElytraMovementCheck;
+		public int maxEntityCramming;
+		public boolean doWeatherCycle;
+		public boolean doLimitedCrafting;
+		public int maxCommandChainLength;
+		public boolean announceAdvancements;
+		public boolean disableRaids;
+		public boolean doInsomnia;
+		public boolean doImmediateRespawn;
+		public boolean drowningDamage;
+		public boolean fallDamage;
+		public boolean fireDamage;
+		public boolean doPatrolSpawning;
+		public boolean doTraderSpawning;
+		public boolean forgiveDeadPlayers;
+		public boolean universalAnger;
 	}
 }
