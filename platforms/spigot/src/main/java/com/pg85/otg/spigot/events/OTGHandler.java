@@ -1,4 +1,4 @@
-package com.pg85.spigot.events;
+package com.pg85.otg.spigot.events;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.interfaces.ILogger;
