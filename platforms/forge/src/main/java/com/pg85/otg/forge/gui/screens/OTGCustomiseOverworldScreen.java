@@ -18,15 +18,15 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class OTGCreateWorldScreen extends CreateWorldScreen
+public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 {
 	private final CreateOTGDimensionsScreen parent;
 	private final DimensionConfig dimConfig;
 	private Button createButton;
 
-	public static OTGCreateWorldScreen create(@Nullable CreateOTGDimensionsScreen parent , DimensionConfig dimConfig)
+	public static OTGCustomiseOverworldScreen create(@Nullable CreateOTGDimensionsScreen parent , DimensionConfig dimConfig)
 	{
-		return new OTGCreateWorldScreen(
+		return new OTGCustomiseOverworldScreen(
 			parent,
 			new OTGWorldOptionsScreen(
 				parent.parent.worldGenSettingsComponent.registryHolder(),
@@ -50,7 +50,7 @@ public class OTGCreateWorldScreen extends CreateWorldScreen
 		);
 	}
 
-	public OTGCreateWorldScreen(@Nullable CreateOTGDimensionsScreen parent, OTGWorldOptionsScreen p_i242063_3_, DimensionConfig dimConfig)
+	public OTGCustomiseOverworldScreen(@Nullable CreateOTGDimensionsScreen parent, OTGWorldOptionsScreen p_i242063_3_, DimensionConfig dimConfig)
 	{
 		super(parent, DatapackCodec.DEFAULT, p_i242063_3_);
 		this.parent = parent;
@@ -69,7 +69,7 @@ public class OTGCreateWorldScreen extends CreateWorldScreen
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		int i = this.width / 2 - 155;
 		int j = this.width / 2 + 5;
-		 ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).init(this, this.minecraft, this.font);
+		((OTGWorldOptionsScreen)this.worldGenSettingsComponent).init(this, this.minecraft, this.font);
 		this.createButton = this.addButton(new Button(i, this.height - 28, 150, 20, DialogTexts.GUI_DONE, (p_214318_1_) ->
 		{
 			this.dimConfig.Overworld.NonOTGWorldType = ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).preset.get().description().getString().replace("generator.", "");
