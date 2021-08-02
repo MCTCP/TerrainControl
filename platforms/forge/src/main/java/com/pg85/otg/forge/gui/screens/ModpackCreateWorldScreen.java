@@ -330,44 +330,43 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			this.cleanupTempResources();
 			OptionalLong seed = parseSeed();
 			DimensionConfig modpackConfig = DimensionConfig.fromDisk("Modpack");			
-			DimensionGeneratorSettings dimensiongeneratorsettings = OTGDimensionType.createOTGSettings(this.worldGenSettingsComponent.registryHolder(), seed.isPresent() ? seed.getAsLong() : -1l, modpackConfig.Settings != null ? modpackConfig.Settings.generateStructures : true, modpackConfig.Settings != null ? modpackConfig.Settings.bonusChest : true, "Modpack");
+			DimensionGeneratorSettings dimensiongeneratorsettings = OTGDimensionType.createOTGSettings(this.worldGenSettingsComponent.registryHolder(), seed.isPresent() ? seed.getAsLong() : -1l, modpackConfig.Settings != null ? modpackConfig.Settings.GenerateStructures : true, modpackConfig.Settings != null ? modpackConfig.Settings.BonusChest : true, "Modpack");
 
 			if(modpackConfig.GameRules != null)
 			{
-				//. TOOD: tryDeserialize does not call onUpdate, shouldn't be a problem at this point though.
-				this.gameRules.getRule(GameRules.RULE_DOFIRETICK).set(modpackConfig.GameRules.doFireTick, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(modpackConfig.GameRules.mobGriefing, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_KEEPINVENTORY).set(modpackConfig.GameRules.keepInventory, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(modpackConfig.GameRules.doMobSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOMOBLOOT).set(modpackConfig.GameRules.doMobLoot, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOBLOCKDROPS).set(modpackConfig.GameRules.doTileDrops, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOENTITYDROPS).set(modpackConfig.GameRules.doEntityDrops, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_COMMANDBLOCKOUTPUT).set(modpackConfig.GameRules.commandBlockOutput, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(modpackConfig.GameRules.naturalRegeneration, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DAYLIGHT).set(modpackConfig.GameRules.doDaylightCycle, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_LOGADMINCOMMANDS).set(modpackConfig.GameRules.logAdminCommands, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES).set(modpackConfig.GameRules.showDeathMessages, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_RANDOMTICKING).tryDeserialize(modpackConfig.GameRules.randomTickSpeed + "");
-				this.gameRules.getRule(GameRules.RULE_SENDCOMMANDFEEDBACK).set(modpackConfig.GameRules.sendCommandFeedback, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_REDUCEDDEBUGINFO).set(modpackConfig.GameRules.reducedDebugInfo, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SPECTATORSGENERATECHUNKS).set(modpackConfig.GameRules.spectatorsGenerateChunks, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SPAWN_RADIUS).tryDeserialize(modpackConfig.GameRules.spawnRadius + "");
-				this.gameRules.getRule(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK).set(modpackConfig.GameRules.disableElytraMovementCheck, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MAX_ENTITY_CRAMMING).tryDeserialize(modpackConfig.GameRules.maxEntityCramming + "");
-				this.gameRules.getRule(GameRules.RULE_WEATHER_CYCLE).set(modpackConfig.GameRules.doWeatherCycle, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_LIMITED_CRAFTING).set(modpackConfig.GameRules.doLimitedCrafting, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MAX_COMMAND_CHAIN_LENGTH).tryDeserialize(modpackConfig.GameRules.maxCommandChainLength + "");
-				this.gameRules.getRule(GameRules.RULE_ANNOUNCE_ADVANCEMENTS).set(modpackConfig.GameRules.announceAdvancements, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DISABLE_RAIDS).set(modpackConfig.GameRules.disableRaids, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOINSOMNIA).set(modpackConfig.GameRules.doInsomnia, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN).set(modpackConfig.GameRules.doImmediateRespawn, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DROWNING_DAMAGE).set(modpackConfig.GameRules.drowningDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FALL_DAMAGE).set(modpackConfig.GameRules.fallDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FIRE_DAMAGE).set(modpackConfig.GameRules.fireDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DO_PATROL_SPAWNING).set(modpackConfig.GameRules.doPatrolSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DO_TRADER_SPAWNING).set(modpackConfig.GameRules.doTraderSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FORGIVE_DEAD_PLAYERS).set(modpackConfig.GameRules.forgiveDeadPlayers, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_UNIVERSAL_ANGER).set(modpackConfig.GameRules.universalAnger, (MinecraftServer)null);
+				// TOOD: tryDeserialize does not call onUpdate, shouldn't be a problem at this point though.
+				// TODO: doImmediateRespawn				
+				this.gameRules.getRule(GameRules.RULE_DOFIRETICK).set(modpackConfig.GameRules.DoFireTick, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(modpackConfig.GameRules.MobGriefing, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_KEEPINVENTORY).set(modpackConfig.GameRules.KeepInventory, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(modpackConfig.GameRules.DoMobSpawning, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DOMOBLOOT).set(modpackConfig.GameRules.DoMobLoot, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DOBLOCKDROPS).set(modpackConfig.GameRules.DoTileDrops, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DOENTITYDROPS).set(modpackConfig.GameRules.DoEntityDrops, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_COMMANDBLOCKOUTPUT).set(modpackConfig.GameRules.CommandBlockOutput, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(modpackConfig.GameRules.NaturalRegeneration, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DAYLIGHT).set(modpackConfig.GameRules.DoDaylightCycle, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_LOGADMINCOMMANDS).set(modpackConfig.GameRules.LogAdminCommands, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES).set(modpackConfig.GameRules.ShowDeathMessages, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_RANDOMTICKING).tryDeserialize(modpackConfig.GameRules.RandomTickSpeed + "");
+				this.gameRules.getRule(GameRules.RULE_SENDCOMMANDFEEDBACK).set(modpackConfig.GameRules.SendCommandFeedback, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_SPECTATORSGENERATECHUNKS).set(modpackConfig.GameRules.SpectatorsGenerateChunks, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_SPAWN_RADIUS).tryDeserialize(modpackConfig.GameRules.SpawnRadius + "");
+				this.gameRules.getRule(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK).set(modpackConfig.GameRules.DisableElytraMovementCheck, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_MAX_ENTITY_CRAMMING).tryDeserialize(modpackConfig.GameRules.MaxEntityCramming + "");
+				this.gameRules.getRule(GameRules.RULE_WEATHER_CYCLE).set(modpackConfig.GameRules.DoWeatherCycle, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_LIMITED_CRAFTING).set(modpackConfig.GameRules.DoLimitedCrafting, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_MAX_COMMAND_CHAIN_LENGTH).tryDeserialize(modpackConfig.GameRules.MaxCommandChainLength + "");
+				this.gameRules.getRule(GameRules.RULE_ANNOUNCE_ADVANCEMENTS).set(modpackConfig.GameRules.AnnounceAdvancements, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DISABLE_RAIDS).set(modpackConfig.GameRules.DisableRaids, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DOINSOMNIA).set(modpackConfig.GameRules.DoInsomnia, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DROWNING_DAMAGE).set(modpackConfig.GameRules.DrowningDamage, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_FALL_DAMAGE).set(modpackConfig.GameRules.FallDamage, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_FIRE_DAMAGE).set(modpackConfig.GameRules.FireDamage, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DO_PATROL_SPAWNING).set(modpackConfig.GameRules.DoPatrolSpawning, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_DO_TRADER_SPAWNING).set(modpackConfig.GameRules.DoTraderSpawning, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_FORGIVE_DEAD_PLAYERS).set(modpackConfig.GameRules.ForgiveDeadPlayers, (MinecraftServer)null);
+				this.gameRules.getRule(GameRules.RULE_UNIVERSAL_ANGER).set(modpackConfig.GameRules.UniversalAnger, (MinecraftServer)null);
 			}
 
 			WorldSettings worldsettings = new WorldSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, this.effectiveDifficulty, this.commands && !this.hardCore, this.gameRules, this.dataPacks);
