@@ -135,7 +135,9 @@ public class OTGGui
 										}
 										dimensions = existingDimSetting.dimensions();
 									}
-								} else {
+								}
+								else if(dimGenSettings.dimGenSettings != null)
+								{
 									// Add non-otg overworld configured via customize menu.
 									Entry<RegistryKey<Dimension>, Dimension> registryEntry = ((Entry<RegistryKey<Dimension>, Dimension>)dimGenSettings.dimGenSettings.dimensions().entrySet().toArray()[0]);
 									if (registryEntry.getKey() == Dimension.OVERWORLD)
