@@ -64,6 +64,8 @@ public class DimensionConfig
 				dimConfig.Nether = loadedConfig.Nether;
 				dimConfig.End = loadedConfig.End;
 				dimConfig.Dimensions = loadedConfig.Dimensions;
+				dimConfig.GameRules = loadedConfig.GameRules;
+				dimConfig.Settings = loadedConfig.Settings;
 				return dimConfig;
 			}
 		}
@@ -133,44 +135,46 @@ public class DimensionConfig
 
 	public class Settings
 	{
-		public boolean generateStructures;
-		public boolean bonusChest;
+		public boolean GenerateStructures;
+		public boolean BonusChest;
+		
+		public Settings() {}
 	}
 	
 	public class GameRules
 	{
-		public boolean doFireTick;
-		public boolean mobGriefing;
-		public boolean keepInventory;
-		public boolean doMobSpawning;
-		public boolean doMobLoot;
-		public boolean doTileDrops;
-		public boolean doEntityDrops;
-		public boolean commandBlockOutput;
-		public boolean naturalRegeneration;
-		public boolean doDaylightCycle;
-		public boolean logAdminCommands;
-		public boolean showDeathMessages;
-		public int randomTickSpeed;
-		public boolean sendCommandFeedback;
-		public boolean reducedDebugInfo; 
-		public boolean spectatorsGenerateChunks;
-		public int spawnRadius;
-		public boolean disableElytraMovementCheck;
-		public int maxEntityCramming;
-		public boolean doWeatherCycle;
-		public boolean doLimitedCrafting;
-		public int maxCommandChainLength;
-		public boolean announceAdvancements;
-		public boolean disableRaids;
-		public boolean doInsomnia;
-		public boolean doImmediateRespawn;
-		public boolean drowningDamage;
-		public boolean fallDamage;
-		public boolean fireDamage;
-		public boolean doPatrolSpawning;
-		public boolean doTraderSpawning;
-		public boolean forgiveDeadPlayers;
-		public boolean universalAnger;
+		public boolean DoFireTick;
+		public boolean MobGriefing;
+		public boolean KeepInventory;
+		public boolean DoMobSpawning;
+		public boolean DoMobLoot;
+		public boolean DoTileDrops;
+		public boolean DoEntityDrops;
+		public boolean CommandBlockOutput;
+		public boolean NaturalRegeneration;
+		public boolean DoDaylightCycle;
+		public boolean LogAdminCommands;
+		public boolean ShowDeathMessages;
+		public int RandomTickSpeed;
+		public boolean SendCommandFeedback;
+		public boolean SpectatorsGenerateChunks;
+		public int SpawnRadius;
+		public boolean DisableElytraMovementCheck;
+		public int MaxEntityCramming;
+		public boolean DoWeatherCycle;
+		public boolean DoLimitedCrafting;
+		public int MaxCommandChainLength;
+		public boolean AnnounceAdvancements;
+		public boolean DisableRaids;
+		public boolean DoInsomnia;
+		public boolean DrowningDamage;
+		public boolean FallDamage;
+		public boolean FireDamage;
+		public boolean DoPatrolSpawning;
+		public boolean DoTraderSpawning;
+		public boolean ForgiveDeadPlayers;
+		public boolean UniversalAnger;
+		
+		public GameRules() {}
 	}
 }
