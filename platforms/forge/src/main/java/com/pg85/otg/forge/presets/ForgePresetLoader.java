@@ -177,25 +177,43 @@ public class ForgePresetLoader extends LocalPresetLoader
 		Map<String, IBiomeConfig> biomeConfigsByName = new HashMap<>();
 		
 		// Create registry keys for each biomeconfig, create template 
-		// biome configs for any modded biomes using TemplateForBiome.
+		// biome configs for any non-otg biomes targeted via TemplateForBiome.
 		Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation = new LinkedHashMap<>();
 		List<String> blackListedBiomes = worldConfig.getBlackListedBiomes();
 		for(IBiomeConfig biomeConfig : biomeConfigs)
 		{
 			if(biomeConfig.getTemplateForBiome() != null && biomeConfig.getTemplateForBiome().trim().length() > 0)
 			{
-				if(
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||					
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
-				)
-				{					
-					String[] tagStrings = biomeConfig.getTemplateForBiome().split(",");
-					for(String tagString : tagStrings)
-					{
+				String[] tagStrings = biomeConfig.getTemplateForBiome().split(",");
+				for(String tagString : tagStrings)
+				{
+					// Handle biome registry names: minecraft:plains
+					if(
+						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) &&
+						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
+						!tagString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) &&
+						!tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
+					) {
+						ResourceLocation resourceLocation = new ResourceLocation(tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
+						Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
+						if(biome != null)
+						{
+							IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biome.getRegistryName().getNamespace(), biome.getRegistryName().getPath(), preset.getFolderName());
+							if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
+							{
+								biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
+								biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
+							}
+						} else {
+							if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+							{
+								OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome found for TemplateForBiome " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase() + " in biome config " + biomeConfig.getName());
+							}
+						}
+					} else {					
 						Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
 						String[] tagSubStrings = tagString.split(" ");
+						// Handle biome category
 						for(String tagSubString : tagSubStrings)
 						{
 							if(
@@ -223,8 +241,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 										OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "TemplateForBiome biome category " + tagSubString +  " for biomeconfig " + biomeConfig.getName() + " could not be found.");
 									}
 								}
-							}
+							}						
 						}
+						// Handle biome dictionary tags
 						List<BiomeDictionary.Type> tags = new ArrayList<>();
 						List<Boolean> tagsMC = new ArrayList<>();
 						for(String tagSubString : tagSubStrings)
@@ -249,6 +268,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						}
 						if(tags.size() > 0)
 						{
+							// When using a combination of category/tags, filter for biomes that match all.
 							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
 							biomesForTags = biomesForTags.stream()
 								.filter(a ->
@@ -275,6 +295,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							for(RegistryKey<Biome> biomeForTag : biomesForTags)
 							{
 								Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
+								// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
 								if(biomeConfig.isWithinTemplateForBiomeTemperatureRange(biome.getBaseTemperature()))
 								{
 									IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), preset.getFolderName());
@@ -292,21 +313,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 							}
 						}
 					}
-				} else {
-					ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getTemplateForBiome().replace("minecraft:", "").replace(" ", "_").toLowerCase());
-					Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
-					if(biome != null)
-					{
-						biomeConfigsByResourceLocation.put(new MCBiomeResourceLocation(biome.getRegistryName().getNamespace(), biome.getRegistryName().getPath(), preset.getFolderName()), biomeConfig);
-						biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-					} else {
-						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-						{
-							OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome found for TemplateForBiome " + biomeConfig.getTemplateForBiome().replace("minecraft:", "").replace(" ", "_").toLowerCase() + " in biome config " + biomeConfig.getName());
-						}
-					}
 				}
 			} else {
+				// Normal OTG biome, not a template biome.
 				IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 				biomeConfigsByResourceLocation.put(otgLocation, biomeConfig);
 				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
@@ -385,7 +394,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 
 			if(biomeConfig.getKey() instanceof OTGBiomeResourceLocation)
 			{
-				// Add biome dictionary tags for Forge
+				// For OTG biomes, add Forge biome dictionary tags.
 				biomeConfig.getValue().getBiomeDictTags().forEach(biomeDictId -> {
 					if(biomeDictId != null && biomeDictId.trim().length() > 0)
 					{
@@ -607,10 +616,27 @@ public class ForgePresetLoader extends LocalPresetLoader
 						}
 					}
 				} else {
-					IBiomeConfig config = biomeConfigsByName.get(biomeEntry);
-					if(config != null)
+					// Check for biomeconfig name, if none then use  
+					// resourcelocation to look up template biome config.
+					IBiomeConfig biomeConfig = biomeConfigsByName.get(biomeEntry);
+					if(biomeConfig != null)
 					{
-						groupBiomes.put(biomeEntry, config);	
+						if(!groupBiomes.containsKey(biomeEntry))
+						{
+							groupBiomes.put(biomeEntry, biomeConfig);
+						}
+					}
+					else if(biomeEntry.contains(":"))
+					{
+						String[] resourceLocationParts = biomeEntry.split(":");
+						if(resourceLocationParts.length == 2)
+						{
+							biomeConfig = biomeConfigsByResourceLocation.get(new MCBiomeResourceLocation(resourceLocationParts[0], resourceLocationParts[1], preset.getFolderName()));
+							if(biomeConfig != null && !groupBiomes.containsKey(biomeEntry))
+							{
+								groupBiomes.put(biomeEntry, biomeConfig);
+							}
+						}
 					}
 				}
 			}
