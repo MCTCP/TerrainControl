@@ -49,12 +49,15 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		
 		try
 		{
-			this.minTemp = readDouble(args.get(args.size() - 2), Double.MIN_VALUE, Double.MAX_VALUE);
-			this.maxTemp = readDouble(args.get(args.size() - 1), Double.MIN_VALUE, Double.MAX_VALUE);
-			args.remove(args.size() - 1);
-			args.remove(args.size() - 1);
+			this.minTemp = readDouble(args.get(args.size() - 2), Integer.MIN_VALUE, Integer.MAX_VALUE);
+			this.maxTemp = readDouble(args.get(args.size() - 1), Integer.MIN_VALUE, Integer.MAX_VALUE);
+			args = args.subList(0, args.size() - 2);
 		}
-		catch(InvalidConfigException ex) { }
+		catch(InvalidConfigException ex)
+		{
+			this.minTemp = 0;
+			this.maxTemp = 0;
+		}
 		
 		for (String biome : readBiomes(args, 3))
 		{
