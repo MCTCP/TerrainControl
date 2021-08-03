@@ -97,7 +97,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
 			Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 
-			Map<String, Integer> worldBiomes = new HashMap<>();
+			Map<String, List<Integer>> worldBiomes = new HashMap<>();
 
 			IRegistryWritable<BiomeBase> biome_registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(BIOME_KEY);
 			Map<String, IBiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
@@ -156,9 +156,15 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					throw new RuntimeException("Fatal error while registering OTG biome id's for preset " + preset.getFolderName() + ", most likely you've assigned a DefaultOceanBiome that doesn't exist.");
 				}
 				presetIdMapping[otgBiomeId] = otgBiome;
-
-				worldBiomes.put(biomeConfig.getName(), otgBiomeId);
-
+				
+				List<Integer> idsForBiome = worldBiomes.get(biomeConfig.getName());
+				if(idsForBiome == null)
+				{
+					idsForBiome = new ArrayList<Integer>();
+					worldBiomes.put(biomeConfig.getName(), idsForBiome);
+				}
+				idsForBiome.add(otgBiomeId);
+				
 				// Make a list of isle and border biomes per generation depth
 				if (biomeConfig.isIsleBiome())
 				{

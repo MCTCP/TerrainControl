@@ -34,7 +34,7 @@ public class NewBiomeGroup
 	// max rarity is a sum of the total rarity of this depth and all subsequent depths
 	public int[] maxRarityPerDepth;
 	
-	public void init(Map<String, Integer> worldIsleBiomes)
+	public void init(Map<String, List<Integer>> worldIsleBiomes)
 	{
 		for(BiomeData biomeData : this.biomes)
 		{
