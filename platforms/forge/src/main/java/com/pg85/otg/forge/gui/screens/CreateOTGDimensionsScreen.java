@@ -107,7 +107,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		// Done
 		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, DialogTexts.GUI_DONE, 
 			(p_213010_1_) -> {
-				if(this.dimGenSettings != null) // Is null when using ModpackCreateWorldMenu
+				if(!(this.parent instanceof ModpackCreateWorldScreen))
 				{
 					this.dimensionConfigConsumer.accept(new OTGDimensionSettingsContainer(this.currentSelection, this.dimGenSettings));
 				}
