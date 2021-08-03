@@ -15,8 +15,9 @@ public abstract class Logger implements ILogger
 	private boolean logPerformance;
 	private boolean logDecoration;
 	private boolean logMobs;
+	private String logPresets;
 
-	public void init(LogLevel level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logPerformance, boolean logDecoration, boolean logMobs)
+	public void init(LogLevel level, boolean logCustomObjects, boolean logStructurePlotting, boolean logConfigs, boolean logBiomeRegistry, boolean logPerformance, boolean logDecoration, boolean logMobs, String logPresets)
 	{
 		this.minimumLevel = level;
 		this.logCustomObjects = logCustomObjects; 
@@ -26,8 +27,15 @@ public abstract class Logger implements ILogger
 		this.logPerformance = logPerformance;
 		this.logDecoration = logDecoration;
 		this.logMobs = logMobs;
+		this.logPresets = logPresets;
 	}
-
+	
+	@Override
+	public boolean canLogForPreset(String presetFolderName)
+	{
+		return this.logPresets.equalsIgnoreCase(presetFolderName) || this.logPresets.equals("all");
+	}	
+	
 	@Override
 	public boolean getLogCategoryEnabled(LogCategory category)
 	{

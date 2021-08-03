@@ -7,7 +7,6 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -132,7 +131,7 @@ public abstract class LocalPresetLoader
 		String presetFolderName = presetDir.toFile().getName();
 		
 		SettingsMap worldConfigSettings = FileSettingsReader.read(presetFolderName, worldConfigFile, logger);
-		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, logger, getMaterialReader(presetFolderName));
+		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, logger, getMaterialReader(presetFolderName), presetFolderName);
 		FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
 		// use shortPresetName to register the biomes, instead of presetName
@@ -177,7 +176,7 @@ public abstract class LocalPresetLoader
 		// Update settings dynamically, these changes don't get written back to the file
 		processSettings(worldConfig, biomeConfigs);
 
-		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS) && OTG.getEngine().getPluginConfig().canLogForPreset(presetDir.getFileName().toString()))
+		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS) && logger.canLogForPreset(presetDir.getFileName().toString()))
 		{
 			logger.log(
 				LogLevel.INFO,
