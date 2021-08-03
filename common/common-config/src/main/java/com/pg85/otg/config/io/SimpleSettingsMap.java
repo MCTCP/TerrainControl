@@ -75,43 +75,11 @@ public final class SimpleSettingsMap implements SettingsMap
 	@Override
 	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
-		List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
-		for (RawSettingValue configFunctionLine : configFunctions)
-		{
-			String configFunctionString = configFunctionLine.getRawValue();
-			int bracketIndex = configFunctionString.indexOf('(');
-			String functionName = configFunctionString.substring(0, bracketIndex);
-			String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
-			List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
-			ConfigFunction<T> function = biomeResourcesManager.getConfigFunction(functionName, holder, args, logger, materialReader);
-			if (function == null)
-			{
-				// Function is in wrong config file, 
-				// allowed for config file inheritance.
-				continue;
-			}
-			result.add(function);
-			if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction)
-			{
-				logger.log(
-					LogLevel.ERROR,
-					LogCategory.CONFIGS,
-					MessageFormat.format(
-						"Invalid resource {0} in {1} on line {2}: {3}", 
-						functionName, 
-						this.name, 
-						configFunctionLine.getLineNumber(), 
-						((ErroredFunction<?>)function).error
-					)
-				);
-			}
-		}
-
-		return result;
+		return this.getConfigFunctions(holder, biomeResourcesManager, logger, materialReader, null, null);
 	}
 
 	@Override
-	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String currentPreset, IPluginConfig conf)
+	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName, IPluginConfig conf)
 	{
 		List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
 		for (RawSettingValue configFunctionLine : configFunctions)
@@ -129,20 +97,36 @@ public final class SimpleSettingsMap implements SettingsMap
 				continue;
 			}
 			result.add(function);
-			String logPresets = conf.logPresets();
-			if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && (conf.logPresets().equals("all") || conf.logPresets().equalsIgnoreCase(currentPreset)))
-			{
-				logger.log(
-						LogLevel.ERROR,
-						LogCategory.CONFIGS,
-						MessageFormat.format(
-								"Invalid resource {0} in {1} on line {2}: {3}",
-								functionName,
-								this.name,
-								configFunctionLine.getLineNumber(),
-								((ErroredFunction<?>)function).error
-						)
-				);
+			if (conf == null || presetFolderName == null) {
+				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction)
+				{
+					logger.log(
+							LogLevel.ERROR,
+							LogCategory.CONFIGS,
+							MessageFormat.format(
+									"Invalid resource {0} in {1} on line {2}: {3}",
+									functionName,
+									this.name,
+									configFunctionLine.getLineNumber(),
+									((ErroredFunction<?>)function).error
+							)
+					);
+				}
+			} else {
+				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && conf.canLogForPreset(presetFolderName))
+				{
+					logger.log(
+							LogLevel.ERROR,
+							LogCategory.CONFIGS,
+							MessageFormat.format(
+									"Invalid resource {0} in {1} on line {2}: {3}",
+									functionName,
+									this.name,
+									configFunctionLine.getLineNumber(),
+									((ErroredFunction<?>)function).error
+							)
+					);
+				}
 			}
 		}
 

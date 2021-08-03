@@ -177,7 +177,7 @@ public abstract class LocalPresetLoader
 		// Update settings dynamically, these changes don't get written back to the file
 		processSettings(worldConfig, biomeConfigs);
 
-		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS) && (OTG.getEngine().getPluginConfig().logPresets().equals("all") || OTG.getEngine().getPluginConfig().logPresets().equalsIgnoreCase(presetDir.getFileName().toString())))
+		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS) && OTG.getEngine().getPluginConfig().canLogForPreset(presetDir.getFileName().toString()))
 		{
 			logger.log(
 				LogLevel.INFO,
