@@ -252,9 +252,8 @@ public class OTGTeleporter implements ITeleporter
 						world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 					)
 					{
-						Preset preset = ((OTGNoiseChunkGenerator)world.getChunkSource().generator).getPreset();
-
-						String portalColor = preset.getWorldConfig().getPortalColor().toLowerCase().trim();
+						OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().generator);
+						String portalColor = generator.getPortalColor().toLowerCase().trim();
 						while(usedColors.contains(portalColor))
 						{
 							portalColor = OTGPortalColors.getNextPortalColor(portalColor);	
@@ -265,7 +264,7 @@ public class OTGTeleporter implements ITeleporter
 						{
 							blockPortalOTG = OTGPortalColors.getPortalBlockByColor(playerPortalColor);
 							portalOTGPOI = OTGPortalColors.getPortalPOIByColor(playerPortalColor);
-							List<LocalMaterialData> portalBlocks = preset.getWorldConfig().getPortalBlocks();
+							List<LocalMaterialData> portalBlocks = generator.getPortalBlocks();
 							if(portalBlocks.size() > 0)
 							{
 								portalBlock = ((ForgeMaterialData)portalBlocks.get(0)).internalBlock();	

@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.gen;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
@@ -13,9 +14,12 @@ import javax.annotation.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.biome.ForgeBiome;
@@ -26,6 +30,7 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
+import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
@@ -90,6 +95,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 							return p_236090_0_.preset.getFolderName();
 						}
 					),
+					Codec.STRING.fieldOf("dim_config_name").forGetter(
+						(p_236090_0_) -> {
+							return p_236090_0_.dimConfigName;
+						}
+					),
 					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
 						(p_236096_0_) -> { return p_236096_0_.biomeSource; }
 					),
@@ -119,22 +129,31 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
 	private final Preset preset;
+	private final String dimConfigName;
+	private final DimensionConfig dimConfig;
 	private CustomStructureCache structureCache; // TODO: Move this?
+	
+	// TODO: Modpack config specific, move this?
+	private boolean portalDataProcessed = false;
+	private List<LocalMaterialData> portalBlocks;
+	private String portalColor;
+	private String portalMob;
+	private String portalIgnitionSource;
 
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		this(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), null, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
-	public OTGNoiseChunkGenerator(String presetFolderName, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		this(presetFolderName, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(presetFolderName, dimConfigName, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
-	
+
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	@SuppressWarnings("deprecation")
-	private OTGNoiseChunkGenerator(String presetFolderName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
 
@@ -144,7 +163,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 
 		this.worldSeed = seed;
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);		
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
+		this.dimConfigName = dimConfigName;
+		if(this.dimConfigName != null && this.dimConfigName.trim().length() > 0)
+		{
+			this.dimConfig = DimensionConfig.fromDisk(this.dimConfigName);
+		} else {
+			this.dimConfig = null;
+		}
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();	
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
@@ -177,11 +203,91 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.preset;
 	}
 
+	// TODO: Modpack config specific, move this?
+
+	public String getPortalColor()
+	{
+		initPortalData();
+		return this.portalColor;
+	}
+
+	public String getPortalMob()
+	{
+		initPortalData();
+		return this.portalMob;
+	}
+
+	public String getPortalIgnitionSource()
+	{
+		initPortalData();
+		return this.portalIgnitionSource;
+	}
+		
+	public List<LocalMaterialData> getPortalBlocks()
+	{
+		initPortalData();
+		return this.portalBlocks;
+	}
+
+	private void initPortalData()
+	{
+		if(!this.portalDataProcessed && this.dimConfig != null)
+		{
+			this.portalDataProcessed = true;
+			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(this.preset.getFolderName());
+			for(OTGDimension dim : this.dimConfig.Dimensions)
+			{
+				if(dim.PresetFolderName != null && this.preset.getFolderName().equals(dim.PresetFolderName))
+				{
+					if(dim.PortalBlocks != null && dim.PortalBlocks.trim().length() > 0)
+					{
+						String[] portalBlocks = dim.PortalBlocks.split(",");
+						ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();					
+						for(String materialString : portalBlocks)
+						{
+							LocalMaterialData material = null;
+							try {
+								material = materialReader.readMaterial(materialString.trim());
+							} catch (InvalidConfigException e) { }
+							if(material != null)
+							{
+								materials.add(material);
+							}
+						}
+						this.portalBlocks = materials;
+					}					
+					this.portalColor = dim.PortalColor;
+					this.portalMob = dim.PortalMob;
+					this.portalIgnitionSource = dim.PortalIgnitionSource;
+					break;
+				}
+			}
+			if(this.portalBlocks.size() == 0)
+			{
+				this.portalBlocks = this.preset.getWorldConfig().getPortalBlocks(); 
+			}
+			if(this.portalColor == null)
+			{
+				this.portalColor = this.preset.getWorldConfig().getPortalColor();	
+			}
+			if(this.portalMob == null)
+			{
+				this.portalMob = this.preset.getWorldConfig().getPortalMob();
+			}
+			if(this.portalIgnitionSource == null)
+			{
+				this.portalIgnitionSource = this.preset.getWorldConfig().getPortalIgnitionSource();
+			}
+		}
+	}
+	
+	//
+	
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public ChunkGenerator withSeed(long seed)
 	{
-		return new OTGNoiseChunkGenerator(this.preset.getFolderName(), this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
+		return new OTGNoiseChunkGenerator(this.preset.getFolderName(), this.dimConfigName, this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
 	}
 	
 	// Base terrain gen

@@ -59,12 +59,11 @@ public class BlockHandler
 					world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 				)
 				{
-					Preset preset = ((OTGNoiseChunkGenerator)world.getChunkSource().generator).getPreset();		
-	
+					OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().generator);	
 					Item ignitionItem = null;
 					try
 					{
-						ignitionItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(preset.getWorldConfig().getPortalIgnitionSource()));
+						ignitionItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(generator.getPortalIgnitionSource()));
 					}
 					catch(ResourceLocationException ex) { }
 					if(ignitionItem == null)
@@ -72,7 +71,7 @@ public class BlockHandler
 						ignitionItem = Items.FLINT_AND_STEEL;
 					}
 
-					String portalColor = preset.getWorldConfig().getPortalColor().toLowerCase().trim();
+					String portalColor = generator.getPortalColor().toLowerCase().trim();
 					while(usedColors.contains(portalColor))
 					{
 						portalColor = OTGPortalColors.getNextPortalColor(portalColor);	
@@ -82,7 +81,7 @@ public class BlockHandler
 					if (event.getItemStack().getItem() == ignitionItem)
 					{
 						RegistryObject<OTGPortalBlock> otgPortalBlock = OTGPortalColors.getPortalBlockByColor(portalColor);				
-						List<LocalMaterialData> portalBlocks = preset.getWorldConfig().getPortalBlocks();
+						List<LocalMaterialData> portalBlocks = generator.getPortalBlocks();
 						if (OTGPortalBlock.checkForPortal((ServerWorld)event.getWorld(), pos, event.getPlayer(), event.getHand(), event.getItemStack(), otgPortalBlock, portalBlocks)) 
 						{
 							event.setCanceled(true);

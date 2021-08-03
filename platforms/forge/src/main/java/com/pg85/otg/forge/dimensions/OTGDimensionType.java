@@ -71,6 +71,7 @@ public class OTGDimensionType extends DimensionType
 		DimensionConfig dimConfig = DimensionConfig.fromDisk(generatorSettings);
 		SimpleRegistry<Dimension> dimensions = null;
 		Preset preset = null;
+		String dimConfigName = null;
 		if(dimConfig == null)
 		{
 			// Find the preset defined in generatorSettings, if none use the default preset.
@@ -85,6 +86,7 @@ public class OTGDimensionType extends DimensionType
 				dimensions = DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed);
 			}
 		} else {
+			dimConfigName = generatorSettings;
 			// Non-otg overworld, generatorsettings contains non-otg world type.
 			ForgeWorldType def = dimConfig.Overworld.NonOTGWorldType == null || dimConfig.Overworld.NonOTGWorldType.trim().length() == 0 ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
 			if(def != null)
@@ -128,6 +130,7 @@ public class OTGDimensionType extends DimensionType
 		}
 
 		return OTGDimensionType.createOTGDimensionGeneratorSettings(
+			dimConfigName,				
 			dimConfig,
 			dimensionTypesRegistry,
 			biomesRegistry,
@@ -140,7 +143,7 @@ public class OTGDimensionType extends DimensionType
 	}
 	
 	// Used for SP and MP
-	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DimensionConfig dimConfig, MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> defaultDimensions)
+	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(String dimConfigName, DimensionConfig dimConfig, MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> defaultDimensions)
 	{
 		// Create a new registry object and register dimensions to it.
 		SimpleRegistry<Dimension> dimensions = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
@@ -149,7 +152,7 @@ public class OTGDimensionType extends DimensionType
 		if(dimConfig.Overworld != null && dimConfig.Overworld.PresetFolderName != null && !nonOTGOverWorld)
 		{
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-				dimConfig.Overworld.PresetFolderName, new OTGBiomeProvider(dimConfig.Overworld.PresetFolderName, seed, false, false, biomesRegistry), seed,
+				dimConfig.Overworld.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Overworld.PresetFolderName, seed, false, false, biomesRegistry), seed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.Overworld.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, DimensionType.OVERWORLD_LOCATION);
@@ -158,7 +161,7 @@ public class OTGDimensionType extends DimensionType
 		{
 			long dimSeed = dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-					dimConfig.Nether.PresetFolderName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+					dimConfig.Nether.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, DimensionType.NETHER_LOCATION);
@@ -167,7 +170,7 @@ public class OTGDimensionType extends DimensionType
 		{
 			long dimSeed = dimConfig.End.Seed != -1l ? dimConfig.End.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-					dimConfig.End.PresetFolderName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+					dimConfig.End.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.END, chunkGenerator, DimensionType.END_LOCATION);
@@ -180,7 +183,7 @@ public class OTGDimensionType extends DimensionType
 				{
 					long dimSeed = otgDim.Seed != -1l ? otgDim.Seed : new Random().nextLong();
 					ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-						otgDim.PresetFolderName, new OTGBiomeProvider(otgDim.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+						otgDim.PresetFolderName, dimConfigName, new OTGBiomeProvider(otgDim.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
 						() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 					);
 					RegistryKey<Dimension> dimRegistryKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));

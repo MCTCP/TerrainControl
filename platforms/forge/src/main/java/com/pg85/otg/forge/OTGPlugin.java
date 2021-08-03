@@ -1,16 +1,6 @@
 package com.pg85.otg.forge;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.RedirectModifier;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.context.ParsedArgument;
-import com.mojang.brigadier.context.ParsedCommandNode;
-import com.mojang.brigadier.context.StringRange;
-import com.mojang.brigadier.tree.CommandNode;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
@@ -27,14 +17,11 @@ import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.presets.Preset;
 
-import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.IntegerValue;
-import net.minecraft.world.GameRules.RuleType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.FolderName;
@@ -159,7 +146,7 @@ public class OTGPlugin
 		// TODO: Only needed for MP?
 		if(event.getWorld() instanceof ServerWorld)
 		{
-			DimensionConfig modpackConfig = DimensionConfig.fromDisk("Modpack");
+			DimensionConfig modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 			if(modpackConfig != null && modpackConfig.GameRules != null)
 			{
 				GameRules gameRules = ((ServerWorld)event.getWorld()).getGameRules();

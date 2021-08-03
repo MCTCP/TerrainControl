@@ -122,8 +122,12 @@ public class DimensionConfig
 	public static class OTGDimension
 	{
 		public String PresetFolderName;
+		public String PortalBlocks;
+		public String PortalColor;
+		public String PortalMob;
+		public String PortalIgnitionSource;
 		public long Seed;
-		
+
 		public OTGDimension() {}
 		
 		public OTGDimension(String presetFolderName, long seed)

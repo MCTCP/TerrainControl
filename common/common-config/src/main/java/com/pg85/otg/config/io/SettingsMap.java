@@ -6,8 +6,6 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IPluginConfig;
-import com.pg85.otg.interfaces.IWorldGenRegion;
-
 import java.util.Collection;
 import java.util.List;
 
