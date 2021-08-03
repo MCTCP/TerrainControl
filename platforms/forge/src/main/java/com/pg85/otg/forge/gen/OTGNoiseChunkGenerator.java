@@ -301,7 +301,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				this.cavesEnabled = this.preset.getWorldConfig().getCavesEnabled();
 				this.ravinesEnabled = this.preset.getWorldConfig().getRavinesEnabled();
 			}
-			if(this.portalBlocks.size() == 0)
+			if(this.portalBlocks == null || this.portalBlocks.size() == 0)
 			{
 				this.portalBlocks = this.preset.getWorldConfig().getPortalBlocks(); 
 			}
