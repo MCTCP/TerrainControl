@@ -13,6 +13,7 @@ public class Constants
 
 	// Main Plugin Config
 	public static final String PluginConfigFilename = "OTG.ini";
+	public static final String MODPACK_CONFIG_NAME = "Modpack";
 	
 	// Folders
 	
@@ -100,8 +101,11 @@ public class Constants
 	 */
 	public static final int PIECES_PER_CHUNK_Y = CHUNK_Y_SIZE / PIECE_Y_SIZE;
 	
-	public static final String MC_BIOME_CATEGORY_LABEL = "mccategory.";
+	public static final String MOD_LABEL = "mod.";
 	public static final String BIOME_CATEGORY_LABEL = "category.";
+	public static final String MOD_BIOME_CATEGORY_LABEL = "modcategory.";
+	public static final String MC_BIOME_CATEGORY_LABEL = "mccategory.";
 	public static final String BIOME_DICT_TAG_LABEL = "tag.";
+	public static final String MOD_BIOME_DICT_TAG_LABEL = "modtag.";
 	public static final String MC_BIOME_DICT_TAG_LABEL = "mctag.";
 }

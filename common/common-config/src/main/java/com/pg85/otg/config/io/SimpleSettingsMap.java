@@ -8,7 +8,6 @@ import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IPluginConfig;
-import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -113,7 +112,7 @@ public final class SimpleSettingsMap implements SettingsMap
 					);
 				}
 			} else {
-				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && conf.canLogForPreset(presetFolderName))
+				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && logger.canLogForPreset(presetFolderName))
 				{
 					logger.log(
 							LogLevel.ERROR,

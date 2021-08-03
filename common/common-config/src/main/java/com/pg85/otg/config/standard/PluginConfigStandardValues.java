@@ -8,7 +8,7 @@ public class PluginConfigStandardValues extends Settings
 {
 	// Plugin Defaults
 	
-	public static final Setting<LogLevels> LOG_LEVEL = enumSetting("LogLevel", LogLevels.Standard);	
+	public static final Setting<LogLevels> LOG_LEVEL = enumSetting("LogLevel", LogLevels.Standard);
 	public static final Setting<Boolean> DECORATION_ENABLED = booleanSetting("DecorationEnabled", true);
 	public static final Setting<Boolean> LOG_CUSTOM_OBJECTS = booleanSetting("LogCustomObjects", false);
 	public static final Setting<Boolean> LOG_BO4_PLOTTING = booleanSetting("LogBO4Plotting", false);

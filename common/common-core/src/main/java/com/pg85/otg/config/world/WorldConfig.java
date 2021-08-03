@@ -56,13 +56,13 @@ public class WorldConfig extends WorldConfigBase
 	private int worldHeightScaleBits;
 	private int worldHeightCapBits;
 	
-	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		super(settingsReader.getName());
 
 		this.worldBiomes.addAll(biomes);
 		this.renameOldSettings(settingsReader, logger, materialReader);
-		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader);
+		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader, presetFolderName);
 		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
@@ -143,7 +143,7 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		// Misc
 
@@ -421,7 +421,10 @@ public class WorldConfig extends WorldConfigBase
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry)",
 			"Adds 2 entries; all plains biomes in the overworld, all hot+dry biomes. Biomes are never added twice.",
 			"- Use space as an AND operator, in the above example \"category.plains tag.overworld\" matches biomes with category plains AND tag overworld.",
-			"- \"category.\" and \"tag.\" exclude minecraft biomes, use \"mccategory.\" or \"mctag.\" to include them.",
+			"To target both minecraft and modded biomes, use \"category.\" or \"tag.\".",
+			"To target only modded biomes, use \"modcategory.\" or \"modtag.\".",
+			"To target only minecraft biomes, use \"mccategory.\" or \"mctag.\".",
+			"To filter biomes for a specific mod, add \"mod.<namespace>\", for example \"mod.byg category.plains tag.overworld\".",			
 			"MinTemperature/MaxTemperature - Optional, when using Tags/Categories, only biomes within this temperature range are used.",
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry, -1.0, 1.0)",
 			"Same example as before, but only includes biomes with temperature between -1.0 and 1.0.",

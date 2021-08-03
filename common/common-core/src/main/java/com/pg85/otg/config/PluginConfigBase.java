@@ -88,7 +88,7 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	{
 		return this.logPerformance;
 	}	
-	
+
 	@Override
 	public boolean getDecorationEnabled()
 	{
@@ -102,10 +102,11 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	}
 
 	@Override
-	public boolean canLogForPreset(String presetFolderName) {
-		return this.logPresets.equalsIgnoreCase(presetFolderName) || this.logPresets.equals("all");
+	public String logPresets()
+	{
+		return this.logPresets;
 	}
-
+	
 	@Override
 	public ConfigMode getSettingsMode()
 	{
