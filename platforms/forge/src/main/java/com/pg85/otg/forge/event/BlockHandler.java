@@ -9,7 +9,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalBlock;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalColors;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.item.Item;

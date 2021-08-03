@@ -139,6 +139,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private String portalColor;
 	private String portalMob;
 	private String portalIgnitionSource;
+	private boolean cavesEnabled;
+	private boolean ravinesEnabled;
 
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
@@ -206,61 +208,91 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// TODO: Modpack config specific, move this?
 
+	public boolean getCavesEnabled()
+	{
+		processDimensionConfigData();
+		return this.cavesEnabled;
+	}
+
+	public boolean getRavinesEnabled()
+	{
+		processDimensionConfigData();
+		return this.ravinesEnabled;
+	}
+
 	public String getPortalColor()
 	{
-		initPortalData();
+		processDimensionConfigData();
 		return this.portalColor;
 	}
 
 	public String getPortalMob()
 	{
-		initPortalData();
+		processDimensionConfigData();
 		return this.portalMob;
 	}
 
 	public String getPortalIgnitionSource()
 	{
-		initPortalData();
+		processDimensionConfigData();
 		return this.portalIgnitionSource;
 	}
 		
 	public List<LocalMaterialData> getPortalBlocks()
 	{
-		initPortalData();
+		processDimensionConfigData();
 		return this.portalBlocks;
 	}
 
-	private void initPortalData()
+	private void processDimensionConfigData()
 	{
 		if(!this.portalDataProcessed && this.dimConfig != null)
 		{
-			this.portalDataProcessed = true;
-			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(this.preset.getFolderName());
-			for(OTGDimension dim : this.dimConfig.Dimensions)
+			this.portalDataProcessed = true;			
+			if(this.dimConfig.Overworld != null && this.dimConfig.Overworld.PresetFolderName != null && this.preset.getFolderName().equals(this.dimConfig.Overworld.PresetFolderName))
 			{
-				if(dim.PresetFolderName != null && this.preset.getFolderName().equals(dim.PresetFolderName))
+				this.cavesEnabled = this.dimConfig.Overworld.CarversEnabled && this.preset.getWorldConfig().getCavesEnabled();
+				this.ravinesEnabled = this.dimConfig.Overworld.CarversEnabled && this.preset.getWorldConfig().getRavinesEnabled();
+			}
+			else if(this.dimConfig.Nether != null && this.dimConfig.Nether.PresetFolderName != null && this.preset.getFolderName().equals(this.dimConfig.Nether.PresetFolderName))
+			{
+				this.cavesEnabled = this.dimConfig.Nether.CarversEnabled && this.preset.getWorldConfig().getCavesEnabled();
+				this.ravinesEnabled = this.dimConfig.Nether.CarversEnabled && this.preset.getWorldConfig().getRavinesEnabled();
+			}
+			else if(this.dimConfig.End != null && this.dimConfig.End.PresetFolderName != null && this.preset.getFolderName().equals(this.dimConfig.End.PresetFolderName))
+			{
+				this.cavesEnabled = this.dimConfig.End.CarversEnabled && this.preset.getWorldConfig().getCavesEnabled();
+				this.ravinesEnabled = this.dimConfig.End.CarversEnabled && this.preset.getWorldConfig().getRavinesEnabled();
+			} else {
+				IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(this.preset.getFolderName());
+				for(OTGDimension dim : this.dimConfig.Dimensions)
 				{
-					if(dim.PortalBlocks != null && dim.PortalBlocks.trim().length() > 0)
+					if(dim.PresetFolderName != null && this.preset.getFolderName().equals(dim.PresetFolderName))
 					{
-						String[] portalBlocks = dim.PortalBlocks.split(",");
-						ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();					
-						for(String materialString : portalBlocks)
+						if(dim.PortalBlocks != null && dim.PortalBlocks.trim().length() > 0)
 						{
-							LocalMaterialData material = null;
-							try {
-								material = materialReader.readMaterial(materialString.trim());
-							} catch (InvalidConfigException e) { }
-							if(material != null)
+							String[] portalBlocks = dim.PortalBlocks.split(",");
+							ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();					
+							for(String materialString : portalBlocks)
 							{
-								materials.add(material);
+								LocalMaterialData material = null;
+								try {
+									material = materialReader.readMaterial(materialString.trim());
+								} catch (InvalidConfigException e) { }
+								if(material != null)
+								{
+									materials.add(material);
+								}
 							}
-						}
-						this.portalBlocks = materials;
-					}					
-					this.portalColor = dim.PortalColor;
-					this.portalMob = dim.PortalMob;
-					this.portalIgnitionSource = dim.PortalIgnitionSource;
-					break;
+							this.portalBlocks = materials;
+						}					
+						this.portalColor = dim.PortalColor;
+						this.portalMob = dim.PortalMob;
+						this.portalIgnitionSource = dim.PortalIgnitionSource;
+						this.cavesEnabled = dim.CarversEnabled && this.preset.getWorldConfig().getCavesEnabled();
+						this.ravinesEnabled = dim.CarversEnabled && this.preset.getWorldConfig().getRavinesEnabled();
+						break;
+					}
 				}
 			}
 			if(this.portalBlocks.size() == 0)
@@ -419,7 +451,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
+			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.getCavesEnabled(), this.getRavinesEnabled());
 		}
 		super.applyCarvers(seed, biomeManager, chunk, stage);
 	}
