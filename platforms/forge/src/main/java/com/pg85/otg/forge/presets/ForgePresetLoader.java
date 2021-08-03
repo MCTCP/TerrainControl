@@ -190,8 +190,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 					// Handle biome registry names: minecraft:plains
 					if(
 						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) &&
+						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) &&
 						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
 						!tagString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) &&
+						!tagString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) &&
 						!tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
 					) {
 						ResourceLocation resourceLocation = new ResourceLocation(tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
@@ -218,10 +220,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							if(
 								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
 							)
 							{
-								Biome.Category category = Biome.Category.byName(tagSubString.trim().toLowerCase().toLowerCase().replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+								Biome.Category category = Biome.Category.byName(tagSubString.trim().toLowerCase().toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
 								if(category != null)
 								{
 									biomesForTags.addAll(
@@ -230,7 +233,14 @@ public class ForgePresetLoader extends LocalPresetLoader
 												a.getBiomeCategory() == category &&
 												!blackListedBiomes.contains(a.getRegistryName().toString()) &&
 												!a.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-												(tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) || !a.getRegistryName().getNamespace().equals("minecraft"))
+												(
+													tagSubString.trim().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+													(
+														tagSubString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) && !a.getRegistryName().getNamespace().equals("minecraft")
+													) || (
+														tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) && a.getRegistryName().getNamespace().equals("minecraft")
+													)
+												)
 											).map(
 												b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
 											).collect(Collectors.toList())
@@ -241,23 +251,24 @@ public class ForgePresetLoader extends LocalPresetLoader
 										OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "TemplateForBiome biome category " + tagSubString +  " for biomeconfig " + biomeConfig.getName() + " could not be found.");
 									}
 								}
-							}						
+							}
 						}
 						// Handle biome dictionary tags
 						List<BiomeDictionary.Type> tags = new ArrayList<>();
-						List<Boolean> tagsMC = new ArrayList<>();
+						List<String> tagsStrings = new ArrayList<>();
 						for(String tagSubString : tagSubStrings)
 						{
 							if(
 								tagSubString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+								tagSubString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
 								tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
 							)
 							{
-								BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString.trim().toLowerCase().replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
+								BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString.trim().toLowerCase().replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
 								if(tag != null)
 								{
 									tags.add(tag);
-									tagsMC.add(tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL));
+									tagsStrings.add(tagSubString.trim().toLowerCase());
 								} else {
 									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 									{
@@ -274,19 +285,37 @@ public class ForgePresetLoader extends LocalPresetLoader
 								.filter(a ->
 									!blackListedBiomes.contains(a.location().toString()) &&
 									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&							
-									(tagsMC.get(0) || !a.location().getNamespace().equals("minecraft"))
+									(
+										tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+										(
+											(
+												tagsStrings.get(0).startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
+											) || (
+												tagsStrings.get(0).startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")	
+											)
+										)
+									)
 								).collect(Collectors.toSet());
 							
 							for(int i = 1; i < tags.size(); i++)
 							{
 								BiomeDictionary.Type tag = tags.get(i);
-								boolean allowMCBiomes = tagsMC.get(i);
+								String tagType = tagsStrings.get(i);
 								biomesForTags = biomesForTags.stream()
 									.filter(
 										a -> BiomeDictionary.hasType(a, tag) && 
 										!blackListedBiomes.contains(a.location().toString()) &&
 										!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-										(allowMCBiomes || !a.location().getNamespace().equals("minecraft"))
+										(
+											tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+											(
+												(
+													tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
+												) || (
+													tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")	
+												)
+											)												
+										)
 									).collect(Collectors.toSet());
 							}
 						}
@@ -505,20 +534,23 @@ public class ForgePresetLoader extends LocalPresetLoader
 				Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
 				if(
 					biomeEntry.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+					biomeEntry.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+					biomeEntry.toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
 				)
-				{					
+				{
 					String[] tagStrings = biomeEntry.split(" ");
 					for(String tagString : tagStrings)
 					{
 						if(
 							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
 						)
 						{
-							Biome.Category category = Biome.Category.byName(tagString.trim().toLowerCase().toLowerCase().replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+							Biome.Category category = Biome.Category.byName(tagString.trim().toLowerCase().toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
 							if(category != null)
 							{
 								biomesForTags.addAll(
@@ -527,7 +559,14 @@ public class ForgePresetLoader extends LocalPresetLoader
 										a -> a.getBiomeCategory() == category &&
 										!a.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 										!blackListedBiomes.contains(a.getRegistryName().toString()) &&
-										(tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) || !a.getRegistryName().getNamespace().equals("minecraft"))
+										(
+											tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) || 
+											(
+												tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) && !a.getRegistryName().getNamespace().equals("minecraft")
+											) || (
+												tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) && a.getRegistryName().getNamespace().equals("minecraft")													
+											)										
+										)
 									).map(
 										b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
 									).collect(Collectors.toList())
@@ -542,19 +581,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 
 					List<BiomeDictionary.Type> tags = new ArrayList<>();
-					List<Boolean> tagsMC = new ArrayList<>();
+					List<String> tagsStrings = new ArrayList<>();
 					for(String tagString : tagStrings)
 					{
 						if(
 							tagString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+							tagString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
 							tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
 						)
 						{
-							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagString.trim().toLowerCase().replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagString.trim().toLowerCase().replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
 							if(tag != null)
 							{
 								tags.add(tag);
-								tagsMC.add(tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL));
+								tagsStrings.add(tagString.trim().toLowerCase());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 								{
@@ -568,24 +608,38 @@ public class ForgePresetLoader extends LocalPresetLoader
 						if(biomesForTags.size() == 0)
 						{
 							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
-						}					
+						}
 						biomesForTags = biomesForTags.stream()
 							.filter(a ->
 								!blackListedBiomes.contains(a.location().toString()) &&
 								!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-								(tagsMC.get(0) || !a.location().getNamespace().equals("minecraft")) 								
+								(
+									tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+									(
+										tagsStrings.get(0).startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
+									) || (
+										tagsStrings.get(0).startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")
+									)
+								) 								
 							).collect(Collectors.toSet());
 						
 						for(int i = 1; i < tags.size(); i++)
 						{
 							BiomeDictionary.Type tag = tags.get(i);
-							boolean allowMCBiomes = tagsMC.get(i);
+							String tagType = tagsStrings.get(i);
 							biomesForTags = biomesForTags.stream()
 								.filter(
 									a -> BiomeDictionary.hasType(a, tag) &&
 									!blackListedBiomes.contains(a.location().toString()) &&
 									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-									(allowMCBiomes || !a.location().getNamespace().equals("minecraft"))
+									(
+										tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+										(
+											tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
+										) || (
+											tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")
+										)
+									)
 								).collect(Collectors.toSet());
 						}
 					}
