@@ -24,7 +24,7 @@ public final class PluginConfig extends PluginConfigBase
 	public PluginConfig(SettingsMap settingsReader, IConfigFunctionProvider biomeResourcesManager, ILogger logger)
 	{
 		super(settingsReader.getName());
-		readConfigSettings(settingsReader, biomeResourcesManager, logger, null);
+		readConfigSettings(settingsReader, biomeResourcesManager, logger, null, null);
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public final class PluginConfig extends PluginConfigBase
 	protected void validateAndCorrectSettings(Path settingsDir, ILogger logger) { }
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);
 		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger);

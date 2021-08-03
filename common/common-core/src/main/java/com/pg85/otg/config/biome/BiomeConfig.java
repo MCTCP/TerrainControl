@@ -124,8 +124,6 @@ public class BiomeConfig extends BiomeConfigBase
 		super(biomeName);
 	}
 
-	private String presetFolderName;
-
 	public BiomeConfig(
 		String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, 
 		IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, 
@@ -134,7 +132,6 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		super(biomeName);
 		this.setRegistryKey(new OTGBiomeResourceLocation(presetFolder, presetShortName, presetMajorVersion, biomeName));
-		presetFolderName = presetFolder.getFileName().toString();
 
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the
@@ -163,7 +160,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.settings.worldConfig = worldConfig;
 
 		this.renameOldSettings(settings, logger, materialReader);
-		this.readConfigSettings(settings, biomeResourcesManager, logger, materialReader);
+		this.readConfigSettings(settings, biomeResourcesManager, logger, materialReader, presetFolder.toFile().getName());
 		this.validateAndCorrectSettings(presetFolder, logger);
 
 		// Set water level
@@ -184,7 +181,7 @@ public class BiomeConfig extends BiomeConfigBase
 	}
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		this.settings.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
 		this.settings.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
@@ -285,7 +282,7 @@ public class BiomeConfig extends BiomeConfigBase
 		this.settings.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
 		this.privateSettings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 
-		this.readResourceSettings(reader, biomeResourcesManager, logger, materialReader);
+		this.readResourceSettings(reader, biomeResourcesManager, logger, materialReader, presetFolderName);
 		
 		this.settings.chcData = new double[this.settings.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
 		this.readHeightSettings(reader, this.settings.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
@@ -339,7 +336,7 @@ public class BiomeConfig extends BiomeConfigBase
 		}
 	}
 
-	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader, presetFolderName, OTG.getEngine().getPluginConfig()));
 		for (ConfigFunction<IBiomeConfig> res : resources)
@@ -361,7 +358,7 @@ public class BiomeConfig extends BiomeConfigBase
 								this.settings.customSaplingGrowers.put(sapling.saplingMaterial, sapling);
 							}
 						} catch (NullPointerException e) {
-							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && OTG.getEngine().getPluginConfig().canLogForPreset(presetFolderName))
+							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && logger.canLogForPreset(presetFolderName))
 							{
 								logger.log(LogLevel.ERROR, LogCategory.CONFIGS, "Unrecognized sapling type in biome " + this.getName());
 							}
@@ -394,7 +391,7 @@ public class BiomeConfig extends BiomeConfigBase
 	protected void writeConfigSettings(SettingsMap writer)
 	{
 		writer.header1("Biome Identity");
-
+		
 		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.templateForBiome,
 			"Can be used in 2 ways:",
 			"1. Enter the registry name of a non-OTG biome to use that biome for biome generation",

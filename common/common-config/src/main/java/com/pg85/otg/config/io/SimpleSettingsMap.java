@@ -112,7 +112,7 @@ public final class SimpleSettingsMap implements SettingsMap
 					);
 				}
 			} else {
-				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && conf.canLogForPreset(presetFolderName))
+				if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && logger.canLogForPreset(presetFolderName))
 				{
 					logger.log(
 							LogLevel.ERROR,
