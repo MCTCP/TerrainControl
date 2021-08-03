@@ -66,7 +66,7 @@ public class BiomeCommand extends BaseCommand
 		componentB.setColor(ChatColor.GREEN);
 		sender.spigot().sendMessage(new ComponentBuilder(componentA).append(componentB).create());
 
-		componentA = new TextComponent("Biome Category: ");
+		componentA = new TextComponent("\nBiome Category: ");
 		componentA.setColor(ChatColor.GOLD);
 		componentB = new TextComponent(biome.t().toString());
 		componentB.setColor(ChatColor.GREEN);
