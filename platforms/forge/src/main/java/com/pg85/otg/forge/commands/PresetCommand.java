@@ -1,8 +1,13 @@
 package com.pg85.otg.forge.commands;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.util.materials.LocalMaterialData;
+
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
@@ -35,7 +40,15 @@ public class PresetCommand extends BaseCommand
 			("Preset: " + preset.getFolderName()
 			 + "\nDescription: " + preset.getDescription()
 			 + "\nMajor version: " + preset.getMajorVersion()
-			), false);
+			),
+				false);
+			List<String> portalBlocks = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator)
+					.getPortalBlocks().stream().map(LocalMaterialData::getName).collect(Collectors.toList());
+
+			if (!portalBlocks.isEmpty())
+			{
+				source.sendSuccess(new StringTextComponent("Portal Blocks: " + String.join(", ", portalBlocks)), false);
+			}
 		return 0;
 	}
 }
