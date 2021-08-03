@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
 {	
@@ -64,13 +65,17 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final Supplier<GeneratorSettingBase> dimensionSettingsSupplier;
 	private final long worldSeed;
 	private final int noiseHeight;
+	protected final IBlockData defaultBlock;
+	protected final IBlockData defaultFluid;
 
 	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
+	private final NoiseGenerator surfaceNoise;
 	private final String presetFolderName;
 	private final Preset preset;
 	private final StructureSettings structSettings;
+	protected final SeededRandom random;
 
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
@@ -109,6 +114,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		NoiseSettings noisesettings = dimensionsettings.b();
 		// func_236169_a_() -> a()
 		this.noiseHeight = noisesettings.a();
+		
+		this.defaultBlock = dimensionsettings.c();
+		this.defaultFluid = dimensionsettings.d();
+		
+		this.random = new SeededRandom(seed);
+		this.surfaceNoise = (NoiseGenerator)(noisesettings.i() ? new NoiseGenerator3(this.random, IntStream.rangeClosed(-3, 0)) : new NoiseGeneratorOctaves(this.random, IntStream.rangeClosed(-3, 0)));
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();
@@ -315,8 +326,43 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void buildBase (RegionLimitedWorldAccess worldGenRegion, IChunkAccess chunk)
 	{
-		// Done during this.internalGenerator.populateNoise
-		// TODO: Not doing this ignores any SurfaceBuilderss registered to this biome. We may have to enable this for non-otg biomes / non-otg surfacebuilders?
+		// OTG handles surface/ground blocks during base terrain gen. For non-OTG biomes used
+		// with TemplateForBiome, we want to use registered surfacebuilders though.
+		// TODO: Disable any surface/ground block related features for Template BiomeConfigs. 
+
+		ChunkCoordIntPair chunkpos = chunk.getPos();
+		int i = chunkpos.x;
+		int j = chunkpos.z;
+		SeededRandom sharedseedrandom = new SeededRandom();
+		sharedseedrandom.a(i, j);
+		ChunkCoordIntPair chunkpos1 = chunk.getPos();
+		int chunkMinX = chunkpos1.d();
+		int chunkMinZ = chunkpos1.e();
+		int worldX;
+		int worldZ;
+		int i2;
+		double d1;
+		IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(chunkMinX, chunkMinZ));
+		IBiome biome;
+		for(int xInChunk = 0; xInChunk < Constants.CHUNK_SIZE; ++xInChunk)
+		{
+			for(int zInChunk = 0; zInChunk < Constants.CHUNK_SIZE; ++zInChunk)
+			{
+				worldX = chunkMinX + xInChunk;
+				worldZ = chunkMinZ + zInChunk;
+
+				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
+
+				// TODO: Improve this check, make sure a non-otg biome is actually being used with this biomeconfig.
+				if(biome.getBiomeConfig().getTemplateForBiome() != null && biome.getBiomeConfig().getTemplateForBiome().trim().length() > 0)
+				{
+					i2 = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
+					d1 = this.surfaceNoise.a((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
+					((SpigotBiome)biome).getBiomeBase().a(sharedseedrandom, chunk, chunkMinX, chunkMinZ, worldX, d1, defaultFluid, defaultBlock, worldZ, i2);
+				}
+			}
+		}
+		// Skip bedrock, OTG always handles that.
 	}
 
 	// Carvers: Caves and ravines
@@ -330,7 +376,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
 			ChunkBuffer chunkBuffer = new SpigotChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.b(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.preset.getWorldConfig().getCavesEnabled(), this.preset.getWorldConfig().getRavinesEnabled());
+			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, true, true); //TODO: Don't use hardcoded true
 		}
 		super.doCarving(seed, biomeManager, chunk, stage);
 	}
