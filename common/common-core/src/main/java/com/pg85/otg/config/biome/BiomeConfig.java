@@ -477,7 +477,6 @@ public class BiomeConfig extends BiomeConfigBase
 			"To filter biomes for a specific mod, add \"mod.<namespace>\", for example \"mod.byg category.plains tag.overworld\".",
 			"Registry names, tags and categories can be used at the same time, however registry names must have their own entry (,minecraft:plains,)",
 			"and can't use OR.",
-			"",
 			"OTG generates the terrain for the biome as configured in this file and spawns resources, but also allows the biome to spawn ",
 			"its own resources and mobs and apply its settings. Because of this, the following OTG settings cannot be used:",
 			"- Colors, Mob spawning, particles, sounds, vanilla structures, wetness, temperature.",
