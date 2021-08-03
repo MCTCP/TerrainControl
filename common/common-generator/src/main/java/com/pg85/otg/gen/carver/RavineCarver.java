@@ -21,8 +21,7 @@ public class RavineCarver extends Carver
 	@Override
 	public boolean isStartChunk(Random random, int chunkX, int chunkZ)
 	{
-		return
-			this.worldConfig.getRavinesEnabled() &&
+		return			
 			// Vanilla uses 0.0-1.0, we use 0-100.
 			(random.nextInt(100) < this.worldConfig.getRavineRarity());
 	}

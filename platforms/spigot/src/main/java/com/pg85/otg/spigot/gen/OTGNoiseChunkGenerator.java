@@ -330,7 +330,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
 			ChunkBuffer chunkBuffer = new SpigotChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.b(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
+			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.preset.getWorldConfig().getCavesEnabled(), this.preset.getWorldConfig().getRavinesEnabled());
 		}
 		super.doCarving(seed, biomeManager, chunk, stage);
 	}

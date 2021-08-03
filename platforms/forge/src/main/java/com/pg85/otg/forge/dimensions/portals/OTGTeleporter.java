@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.block.BlockState;
