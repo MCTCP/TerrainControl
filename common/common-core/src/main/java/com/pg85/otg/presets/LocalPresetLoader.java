@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -176,7 +177,7 @@ public abstract class LocalPresetLoader
 		// Update settings dynamically, these changes don't get written back to the file
 		processSettings(worldConfig, biomeConfigs);
 
-		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+		if(logger.getLogCategoryEnabled(LogCategory.CONFIGS) && (OTG.getEngine().getPluginConfig().logPresets().equals("all") || OTG.getEngine().getPluginConfig().logPresets().equalsIgnoreCase(presetDir.getFileName().toString())))
 		{
 			logger.log(
 				LogLevel.INFO,

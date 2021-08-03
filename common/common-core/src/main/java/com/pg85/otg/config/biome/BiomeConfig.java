@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -123,6 +124,8 @@ public class BiomeConfig extends BiomeConfigBase
 		super(biomeName);
 	}
 
+	private String presetFolderName;
+
 	public BiomeConfig(
 		String biomeName, BiomeConfigStub biomeConfigStub, Path presetFolder, SettingsMap settings, 
 		IWorldConfig worldConfig, String presetShortName, int presetMajorVersion, 
@@ -131,6 +134,7 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		super(biomeName);
 		this.setRegistryKey(new OTGBiomeResourceLocation(presetFolder, presetShortName, presetMajorVersion, biomeName));
+		presetFolderName = presetFolder.getFileName().toString();
 
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the
@@ -337,7 +341,7 @@ public class BiomeConfig extends BiomeConfigBase
 
 	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
-		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader));
+		List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader, presetFolderName, OTG.getEngine().getPluginConfig()));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)
@@ -357,7 +361,7 @@ public class BiomeConfig extends BiomeConfigBase
 								this.settings.customSaplingGrowers.put(sapling.saplingMaterial, sapling);
 							}
 						} catch (NullPointerException e) {
-							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS))
+							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && (OTG.getEngine().getPluginConfig().logPresets().equals("all") || OTG.getEngine().getPluginConfig().logPresets().equals(presetFolderName)))
 							{
 								logger.log(LogLevel.ERROR, LogCategory.CONFIGS, "Unrecognized sapling type in biome " + this.getName());
 							}
@@ -369,7 +373,7 @@ public class BiomeConfig extends BiomeConfigBase
 			}
 		}
 
-		resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader));
+		resources = new ArrayList<>(settings.getConfigFunctions(this, biomeResourcesManager, logger, materialReader, presetFolderName, OTG.getEngine().getPluginConfig()));
 		for (ConfigFunction<IBiomeConfig> res : resources)
 		{
 			if (res != null)

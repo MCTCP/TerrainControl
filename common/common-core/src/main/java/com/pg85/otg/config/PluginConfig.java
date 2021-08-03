@@ -45,6 +45,7 @@ public final class PluginConfig extends PluginConfigBase
 		this.logPerformance = reader.getSetting(PluginConfigStandardValues.LOG_PERFORMANCE, logger);		
 		this.logDecoration = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION, logger);
 		this.logMobs = reader.getSetting(PluginConfigStandardValues.LOG_MOBS, logger);
+		this.logPresets = reader.getSetting(PluginConfigStandardValues.LOG_PRESETS, logger);
 		this.decorationEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
 		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
 		this.workerThreads = reader.getSetting(PluginConfigStandardValues.WORKER_THREADS, logger);
@@ -109,6 +110,11 @@ public final class PluginConfig extends PluginConfigBase
 		writer.putSetting(PluginConfigStandardValues.LOG_MOBS, this.logMobs,
 			"Logs information about mob config errors and spawning.",
 			"Defaults to: false"
+		);
+
+		writer.putSetting(PluginConfigStandardValues.LOG_PRESETS, this.logPresets,
+				"Will only log values for a specific preset.",
+				"Default to: all"
 		);
 		
 		writer.putSetting(PluginConfigStandardValues.LOG_PERFORMANCE, this.logPerformance,

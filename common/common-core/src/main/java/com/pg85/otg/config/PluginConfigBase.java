@@ -28,6 +28,7 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	protected boolean logBiomeRegistry;
 	protected boolean decorationEnabled;
 	protected boolean logMobs;
+	protected String logPresets;
 	
 	public PluginConfigBase(String configName)
 	{
@@ -98,6 +99,11 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	public boolean logMobs()
 	{
 		return this.logMobs;
+	}
+
+	@Override
+	public String logPresets() {
+		return this.logPresets;
 	}
 
 	@Override

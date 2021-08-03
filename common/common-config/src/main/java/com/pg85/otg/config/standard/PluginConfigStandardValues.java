@@ -16,6 +16,7 @@ public class PluginConfigStandardValues extends Settings
 	public static final Setting<Boolean> LOG_BIOME_REGISTRY = booleanSetting("LogBiomeRegistry", false);
 	public static final Setting<Boolean> LOG_DECORATION = booleanSetting("LogDecoration", false);
 	public static final Setting<Boolean> LOG_MOBS = booleanSetting("LogMobs", false);
+	public static final Setting<String> LOG_PRESETS = stringSetting("LogPresets", "all");
 	public static final Setting<Boolean> LOG_PERFORMANCE = booleanSetting("LogPerformance", false);
 	public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
 	public static final Setting<Integer> WORKER_THREADS = intSetting("WorkerThreads", 0, 0, 10);

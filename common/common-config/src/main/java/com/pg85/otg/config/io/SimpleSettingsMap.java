@@ -7,6 +7,8 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IPluginConfig;
+import com.pg85.otg.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -101,6 +103,45 @@ public final class SimpleSettingsMap implements SettingsMap
 						configFunctionLine.getLineNumber(), 
 						((ErroredFunction<?>)function).error
 					)
+				);
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String currentPreset, IPluginConfig conf)
+	{
+		List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
+		for (RawSettingValue configFunctionLine : configFunctions)
+		{
+			String configFunctionString = configFunctionLine.getRawValue();
+			int bracketIndex = configFunctionString.indexOf('(');
+			String functionName = configFunctionString.substring(0, bracketIndex);
+			String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
+			List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
+			ConfigFunction<T> function = biomeResourcesManager.getConfigFunction(functionName, holder, args, logger, materialReader);
+			if (function == null)
+			{
+				// Function is in wrong config file,
+				// allowed for config file inheritance.
+				continue;
+			}
+			result.add(function);
+			String logPresets = conf.logPresets();
+			if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && function instanceof ErroredFunction && (conf.logPresets().equals("all") || conf.logPresets().equalsIgnoreCase(currentPreset)))
+			{
+				logger.log(
+						LogLevel.ERROR,
+						LogCategory.CONFIGS,
+						MessageFormat.format(
+								"Invalid resource {0} in {1} on line {2}: {3}",
+								functionName,
+								this.name,
+								configFunctionLine.getLineNumber(),
+								((ErroredFunction<?>)function).error
+						)
 				);
 			}
 		}
