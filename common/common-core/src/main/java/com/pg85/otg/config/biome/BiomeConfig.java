@@ -361,7 +361,7 @@ public class BiomeConfig extends BiomeConfigBase
 								this.settings.customSaplingGrowers.put(sapling.saplingMaterial, sapling);
 							}
 						} catch (NullPointerException e) {
-							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && (OTG.getEngine().getPluginConfig().logPresets().equals("all") || OTG.getEngine().getPluginConfig().logPresets().equals(presetFolderName)))
+							if (logger.getLogCategoryEnabled(LogCategory.CONFIGS) && OTG.getEngine().getPluginConfig().canLogForPreset(presetFolderName))
 							{
 								logger.log(LogLevel.ERROR, LogCategory.CONFIGS, "Unrecognized sapling type in biome " + this.getName());
 							}
