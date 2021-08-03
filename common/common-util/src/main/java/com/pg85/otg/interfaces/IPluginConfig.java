@@ -26,6 +26,6 @@ public interface IPluginConfig
 	public boolean logBiomeRegistry();
 	public boolean getDecorationEnabled();
 	public boolean logMobs();
-	public boolean canLogForPreset(String presetFolderName);
+	public String logPresets();	
 	public ConfigMode getSettingsMode();
 }

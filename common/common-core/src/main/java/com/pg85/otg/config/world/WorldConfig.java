@@ -56,13 +56,13 @@ public class WorldConfig extends WorldConfigBase
 	private int worldHeightScaleBits;
 	private int worldHeightCapBits;
 	
-	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		super(settingsReader.getName());
 
 		this.worldBiomes.addAll(biomes);
 		this.renameOldSettings(settingsReader, logger, materialReader);
-		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader);
+		this.readConfigSettings(settingsReader, biomeResourcesManager, logger, materialReader, presetFolderName);
 		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
@@ -143,7 +143,7 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	@Override
-	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		// Misc
 
