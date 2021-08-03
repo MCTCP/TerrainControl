@@ -57,9 +57,9 @@ public class OTGWorldOptionsScreen extends WorldOptionsScreen
 		{
 			this.seed = this.parseSeed();
 		});
-		((OTGCreateWorldScreen)p_239048_1_).addWidget(this.seedEdit);
+		((OTGCustomiseOverworldScreen)p_239048_1_).addWidget(this.seedEdit);
 		int j = this.width / 2 + 5;
-		this.typeButton = ((OTGCreateWorldScreen)p_239048_1_).addButton(new Button(j, 100, 150, 20, new TranslationTextComponent("selectWorld.mapType"), (p_239050_2_) ->
+		this.typeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 100, 150, 20, new TranslationTextComponent("selectWorld.mapType"), (p_239050_2_) ->
 		{
 			while(true)
 			{
@@ -108,7 +108,7 @@ public class OTGWorldOptionsScreen extends WorldOptionsScreen
 		});
 		this.typeButton.visible = false;
 		this.typeButton.active = this.preset.isPresent();
-		this.customizeTypeButton = ((OTGCreateWorldScreen)p_239048_1_).addButton(new Button(j, 120, 150, 20, new TranslationTextComponent("selectWorld.customizeType"), (p_239044_3_) ->
+		this.customizeTypeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 120, 150, 20, new TranslationTextComponent("selectWorld.customizeType"), (p_239044_3_) ->
 		{
 			BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(this.preset);
 			biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(this.preset, biomegeneratortypescreens$ifactory);
