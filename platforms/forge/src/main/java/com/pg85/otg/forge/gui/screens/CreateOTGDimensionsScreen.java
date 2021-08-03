@@ -9,6 +9,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
+import com.pg85.otg.constants.Constants;
 
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -62,7 +63,7 @@ public class CreateOTGDimensionsScreen extends Screen
 	private static TextComponent setTitle()
 	{
 		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
-		modpackConfig = DimensionConfig.fromDisk("Modpack");
+		modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 
 		if(modpackConfig == null || modpackConfig.ModpackName == null)
 		{

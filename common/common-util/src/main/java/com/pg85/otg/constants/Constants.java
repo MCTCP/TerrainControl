@@ -13,6 +13,7 @@ public class Constants
 
 	// Main Plugin Config
 	public static final String PluginConfigFilename = "OTG.ini";
+	public static final String MODPACK_CONFIG_NAME = "Modpack";
 	
 	// Folders
 	
