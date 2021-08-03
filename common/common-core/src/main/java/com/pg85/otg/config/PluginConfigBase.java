@@ -26,7 +26,6 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 	protected boolean logPerformance;	
 	protected boolean logDecoration;
 	protected boolean logBiomeRegistry;
-	protected boolean carversEnabled;
 	protected boolean decorationEnabled;
 	protected boolean logMobs;
 	protected String logPresets;
@@ -90,12 +89,6 @@ public abstract class PluginConfigBase extends ConfigFile implements IPluginConf
 		return this.logPerformance;
 	}	
 
-	@Override
-	public boolean getCarversEnabled()
-	{
-		return this.carversEnabled;
-	}
-	
 	@Override
 	public boolean getDecorationEnabled()
 	{
