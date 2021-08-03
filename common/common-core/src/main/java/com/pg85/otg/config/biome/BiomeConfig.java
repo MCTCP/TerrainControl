@@ -407,6 +407,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"To target both minecraft and modded biomes, use \"category.\" or \"tag.\".",
 			"To target only modded biomes, use \"modcategory.\" or \"modtag.\".",			
 			"To target only minecraft biomes, use \"mccategory.\" or \"mctag.\".",
+			"To target a specific mod, use \"mod.<namespace>\", for example \"mod.byg\".",
 			"Registry names, tags and categories can be used at the same time, however registry names must have their own entry (,minecraft:plains,)",
 			"and can't use OR.",
 			"",

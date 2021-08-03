@@ -424,6 +424,7 @@ public class WorldConfig extends WorldConfigBase
 			"To target both minecraft and modded biomes, use \"category.\" or \"tag.\".",
 			"To target only modded biomes, use \"modcategory.\" or \"modtag.\".",
 			"To target only minecraft biomes, use \"mccategory.\" or \"mctag.\".",
+			"To target a specific mod, use \"mod.<namespace>\", for example \"mod.byg\".",			
 			"MinTemperature/MaxTemperature - Optional, when using Tags/Categories, only biomes within this temperature range are used.",
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry, -1.0, 1.0)",
 			"Same example as before, but only includes biomes with temperature between -1.0 and 1.0.",
