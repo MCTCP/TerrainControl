@@ -142,6 +142,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 					BiomeRegistryNames.Contain(biomeName) || 
 					customBiomeNames.contains(biomeName) ||
 					biomeName.contains(":") || // Non-otg biome registry name
+					biomeName.toLowerCase().startsWith(Constants.MOD_LABEL) ||
 					biomeName.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
 					biomeName.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 					biomeName.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||					

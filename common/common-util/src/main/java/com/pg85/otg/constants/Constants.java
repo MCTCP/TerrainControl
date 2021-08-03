@@ -99,7 +99,8 @@ public class Constants
 	 * The amount of noise pieces that fit inside a chunk on the y axis.
 	 */
 	public static final int PIECES_PER_CHUNK_Y = CHUNK_Y_SIZE / PIECE_Y_SIZE;
-
+	
+	public static final String MOD_LABEL = "mod.";
 	public static final String BIOME_CATEGORY_LABEL = "category.";
 	public static final String MOD_BIOME_CATEGORY_LABEL = "modcategory.";
 	public static final String MC_BIOME_CATEGORY_LABEL = "mccategory.";

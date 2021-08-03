@@ -189,6 +189,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				{
 					// Handle biome registry names: minecraft:plains
 					if(
+						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_LABEL) &&
 						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) &&
 						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) &&
 						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
@@ -277,15 +278,28 @@ public class ForgePresetLoader extends LocalPresetLoader
 								}
 							}
 						}
+						String modTag = null;
+						for(String tagSubString : tagSubStrings)
+						{
+							if(tagSubString.trim().toLowerCase().startsWith(Constants.MOD_LABEL))
+							{
+								modTag = tagSubString.trim().toLowerCase().replace(Constants.MOD_LABEL, "");
+								break;
+							}
+						}
 						if(tags.size() > 0)
 						{
+							final String modTag2 = modTag;
 							// When using a combination of category/tags, filter for biomes that match all.
 							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
 							biomesForTags = biomesForTags.stream()
 								.filter(a ->
 									!blackListedBiomes.contains(a.location().toString()) &&
-									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&							
+									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 									(
+										modTag2 == null ||
+										a.location().getNamespace().equals(modTag2)
+									) && (
 										tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
 										(
 											(
@@ -307,6 +321,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 										!blackListedBiomes.contains(a.location().toString()) &&
 										!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 										(
+											modTag2 == null ||
+											a.location().getNamespace().equals(modTag2)
+										) && (
 											tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
 											(
 												(
@@ -533,6 +550,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			{
 				Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
 				if(
+					biomeEntry.toLowerCase().startsWith(Constants.MOD_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
@@ -603,8 +621,18 @@ public class ForgePresetLoader extends LocalPresetLoader
 							}
 						}
 					}
+					String modTag = null;
+					for(String tagString : tagStrings)
+					{
+						if(tagString.trim().toLowerCase().startsWith(Constants.MOD_LABEL))
+						{
+							modTag = tagString.trim().toLowerCase().replace(Constants.MOD_LABEL, "");
+							break;
+						}
+					}					
 					if(tags.size() > 0)
 					{
+						final String modTag2 = modTag;
 						if(biomesForTags.size() == 0)
 						{
 							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
@@ -612,8 +640,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 						biomesForTags = biomesForTags.stream()
 							.filter(a ->
 								!blackListedBiomes.contains(a.location().toString()) &&
-								!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
+								!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) && 
 								(
+									modTag2 == null || a.location().getNamespace().equals(modTag2)
+								) && (
 									tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
 									(
 										tagsStrings.get(0).startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
@@ -633,6 +663,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 									!blackListedBiomes.contains(a.location().toString()) &&
 									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 									(
+										modTag2 == null || a.location().getNamespace().equals(modTag2)
+									) && (
 										tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
 										(
 											tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
