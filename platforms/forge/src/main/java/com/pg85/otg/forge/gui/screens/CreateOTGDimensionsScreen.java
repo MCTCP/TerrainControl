@@ -103,12 +103,17 @@ public class CreateOTGDimensionsScreen extends Screen
 				}
 			}));
 		}
-		
+
 		// Done
-		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, DialogTexts.GUI_DONE, (p_213010_1_) -> {
-			this.dimensionConfigConsumer.accept(new OTGDimensionSettingsContainer(this.currentSelection, this.dimGenSettings));			
-			this.minecraft.setScreen(this.parent);
-		}));
+		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, DialogTexts.GUI_DONE, 
+			(p_213010_1_) -> {
+				if(!(this.parent instanceof ModpackCreateWorldScreen))
+				{
+					this.dimensionConfigConsumer.accept(new OTGDimensionSettingsContainer(this.currentSelection, this.dimGenSettings));
+				}
+				this.minecraft.setScreen(this.parent);
+			}
+		));
 
 		// Cancel
 		this.addButton(new Button(this.width / 2 + 5, this.height - 28, 150, 20, DialogTexts.GUI_CANCEL, (p_213009_1_) -> {

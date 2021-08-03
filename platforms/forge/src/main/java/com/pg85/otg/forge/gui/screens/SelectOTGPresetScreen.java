@@ -157,7 +157,7 @@ public class SelectOTGPresetScreen extends Screen
 					if(this.preset == null && SelectOTGPresetScreen.this.dimId == 0)
 					{
 						SelectOTGPresetScreen.this.currentSelection.Overworld = new OTGOverWorld(null, -1l, null, null);
-						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCreateWorldScreen.create(SelectOTGPresetScreen.this.parent, SelectOTGPresetScreen.this.currentSelection));
+						SelectOTGPresetScreen.this.minecraft.setScreen(OTGCustomiseOverworldScreen.create(SelectOTGPresetScreen.this.parent, SelectOTGPresetScreen.this.currentSelection));
 					} else {
 						OTGDimension otgDim = new OTGDimension(this.preset == null ? null : this.preset.getFolderName(), -1l);
 						switch(SelectOTGPresetScreen.this.dimId)

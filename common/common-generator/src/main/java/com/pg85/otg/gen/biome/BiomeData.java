@@ -33,10 +33,12 @@ public class BiomeData
 	
 	public void init(Map<String, Integer> worldBiomes)
 	{
+		// Note: For template biomes targeting multiple biomes this won't work, 
+		// since worldBiomes only contains one id for each biome config name.
 		for(String isleInBiomeName : this.configIsleInBiomes)
 		{
 			Integer isleBiome = worldBiomes.get(isleInBiomeName);
-			if(isleBiome != null)
+			if(isleBiome != null && !this.isleInBiomes.contains(isleBiome.intValue()))
 			{
 				this.isleInBiomes.add(isleBiome.intValue());
 			}
@@ -44,7 +46,7 @@ public class BiomeData
 		for(String borderInBiomeName : this.configBorderInBiomes)
 		{
 			Integer borderBiome = worldBiomes.get(borderInBiomeName);
-			if(borderBiome != null)
+			if(borderBiome != null && !this.borderInBiomes.contains(borderBiome.intValue()))
 			{
 				this.borderInBiomes.add(borderBiome.intValue());
 			}
@@ -52,7 +54,7 @@ public class BiomeData
 		for(String onlyBorderNearBiomeName : this.configOnlyBorderNearBiomes)
 		{
 			Integer onlyBorderNearBiome = worldBiomes.get(onlyBorderNearBiomeName);
-			if(onlyBorderNearBiome != null)
+			if(onlyBorderNearBiome != null && !this.onlyBorderNearBiomes.contains(onlyBorderNearBiome.intValue()))
 			{
 				this.onlyBorderNearBiomes.add(onlyBorderNearBiome.intValue());
 			}
@@ -60,7 +62,7 @@ public class BiomeData
 		for(String notBorderNearBiomeName : this.configNotBorderNearBiomes)
 		{
 			Integer notBorderNearBiome = worldBiomes.get(notBorderNearBiomeName);
-			if(notBorderNearBiome != null)
+			if(notBorderNearBiome != null && !this.notBorderNearBiomes.contains(notBorderNearBiome.intValue()))
 			{
 				this.notBorderNearBiomes.add(notBorderNearBiome.intValue());
 			}
