@@ -12,4 +12,3 @@ public interface ILogger
 	public void printStackTrace(LogLevel marker, LogCategory category, Exception e);
 	public boolean canLogForPreset(String presetFolderName);
 }
-
