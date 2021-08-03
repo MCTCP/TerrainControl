@@ -195,7 +195,7 @@ public class BiomeLayerData
 		this.riversEnabled = worldConfig.getRiversEnabled();
 	}
 
-	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<BiomeData>> isleBiomesAtDepth, Map<Integer, List<BiomeData>> borderBiomesAtDepth, Map<String, Integer> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiome[] biomes)
+	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<BiomeData>> isleBiomesAtDepth, Map<Integer, List<BiomeData>> borderBiomesAtDepth, Map<String, List<Integer>> biomeIdsByName, HashMap<Integer, Integer> biomeColorMap, IBiome[] biomes)
 	{		
 		this.biomeDepths.addAll(biomeDepths);
 		this.groups.putAll(groupDepth);
@@ -248,8 +248,8 @@ public class BiomeLayerData
 		this.biomeColorMap = biomeColorMap;
 		this.riverBiomes = new int[biomes.length];
 		for(int i = 0; i < biomes.length; i++)
-		{
-			this.riverBiomes[i] = biomeIdsByName.getOrDefault(biomes[i].getBiomeConfig().getRiverBiome(), -1);
+		{			
+			this.riverBiomes[i] = biomeIdsByName.getOrDefault(biomes[i].getBiomeConfig().getRiverBiome(), null).get(0);
 		}
 	}
 }

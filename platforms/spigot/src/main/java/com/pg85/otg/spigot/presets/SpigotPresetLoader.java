@@ -108,7 +108,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
 		Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 		
-		Map<String, Integer> worldBiomes = new HashMap<>();
+		Map<String, List<Integer>> worldBiomes = new HashMap<>();
 		Map<String, IBiomeConfig> biomeConfigsByName = new HashMap<>();
 		
 		// Create registry keys for each biomeconfig, create template 
@@ -290,12 +290,13 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			}
 			presetIdMapping[otgBiomeId] = otgBiome;
 
-			// Note: BiomeConfigs used with TemplateForBiome may represent
-			// multiple otg biome id's, this simply overrides. worldbiomes
-			// is used for River/Isle/Border biome settings, so this may 
-			// cause unexpected behaviours when using template biomes as 
-			// rivers/isles/borders.
-			worldBiomes.put(biomeConfig.getValue().getName(), otgBiomeId);
+			List<Integer> idsForBiome = worldBiomes.get(biomeConfig.getValue().getName());
+			if(idsForBiome == null)
+			{
+				idsForBiome = new ArrayList<Integer>();
+				worldBiomes.put(biomeConfig.getValue().getName(), idsForBiome);
+			}
+			idsForBiome.add(otgBiomeId);
 			
 			// Make a list of isle and border biomes per generation depth
 			if(biomeConfig.getValue().isIsleBiome())
