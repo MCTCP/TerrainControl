@@ -24,6 +24,7 @@ public interface IPluginConfig
 	public boolean logPerformance();	
 	public boolean logDecoration();	
 	public boolean logBiomeRegistry();
+	boolean getCarversEnabled();	
 	public boolean getDecorationEnabled();
 	public boolean logMobs();
 	public boolean canLogForPreset(String presetFolderName);

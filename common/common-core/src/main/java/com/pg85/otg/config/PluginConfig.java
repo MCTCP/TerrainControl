@@ -46,6 +46,7 @@ public final class PluginConfig extends PluginConfigBase
 		this.logDecoration = reader.getSetting(PluginConfigStandardValues.LOG_DECORATION, logger);
 		this.logMobs = reader.getSetting(PluginConfigStandardValues.LOG_MOBS, logger);
 		this.logPresets = reader.getSetting(PluginConfigStandardValues.LOG_PRESETS, logger);
+		this.carversEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
 		this.decorationEnabled = reader.getSetting(PluginConfigStandardValues.DECORATION_ENABLED, logger);
 		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
 		this.workerThreads = reader.getSetting(PluginConfigStandardValues.WORKER_THREADS, logger);
@@ -65,6 +66,12 @@ public final class PluginConfig extends PluginConfigBase
 			"Writing updates your configs to the currently installed version of OTG."
 		);
 
+		writer.putSetting(PluginConfigStandardValues.CARVERS_ENABLED, this.carversEnabled,
+			"Set this to false to disable OTG's own caves and ravines,",
+			"modded caves and ravines will still spawn.",
+			"Defaults to: true"
+		);
+		
 		writer.putSetting(PluginConfigStandardValues.WORKER_THREADS, this.workerThreads,
 			"Forge only, experimental: The amount of OTG worker threads used to speed up ",
 			"base terrain and BO4 generation. Higher values may not result in better ",
@@ -113,10 +120,11 @@ public final class PluginConfig extends PluginConfigBase
 		);
 
 		writer.putSetting(PluginConfigStandardValues.LOG_PRESETS, this.logPresets,
-				"Will only log values for a specific preset.",
-				"Default to: all"
+			"Set the name of a preset or \"all\" to log warnings and errors",
+			"for specified presets only.",
+			"Default to: all"
 		);
-		
+
 		writer.putSetting(PluginConfigStandardValues.LOG_PERFORMANCE, this.logPerformance,
 			"Logs information about any feature that is taking more than 50 milliseconds.",
 			"Includes: base terrain gen, decoration, resources, bo4 plotting, bo3/bo4 spawning.",

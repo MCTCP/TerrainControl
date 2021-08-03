@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -239,7 +240,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	@Override
 	public boolean getRavinesEnabled()
 	{
-		return this.ravinesEnabled;
+		return OTG.getEngine().getPluginConfig().getCarversEnabled() && this.ravinesEnabled;
 	}
 	
 	@Override
@@ -280,8 +281,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	@Override
 	public boolean getCavesEnabled()
-	{
-		return this.cavesEnabled;
+	{		
+		return OTG.getEngine().getPluginConfig().getCarversEnabled() && this.cavesEnabled;
 	}
 	
 	@Override
