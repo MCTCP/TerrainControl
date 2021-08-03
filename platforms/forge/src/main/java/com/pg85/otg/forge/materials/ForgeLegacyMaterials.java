@@ -191,6 +191,11 @@ class ForgeLegacyMaterials
 				return Blocks.REDSTONE_LAMP.defaultBlockState().setValue(RedstoneLampBlock.LIT, false);
 			case "wool":
 				return Blocks.WHITE_WOOL.defaultBlockState();
+			case "wooden_button":
+			case "wood_button":
+				return Blocks.OAK_BUTTON.defaultBlockState();
+			case "waterlily":
+				return Blocks.LILY_PAD.defaultBlockState();
 			case "log":
 			case "wood":
 				return Blocks.OAK_LOG.defaultBlockState();
