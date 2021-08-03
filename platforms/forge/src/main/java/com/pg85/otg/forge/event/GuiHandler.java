@@ -19,7 +19,7 @@ public class GuiHandler
 	{
 		if(event.getGui() instanceof CreateWorldScreen && !(event.getGui() instanceof ModpackCreateWorldScreen))
 		{
-			DimensionConfig modPackConfig = DimensionConfig.fromDisk("Modpack");
+			DimensionConfig modPackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 			if(modPackConfig != null)
 			{
 				CreateWorldScreen screen = (CreateWorldScreen)event.getGui();
