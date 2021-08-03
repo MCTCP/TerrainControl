@@ -164,11 +164,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.worldSeed = seed;
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
-		this.dimConfigName = dimConfigName;
-		if(this.dimConfigName != null && this.dimConfigName.trim().length() > 0)
+		if(dimConfigName != null && dimConfigName.trim().length() > 0)
 		{
+			this.dimConfigName = dimConfigName;
 			this.dimConfig = DimensionConfig.fromDisk(this.dimConfigName);
 		} else {
+			this.dimConfigName = "";
 			this.dimConfig = null;
 		}
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
