@@ -38,7 +38,7 @@ public final class TemplateBiome extends ConfigFunction<IWorldConfig>
 			this.maxTemp = 0;
 		}
 
-		for (String biome : readTags(args, 3))
+		for (String biome : readTags(args, 1))
 		{
 			this.tags.add(biome);
 		}
@@ -61,7 +61,7 @@ public final class TemplateBiome extends ConfigFunction<IWorldConfig>
 	@Override
 	public String toString()
 	{
-		return "TemplateBiome(" + name + ", " + StringHelper.join(tags, ", ") + (this.minTemp == 0 ? "" : ", " + this.minTemp)  + (this.maxTemp == 0 ? "" : ", " + this.maxTemp) + ")";
+		return "TemplateBiome(" + this.name + ", " + StringHelper.join(this.tags, ", ") + (this.minTemp == 0 ? "" : ", " + this.minTemp)  + (this.maxTemp == 0 ? "" : ", " + this.maxTemp) + ")";
 	}
 
 	private List<String> readTags(List<String> strings, int start) throws InvalidConfigException
@@ -71,7 +71,7 @@ public final class TemplateBiome extends ConfigFunction<IWorldConfig>
 
 	public String getName()
 	{
-		return name;
+		return this.name;
 	}
 
 	void filterBiomes(ArrayList<String> customBiomeNames, ILogger logger)

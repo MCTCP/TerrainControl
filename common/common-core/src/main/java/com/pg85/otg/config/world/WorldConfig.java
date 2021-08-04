@@ -432,6 +432,12 @@ public class WorldConfig extends WorldConfigBase
 			"Whether or not OTG should use the old group rarity"
 		);
 		
+		writer.header2("Template biomes",
+			""
+		);
+
+		writer.addConfigFunctions(this.templateBiomes);
+		
 		writer.header2("Biome Groups",
 			"Biome groups group similar biomes together so that they spawn next to each other.", 
 			"Only standard biomes are required to be part of biome groups, isle, border and river biomes are configured separately.",
