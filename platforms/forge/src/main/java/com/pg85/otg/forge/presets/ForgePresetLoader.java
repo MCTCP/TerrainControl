@@ -186,7 +186,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		
 		for(IBiomeConfig biomeConfig : biomeConfigs)
 		{
-			if(biomeConfig.getTemplateForBiome() == null || biomeConfig.getTemplateForBiome().trim().length() == 0)
+			if(!biomeConfig.getTemplateForBiome())
 			{
 				// Normal OTG biome, not a template biome.
 				IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
@@ -214,7 +214,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getKey().toResourceLocationString());
 			RegistryKey<Biome> registryKey;
 			Biome biome;
-			if(biomeConfig.getValue().getTemplateForBiome() != null && biomeConfig.getValue().getTemplateForBiome().trim().length() > 0)
+			if(biomeConfig.getValue().getTemplateForBiome())
 			{
 				biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 				if(biome == null)
@@ -225,11 +225,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 					continue;
 				}
-				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);				
 				presetBiomes.add(registryKey);
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
 			} else {
+				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
+				{
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+					{
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
+					}
+					continue;
+				}
+				
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
  				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
@@ -682,7 +691,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
 							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
-							if(biomeConfig.isWithinTemplateForBiomeTemperatureRange(biome.getBaseTemperature()))
+							if(templateBiome.temperatureAllowed(biome.getBaseTemperature()))
 							{
 								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), presetFolderName);
 								if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
@@ -768,13 +777,32 @@ public class ForgePresetLoader extends LocalPresetLoader
 							IBiomeConfig biomeConfig = biomeConfigsByName.get(tagString.trim());
 							if(biomeConfig != null)
 							{
-								if(!groupBiomes.containsKey(tagString.trim()))
+								if(biomeConfig.getTemplateForBiome())
 								{
-									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+									// For temple biome configs, fetch all associated biomes and add them.
+									for(Entry<IBiomeResourceLocation, IBiomeConfig> entry : biomeConfigsByResourceLocation.entrySet())
 									{
-										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
+										if(entry.getValue().getName().equals(biomeConfig.getName()))
+										{
+											if(!groupBiomes.containsKey(entry.getKey().toResourceLocationString()))
+											{
+												if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+												{
+													OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
+												}
+												groupBiomes.put(entry.getKey().toResourceLocationString(), biomeConfig);
+											}
+										}
 									}
-									groupBiomes.put(tagString.trim(), biomeConfig);
+								} else {
+									if(!groupBiomes.containsKey(tagString.trim()))
+									{
+										if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+										{
+											OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
+										}
+										groupBiomes.put(tagString.trim(), biomeConfig);
+									}
 								}
 							}
 							else if(tagString.trim().contains(":"))

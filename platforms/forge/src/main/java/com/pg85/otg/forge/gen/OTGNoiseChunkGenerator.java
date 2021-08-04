@@ -432,11 +432,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				worldX = chunkMinX + xInChunk;
 				worldZ = chunkMinZ + zInChunk;
-
 				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
-
-				// TODO: Improve this check, make sure a non-otg biome is actually being used with this biomeconfig.
-				if(biome.getBiomeConfig().getTemplateForBiome() != null && biome.getBiomeConfig().getTemplateForBiome().trim().length() > 0)
+				if(biome.getBiomeConfig().getTemplateForBiome())
 				{
 					i2 = chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
 					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;

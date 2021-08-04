@@ -46,12 +46,12 @@ public class BiomeStandardValues extends Settings
 		NETHER_FOSSIL_ENABLED = booleanSetting("NetherFossilEnabled", false),
 		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false),
 		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false),
-		USE_FROZEN_OCEAN_TEMPERATURE = booleanSetting("UseFrozenOceanTemperature", false)			
+		USE_FROZEN_OCEAN_TEMPERATURE = booleanSetting("UseFrozenOceanTemperature", false),
+		TEMPLATE_FOR_BIOME = booleanSetting("TemplateForBiome", false)
 	;
 
 	public static final Setting<String>
 		RIVER_BIOME = stringSetting("RiverBiome", "River"),
-		TEMPLATE_FOR_BIOME = stringSetting("TemplateForBiome", ""),
 		INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", ""),
 		PARTICLE_TYPE = stringSetting("ParticleType", ""),
 		MUSIC = stringSetting("Music", ""),
@@ -108,9 +108,7 @@ public class BiomeStandardValues extends Settings
 		MAX_AVERAGE_HEIGHT = doubleSetting("MaxAverageHeight", 0, -1000, 1000),
 		MAX_AVERAGE_DEPTH = doubleSetting("MaxAverageDepth", 0, -1000, 1000),
 		MOOD_OFFSET = doubleSetting("MoodOffset", 2.0, 0, Double.MAX_VALUE),
-		ADDITIONS_TICK_CHANCE = doubleSetting("AdditionsTickChance", 0, 0, Double.MAX_VALUE),
-		TEMPLATE_FOR_BIOME_MIN_TEMP = doubleSetting("TemplateForBiomeMinTemp", 0, Integer.MIN_VALUE, Double.MAX_VALUE),
-		TEMPLATE_FOR_BIOME_MAX_TEMP = doubleSetting("TemplateForBiomeMaxTemp", 0, Integer.MIN_VALUE, Double.MAX_VALUE)
+		ADDITIONS_TICK_CHANCE = doubleSetting("AdditionsTickChance", 0, 0, Double.MAX_VALUE)
 	;
 
 	public static final Setting<LocalMaterialData>

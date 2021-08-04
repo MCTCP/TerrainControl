@@ -184,10 +184,8 @@ public class BiomeConfig extends BiomeConfigBase
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
 		this.settings.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
-		this.settings.templateForBiomeMinTemp = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MIN_TEMP, logger);
-		this.settings.templateForBiomeMaxTemp = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MAX_TEMP, logger);
 
-		boolean isTemplateBiome = this.settings.templateForBiome != null && this.settings.templateForBiome.trim().length() > 0;
+		boolean isTemplateBiome = this.settings.templateForBiome;
 		
 		if(!isTemplateBiome)
 		{
@@ -458,7 +456,7 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void writeConfigSettings(SettingsMap writer)
 	{
-		boolean isTemplateBiome = this.settings.templateForBiome != null && this.settings.templateForBiome.trim().length() > 0;
+		boolean isTemplateBiome = this.settings.templateForBiome;
 		
 		writer.header1("Biome Identity");
 		
@@ -485,17 +483,7 @@ public class BiomeConfig extends BiomeConfigBase
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
-
-		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MIN_TEMP, this.settings.templateForBiomeMinTemp,
-			"When using biome category/tags with TemplateForBiome, the targeted biomes' temperature must be between",
-			"TemplateForBiomeMinTemp and TemplateForBiomeMaxTemp. Put both at 0 to ignore."
-		);
-		
-		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME_MAX_TEMP, this.settings.templateForBiomeMaxTemp,
-			"When using biome category/tags with TemplateForBiome, the targeted biomes' temperature must be between",
-			"TemplateForBiomeMinTemp and TemplateForBiomeMaxTemp. Put both at 0 to ignore."
-		);
-		
+	
 		if(!isTemplateBiome)
 		{		
 			writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,

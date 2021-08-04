@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -40,7 +39,6 @@ import com.pg85.otg.spigot.materials.SpigotMaterialReader;
 import com.pg85.otg.spigot.networking.BiomeSettingSyncWrapper;
 import com.pg85.otg.spigot.networking.OTGClientSyncManager;
 import com.pg85.otg.spigot.util.MobSpawnGroupHelper;
-import com.pg85.otg.util.biome.MCBiomeResourceLocation;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -114,93 +112,16 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		// Create registry keys for each biomeconfig, create template 
 		// biome configs for any modded biomes using TemplateForBiome.
 		Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation = new LinkedHashMap<>();
-		List<String> blackListedBiomes = worldConfig.getBlackListedBiomes();
 		for(IBiomeConfig biomeConfig : biomeConfigs)
 		{
-			if(biomeConfig.getTemplateForBiome() != null && biomeConfig.getTemplateForBiome().trim().length() > 0)
+			if(!biomeConfig.getTemplateForBiome())
 			{
-				if(
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-					biomeConfig.getTemplateForBiome().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
-				)
-				{					
-					String[] tagStrings = biomeConfig.getTemplateForBiome().split(",");
-					for(String tagString : tagStrings)
-					{
-						Set<ResourceKey<BiomeBase>> biomesForTags = new HashSet<>();
-						String[] tagSubStrings = tagString.split(" ");
-						for(String tagSubString : tagSubStrings)
-						{
-							if(
-								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
-							)
-							{
-								BiomeBase.Geography category = 	BiomeBase.Geography.a(tagSubString.trim().toLowerCase().toLowerCase().replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
-								if(category != null)
-								{
-									biomesForTags.addAll(
-											biomeRegistry.g()
-											.filter(a -> 
-												a.t() == category &&
-												!blackListedBiomes.contains(biomeRegistry.getKey(a).toString()) &&
-												!biomeRegistry.getKey(a).getNamespace().equals(Constants.MOD_ID_SHORT) &&
-												(tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) || !biomeRegistry.getKey(a).getNamespace().equals("minecraft"))
-											).map(
-												b -> ResourceKey.a(BIOME_KEY, biomeRegistry.getKey(b))
-											).collect(Collectors.toList())
-									);
-								} else {
-									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-									{
-										OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "TemplateForBiome biome category " + tagSubString +  " for biomeconfig " + biomeConfig.getName() + " could not be found.");
-									}
-								}
-							}
-						}
-						if(biomesForTags != null)
-						{
-							for(ResourceKey<BiomeBase> biomeForTag : biomesForTags)
-							{
-								BiomeBase biome = biomeRegistry.get(biomeForTag.a());
-								if(biomeConfig.isWithinTemplateForBiomeTemperatureRange(biome.k()))
-								{
-									IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.a().getNamespace(), biomeForTag.a().getKey(), preset.getFolderName());
-									if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
-									{
-										biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
-										biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-									}
-								}
-							}
-						} else {
-							if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-							{
-								OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No tags or categories found for TemplateForBiome: " + biomeConfig.getTemplateForBiome() + " in biome config " + biomeConfig.getName());
-							}
-						}
-					}
-				} else {
-					MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getTemplateForBiome().replace("minecraft:", "").replace(" ", "_").toLowerCase());
-					BiomeBase biome = biomeRegistry.get(resourceLocation);
-					if(biome != null)
-					{
-						biomeConfigsByResourceLocation.put(new MCBiomeResourceLocation(biomeRegistry.getKey(biome).getNamespace(), biomeRegistry.getKey(biome).getKey(), preset.getFolderName()), biomeConfig);
-						biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-					} else {
-						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-						{
-							OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome found for TemplateForBiome " + biomeConfig.getTemplateForBiome().replace("minecraft:", "").replace(" ", "_").toLowerCase() + " in biome config " + biomeConfig.getName());
-						}
-					}
-				}
-			} else {
 				IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 				biomeConfigsByResourceLocation.put(otgLocation, biomeConfig);
 				biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
 			}
 		}
-		
+
 		IBiome[] presetIdMapping = new IBiome[biomeConfigsByResourceLocation.entrySet().size()];
 		for(Entry<IBiomeResourceLocation, IBiomeConfig> biomeConfig : biomeConfigsByResourceLocation.entrySet())
 		{
@@ -220,7 +141,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getKey().toResourceLocationString());
 			ResourceKey<BiomeBase> registryKey;
 			BiomeBase biome;
-			if(biomeConfig.getValue().getTemplateForBiome() != null && biomeConfig.getValue().getTemplateForBiome().trim().length() > 0)
+			if(biomeConfig.getValue().getTemplateForBiome())
 			{
 				biome = biomeRegistry.get(resourceLocation);
 				if(biome == null)
@@ -236,6 +157,14 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
 			} else {
+				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
+				{
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+					{
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
+					}
+					continue;
+				}				
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
  				registryKey = ResourceKey.a(BIOME_KEY, resourceLocation);
@@ -382,76 +311,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			HashMap<String, IBiomeConfig> groupBiomes = new LinkedHashMap<String, IBiomeConfig>();
 			for (String biomeEntry : group.getBiomes())
 			{
-				Set<ResourceKey<BiomeBase>> biomesForTags = new HashSet<>();
-				if(
-					biomeEntry.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
-				)
-				{					
-					String[] tagStrings = biomeEntry.split(" ");
-					for(String tagString : tagStrings)
-					{
-						if(
-							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
-						)
-						{
-							BiomeBase.Geography category = 	BiomeBase.Geography.a(tagString.trim().toLowerCase().toLowerCase().replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
-							if(category != null)
-							{
-								biomesForTags.addAll(
-										biomeRegistry.g()
-										.filter(a -> 
-											a.t() == category &&
-											!blackListedBiomes.contains(biomeRegistry.getKey(a).toString()) &&
-											!biomeRegistry.getKey(a).getNamespace().equals(Constants.MOD_ID_SHORT) &&
-											(tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) || !biomeRegistry.getKey(a).getNamespace().equals("minecraft"))
-										).map(
-											b -> ResourceKey.a(BIOME_KEY, biomeRegistry.getKey(b))
-										).collect(Collectors.toList())
-								);
-							} else {
-								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-								{
-									OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome category found for " + tagString + " in world config for preset " + preset.getFolderName());
-								}
-							}
-						}
-					}
-					if(biomesForTags != null)
-					{
-						for(ResourceKey<BiomeBase> biomeForTag : biomesForTags)
-						{
-							BiomeBase biome = biomeRegistry.a(biomeForTag);
-							if(group.temperatureAllowed(biome.k()))
-							{
-								String otgBiomeName = biomeRegistry.getKey(biome).getNamespace() + "." + biomeRegistry.getKey(biome).getKey();
-								for(IBiomeConfig biomeConfig : biomeConfigsByResourceLocation.values())
-								{
-									if(
-										biomeConfig.getRegistryKey().toResourceLocationString().equals(biomeForTag.a().toString()) &&
-										!groupBiomes.containsKey(otgBiomeName)
-									)
-									{
-										groupBiomes.put(otgBiomeName, biomeConfig);
-									}
-								}
-							}
-						}
-					} else {
-						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-						{
-							OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "No tags/categories found for TemplateForBiome: " + biomeEntry + " in world config for preset " + preset.getFolderName());
-						}
-					}
-				} else {
-					IBiomeConfig config = biomeConfigsByName.get(biomeEntry);
-					if(config != null)
-					{
-						groupBiomes.put(biomeEntry, config);	
-					}
+				IBiomeConfig config = biomeConfigsByName.get(biomeEntry);
+				if(config != null)
+				{
+					groupBiomes.put(biomeEntry, config);	
 				}
 			}
 

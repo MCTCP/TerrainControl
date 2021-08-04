@@ -78,8 +78,11 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
 		{
 			biome = biomeLookup[biomeId];
-			key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
-			this.keyLookup.put(biomeId, key);
+			if(biome != null)
+			{
+				key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
+				this.keyLookup.put(biomeId, key);
+			}
 		}
 	}
 	

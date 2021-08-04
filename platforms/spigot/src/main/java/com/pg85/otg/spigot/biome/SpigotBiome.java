@@ -158,7 +158,7 @@ public class SpigotBiome implements IBiome
 		}		
 		
 		BiomeBase.Geography category = BiomeBase.Geography.a(biomeConfig.getBiomeCategory());
-		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS);
+		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.NONE);
 		if (category == null)
 		{
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
