@@ -453,7 +453,9 @@ public class WorldConfig extends WorldConfigBase
 			"Example: TemplateBiome(TagPlains, category.plains -tag.overworld) or TemplateBiome(TagPlains, category.plains -tag.overworld, -0.2, 0.2)",
 			"This targets a BiomeConfig named TagPlains.bc, and adds to it all non-OTG biomes that are of category \"plains\" but do not have biome dictionary tag \"overworld\",",
 			"the second example includes a temperature range between -0.2 and 0.2.",
-			"Each biome can only be assigned to one biome config, so the order of TemplateBiome()s is important. Put your most specific TemplateBiome first, and the most generic last."
+			"Note:",
+			"Each biome can only be assigned to one biome config, so the order of TemplateBiome()s is important. Put your most specific TemplateBiome first, and the most generic last.",
+			"When using BiomeRegistryName to include or exclude a biome, it must have its own entry, for example: \",minecraft:forest,-minecraft:plains,\""
 		);
 
 		writer.addConfigFunctions(this.templateBiomes);
@@ -468,7 +470,6 @@ public class WorldConfig extends WorldConfigBase
 			"Rarity - relative spawn chance.",
 			"BiomeName - Name of a corresponding biome config. Case sensitive. Can also be a registry name (minecraft:plains), if there is a associated TemplateBiome().",
 			"If the biome config is a template biome, all associated non-otg biomes are added to the group.",
-			"biome config that targets the biome, it is ignored.",
 			"Tags/Categories - Instead of BiomeName, Forge Biome Dictionary id's and/or MC Biome Categories. ",
 			"OTG fetches all non-OTG biomes that match the specified category/tags and adds them to the biome group.",
 			"A TemplateBiome() that targets the biome must exist, or it is ignored.",
@@ -484,6 +485,7 @@ public class WorldConfig extends WorldConfigBase
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry, -1.0, 1.0)",
 			"Same example as before, but only includes biomes with temperature between -1.0 and 1.0.",
 			"Note:", 
+			"When using BiomeRegistryName to include or exclude a biome, it must have its own entry, for example: \",minecraft:forest,-minecraft:plains,\"",
 			"If using BiomeMode: Normal, there are no limitations on the number of biome groups you can have or their names.",
 			"If using BiomeMode: NoGroups, only two biome group names are valid, NormalBiomes and IceBiomes, other groups are ignored. Only the size and rarity of the group named IceBiomes will be used, the size and rarity of the NormalBiomes group is ignored."
 		);
