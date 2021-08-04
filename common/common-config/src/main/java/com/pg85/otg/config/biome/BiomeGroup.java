@@ -78,6 +78,8 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 		this.name = groupName;
 		this.generationDepth = size;
 		this.groupRarity = rarity;
+		this.minTemp = 0;
+		this.maxTemp = 0;		
 		for (String biome : biomes)
 		{
 			this.biomes.add(biome);

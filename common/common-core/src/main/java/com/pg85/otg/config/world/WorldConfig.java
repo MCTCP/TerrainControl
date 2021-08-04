@@ -11,6 +11,7 @@ import java.util.OptionalLong;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.biome.BiomeGroupManager;
+import com.pg85.otg.config.biome.TemplateBiome;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.standard.WorldStandardValues;
@@ -40,6 +41,7 @@ public class WorldConfig extends WorldConfigBase
 	static
 	{
 		CONFIG_FUNCTIONS.put("BiomeGroup", BiomeGroup.class);
+		CONFIG_FUNCTIONS.put("TemplateBiome", TemplateBiome.class);
 	}
 
 	// TODO: Not used atm, implement these.
@@ -48,8 +50,11 @@ public class WorldConfig extends WorldConfigBase
 
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
 
-	// TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
+	// TODO: Refactor BiomeGroups classes, since we have new biome groups now.
+	// TODO: Refactor to IBiomeGroupManager and move to Base?	
 	private BiomeGroupManager biomeGroupManager;
+	// TODO: Refactor to ITemplateBiome and move to Base?	
+	private List<TemplateBiome> templateBiomes;
 	
 	// Private fields, only used when reading/writing
 	
@@ -66,12 +71,18 @@ public class WorldConfig extends WorldConfigBase
 		this.validateAndCorrectSettings(settingsDir, logger);		 
 	}
 
-	// TODO: Refactor to IBiomeGroupManager?
+	// TODO: Refactor to IBiomeGroupManager and move to Base?
 	public BiomeGroupManager getBiomeGroupManager()
 	{
 		return this.biomeGroupManager;
-	}	
+	}
 
+	// TODO: Refactor to ITemplateBiome and move to Base?
+	public List<TemplateBiome> getTemplateBiomes()
+	{
+		return this.templateBiomes;
+	}
+	
 	@Override
 	protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader)
 	{
@@ -203,6 +214,7 @@ public class WorldConfig extends WorldConfigBase
 		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger);
 
 		// BiomeGroups requires that values like genDepth are initialized
+		readTemplateBiomes(reader, biomeResourcesManager, logger, materialReader);
 		readBiomeGroups(reader, biomeResourcesManager, logger, materialReader);
 		
 		this.blackListedBiomes = reader.getSetting(WorldStandardValues.BLACKLISTED_BIOMES, logger);
@@ -313,6 +325,21 @@ public class WorldConfig extends WorldConfigBase
 		this.portalIgnitionSource = reader.getSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, logger);
 	}
 
+	private void readTemplateBiomes(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
+	{
+		this.templateBiomes = new ArrayList<TemplateBiome>();
+		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, biomeResourcesManager, logger, materialReader))
+		{
+			if (res != null)
+			{
+				if (res instanceof TemplateBiome)
+				{
+					this.templateBiomes.add((TemplateBiome)res);
+				}
+			}
+		}
+	}	
+	
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeGroupManager = new BiomeGroupManager();
