@@ -18,6 +18,7 @@ import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeGroup;
+import com.pg85.otg.config.biome.TemplateBiome;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
@@ -173,194 +174,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 		Map<Integer, List<BiomeData>> isleBiomesAtDepth = new HashMap<>();
 		Map<Integer, List<BiomeData>> borderBiomesAtDepth = new HashMap<>();
 		
-		Map<String, Integer> worldBiomes = new HashMap<>();
+		Map<String, List<Integer>> worldBiomes = new HashMap<>();
 		Map<String, IBiomeConfig> biomeConfigsByName = new HashMap<>();
 		
 		// Create registry keys for each biomeconfig, create template 
 		// biome configs for any non-otg biomes targeted via TemplateForBiome.
 		Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation = new LinkedHashMap<>();
 		List<String> blackListedBiomes = worldConfig.getBlackListedBiomes();
+
+		processTemplateBiomes(preset.getFolderName(), worldConfig, biomeConfigs, biomeConfigsByResourceLocation, biomeConfigsByName, blackListedBiomes);
+		
 		for(IBiomeConfig biomeConfig : biomeConfigs)
 		{
-			if(biomeConfig.getTemplateForBiome() != null && biomeConfig.getTemplateForBiome().trim().length() > 0)
+			if(!biomeConfig.getTemplateForBiome())
 			{
-				String[] tagStrings = biomeConfig.getTemplateForBiome().split(",");
-				for(String tagString : tagStrings)
-				{
-					// Handle biome registry names: minecraft:plains
-					if(
-						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_LABEL) &&
-						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) &&
-						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) &&
-						!tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
-						!tagString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) &&
-						!tagString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) &&
-						!tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
-					) {
-						ResourceLocation resourceLocation = new ResourceLocation(tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
-						Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
-						if(biome != null)
-						{
-							IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biome.getRegistryName().getNamespace(), biome.getRegistryName().getPath(), preset.getFolderName());
-							if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
-							{
-								biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
-								biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-							}
-						} else {
-							if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-							{
-								OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome found for TemplateForBiome " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase() + " in biome config " + biomeConfig.getName());
-							}
-						}
-					} else {					
-						Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
-						String[] tagSubStrings = tagString.split(" ");
-						// Handle biome category
-						for(String tagSubString : tagSubStrings)
-						{
-							if(
-								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
-								tagSubString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
-							)
-							{
-								Biome.Category category = Biome.Category.byName(tagSubString.trim().toLowerCase().toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
-								if(category != null)
-								{
-									biomesForTags.addAll(
-										ForgeRegistries.BIOMES.getValues().stream()
-											.filter(a -> 
-												a.getBiomeCategory() == category &&
-												!blackListedBiomes.contains(a.getRegistryName().toString()) &&
-												!a.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-												(
-													tagSubString.trim().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-													(
-														tagSubString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) && !a.getRegistryName().getNamespace().equals("minecraft")
-													) || (
-														tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) && a.getRegistryName().getNamespace().equals("minecraft")
-													)
-												)
-											).map(
-												b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
-											).collect(Collectors.toList())
-									);
-								} else {
-									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-									{
-										OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "TemplateForBiome biome category " + tagSubString +  " for biomeconfig " + biomeConfig.getName() + " could not be found.");
-									}
-								}
-							}
-						}
-						// Handle biome dictionary tags
-						List<BiomeDictionary.Type> tags = new ArrayList<>();
-						List<String> tagsStrings = new ArrayList<>();
-						for(String tagSubString : tagSubStrings)
-						{
-							if(
-								tagSubString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-								tagSubString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
-								tagSubString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
-							)
-							{
-								BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString.trim().toLowerCase().replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
-								if(tag != null)
-								{
-									tags.add(tag);
-									tagsStrings.add(tagSubString.trim().toLowerCase());
-								} else {
-									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-									{
-										OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "TemplateForBiome biome tag " + tagSubString +  " for biomeconfig " + biomeConfig.getName() + " could not be found.");
-									}
-								}
-							}
-						}
-						String modTag = null;
-						for(String tagSubString : tagSubStrings)
-						{
-							if(tagSubString.trim().toLowerCase().startsWith(Constants.MOD_LABEL))
-							{
-								modTag = tagSubString.trim().toLowerCase().replace(Constants.MOD_LABEL, "");
-								break;
-							}
-						}
-						if(tags.size() > 0)
-						{
-							final String modTag2 = modTag;
-							// When using a combination of category/tags, filter for biomes that match all.
-							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
-							biomesForTags = biomesForTags.stream()
-								.filter(a ->
-									!blackListedBiomes.contains(a.location().toString()) &&
-									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-									(
-										modTag2 == null ||
-										a.location().getNamespace().equals(modTag2)
-									) && (
-										tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-										(
-											(
-												tagsStrings.get(0).startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
-											) || (
-												tagsStrings.get(0).startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")	
-											)
-										)
-									)
-								).collect(Collectors.toSet());
-							
-							for(int i = 1; i < tags.size(); i++)
-							{
-								BiomeDictionary.Type tag = tags.get(i);
-								String tagType = tagsStrings.get(i);
-								biomesForTags = biomesForTags.stream()
-									.filter(
-										a -> BiomeDictionary.hasType(a, tag) && 
-										!blackListedBiomes.contains(a.location().toString()) &&
-										!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-										(
-											modTag2 == null ||
-											a.location().getNamespace().equals(modTag2)
-										) && (
-											tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-											(
-												(
-													tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
-												) || (
-													tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")	
-												)
-											)												
-										)
-									).collect(Collectors.toSet());
-							}
-						}
-						if(biomesForTags != null)
-						{
-							for(RegistryKey<Biome> biomeForTag : biomesForTags)
-							{
-								Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
-								// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
-								if(biomeConfig.isWithinTemplateForBiomeTemperatureRange(biome.getBaseTemperature()))
-								{
-									IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), preset.getFolderName());
-									if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
-									{
-										biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
-										biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
-									}
-								}
-							}
-						} else {
-							if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-							{
-								OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No tags or categories found for TemplateForBiome: " + biomeConfig.getTemplateForBiome() + " in biome config " + biomeConfig.getName());
-							}
-						}
-					}
-				}
-			} else {
 				// Normal OTG biome, not a template biome.
 				IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 				biomeConfigsByResourceLocation.put(otgLocation, biomeConfig);
@@ -387,22 +214,31 @@ public class ForgePresetLoader extends LocalPresetLoader
 			ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getKey().toResourceLocationString());
 			RegistryKey<Biome> registryKey;
 			Biome biome;
-			if(biomeConfig.getValue().getTemplateForBiome() != null && biomeConfig.getValue().getTemplateForBiome().trim().length() > 0)
+			if(biomeConfig.getValue().getTemplateForBiome())
 			{
 				biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 				if(biome == null)
 				{
-					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not find biome " + resourceLocation.toString() + " for template biomeconfig " + biomeConfig.getValue().getName());
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not find biome " + resourceLocation.toString() + " for template biomeconfig " + biomeConfig.getValue().getName());
 					}
 					continue;
 				}
-				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);				
 				presetBiomes.add(registryKey);
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
 			} else {
+				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
+				{
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+					{
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
+					}
+					continue;
+				}
+				
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
  				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
@@ -457,12 +293,13 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 			presetIdMapping[otgBiomeId] = otgBiome;
 
-			// Note: BiomeConfigs used with TemplateForBiome may represent
-			// multiple otg biome id's, this simply overrides. worldbiomes
-			// is used for River/Isle/Border biome settings, so this may 
-			// cause unexpected behaviours when using template biomes as 
-			// rivers/isles/borders.
-			worldBiomes.put(biomeConfig.getValue().getName(), otgBiomeId);
+			List<Integer> idsForBiome = worldBiomes.get(biomeConfig.getValue().getName());
+			if(idsForBiome == null)
+			{
+				idsForBiome = new ArrayList<Integer>();
+				worldBiomes.put(biomeConfig.getValue().getName(), idsForBiome);
+			}
+			idsForBiome.add(otgBiomeId);
 			
 			// Make a list of isle and border biomes per generation depth
 			if(biomeConfig.getValue().isIsleBiome())
@@ -528,9 +365,367 @@ public class ForgePresetLoader extends LocalPresetLoader
 		Set<Integer> biomeDepths = new HashSet<>();
 		Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
 
-		int genDepth = worldConfig.getGenerationDepth();
-
 		// Iterate through the groups and add it to the layer data
+		processBiomeGroups(preset.getFolderName(), worldConfig, biomeConfigsByResourceLocation, biomeConfigsByName, blackListedBiomes, biomeDepths, groupDepths, data);
+		
+		// Add the data and process isle/border biomes
+		data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap, presetIdMapping);
+
+		// Set data for this preset
+		this.presetGenerationData.put(preset.getFolderName(), data);
+	}
+
+	private void processTemplateBiomes(String presetFolderName, IWorldConfig worldConfig, List<IBiomeConfig> biomeConfigs, Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation, Map<String, IBiomeConfig> biomeConfigsByName, List<String> blackListedBiomes)
+	{
+		for (TemplateBiome templateBiome : ((WorldConfig)worldConfig).getTemplateBiomes())
+		{
+			List<String> templateBiomeTagStrings = templateBiome.getTags();
+			IBiomeConfig biomeConfig = biomeConfigs.stream().filter(a -> a.getName().toLowerCase().trim().equals(templateBiome.getName().toLowerCase().trim())).findFirst().orElse(null);
+			if(biomeConfig == null)
+			{
+				continue;
+			}
+			List<String> allowedMods = new ArrayList<>();
+			List<Biome> excludedBiomes = new ArrayList<>();
+			List<Biome.Category> excludedCategories = new ArrayList<>();
+			List<BiomeDictionary.Type> excludedTags = new ArrayList<>();
+			List<String> excludedMods = new ArrayList<>();
+			List<String> tagStrings = new ArrayList<>();
+			for(String tagString : templateBiomeTagStrings)
+			{
+				String tagString2 = tagString.trim().toLowerCase();
+				String[] tagSubStrings = tagString2.split(" ");
+				if(tagSubStrings.length == 1)
+				{
+					if(!tagString2.startsWith(Constants.LABEL_EXCLUDE))
+					{
+						// Handle biome registry names: minecraft:plains
+						if(
+							!tagString2.startsWith(Constants.MOD_LABEL) &&
+							!tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
+						) {
+							// Add biome, don't care about excludes.
+							ResourceLocation resourceLocation = new ResourceLocation(tagString2.replace("minecraft:", "").replace(" ", "_"));
+							Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
+							if(biome != null)
+							{
+								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biome.getRegistryName().getNamespace(), biome.getRegistryName().getPath(), presetFolderName);
+								if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
+								{
+									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+									{
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biome.getRegistryName().toString() + " found for " + templateBiome.toString() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
+									}
+									biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
+									biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
+								}
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "No biome found for TemplateBiome() " + templateBiome.toString() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
+								}
+							}
+						}
+						else if(tagString2.startsWith(Constants.MOD_LABEL))
+						{
+							allowedMods.add(tagString2.replace(Constants.MOD_LABEL, ""));
+						} else {
+							tagStrings.add(tagString);
+						}
+					} else  {
+						if(
+							tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
+						)
+						{
+							// Exclude biome
+							ResourceLocation resourceLocation = new ResourceLocation(tagString2.replace("minecraft:", "").replace(" ", "_").substring(1));
+							Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
+							if(biome != null)
+							{
+								excludedBiomes.add(biome);
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biome.getRegistryName().toString() + " excluded for " + templateBiome.toString());
+								}
+							}
+						} else if(
+							tagString2.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
+						)
+						{
+							// Exclude biome category
+							Biome.Category category = Biome.Category.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							if(category != null)
+							{
+								excludedCategories.add(category);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome category " + tagString +  " for " + templateBiome.toString() + " could not be found.");
+								}
+							}
+						}
+						else if(
+							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
+						)
+						{
+							// Exclude tag
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE, ""));
+							if(tag != null)
+							{
+								excludedTags.add(tag);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Biome tag " + tagString +  " for " + templateBiome.toString() + " could not be found.");
+								}
+							}
+						}					
+						else if(tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
+						{
+							// Exclude mod
+							excludedMods.add(tagString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+						}
+					}
+				} else {
+					tagStrings.add(tagString);
+				}
+			}
+			for(String tagString : tagStrings)
+			{
+				String tagString2 = tagString.trim().toLowerCase();
+				String[] tagSubStrings = tagString.split(" ");
+				if(
+					tagString2.startsWith(Constants.MOD_LABEL) ||
+					tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
+				) {
+					Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
+					List<Biome.Category> innerExcludedCategories = new ArrayList<>();
+					List<BiomeDictionary.Type> innerExcludedTags = new ArrayList<>();
+					List<String> innerExcludedMods = new ArrayList<>();
+					// Handle biome category
+					for(String tagSubString : tagSubStrings)
+					{
+						String tagSubString2 = tagSubString.trim().toLowerCase().toLowerCase();
+						if(
+							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
+						)
+						{
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							if(category != null)
+							{								
+								innerExcludedCategories.add(category);
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome category " + tagSubString +  " for " + templateBiome.toString() + " could not be found.");
+								}
+							}
+						}
+						else if(
+							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
+						)
+						{
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+							if(category != null)
+							{
+								biomesForTags.addAll(
+									ForgeRegistries.BIOMES.getValues().stream()
+										.filter(biome -> 
+											biome.getBiomeCategory() == category &&
+											!excludedBiomes.contains(biome) &&
+											!excludedCategories.contains(biome.getBiomeCategory()) &&
+											!innerExcludedCategories.contains(biome.getBiomeCategory()) &&
+											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
+											!blackListedBiomes.contains(biome.getRegistryName().toString()) &&
+											!biome.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
+											(
+												allowedMods.size() == 0 ||
+												allowedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
+											) && (
+												excludedMods.size() == 0 ||
+												!excludedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
+											)
+										).map(
+											b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
+										).collect(Collectors.toList())
+								);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome category " + tagSubString +  " could not be found for " + templateBiome.toString() + " .");
+								}
+							}
+						}
+					}
+					// Handle biome dictionary tags
+					List<BiomeDictionary.Type> tags = new ArrayList<>();
+					List<String> tagsStrings = new ArrayList<>();
+					for(String tagSubString : tagSubStrings)
+					{
+						String tagSubString2 = tagSubString.trim().toLowerCase().toLowerCase();
+						if(
+							tagSubString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
+						)
+						{
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE, ""));
+							if(tag != null)
+							{
+								innerExcludedTags.add(tag);
+								biomesForTags = biomesForTags.stream().filter(key -> !BiomeDictionary.hasType(key, tag)).collect(Collectors.toSet());
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome tag " + tagSubString +  " could not be found for " + templateBiome.toString() + " .");
+								}
+							}
+						} else if(
+							tagSubString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
+						)
+						{
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
+							if(tag != null)
+							{
+								tags.add(tag);
+								tagsStrings.add(tagSubString2);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome tag " + tagSubString +  " could not be found for " + templateBiome.toString() + " .");
+								}
+							}
+						}
+					}
+					List<String> innerMods = new ArrayList<>();
+					for(String tagSubString : tagSubStrings)
+					{
+						String tagSubString2 = tagSubString.trim().toLowerCase();
+						if(tagSubString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
+						{
+							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+						}
+						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
+						{
+							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
+						}
+					}
+					if(tags.size() > 0)
+					{
+						String tagType = tagsStrings.get(0);
+						biomesForTags.addAll(
+							BiomeDictionary.getBiomes(tags.get(0)).stream()
+							.filter(key -> 
+								tags.stream().allMatch(tag -> BiomeDictionary.hasType(key, tag)) &&
+								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
+								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
+								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
+								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								!blackListedBiomes.contains(key.location().toString()) &&
+								!key.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
+								(
+									allowedMods.size() == 0 ||
+									allowedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))
+								) && (
+									excludedMods.size() == 0 ||
+									!excludedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))
+								) && (
+									innerExcludedMods.size() == 0 ||
+									!innerExcludedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))											
+								) && (
+									tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+									(
+										(
+											tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !key.location().getNamespace().equals("minecraft")
+										) || (
+											tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && key.location().getNamespace().equals("minecraft")	
+										)
+									)
+								)
+							).collect(Collectors.toList())
+						);
+					}
+					if(biomesForTags.size() > 0)
+					{
+						for(RegistryKey<Biome> biomeForTag : biomesForTags)
+						{
+							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
+							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
+							if(templateBiome.temperatureAllowed(biome.getBaseTemperature()))
+							{
+								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), presetFolderName);
+								if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
+								{
+									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+									{
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biomeForTag.location().toString() + " found for " + templateBiome.toString());
+									}										
+									biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
+									biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
+								}
+							}
+						}
+					} else {
+						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+						{
+							OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "No tags or categories found for " + templateBiome.toString());
+						}
+					}
+				} else {
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+					{
+						OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "No tags or categories found for " + templateBiome.toString());
+					}
+				}
+			}
+		}
+	}
+
+	private void processBiomeGroups(String presetFolderName, IWorldConfig worldConfig, Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation, Map<String, IBiomeConfig> biomeConfigsByName, List<String> blackListedBiomes, Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepths, BiomeLayerData data)
+	{
+		int genDepth = worldConfig.getGenerationDepth();
 		// TODO: Refactor BiomeGroupManager to IBiomeGroupManager/IBiomeGroup to avoid WorldConfig cast?
 		for (BiomeGroup group : ((WorldConfig)worldConfig).getBiomeGroupManager().getGroups())
 		{
@@ -546,183 +741,380 @@ public class ForgePresetLoader extends LocalPresetLoader
 			float totalTemp = 0;
 
 			HashMap<String, IBiomeConfig> groupBiomes = new LinkedHashMap<String, IBiomeConfig>();
-			for (String biomeEntry : group.getBiomes())
+			List<String> templateBiomeTagStrings = group.getBiomes();
+			List<String> allowedMods = new ArrayList<>();
+			List<Biome> excludedBiomes = new ArrayList<>();
+			List<Biome.Category> excludedCategories = new ArrayList<>();
+			List<BiomeDictionary.Type> excludedTags = new ArrayList<>();
+			List<String> excludedMods = new ArrayList<>();
+			List<String> tagStrings = new ArrayList<>();
+			for(String tagString : templateBiomeTagStrings)
 			{
-				Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
-				if(
-					biomeEntry.toLowerCase().startsWith(Constants.MOD_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
-					biomeEntry.toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
-				)
+				String tagString2 = tagString.trim().toLowerCase();
+				String[] tagSubStrings = tagString2.split(" ");
+				if(tagSubStrings.length == 1)
 				{
-					String[] tagStrings = biomeEntry.split(" ");
-					for(String tagString : tagStrings)
+					if(!tagString2.startsWith(Constants.LABEL_EXCLUDE))
 					{
+						// Handle biome registry names: minecraft:plains
 						if(
-							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) ||
-							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
-							tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
+							!tagString2.startsWith(Constants.MOD_LABEL) &&
+							!tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL) &&
+							!tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) &&
+							!tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) &&
+							!tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
+						) {
+							// Add biome, don't care about excludes.
+							// Check for biomeconfig name, if none then use  
+							// resourcelocation to look up template biome config.
+							IBiomeConfig biomeConfig = biomeConfigsByName.get(tagString.trim());
+							if(biomeConfig != null)
+							{
+								if(biomeConfig.getTemplateForBiome())
+								{
+									// For temple biome configs, fetch all associated biomes and add them.
+									for(Entry<IBiomeResourceLocation, IBiomeConfig> entry : biomeConfigsByResourceLocation.entrySet())
+									{
+										if(entry.getValue().getName().equals(biomeConfig.getName()))
+										{
+											if(!groupBiomes.containsKey(entry.getKey().toResourceLocationString()))
+											{
+												if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+												{
+													OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
+												}
+												groupBiomes.put(entry.getKey().toResourceLocationString(), biomeConfig);
+											}
+										}
+									}
+								} else {
+									if(!groupBiomes.containsKey(tagString.trim()))
+									{
+										if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+										{
+											OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
+										}
+										groupBiomes.put(tagString.trim(), biomeConfig);
+									}
+								}
+							}
+							else if(tagString.trim().contains(":"))
+							{
+								String[] resourceLocationParts = tagString.trim().split(":");
+								if(resourceLocationParts.length == 2)
+								{
+									biomeConfig = biomeConfigsByResourceLocation.get(new MCBiomeResourceLocation(resourceLocationParts[0], resourceLocationParts[1], presetFolderName));
+									if(biomeConfig != null && !groupBiomes.containsKey(tagString.trim()))
+									{
+										if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+										{
+											OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());											
+										}
+										groupBiomes.put(tagString.trim(), biomeConfig);
+									}
+								}
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "No biomeConfig found for entry " + tagString + " in group " + group.getName());
+								}
+							}							
+						}
+						else if(tagString2.startsWith(Constants.MOD_LABEL))
+						{
+							allowedMods.add(tagString2.replace(Constants.MOD_LABEL, ""));
+						} else {
+							tagStrings.add(tagString);
+						}
+					} else  {
+						if(
+							tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
 						)
 						{
-							Biome.Category category = Biome.Category.byName(tagString.trim().toLowerCase().toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+							// Exclude biome
+							ResourceLocation resourceLocation = new ResourceLocation(tagString2.replace("minecraft:", "").replace(" ", "_").substring(1));
+							Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
+							if(biome != null)
+							{
+								excludedBiomes.add(biome);
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biome.getRegistryName().toString() + " excluded for entry " + tagString + " in group " + group.getName());
+								}
+							}
+						} else if(
+							tagString2.toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagString2.toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
+						)
+						{
+							// Exclude biome category
+							Biome.Category category = Biome.Category.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							if(category != null)
+							{
+								excludedCategories.add(category);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome category " + tagString + " for entry " + tagString + " in group " + group.getName() + " could not be found.");
+								}
+							}
+						}
+						else if(
+							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
+						)
+						{
+							// Exclude tag
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE, ""));
+							if(tag != null)
+							{
+								excludedTags.add(tag);
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome tag " + tagString + " for entry " + tagString + " in group " + group.getName() + " could not be found.");
+								}
+							}
+						}
+						else if(tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
+						{
+							// Exclude mod
+							excludedMods.add(tagString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+						}
+					}
+				} else {
+					tagStrings.add(tagString);
+				}
+			}
+			for(String tagString : tagStrings)
+			{
+				String tagString2 = tagString.trim().toLowerCase();
+				String[] tagSubStrings = tagString.split(" ");
+				if(
+					tagString2.startsWith(Constants.MOD_LABEL) ||
+					tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL) ||
+					tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) ||
+					tagString2.startsWith(Constants.MOD_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
+				) {
+					Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
+					List<Biome.Category> innerExcludedCategories = new ArrayList<>();
+					List<BiomeDictionary.Type> innerExcludedTags = new ArrayList<>();
+					List<String> innerExcludedMods = new ArrayList<>();
+					// Handle biome category
+					for(String tagSubString : tagSubStrings)
+					{
+						String tagSubString2 = tagSubString.trim().toLowerCase().toLowerCase();
+						if(
+							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
+						)
+						{
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							if(category != null)
+							{
+								innerExcludedCategories.add(category);
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome category " + tagString + " in group " + group.getName() + " could not be found.");
+								}
+							}
+						}
+						else if(
+							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
+						)
+						{
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
 							if(category != null)
 							{
 								biomesForTags.addAll(
 									ForgeRegistries.BIOMES.getValues().stream()
-									.filter(
-										a -> a.getBiomeCategory() == category &&
-										!a.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-										!blackListedBiomes.contains(a.getRegistryName().toString()) &&
-										(
-											tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.BIOME_CATEGORY_LABEL) || 
+										.filter(biome -> 
+											biome.getBiomeCategory() == category &&
+											!excludedBiomes.contains(biome) &&
+											!excludedCategories.contains(biome.getBiomeCategory()) &&
+											!innerExcludedCategories.contains(biome.getBiomeCategory()) &&
+											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
+											!blackListedBiomes.contains(biome.getRegistryName().toString()) &&
+											!biome.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 											(
-												tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) && !a.getRegistryName().getNamespace().equals("minecraft")
-											) || (
-												tagString.trim().toLowerCase().toLowerCase().startsWith(Constants.MC_BIOME_CATEGORY_LABEL) && a.getRegistryName().getNamespace().equals("minecraft")													
-											)										
-										)
-									).map(
-										b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
-									).collect(Collectors.toList())
+												allowedMods.size() == 0 ||
+												allowedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
+											) && (
+												excludedMods.size() == 0 ||
+												!excludedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
+											)
+										).map(
+											b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
+										).collect(Collectors.toList())
 								);
 							} else {
-								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 								{
-									OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome category found for " + tagString + " in world config for preset " + preset.getFolderName());
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome category " + tagSubString + " in group " + group.getName() + " could not be found.");
 								}
 							}
 						}
 					}
-
+					// Handle biome dictionary tags
 					List<BiomeDictionary.Type> tags = new ArrayList<>();
 					List<String> tagsStrings = new ArrayList<>();
-					for(String tagString : tagStrings)
+					for(String tagSubString : tagSubStrings)
 					{
+						String tagSubString2 = tagSubString.trim().toLowerCase().toLowerCase();
 						if(
-							tagString.trim().toLowerCase().startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-							tagString.trim().toLowerCase().startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
-							tagString.trim().toLowerCase().startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
+							tagSubString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
 						)
 						{
-							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagString.trim().toLowerCase().replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE, "").replace(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE, ""));
+							if(tag != null)
+							{
+								innerExcludedTags.add(tag);
+								biomesForTags = biomesForTags.stream().filter(key -> !BiomeDictionary.hasType(key, tag)).collect(Collectors.toSet());
+							} else {
+								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+								{
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome tag " + tagSubString + " in group " + group.getName() + " could not be found.");
+								}
+							}
+						} else if(
+							tagSubString2.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+							tagSubString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) ||
+							tagSubString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL)
+						)
+						{
+							BiomeDictionary.Type tag = BiomeDictionary.Type.getType(tagSubString2.replace(Constants.MOD_BIOME_DICT_TAG_LABEL, "").replace(Constants.MC_BIOME_DICT_TAG_LABEL, "").replace(Constants.BIOME_DICT_TAG_LABEL, ""));
 							if(tag != null)
 							{
 								tags.add(tag);
-								tagsStrings.add(tagString.trim().toLowerCase());
+								tagsStrings.add(tagSubString2);
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 								{
-									OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "No biome dictionary tag found for " + tagString + " in world config for preset " + preset.getFolderName());
+									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome tag " + tagSubString + " in group " + group.getName() + " could not be found.");
 								}
 							}
 						}
 					}
-					String modTag = null;
-					for(String tagString : tagStrings)
+					List<String> innerMods = new ArrayList<>();
+					for(String tagSubString : tagSubStrings)
 					{
-						if(tagString.trim().toLowerCase().startsWith(Constants.MOD_LABEL))
+						String tagSubString2 = tagSubString.trim().toLowerCase();
+						if(tagSubString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
 						{
-							modTag = tagString.trim().toLowerCase().replace(Constants.MOD_LABEL, "");
-							break;
-						}
-					}					
-					if(tags.size() > 0)
-					{
-						final String modTag2 = modTag;
-						if(biomesForTags.size() == 0)
+							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+						}						
+						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
 						{
-							biomesForTags.addAll(BiomeDictionary.getBiomes(tags.get(0)));
-						}
-						biomesForTags = biomesForTags.stream()
-							.filter(a ->
-								!blackListedBiomes.contains(a.location().toString()) &&
-								!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) && 
-								(
-									modTag2 == null || a.location().getNamespace().equals(modTag2)
-								) && (
-									tagsStrings.get(0).startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-									(
-										tagsStrings.get(0).startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
-									) || (
-										tagsStrings.get(0).startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")
-									)
-								) 								
-							).collect(Collectors.toSet());
-						
-						for(int i = 1; i < tags.size(); i++)
-						{
-							BiomeDictionary.Type tag = tags.get(i);
-							String tagType = tagsStrings.get(i);
-							biomesForTags = biomesForTags.stream()
-								.filter(
-									a -> BiomeDictionary.hasType(a, tag) &&
-									!blackListedBiomes.contains(a.location().toString()) &&
-									!a.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
-									(
-										modTag2 == null || a.location().getNamespace().equals(modTag2)
-									) && (
-										tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
-										(
-											tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !a.location().getNamespace().equals("minecraft")
-										) || (
-											tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && a.location().getNamespace().equals("minecraft")
-										)
-									)
-								).collect(Collectors.toSet());
+							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
 						}
 					}
-					if(biomesForTags != null)
+					if(tags.size() > 0)
+					{
+						String tagType = tagsStrings.get(0);
+						biomesForTags.addAll(
+							BiomeDictionary.getBiomes(tags.get(0)).stream()
+							.filter(key -> 
+								tags.stream().allMatch(tag -> BiomeDictionary.hasType(key, tag)) &&
+								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
+								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
+								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
+								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								!blackListedBiomes.contains(key.location().toString()) &&
+								!key.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
+								(
+									allowedMods.size() == 0 ||
+									allowedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))
+								) && (
+									excludedMods.size() == 0 ||
+									!excludedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))
+								) && (
+									innerExcludedMods.size() == 0 ||
+									!innerExcludedMods.stream().anyMatch(mod -> key.location().getNamespace().equals(mod))											
+								) && (
+									tagType.startsWith(Constants.BIOME_DICT_TAG_LABEL) ||
+									(
+										(
+											tagType.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL) && !key.location().getNamespace().equals("minecraft")
+										) || (
+											tagType.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL) && key.location().getNamespace().equals("minecraft")	
+										)
+									)
+								)
+							).collect(Collectors.toList())
+						);
+					}
+					if(biomesForTags.size() > 0)
 					{
 						for(RegistryKey<Biome> biomeForTag : biomesForTags)
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
+							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
 							if(group.temperatureAllowed(biome.getBaseTemperature()))
 							{
-								String otgBiomeName = biome.getRegistryName().getNamespace() + "." + biome.getRegistryName().getPath();
-								for(IBiomeConfig biomeConfig : biomeConfigsByResourceLocation.values())
+								// Check for biomeconfig name, if none then use  
+								// resourcelocation to look up template biome config.
+								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), presetFolderName);
+								IBiomeConfig biomeConfig = biomeConfigsByResourceLocation.get(otgLocation);
+								if(biomeConfig != null && !groupBiomes.containsKey(biomeForTag.location().toString()))
 								{
-									if(
-										biomeConfig.getRegistryKey().toResourceLocationString().equals(biomeForTag.location().toString()) &&
-										!groupBiomes.containsKey(otgBiomeName)
-									)
+									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 									{
-										groupBiomes.put(otgBiomeName, biomeConfig);
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for biome " + biome.getRegistryName().toString() + " in group " + group.getName() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
+									}
+									groupBiomes.put(biomeForTag.location().toString(), biomeConfig);
+								} else {
+									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+									{
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "No BiomeConfig found for biome " + biome.getRegistryName().toString() + " in group " + group.getName() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
 									}
 								}
 							}
 						}
 					} else {
-						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
+						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 						{
-							OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "No tags/categories found for TemplateForBiome: " + biomeEntry + " in world config for preset " + preset.getFolderName());
+							OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "No tags or categories found for group " + group.getName() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
 						}
 					}
 				} else {
-					// Check for biomeconfig name, if none then use  
-					// resourcelocation to look up template biome config.
-					IBiomeConfig biomeConfig = biomeConfigsByName.get(biomeEntry);
-					if(biomeConfig != null)
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 					{
-						if(!groupBiomes.containsKey(biomeEntry))
-						{
-							groupBiomes.put(biomeEntry, biomeConfig);
-						}
-					}
-					else if(biomeEntry.contains(":"))
-					{
-						String[] resourceLocationParts = biomeEntry.split(":");
-						if(resourceLocationParts.length == 2)
-						{
-							biomeConfig = biomeConfigsByResourceLocation.get(new MCBiomeResourceLocation(resourceLocationParts[0], resourceLocationParts[1], preset.getFolderName()));
-							if(biomeConfig != null && !groupBiomes.containsKey(biomeEntry))
-							{
-								groupBiomes.put(biomeEntry, biomeConfig);
-							}
-						}
+						OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "No tags or categories found for group " + group.getName() + " with entry " + tagString.replace("minecraft:", "").trim().replace(" ", "_").toLowerCase());
 					}
 				}
 			}
@@ -781,12 +1173,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 			// Register group id
 			data.groupRegistry.put(bg.id, bg);
 		}
-
-		// Add the data and process isle/border biomes
-		data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap, presetIdMapping);
-
-		// Set data for this preset
-		this.presetGenerationData.put(preset.getFolderName(), data);
 	}
 
 	@Override

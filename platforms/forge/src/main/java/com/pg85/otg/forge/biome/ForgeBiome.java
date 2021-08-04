@@ -183,6 +183,7 @@ public class ForgeBiome implements IBiome
 			{
 				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category " + biomeConfig.getBiomeCategory());
 			}
+			category = isOceanBiome ? Biome.Category.OCEAN : Biome.Category.NONE;
 		}
         Biome.RainType rainType = 
     		biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.RainType.NONE : 
@@ -343,7 +344,7 @@ public class ForgeBiome implements IBiome
 
 		// Mineshafts
 		if(worldConfig.getMineshaftsEnabled() && biomeConfig.getMineShaftType() != MineshaftType.disabled)
-		{		
+		{
 			float mineShaftProbability = biomeConfig.getMineShaftProbability();
 			MineshaftType mineShaftType = biomeConfig.getMineShaftType();
 			StructureFeature<MineshaftConfig, ? extends Structure<MineshaftConfig>> customMineShaft = register(

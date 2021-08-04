@@ -52,8 +52,8 @@ public interface IBiomeConfig
 
 	List<String> getBiomeDictTags();
 	String getBiomeCategory();
-	String getTemplateForBiome();
-	boolean isWithinTemplateForBiomeTemperatureRange(float temperature);
+	boolean getTemplateForBiome();
+
 	// Placement
 
 	int getBiomeSize();

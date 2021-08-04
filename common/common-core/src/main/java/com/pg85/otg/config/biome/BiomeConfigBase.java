@@ -63,10 +63,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		
 		// Identity
 		
-		protected String templateForBiome;
+		protected boolean templateForBiome;
 		protected String biomeCategory;
-		protected double templateForBiomeMinTemp;
-		protected double templateForBiomeMaxTemp;
 		
 		// Inheritance
 		
@@ -456,19 +454,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public String getTemplateForBiome()
+	public boolean getTemplateForBiome()
 	{
 		return this.settings.templateForBiome;
-	}
-
-	@Override
-	public boolean isWithinTemplateForBiomeTemperatureRange(float temperature)
-	{
-		if(this.settings.templateForBiomeMinTemp != 0 || this.settings.templateForBiomeMaxTemp != 0)
-		{
-			return temperature >= this.settings.templateForBiomeMinTemp && temperature < this.settings.templateForBiomeMaxTemp;
-		}
-		return true;
 	}
 
 	@Override

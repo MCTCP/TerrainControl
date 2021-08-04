@@ -31,40 +31,64 @@ public class BiomeData
 		this.configNotBorderNearBiomes = configNotBorderNearBiomes;
 	}
 	
-	public void init(Map<String, Integer> worldBiomes)
+	public void init(Map<String, List<Integer>> worldBiomes)
 	{
 		// Note: For template biomes targeting multiple biomes this won't work, 
 		// since worldBiomes only contains one id for each biome config name.
 		for(String isleInBiomeName : this.configIsleInBiomes)
 		{
-			Integer isleBiome = worldBiomes.get(isleInBiomeName);
-			if(isleBiome != null && !this.isleInBiomes.contains(isleBiome.intValue()))
+			List<Integer> isleBiomes = worldBiomes.get(isleInBiomeName);
+			if(isleBiomes != null)
 			{
-				this.isleInBiomes.add(isleBiome.intValue());
+				for(Integer isleBiome : isleBiomes)
+				{
+					if(isleBiome != null && !this.isleInBiomes.contains(isleBiome.intValue()))
+					{
+						this.isleInBiomes.add(isleBiome.intValue());
+					}				
+				}
 			}
 		}
 		for(String borderInBiomeName : this.configBorderInBiomes)
 		{
-			Integer borderBiome = worldBiomes.get(borderInBiomeName);
-			if(borderBiome != null && !this.borderInBiomes.contains(borderBiome.intValue()))
+			List<Integer> borderBiomes = worldBiomes.get(borderInBiomeName);
+			if(borderBiomes != null)
 			{
-				this.borderInBiomes.add(borderBiome.intValue());
+				for(Integer borderBiome : borderBiomes)
+				{
+					if(borderBiome != null && !this.borderInBiomes.contains(borderBiome.intValue()))
+					{
+						this.borderInBiomes.add(borderBiome.intValue());
+					}
+				}
 			}
 		}
 		for(String onlyBorderNearBiomeName : this.configOnlyBorderNearBiomes)
 		{
-			Integer onlyBorderNearBiome = worldBiomes.get(onlyBorderNearBiomeName);
-			if(onlyBorderNearBiome != null && !this.onlyBorderNearBiomes.contains(onlyBorderNearBiome.intValue()))
+			List<Integer> onlyBorderNearBiomes = worldBiomes.get(onlyBorderNearBiomeName);
+			if(onlyBorderNearBiomes != null)
 			{
-				this.onlyBorderNearBiomes.add(onlyBorderNearBiome.intValue());
+				for(Integer onlyBorderNearBiome : onlyBorderNearBiomes)
+				{
+					if(onlyBorderNearBiome != null && !this.onlyBorderNearBiomes.contains(onlyBorderNearBiome.intValue()))
+					{
+						this.onlyBorderNearBiomes.add(onlyBorderNearBiome.intValue());
+					}
+				}
 			}
-		}		
+		}
 		for(String notBorderNearBiomeName : this.configNotBorderNearBiomes)
 		{
-			Integer notBorderNearBiome = worldBiomes.get(notBorderNearBiomeName);
-			if(notBorderNearBiome != null && !this.notBorderNearBiomes.contains(notBorderNearBiome.intValue()))
+			List<Integer> notBorderNearBiomes = worldBiomes.get(notBorderNearBiomeName);
+			if(notBorderNearBiomes != null)
 			{
-				this.notBorderNearBiomes.add(notBorderNearBiome.intValue());
+				for(Integer notBorderNearBiome : notBorderNearBiomes)
+				{
+					if(notBorderNearBiome != null && !this.notBorderNearBiomes.contains(notBorderNearBiome.intValue()))
+					{
+						this.notBorderNearBiomes.add(notBorderNearBiome.intValue());
+					}
+				}
 			}
 		}
 	}

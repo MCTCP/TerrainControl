@@ -45,15 +45,14 @@ public class BiomeCommand extends BaseCommand
 		IBiomeConfig config = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator)
 				.getCachedBiomeProvider().getBiomeConfig((int) source.getPosition().x, (int) source.getPosition().z);
 
-		if (config.getTemplateForBiome() != null && config.getTemplateForBiome().trim().length() > 0)
+		if (config.getTemplateForBiome())
 		{
 			source.sendSuccess(new StringTextComponent(
 					"According to OTG, this biome uses the " + config.getName() + " template.").append(
 							new StringTextComponent("\nThis biome belongs to either another mod or the vanilla game.")
 									.withStyle(TextFormatting.GRAY)),
 					false);
-		} else
-		{
+		} else {
 			source.sendSuccess(
 					new StringTextComponent("According to OTG, you are in the " + config.getName() + " biome."), false);
 			source.sendSuccess(new StringTextComponent("Biome registry name: ").withStyle(TextFormatting.GOLD).append(
