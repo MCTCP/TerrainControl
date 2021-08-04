@@ -249,7 +249,8 @@ public class BiomeLayerData
 		this.riverBiomes = new int[biomes.length];
 		for(int i = 0; i < biomes.length; i++)
 		{			
-			this.riverBiomes[i] = biomeIdsByName.getOrDefault(biomes[i].getBiomeConfig().getRiverBiome(), null).get(0);
+			List<Integer> ids = biomeIdsByName.getOrDefault(biomes[i].getBiomeConfig().getRiverBiome(), null);
+			this.riverBiomes[i] = ids == null ? -1 : ids.get(0);
 		}
 	}
 }
