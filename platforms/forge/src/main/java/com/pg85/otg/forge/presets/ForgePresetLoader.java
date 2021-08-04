@@ -547,9 +547,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 							if(category != null)
-							{
-								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
+							{								
 								innerExcludedCategories.add(category);
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 								{
@@ -611,6 +611,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							if(tag != null)
 							{
 								innerExcludedTags.add(tag);
+								biomesForTags = biomesForTags.stream().filter(key -> !BiomeDictionary.hasType(key, tag)).collect(Collectors.toSet());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 								{
@@ -647,6 +648,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
 						{
 							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
 						}
 					}
 					if(tags.size() > 0)
@@ -937,8 +939,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 							if(category != null)
 							{
-								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
 								innerExcludedCategories.add(category);
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 								{
@@ -1000,6 +1002,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							if(tag != null)
 							{
 								innerExcludedTags.add(tag);
+								biomesForTags = biomesForTags.stream().filter(key -> !BiomeDictionary.hasType(key, tag)).collect(Collectors.toSet());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 								{
@@ -1036,6 +1039,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
 						{
 							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
 						}
 					}
 					if(tags.size() > 0)
