@@ -433,7 +433,27 @@ public class WorldConfig extends WorldConfigBase
 		);
 		
 		writer.header2("Template biomes",
-			""
+			"Template biomes can be used to include non-OTG biomes (modded or vanilla) in OTG presets.",
+			"",
+			"Syntax: TemplateBiome(BiomeConfigName, BiomeRegistryName or Tags/Categories[, more BiomeRegistryName or Tags/Categories[, ...]], minTemperature, maxTemperature)",
+			"BiomeConfigName - Name of a corresponding biome config. Case sensitive.",			
+			"BiomeRegistryName - The registry name of a non-otg biome, for example \"minecraft:plains\".",
+			"Tags/Categories - Instead of BiomeRegistryName, Forge Biome Dictionary id's and/or MC Biome Categories.",
+			"OTG fetches all non-OTG biomes that match the specified category/tags and associates them with the BiomeConfig.",
+			"The BiomeConfig must use TemplateForBiome:true, or it is ignored.",
+			"Example: TemplateBiome(MCForest, category.forest tag.overworld)",
+			"Adds 2 all plains biomes in the overworld. Biomes are never added twice.",
+			"- Use space as an AND operator, in the above example \"category.forest tag.overworld\" matches biomes with category forest AND tag overworld.",
+			"To target both minecraft and modded biomes, use \"category.\" or \"tag.\".",
+			"To target only modded biomes, use \"modcategory.\" or \"modtag.\".",
+			"To target only minecraft biomes, use \"mccategory.\" or \"mctag.\".",
+			"To filter biomes for a specific mod, add \"mod.<namespace>\", for example \"mod.byg category.plains tag.overworld\".",
+			"To exclude specific biome registry names, tags, categories or mods, use \"-\", for example -tag.overworld to exclude overworld biomes.",		
+			"MinTemperature/MaxTemperature - Optional, only biomes within this temperature range are allowed.",	
+			"Example: TemplateBiome(TagPlains, category.plains -tag.overworld) or TemplateBiome(TagPlains, category.plains -tag.overworld, -0.2, 0.2)",
+			"This targets a BiomeConfig named TagPlains.bc, and adds to it all non-OTG biomes that are of category \"plains\" but do not have biome dictionary tag \"overworld\",",
+			"the second example includes a temperature range between -0.2 and 0.2.",
+			"Each biome can only be assigned to one biome config, so the order of TemplateBiome()s is important. Put your most specific TemplateBiome first, and the most generic last."
 		);
 
 		writer.addConfigFunctions(this.templateBiomes);
@@ -446,18 +466,20 @@ public class WorldConfig extends WorldConfigBase
 			"GroupName - must be unique, choose something descriptive.",
 			"Size - from 0 to GenerationDepth. Lower number = larger. All biomes in the group must be smaller (higher BiomeSize number) or equal to this value.",
 			"Rarity - relative spawn chance.",
-			"BiomeName - Name of a corresponding biome config. Case sensitive. Can also be a registry name (minecraft:plains), if there is no TemplateForBiome",
+			"BiomeName - Name of a corresponding biome config. Case sensitive. Can also be a registry name (minecraft:plains), if there is a associated TemplateBiome().",
+			"If the biome config is a template biome, all associated non-otg biomes are added to the group.",
 			"biome config that targets the biome, it is ignored.",
 			"Tags/Categories - Instead of BiomeName, Forge Biome Dictionary id's and/or MC Biome Categories. ",
-			"OTG fetches all registered non-OTG biomes that match the specified category/tags and adds them to the biome group.",
-			"A BiomeConfig using TemplateForBiome that targets the biome must exist, or the biome is ignored.",
+			"OTG fetches all non-OTG biomes that match the specified category/tags and adds them to the biome group.",
+			"A TemplateBiome() that targets the biome must exist, or it is ignored.",
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry)",
 			"Adds 2 entries; all plains biomes in the overworld, all hot+dry biomes. Biomes are never added twice.",
 			"- Use space as an AND operator, in the above example \"category.plains tag.overworld\" matches biomes with category plains AND tag overworld.",
 			"To target both minecraft and modded biomes, use \"category.\" or \"tag.\".",
 			"To target only modded biomes, use \"modcategory.\" or \"modtag.\".",
 			"To target only minecraft biomes, use \"mccategory.\" or \"mctag.\".",
-			"To filter biomes for a specific mod, add \"mod.<namespace>\", for example \"mod.byg category.plains tag.overworld\".",			
+			"To filter biomes for a specific mod, add \"mod.<namespace>\", for example \"mod.byg category.plains tag.overworld\".",
+			"To exclude specific biome registry names, tags, categories or mods, use \"-\", for example -tag.overworld to exclude overworld biomes.",			
 			"MinTemperature/MaxTemperature - Optional, when using Tags/Categories, only biomes within this temperature range are used.",
 			"Example: BiomeGroup(NormalBiomes, 1, 100, category.plains tag.overworld, tag.hot tag.dry, -1.0, 1.0)",
 			"Same example as before, but only includes biomes with temperature between -1.0 and 1.0.",
@@ -879,7 +901,7 @@ public class WorldConfig extends WorldConfigBase
 			"green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default."
 		);
 		writer.putSetting(WorldStandardValues.PORTAL_MOB, this.portalMob,
-			"The mob that spawns from this portal, minecraft:zombie_pigman by default.",
+			"The mob that spawns from this portal, minecraft:zombified_piglin by default.",
 			"Only applies for dimensions, not overworld/nether/end."
 		);
 		writer.putSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, this.portalIgnitionSource,

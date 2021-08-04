@@ -52,7 +52,7 @@ public class WorldStandardValues extends Settings
 		EFFECTS_LOCATION = stringSetting("EffectsLocation", "minecraft:overworld"),
 		PORTAL_COLOR = stringSetting("PortalColor", "Default"),
 		PORTAL_IGNITION_SOURCE = stringSetting("PortalIgnitionSource", "minecraft:flint_and_steel"),
-		PORTAL_MOB = stringSetting("PortalMob", "minecraft:zombie_pigman")
+		PORTAL_MOB = stringSetting("PortalMob", "minecraft:zombified_piglin")
 	;
 
 	public static final Setting<Integer>
