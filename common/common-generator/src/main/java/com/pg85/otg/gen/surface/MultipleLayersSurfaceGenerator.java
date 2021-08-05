@@ -124,7 +124,10 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 			stringBuilder.append(',').append(' ');
 		}
 		// Delete last ", "
-		stringBuilder.deleteCharAt(stringBuilder.length() - 2);
+		if(stringBuilder.length() > 0)
+		{
+			stringBuilder.deleteCharAt(stringBuilder.length() - 2);
+		}
 		return stringBuilder.toString();
 	}
 }
