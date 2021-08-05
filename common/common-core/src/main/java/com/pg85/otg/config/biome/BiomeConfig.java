@@ -620,6 +620,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.settings.underWaterSurfaceBlock,
 				"The surface block used for the biome when underwater, usually the same as GroundBlock.");
 		}
+
 		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.settings.surfaceAndGroundControl,
 			"Setting for biomes with more complex surface and ground blocks.",
 			"Each column in the world has a noise value from what appears to be -7 to 7.",
