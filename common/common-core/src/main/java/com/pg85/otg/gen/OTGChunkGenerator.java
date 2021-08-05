@@ -598,7 +598,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
-								else if (realY < waterLevel[localX * 16 + localZ])
+								else if (realY < waterLevel[localX * 16 + localZ] && realY > biomeConfig.getWaterLevelMin())
 								{
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
