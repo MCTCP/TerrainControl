@@ -530,8 +530,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			return spawns;
 		}
-		//
-
 		return super.getMobsAt(biome, structureManager, entityClassification, blockPos);
 	}
 

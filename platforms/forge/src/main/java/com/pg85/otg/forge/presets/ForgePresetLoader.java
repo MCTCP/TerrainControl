@@ -482,8 +482,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome category " + tagString +  " for " + templateBiome.toString() + " could not be found.");
 								}
 							}
-						}
-						else if(
+						} else if(
 							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
@@ -556,8 +555,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 									OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Biome category " + tagSubString +  " for " + templateBiome.toString() + " could not be found.");
 								}
 							}
-						}
-						else if(
+						} else if(
 							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
 							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
@@ -873,8 +871,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome category " + tagString + " for entry " + tagString + " in group " + group.getName() + " could not be found.");
 								}
 							}
-						}
-						else if(
+						} else if(
 							tagString2.startsWith(Constants.BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 							tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 							tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)
@@ -947,8 +944,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 									OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome category " + tagString + " in group " + group.getName() + " could not be found.");
 								}
 							}
-						}
-						else if(
+						} else if(
 							tagSubString2.startsWith(Constants.BIOME_CATEGORY_LABEL) ||
 							tagSubString2.startsWith(Constants.MOD_BIOME_CATEGORY_LABEL) ||
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
