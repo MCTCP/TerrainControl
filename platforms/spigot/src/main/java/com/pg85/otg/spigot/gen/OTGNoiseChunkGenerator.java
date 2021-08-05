@@ -415,7 +415,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
 			((SpigotBiome)biome).getBiomeBase().a(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);			
+			// Template biomes handle their own snow, OTG biomes use OTG snow.
+			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
+			if(!biome.getBiomeConfig().getTemplateForBiome())
+			{
+				this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
+			}
 		}
 		catch (Exception exception)
 		{

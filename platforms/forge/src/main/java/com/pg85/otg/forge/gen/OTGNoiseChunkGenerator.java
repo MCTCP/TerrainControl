@@ -479,7 +479,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	
-		//	
+		//
 
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
 		ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);		
@@ -491,7 +491,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
 			((ForgeBiome)biome).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-			this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
+			// Template biomes handle their own snow, OTG biomes use OTG snow.
+			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
+			if(!biome.getBiomeConfig().getTemplateForBiome())
+			{
+				this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
+			}
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
 			crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", decorationSeed);
