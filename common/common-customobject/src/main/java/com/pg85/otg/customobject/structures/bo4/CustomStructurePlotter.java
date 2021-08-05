@@ -55,6 +55,8 @@ public class CustomStructurePlotter
 	private boolean processing = false;
 	//
 	
+	private boolean structurePlottedAtSpawn; // Used to make sure the structureatspawn is plotted first.
+	
 	// Non-persistent caches (optimisations)
 	private final FifoMap<ChunkCoordinate, ArrayList<String>> structureNamesPerChunk;
 	private final FifoMap<ChunkCoordinate, Object> plottedChunksFastCache; // TODO: Technically we don't need a map, we need a FIFO list with unique entries.
@@ -217,6 +219,15 @@ public class CustomStructurePlotter
 	
 	private ChunkCoordinate plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, boolean force)
 	{
+		// Make sure the BO4 at spawn is plotted before anything else
+		// This isn't thread-safe so there's a race condition, shouldn't 
+		// cause problems though due to the lock later on.
+		if(!this.structurePlottedAtSpawn) 
+		{
+			this.structurePlottedAtSpawn = true;
+			plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, worldGenRegion.getSpawnChunk(), true, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker, force);
+		}
+		
 		// This method can be called by /otg spawn and during chunkgeneration.
 		// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
 		// When called by /otg spawn, skip this attempt to spawn and let chunk generation complete first.
