@@ -99,10 +99,10 @@ public abstract class OTGEngine
 			presetsDir.mkdirs();
 		}
 
-		File modPacksDir = Paths.get(getOTGRootFolder().toString(), Constants.MODPACK_CONFIGS_FOLDER).toFile();
-		if(!modPacksDir.exists())
+		File dimensionConfigsDir = Paths.get(getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER).toFile();
+		if(!dimensionConfigsDir.exists())
 		{
-			modPacksDir.mkdirs();
+			dimensionConfigsDir.mkdirs();
 		}
 
 		File globalObjectsDir = this.globalObjectsFolder.toFile();

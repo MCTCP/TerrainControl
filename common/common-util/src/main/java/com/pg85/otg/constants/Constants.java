@@ -18,7 +18,6 @@ public class Constants
 	// Folders
 	
 	public static final String PRESETS_FOLDER = "Presets";
-	public static final String MODPACK_CONFIGS_FOLDER = "Modpacks";
 	public static final String GLOBAL_OBJECTS_FOLDER = "GlobalObjects";
 	public static final String DIMENSION_CONFIGS_FOLDER = "DimensionConfigs";	
 	public static final String DEFAULT_PRESET_NAME = "Default";	
