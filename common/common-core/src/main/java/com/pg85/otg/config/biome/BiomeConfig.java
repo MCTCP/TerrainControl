@@ -470,7 +470,7 @@ public class BiomeConfig extends BiomeConfigBase
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
-	
+
 		if(!isTemplateBiome)
 		{		
 			writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,
@@ -716,6 +716,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.settings.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 	
 			writer.putSetting(BiomeStandardValues.FOG_COLOR, this.settings.fogColor, "Biome fog color.");
+
 			writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.settings.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
 	
 			writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.settings.waterFogColor, "Biome water fog color.");
@@ -763,6 +764,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, this.settings.additionsTickChance,
 				"The tick chance that the additions sound plays");
 		}
+
 		writer.header1("Resource queue", "This section controls all resources spawning during decoration.",
 			"The resources will be placed in this order.", "",
 			"Keep in mind that a high size, frequency or rarity may slow down terrain generation.", "",
