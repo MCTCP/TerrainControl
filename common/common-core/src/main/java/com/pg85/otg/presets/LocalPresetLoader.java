@@ -74,10 +74,6 @@ public abstract class LocalPresetLoader
 		{
 			return this.presets.get(aliasMap.get(name));
 		}
-		// Presets with spaces can be accessed with underscores.
-		else if (aliasMap.containsValue(name.replaceAll("_", " "))) {
-			return this.presets.get(name.replaceAll("_", " "));
-		}
 		return this.presets.get(name);
 	}
 	
