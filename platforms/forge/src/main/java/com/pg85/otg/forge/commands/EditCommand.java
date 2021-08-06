@@ -75,7 +75,7 @@ public class EditCommand extends BaseCommand
 	{
 		builder.then(Commands.literal("edit")
 			.executes(this::help).then(
-				Commands.argument("preset", StringArgumentType.word()).executes(this::execute)
+				Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
 				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
 					Commands.argument("object", StringArgumentType.word()).executes(this::execute)
 					.suggests(BiomeObjectArgument::suggest
