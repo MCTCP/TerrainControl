@@ -123,6 +123,11 @@ public class CreateOTGDimensionsScreen extends Screen
 
 		this.updateButtonValidity();
 	}
+	
+	public void applySettings()
+	{
+		this.dimensionConfigConsumer.accept(new OTGDimensionSettingsContainer(this.currentSelection, this.dimGenSettings));
+	}
 
 	private void updateButtonValidity()
 	{

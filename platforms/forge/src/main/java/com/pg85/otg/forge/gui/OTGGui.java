@@ -84,7 +84,7 @@ public class OTGGui
 							// settings when leaving customisation menu.
 							(dimGenSettings) ->
 							{
-								DynamicRegistries.Impl dynamicRegistries = createWorldScreen.worldGenSettingsComponent.registryHolder();							
+								DynamicRegistries.Impl dynamicRegistries = createWorldScreen.worldGenSettingsComponent.registryHolder();
 								MutableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 								Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 								Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
@@ -99,7 +99,7 @@ public class OTGGui
 								if(dimConfig.isModpackConfig())
 								{
 									// Non-otg overworld, generatorsettings contains non-otg world type.
-									ForgeWorldType def = ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
+									ForgeWorldType def = dimConfig.Overworld.NonOTGWorldType == null ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
 									if(def != null)
 									{
 										DimensionGeneratorSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateFeatures, generateBonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);
