@@ -482,8 +482,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		//
 
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
-		ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);		
+		ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
 		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 2, (worldGenRegion.getCenterZ() << 2) + 2);
+		IBiome biome1 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2), (worldGenRegion.getCenterZ() << 2));
+		IBiome biome2 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2), (worldGenRegion.getCenterZ() << 2) + 4);
+		IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 4, (worldGenRegion.getCenterZ() << 2));
+		IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 4, (worldGenRegion.getCenterZ() << 2) + 4);
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
 
@@ -493,7 +497,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			((ForgeBiome)biome).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			// Template biomes handle their own snow, OTG biomes use OTG snow.
 			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
-			if(!biome.getBiomeConfig().getTemplateForBiome())
+			if(
+				!biome.getBiomeConfig().getTemplateForBiome() ||
+				!biome1.getBiomeConfig().getTemplateForBiome() ||
+				!biome2.getBiomeConfig().getTemplateForBiome() ||
+				!biome3.getBiomeConfig().getTemplateForBiome() ||				
+				!biome4.getBiomeConfig().getTemplateForBiome()
+			)
 			{
 				this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);
 			}
