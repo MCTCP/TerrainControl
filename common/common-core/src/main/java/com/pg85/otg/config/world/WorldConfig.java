@@ -516,7 +516,7 @@ public class WorldConfig extends WorldConfigBase
 			"Land size from 0 to GenerationDepth. Higher LandSize numbers will make the size of the land smaller. Landsize number should always be lower than any biome groups."
 		);
 
-		writer.putSetting(WorldStandardValues.OCEAN_BIOME_SIZE, this.landSize,
+		writer.putSetting(WorldStandardValues.OCEAN_BIOME_SIZE, this.oceanBiomeSize,
 			"Ocean biome size 0 to GenerationDepth. Higher OceanBiomeSize numbers will make the size of the ocean biomes smaller."
 		);
 
