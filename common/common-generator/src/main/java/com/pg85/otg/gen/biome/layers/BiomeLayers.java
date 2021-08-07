@@ -86,7 +86,8 @@ public class BiomeLayers
 					riverFactory = new ScaleLayer().create(contextProvider.apply(2000L + depth), riverFactory);
 				}
 
-				if (oceanTemperatureStarted) {
+				if (oceanTemperatureStarted)
+				{
 					oceanTemperatureFactory = new ScaleLayer().create(contextProvider.apply(2000L + depth), oceanTemperatureFactory);
 				}
 				
@@ -98,7 +99,8 @@ public class BiomeLayers
 				}
 
 				// TODO: worldconfig
-				if (depth == data.oceanBiomeSize && !oceanTemperatureStarted) {
+				if (depth == data.oceanBiomeSize && !oceanTemperatureStarted)
+				{
 					oceanTemperatureFactory = new OceanTemperatureLayer(data).create(contextProvider.apply(3L));
 					oceanTemperatureStarted = true;
 				}
