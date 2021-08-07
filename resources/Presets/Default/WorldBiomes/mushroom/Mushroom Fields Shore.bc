@@ -5,22 +5,11 @@
 # +-----------------------------------------------------------------+ #
 #######################################################################
 
-ReplaceToBiomeName: minecraft:mushroom_field_shore
+TemplateForBiome: false
 
-BiomeDictId: MUSHROOM, BEACH
+BiomeDictTags: MUSHROOM, BEACH
 
 BiomeCategory: mushroom
-
-
-#######################################################################
-# +-----------------------------------------------------------------+ #
-# |                        Biome Inheritance                        | #
-# +-----------------------------------------------------------------+ #
-#######################################################################
-
-BiomeExtends: 
-
-ResourceInheritance: true
 
 
 #######################################################################
@@ -52,9 +41,11 @@ BiomeRarityWhenIsle: 1
 
 BiomeIsBorder: Mushroom Fields
 
+OnlyBorderNear: 
+
 NotBorderNear: 
 
-BiomeSizeWhenBorder: 9
+BiomeSizeWhenBorder: 8
 
 
 #######################################################################
@@ -105,9 +96,11 @@ RiverBiome:
 
 StoneBlock: minecraft:stone
 
-SurfaceBlock: minecraft:mycelium[snowy=false]
+SurfaceBlock: minecraft:mycelium
 
 GroundBlock: minecraft:dirt
+
+UnderWaterSurfaceBlock: minecraft:dirt
 
 SurfaceAndGroundControl: 
 
@@ -124,11 +117,15 @@ WaterLevelMax: 63
 
 WaterLevelMin: 0
 
-WaterBlock: minecraft:water[level=0]
+WaterBlock: minecraft:water
 
 IceBlock: minecraft:ice
 
-CooledLavaBlock: minecraft:lava[level=0]
+PackedIceBlock: minecraft:packed_ice
+
+SnowBlock: minecraft:snow_block
+
+CooledLavaBlock: minecraft:lava
 
 
 #######################################################################
@@ -139,19 +136,29 @@ CooledLavaBlock: minecraft:lava[level=0]
 
 BiomeTemperature: 0.9
 
+UseFrozenOceanTemperature: false
+
 BiomeWetness: 1.0
 
 SkyColor: #7BA5FF
 
 WaterColor: #FFFFFF
 
+WaterColorControl: 
+
 GrassColor: #FFFFFF
+
+GrassColorControl: 
 
 GrassColorModifier: None
 
 FoliageColor: #FFFFFF
 
+FoliageColorControl: 
+
 FogColor: #000000
+
+FogDensity: 0.0
 
 WaterFogColor: #000000
 
@@ -196,24 +203,23 @@ Ore(minecraft:andesite,33,10,100.0,0,79,minecraft:stone)
 Ore(minecraft:coal_ore,17,20,100.0,0,127,minecraft:stone)
 Ore(minecraft:iron_ore,9,20,100.0,0,63,minecraft:stone)
 Ore(minecraft:gold_ore,9,2,100.0,0,31,minecraft:stone)
-Ore(minecraft:redstone_ore[lit=false],8,8,100.0,0,15,minecraft:stone)
+Ore(minecraft:redstone_ore,8,8,100.0,0,15,minecraft:stone)
 Ore(minecraft:diamond_ore,8,1,100.0,0,15,minecraft:stone)
 Ore(minecraft:lapis_ore,7,1,100.0,0,15,minecraft:stone)
 UnderGroundLake(25,60,2,5.0,0,49)
-Liquid(minecraft:water[level=0],20,100.0,8,128,minecraft:stone)
-Liquid(minecraft:lava[level=0],10,100.0,8,128,minecraft:stone)
-SmallLake(minecraft:water[level=0],4,7.0,8,119)
-SmallLake(minecraft:lava[level=0],2,1.0,8,119)
-SmallLake(minecraft:lava[level=0],2,8.0,6,50)
+Liquid(minecraft:water,20,100.0,8,128,minecraft:stone)
+Liquid(minecraft:lava,10,100.0,8,128,minecraft:stone)
+SmallLake(minecraft:water,4,7.0,8,119)
+SmallLake(minecraft:lava,2,1.0,8,119)
+SmallLake(minecraft:lava,2,8.0,6,50)
 AboveWaterRes(minecraft:lily_pad,1,100.0)
-UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:dirt,minecraft:grass_block[snowy=false])
+UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:dirt,minecraft:grass_block)
 UnderWaterOre(minecraft:clay,4,1,100.0,minecraft:dirt,minecraft:clay)
-UnderWaterOre(minecraft:gravel,6,1,100.0,minecraft:dirt,minecraft:grass_block[snowy=false])
-Dungeon(8,100.0,0,128)
-Plant(RedMushroom,2,12.0,0,128,minecraft:mycelium[snowy=false],minecraft:dirt)
-Plant(BrownMushroom,2,25.0,0,128,minecraft:mycelium[snowy=false],minecraft:dirt)
-Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block[snowy=false])
-CustomObject(UseWorld)
+UnderWaterOre(minecraft:gravel,6,1,100.0,minecraft:dirt,minecraft:grass_block)
+Dungeon(8.0,10,100)
+Plant(RedMushroom,2,12.0,0,128,minecraft:mycelium,minecraft:dirt)
+Plant(BrownMushroom,2,25.0,0,128,minecraft:mycelium,minecraft:dirt)
+Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block)
 
 #######################################################################
 # +-----------------------------------------------------------------+ #
@@ -266,7 +272,7 @@ NetherFossilEnabled: false
 
 EndCityEnabled: false
 
-RuinedPortalType: disabled
+RuinedPortalType: normal
 
 OceanRuinsType: disabled
 

@@ -12,7 +12,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IBiomeConfig;
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
