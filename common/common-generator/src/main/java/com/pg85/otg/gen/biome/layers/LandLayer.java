@@ -22,15 +22,17 @@ class LandLayer implements ParentedLayer
 	public int sample(LayerSampleContext<?> context, ILayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
-		// If we're on the center sample return land to try and make sure that the player doesn't spawn in the ocean.
-		if (x == 0 && z == 0)
-		{
-			return sample | LAND_BIT;
-		}
 
 		// Set land based on the rarity
-		if (context.nextInt(this.rarity) == 0) {
+		if (context.nextInt(this.rarity) == 0)
+		{
 			return sample | LAND_BIT;
+		} else {
+			// If we're on the center sample return land to try and make sure that the player doesn't spawn in the ocean.
+			if (x == 0 && z == 0)
+			{
+				return sample | LAND_BIT;
+			}
 		}
 
 		return sample;
