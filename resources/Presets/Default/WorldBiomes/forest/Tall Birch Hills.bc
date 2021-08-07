@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: FOREST, HILLS
+BiomeDictTags: FOREST, HILLS, OVERWORLD
 
 BiomeCategory: forest
 

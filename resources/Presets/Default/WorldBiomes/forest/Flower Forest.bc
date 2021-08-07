@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: FOREST
+BiomeDictTags: FOREST, OVERWORLD
 
 BiomeCategory: forest
 

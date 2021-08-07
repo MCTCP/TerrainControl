@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: HOT, DRY, SANDY
+BiomeDictTags: HOT, DRY, SANDY, OVERWORLD
 
 BiomeCategory: desert
 

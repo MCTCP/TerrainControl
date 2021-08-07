@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: PLAINS
+BiomeDictTags: PLAINS, OVERWORLD
 
 BiomeCategory: plains
 

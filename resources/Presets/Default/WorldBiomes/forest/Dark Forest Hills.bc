@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: SPOOKY, DENSE, FOREST
+BiomeDictTags: SPOOKY, DENSE, FOREST, OVERWORLD
 
 BiomeCategory: forest
 

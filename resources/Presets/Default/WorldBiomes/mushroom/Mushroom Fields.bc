@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: MUSHROOM
+BiomeDictTags: MUSHROOM, OVERWORLD
 
 BiomeCategory: mushroom
 

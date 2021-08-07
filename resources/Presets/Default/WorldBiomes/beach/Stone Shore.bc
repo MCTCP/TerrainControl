@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: BEACH
+BiomeDictTags: BEACH, OVERWORLD
 
 BiomeCategory: beach
 

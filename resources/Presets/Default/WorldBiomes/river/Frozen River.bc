@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, RIVER, SNOWY
+BiomeDictTags: COLD, RIVER, SNOWY, OVERWORLD
 
 BiomeCategory: river
 

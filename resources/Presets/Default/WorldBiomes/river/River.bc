@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: RIVER
+BiomeDictTags: RIVER, OVERWORLD
 
 BiomeCategory: river
 

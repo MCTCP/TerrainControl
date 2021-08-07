@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, CONIFEROUS, FOREST, SNOWY
+BiomeDictTags: COLD, CONIFEROUS, FOREST, SNOWY, OVERWORLD
 
 BiomeCategory: taiga
 

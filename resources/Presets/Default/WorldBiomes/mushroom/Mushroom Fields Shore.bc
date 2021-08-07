@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: MUSHROOM, BEACH
+BiomeDictTags: MUSHROOM, BEACH, OVERWORLD
 
 BiomeCategory: mushroom
 

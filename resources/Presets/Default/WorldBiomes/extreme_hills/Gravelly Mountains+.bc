@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: MOUNTAIN, FOREST, SPARSE
+BiomeDictTags: MOUNTAIN, FOREST, SPARSE, OVERWORLD
 
 BiomeCategory: extreme_hills
 
