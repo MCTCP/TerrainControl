@@ -5,22 +5,11 @@
 # +-----------------------------------------------------------------+ #
 #######################################################################
 
-ReplaceToBiomeName: minecraft:taiga_mountains
+TemplateForBiome: false
 
-BiomeDictId: COLD, CONIFEROUS, FOREST
+BiomeDictTags: COLD, CONIFEROUS, FOREST
 
 BiomeCategory: taiga
-
-
-#######################################################################
-# +-----------------------------------------------------------------+ #
-# |                        Biome Inheritance                        | #
-# +-----------------------------------------------------------------+ #
-#######################################################################
-
-BiomeExtends: 
-
-ResourceInheritance: true
 
 
 #######################################################################
@@ -51,6 +40,8 @@ BiomeRarityWhenIsle: 97
 #################
 
 BiomeIsBorder: 
+
+OnlyBorderNear: 
 
 NotBorderNear: 
 
@@ -105,9 +96,11 @@ RiverBiome: River
 
 StoneBlock: minecraft:stone
 
-SurfaceBlock: minecraft:grass_block[snowy=false]
+SurfaceBlock: minecraft:grass_block
 
 GroundBlock: minecraft:dirt
+
+UnderWaterSurfaceBlock: minecraft:dirt
 
 SurfaceAndGroundControl: 
 
@@ -124,11 +117,15 @@ WaterLevelMax: 63
 
 WaterLevelMin: 0
 
-WaterBlock: minecraft:water[level=0]
+WaterBlock: minecraft:water
 
 IceBlock: minecraft:ice
 
-CooledLavaBlock: minecraft:lava[level=0]
+PackedIceBlock: minecraft:packed_ice
+
+SnowBlock: minecraft:snow_block
+
+CooledLavaBlock: minecraft:lava
 
 
 #######################################################################
@@ -139,19 +136,29 @@ CooledLavaBlock: minecraft:lava[level=0]
 
 BiomeTemperature: 0.25
 
+UseFrozenOceanTemperature: false
+
 BiomeWetness: 0.8
 
 SkyColor: #7BA5FF
 
 WaterColor: #FFFFFF
 
+WaterColorControl: 
+
 GrassColor: #FFFFFF
+
+GrassColorControl: 
 
 GrassColorModifier: None
 
 FoliageColor: #FFFFFF
 
+FoliageColorControl: 
+
 FogColor: #000000
+
+FogDensity: 0.0
 
 WaterFogColor: #000000
 
@@ -196,25 +203,24 @@ Ore(minecraft:andesite,33,10,100.0,0,79,minecraft:stone)
 Ore(minecraft:coal_ore,17,20,100.0,0,127,minecraft:stone)
 Ore(minecraft:iron_ore,9,20,100.0,0,63,minecraft:stone)
 Ore(minecraft:gold_ore,9,2,100.0,0,31,minecraft:stone)
-Ore(minecraft:redstone_ore[lit=false],8,8,100.0,0,15,minecraft:stone)
+Ore(minecraft:redstone_ore,8,8,100.0,0,15,minecraft:stone)
 Ore(minecraft:diamond_ore,8,1,100.0,0,15,minecraft:stone)
 Ore(minecraft:lapis_ore,7,1,100.0,0,15,minecraft:stone)
 Registry(minecraft:patch_berry_bush)
 UnderGroundLake(25,60,2,5.0,0,49)
-Liquid(minecraft:water[level=0],20,100.0,8,128,minecraft:stone)
-Liquid(minecraft:lava[level=0],10,100.0,8,128,minecraft:stone)
-SmallLake(minecraft:water[level=0],4,7.0,8,119)
-SmallLake(minecraft:lava[level=0],2,1.0,8,119)
-SmallLake(minecraft:lava[level=0],2,8.0,6,50)
-UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:dirt,minecraft:grass_block[snowy=false])
+Liquid(minecraft:water,20,100.0,8,128,minecraft:stone)
+Liquid(minecraft:lava,10,100.0,8,128,minecraft:stone)
+SmallLake(minecraft:water,4,7.0,8,119)
+SmallLake(minecraft:lava,2,1.0,8,119)
+SmallLake(minecraft:lava,2,8.0,6,50)
+UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:dirt,minecraft:grass_block)
 UnderWaterOre(minecraft:clay,4,1,100.0,minecraft:dirt,minecraft:clay)
-UnderWaterOre(minecraft:gravel,6,1,100.0,minecraft:dirt,minecraft:grass_block[snowy=false])
-Dungeon(8,100.0,0,128)
+UnderWaterOre(minecraft:gravel,6,1,100.0,minecraft:dirt,minecraft:grass_block)
+Dungeon(8.0,10,100)
 Tree(10,Taiga1,35,Taiga2,100)
-Grass(Tallgrass,NotGrouped,10,100.0,minecraft:grass_block[snowy=false],minecraft:dirt)
-Plant(Dandelion,2,100.0,0,128,minecraft:grass_block[snowy=false],minecraft:dirt)
-Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block[snowy=false])
-CustomObject(UseWorld)
+Grass(Tallgrass,NotGrouped,10,100.0,minecraft:grass_block,minecraft:dirt)
+Plant(Dandelion,2,100.0,0,128,minecraft:grass_block,minecraft:dirt)
+Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block)
 
 #######################################################################
 # +-----------------------------------------------------------------+ #
@@ -267,7 +273,7 @@ NetherFossilEnabled: false
 
 EndCityEnabled: false
 
-RuinedPortalType: disabled
+RuinedPortalType: normal
 
 OceanRuinsType: disabled
 
