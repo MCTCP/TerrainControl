@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.commands;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,17 +14,32 @@ import org.bukkit.util.StringUtil;
 
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeSettingsMobs.c;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.EnumCreatureType;
 import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.WeightedRandom.WeightedRandomChoice;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
 public class BiomeCommand extends BaseCommand
 {
 	private static final List<String> TYPES = new ArrayList<>(Arrays.asList("info", "spawns"));
+	private static Field weightField;
+
+	static
+	{
+		try
+		{
+			weightField = WeightedRandomChoice.class.getDeclaredField("a");
+			weightField.setAccessible(true);
+		} catch (ReflectiveOperationException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	public BiomeCommand()
 	{
@@ -97,6 +113,9 @@ public class BiomeCommand extends BaseCommand
 
 		sender.spigot().sendMessage(
 				createComponent("Biome Category: ", biome.t().toString(), ChatColor.GOLD, ChatColor.GREEN).create());
+		sender.spigot().sendMessage(
+				createComponent("Inherit Mobs: ", config.getInheritMobsBiomeName(), ChatColor.GOLD, ChatColor.GREEN)
+						.create());
 
 		sender.spigot().sendMessage(
 				createComponent("Base Size: ", Integer.toString(config.getBiomeSize()), ChatColor.GOLD, ChatColor.GREEN)
@@ -129,26 +148,40 @@ public class BiomeCommand extends BaseCommand
 	{
 		sender.spigot().sendMessage(createComponent("Spawns:", ChatColor.GOLD));
 		sender.spigot().sendMessage(createComponent("  Monsters:", ChatColor.GOLD));
-		showSpawns(sender, config.getMonsters());
+		showSpawns(sender, biome.b().a(EnumCreatureType.MONSTER));
 		sender.spigot().sendMessage(createComponent("  Creatures:", ChatColor.GOLD));
-		showSpawns(sender, config.getCreatures());
+		showSpawns(sender, biome.b().a(EnumCreatureType.CREATURE));
+		sender.spigot().sendMessage(createComponent("  Water Creatures:", ChatColor.GOLD));
+		showSpawns(sender, biome.b().a(EnumCreatureType.CREATURE));
 		sender.spigot().sendMessage(createComponent("  Ambient Creatures:", ChatColor.GOLD));
-		showSpawns(sender, config.getAmbientCreatures());
+		showSpawns(sender, biome.b().a(EnumCreatureType.AMBIENT));
+		sender.spigot().sendMessage(createComponent("  Water Ambient:", ChatColor.GOLD));
+		showSpawns(sender, biome.b().a(EnumCreatureType.WATER_AMBIENT));
 		sender.spigot().sendMessage(createComponent("  Misc:", ChatColor.GOLD));
-		showSpawns(sender, config.getMiscCreatures());
+		showSpawns(sender, biome.b().a(EnumCreatureType.MISC));
 
 	}
 
-	public void showSpawns(Player sender, List<WeightedMobSpawnGroup> spawns)
+	public void showSpawns(Player sender, List<c> list)
 	{
-		spawns.forEach(spawn -> sender.spigot()
-				.sendMessage(createComponent("   - Entity: ", spawn.getMob(), ChatColor.GOLD, ChatColor.GREEN)
-						.append(createComponent(", Weight: ", Integer.toString(spawn.getWeight()), ChatColor.GOLD,
-								ChatColor.GREEN).create())
-						.append(createComponent(", Min: ", Integer.toString(spawn.getMin()), ChatColor.GOLD,
-								ChatColor.GREEN).create())
-						.append(createComponent(", Max: ", Integer.toString(spawn.getMax()), ChatColor.GOLD,
-								ChatColor.GREEN).create())
-						.create()));
+		list.forEach(spawn ->
+		{
+			try
+			{
+				sender.spigot()
+						.sendMessage(createComponent("   - Entity: ", IRegistry.ENTITY_TYPE.getKey(spawn.c).toString(),
+								ChatColor.GOLD, ChatColor.GREEN).append(
+										createComponent(", Weight: ", Integer.toString(weightField.getInt(spawn)),
+												ChatColor.GOLD, ChatColor.GREEN).create())
+										.append(createComponent(", Min: ", Integer.toString(spawn.d), ChatColor.GOLD,
+												ChatColor.GREEN).create())
+										.append(createComponent(", Max: ", Integer.toString(spawn.e), ChatColor.GOLD,
+												ChatColor.GREEN).create())
+										.create());
+			} catch (ReflectiveOperationException e)
+			{
+				e.printStackTrace();
+			}
+		});
 	}
 }

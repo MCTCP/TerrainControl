@@ -17,12 +17,14 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class BiomeCommand extends BaseCommand
@@ -104,6 +106,8 @@ public class BiomeCommand extends BaseCommand
 		source.sendSuccess(
 				createComponent("Biome Tags: ", String.join(", ", types), TextFormatting.GOLD, TextFormatting.GREEN),
 				false);
+		source.sendSuccess(createComponent("Inherit Mobs: ", config.getInheritMobsBiomeName(), TextFormatting.GOLD,
+				TextFormatting.GREEN), false);
 
 		source.sendSuccess(createComponent("Base Size: ", Integer.toString(config.getBiomeSize()), TextFormatting.GOLD,
 				TextFormatting.GREEN)
@@ -134,25 +138,29 @@ public class BiomeCommand extends BaseCommand
 	{
 		source.sendSuccess(new StringTextComponent("Spawns:").withStyle(TextFormatting.GOLD), false);
 		source.sendSuccess(new StringTextComponent("  Monsters:").withStyle(TextFormatting.GOLD), false);
-		showSpawns(source, config.getMonsters());
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.MONSTER));
 		source.sendSuccess(new StringTextComponent("  Creatures:").withStyle(TextFormatting.GOLD), false);
-		showSpawns(source, config.getCreatures());
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.CREATURE));
+		source.sendSuccess(new StringTextComponent("  Water Creatures:").withStyle(TextFormatting.GOLD), false);
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.WATER_CREATURE));
 		source.sendSuccess(new StringTextComponent("  Ambient Creatures:").withStyle(TextFormatting.GOLD), false);
-		showSpawns(source, config.getAmbientCreatures());
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.AMBIENT));
+		source.sendSuccess(new StringTextComponent("  Water Ambient:").withStyle(TextFormatting.GOLD), false);
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.WATER_AMBIENT));
 		source.sendSuccess(new StringTextComponent("  Misc:").withStyle(TextFormatting.GOLD), false);
-		showSpawns(source, config.getMiscCreatures());
+		showSpawns(source, biome.getMobSettings().getMobs(EntityClassification.MISC));
 
 	}
 
-	public void showSpawns(CommandSource source, List<WeightedMobSpawnGroup> spawns)
+	public void showSpawns(CommandSource source, List<Spawners> spawns)
 	{
 		spawns.forEach(spawn -> source
-				.sendSuccess(createComponent("   - Entity: ", spawn.getMob(), TextFormatting.GOLD, TextFormatting.GREEN)
-						.append(createComponent(", Weight: ", Integer.toString(spawn.getWeight()), TextFormatting.GOLD,
+				.sendSuccess(createComponent("   - Entity: ", spawn.type.getRegistryName().toString(), TextFormatting.GOLD, TextFormatting.GREEN)
+						.append(createComponent(", Weight: ", Integer.toString(spawn.weight), TextFormatting.GOLD,
 								TextFormatting.GREEN))
-						.append(createComponent(", Min: ", Integer.toString(spawn.getMin()), TextFormatting.GOLD,
+						.append(createComponent(", Min: ", Integer.toString(spawn.minCount), TextFormatting.GOLD,
 								TextFormatting.GREEN))
-						.append(createComponent(", Max: ", Integer.toString(spawn.getMax()), TextFormatting.GOLD,
+						.append(createComponent(", Max: ", Integer.toString(spawn.maxCount), TextFormatting.GOLD,
 								TextFormatting.GREEN)),
 						false));
 
