@@ -451,10 +451,17 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (stage == GenerationStage.Carving.AIR)
 		{
-			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
-			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
-			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.getCavesEnabled(), this.getRavinesEnabled());
+			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((chunk.getPos().getWorldPosition().getX() << 2) + 2, (chunk.getPos().getWorldPosition().getZ() << 2) + 2);
+			// Prevent double carvers for non-OTG biomes.
+			// TODO: This causes seams along biome borders for otg/non-otg biomes. 
+			// Implement a wrapper for carvers and register them as normal carvers.
+			if(!biome.getBiomeConfig().getTemplateForBiome())
+			{
+				ChunkPrimer protoChunk = (ChunkPrimer) chunk;
+				ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
+				BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
+				this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, this.getCavesEnabled(), this.getRavinesEnabled());
+			}
 		}
 		super.applyCarvers(seed, biomeManager, chunk, stage);
 	}
