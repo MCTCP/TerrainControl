@@ -186,6 +186,7 @@ public interface IBiomeConfig
 	boolean getOceanMonumentsEnabled();	
 
 	// Mob spawning
+	String getInheritMobsBiomeName();
 	
 	List<WeightedMobSpawnGroup> getMonsters();
 	List<WeightedMobSpawnGroup> getCreatures();

@@ -96,9 +96,7 @@ public class BiomeConfig extends BiomeConfigBase
 	// biomes in otg worlds.
 	private SettingsContainer privateSettings = new SettingsContainer();
 	class SettingsContainer
-	{
-		private String inheritMobsBiomeName;
-		
+	{	
 		private int configWaterLevelMax;
 		private int configWaterLevelMin;
 		
@@ -248,7 +246,7 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
 			this.settings.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
 			this.settings.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
-			this.privateSettings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
+			this.settings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 			this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);
 		} else {
 			this.settings.biomeCategory = BiomeStandardValues.BIOME_CATEGORY.getDefaultValue();
@@ -306,7 +304,7 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.pillagerOutpostSize = BiomeStandardValues.PILLAGER_OUTPOST_SIZE.getDefaultValue();
 			this.settings.bastionRemnantSize = BiomeStandardValues.BASTION_REMNANT_SIZE.getDefaultValue();
 			this.settings.biomeDictTags = BiomeStandardValues.BIOME_DICT_TAGS.getDefaultValue();
-			this.privateSettings.inheritMobsBiomeName = BiomeStandardValues.INHERIT_MOBS_BIOME_NAME.getDefaultValue();
+			this.settings.inheritMobsBiomeName = BiomeStandardValues.INHERIT_MOBS_BIOME_NAME.getDefaultValue();
 			this.settings.useFrozenOceanTemperature = BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE.getDefaultValue();
 		}
 
@@ -986,7 +984,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.privateSettings.inheritMobsBiomeName,
+			writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.settings.inheritMobsBiomeName,
 				"Inherit the internal mobs list of another biome. Inherited mobs can be overridden using",
 				"the mob spawn settings in this biome config. Any mob type defined in this biome config",
 				"will override inherited mob settings for the same mob in the same mob category.",
