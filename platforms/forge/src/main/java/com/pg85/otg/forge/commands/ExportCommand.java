@@ -24,6 +24,7 @@ import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
+import com.pg85.otg.forge.commands.RegionCommand.Region;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
@@ -35,6 +36,9 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.forge.ForgeAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -42,6 +46,7 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -103,6 +108,7 @@ public class ExportCommand extends BaseCommand
 				source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
 				return 0;
 			}
+			ServerPlayerEntity playerEntity = (ServerPlayerEntity) source.getEntity();
 
 			// Extract here; this is kinda complex, would be messy in OTGCommand
 			String objectName = "";
@@ -158,7 +164,21 @@ public class ExportCommand extends BaseCommand
 				return 0;
 			}
 
-			RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
+			Region region;
+			if (
+				OTG.getEngine().getModLoadedChecker().isModLoaded("worldedit")
+				&& WorldEdit.getInstance().getSessionManager().contains(ForgeAdapter.adaptPlayer(playerEntity)))
+			{
+				com.sk89q.worldedit.regions.Region weRegion = WorldEdit.getInstance().getSessionManager()
+					.get(ForgeAdapter.adaptPlayer(playerEntity))
+					.getSelection(ForgeAdapter.adapt(playerEntity.getLevel()));
+				region = new Region();
+				region.setPos(getPosFromVector3(weRegion.getMinimumPoint()));
+				region.setPos(getPosFromVector3(weRegion.getMaximumPoint()));
+			} else {
+				region = RegionCommand.playerSelectionMap.get(source.getEntity());
+			}
+
 			if (region == null || region.getMin() == null || region.getMax() == null)
 			{
 				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
@@ -265,6 +285,11 @@ public class ExportCommand extends BaseCommand
 		}
 
 		return 0;
+	}
+
+	private BlockPos getPosFromVector3(BlockVector3 vector)
+	{
+		return new BlockPos(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
 	}
 
 	public int helpMessage(CommandSource source)
