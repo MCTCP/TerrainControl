@@ -87,6 +87,7 @@ public class BiomeConfig extends BiomeConfigBase
 		RESOURCE_QUEUE_RESOURCES.put("CoralTree", CoralTreeResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("CoralClaw", CoralClawResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("Iceberg", IcebergResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("BasaltColumn", BasaltColumnResource.class);
 	}
 
 	// Private fields, only used when reading/writing
@@ -779,7 +780,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"Reed(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"SmallLake(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude)",
-			"SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....]",
+			"SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"Tree(Frequency,TreeType,TreeTypeChance[,AdditionalTreeType,AdditionalTreeTypeChance.....])",
 			"UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)",
 			"UnderWaterOre(BlockName,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])",
@@ -791,7 +792,8 @@ public class BiomeConfig extends BiomeConfigBase
 			"SeaGrass(Frequency,Rarity,TallChance)", "Kelp(Frequency,Rarity)",
 			"SeaPickle(Frequency,Rarity,Attempts)", "Registry(RegistryKey)", "CoralMushroom(Frequency,Rarity)",
 			"CoralTree(Frequency,Rarity)", "CoralClaw(Frequency,Rarity)", 
-			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", "",
+			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", 
+			"BasaltColumn(BlockName,Frequency,Rarity,BaseSize,SizeVariance,BaseHeight,HeightVariance,BlockSource[,BlockSource2,BlockSource3.....])", "",
 			"BlockName:	  	The name of the block, can include data.",
 			"BlockSource:	List of blocks the resource can spawn on/in. You can also use \"Solid\" or \"All\".",
 			"Frequency:	  	Number of attempts to place this resource in each chunk.",
