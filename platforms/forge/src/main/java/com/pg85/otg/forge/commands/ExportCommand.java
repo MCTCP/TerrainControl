@@ -36,9 +36,6 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.forge.ForgeAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -46,14 +43,11 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class ExportCommand extends BaseCommand
 {
-
-	
 	private static final String[] FLAGS = new String[]
 	{ "-o", "-a", "-b" };
 	
@@ -164,24 +158,20 @@ public class ExportCommand extends BaseCommand
 				return 0;
 			}
 
-			Region region;
-			if (
-				OTG.getEngine().getModLoadedChecker().isModLoaded("worldedit")
-				&& WorldEdit.getInstance().getSessionManager().contains(ForgeAdapter.adaptPlayer(playerEntity)))
+			Region region = null;
+			if (OTG.getEngine().getModLoadedChecker().isModLoaded("worldedit"))
 			{
-				com.sk89q.worldedit.regions.Region weRegion = WorldEdit.getInstance().getSessionManager()
-					.get(ForgeAdapter.adaptPlayer(playerEntity))
-					.getSelection(ForgeAdapter.adapt(playerEntity.getLevel()));
-				region = new Region();
-				region.setPos(getPosFromVector3(weRegion.getMinimumPoint()));
-				region.setPos(getPosFromVector3(weRegion.getMaximumPoint()));
-			} else {
+				region = WorldEditUtil.getRegionFromPlayer(playerEntity);
+			}
+
+			if (region == null)
+			{
 				region = RegionCommand.playerSelectionMap.get(source.getEntity());
 			}
 
 			if (region == null || region.getMin() == null || region.getMax() == null)
 			{
-				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
+				source.sendSuccess(new StringTextComponent("Please define a region with /otg region mark, or worldedit"), false);
 				return 0;
 			}
 
@@ -285,11 +275,6 @@ public class ExportCommand extends BaseCommand
 		}
 
 		return 0;
-	}
-
-	private BlockPos getPosFromVector3(BlockVector3 vector)
-	{
-		return new BlockPos(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
 	}
 
 	public int helpMessage(CommandSource source)

@@ -14,12 +14,7 @@ import com.pg85.otg.spigot.materials.SpigotMaterialData;
 import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import net.minecraft.server.v1_16_R3.ArgumentTile;
-import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -146,32 +141,17 @@ public class ExportCommand extends BaseCommand
 			source.sendMessage("Cannot export BO2 objects");
 			return true;
 		}
-		Region region;
-		if (
-			OTG.getEngine().getModLoadedChecker().isModLoaded("worldedit")
-			&& WorldEdit.getInstance().getSessionManager().contains(BukkitAdapter.adapt(source)))
+		Region region = null;
+		if (OTG.getEngine().getModLoadedChecker().isModLoaded("worldedit"))
 		{
-			// The player has a worldedit session, let's use that
-			try
-			{
-				com.sk89q.worldedit.regions.Region weRegion = WorldEdit.getInstance().getSessionManager()
-					.get(BukkitAdapter.adapt(source))
-					.getSelection(BukkitAdapter.adapt(source.getWorld()));
-				region = new Region();
-				region.setPos(getPosFromVector3(weRegion.getMinimumPoint()));
-				region.setPos(getPosFromVector3(weRegion.getMaximumPoint()));
-			}
-			catch (IncompleteRegionException e)
-			{
-				source.sendMessage("Export failed; worldedit region is not fully defined");
-				return true;
-			}
-		} else {
+			region = WorldEditUtil.getRegionFromPlayer(source);
+		}
+		if (region == null) {
 			region = RegionCommand.playerSelectionMap.get(source);
 		}
 		if (region == null || region.getMin() == null || region.getMax() == null)
 		{
-			source.sendMessage("Please mark two corners with /otg region mark");
+			source.sendMessage("Please define a region with /otg region mark, or worldedit");
 			return true;
 		}
 		if (ObjectUtils.isOutsideBounds(region, type))
@@ -245,10 +225,5 @@ public class ExportCommand extends BaseCommand
 		source.sendMessage("    - Templates have file ending .BO3Template or .BO4Template");
 		source.sendMessage("    - Templates are not loaded as objects");
 		source.sendMessage(" - There are three flags; -a for Air blocks, -b for Branches, -o for Override");
-	}
-
-	private BlockPosition getPosFromVector3(BlockVector3 vector)
-	{
-		return new BlockPosition(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
 	}
 }
