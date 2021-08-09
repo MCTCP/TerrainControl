@@ -553,7 +553,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							if(category != null)
 							{								
 								innerExcludedCategories.add(category);
-								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()) != null && ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 								{
@@ -661,6 +661,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							BiomeDictionary.getBiomes(tags.get(0)).stream()
 							.filter(key -> 
 								tags.stream().allMatch(tag -> BiomeDictionary.hasType(key, tag)) &&
+								ForgeRegistries.BIOMES.getValue(key.location()) != null &&
 								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
 								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
 								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
@@ -696,7 +697,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
 							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
-							if(templateBiome.temperatureAllowed(biome.getBaseTemperature()))
+							if(biome != null && templateBiome.temperatureAllowed(biome.getBaseTemperature()))
 							{
 								IBiomeResourceLocation otgLocation = new MCBiomeResourceLocation(biomeForTag.location().getNamespace(), biomeForTag.location().getPath(), presetFolderName);
 								if(!biomeConfigsByResourceLocation.containsKey(otgLocation))
@@ -847,7 +848,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					{
 						if(biomeConfig.getTemplateForBiome())
 						{
-							// For temple biome configs, fetch all associated biomes and add them.
+							// For template biome configs, fetch all associated biomes and add them.
 							for(Entry<IBiomeResourceLocation, IBiomeConfig> entry : biomeConfigsByResourceLocation.entrySet())
 							{
 								if(entry.getValue().getName().equals(biomeConfig.getName()))
@@ -994,7 +995,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							if(category != null)
 							{
 								innerExcludedCategories.add(category);
-								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
+								biomesForTags.stream().filter(a -> ForgeRegistries.BIOMES.getValue(a.location()) != null && ForgeRegistries.BIOMES.getValue(a.location()).getBiomeCategory() != category).collect(Collectors.toList());
 							} else {
 								if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 								{
@@ -1102,6 +1103,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							BiomeDictionary.getBiomes(tags.get(0)).stream()
 							.filter(key -> 
 								tags.stream().allMatch(tag -> BiomeDictionary.hasType(key, tag)) &&
+								ForgeRegistries.BIOMES.getValue(key.location()) != null &&
 								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
 								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
 								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
@@ -1137,7 +1139,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
 							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
-							if(group.temperatureAllowed(biome.getBaseTemperature()))
+							if(biome != null && group.temperatureAllowed(biome.getBaseTemperature()))
 							{
 								// Check for biomeconfig name, if none then use  
 								// resourcelocation to look up template biome config.
