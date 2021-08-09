@@ -177,4 +177,12 @@ public interface IWorldConfig
 	public String getPortalColor();
 	public String getPortalMob();
 	public String getPortalIgnitionSource();
+
+	// Spawn point settings
+	
+	public boolean getSpawnPointSet();
+	public int getSpawnPointX();
+	public int getSpawnPointY();
+	public int getSpawnPointZ();
+	public float getSpawnPointAngle();
 }

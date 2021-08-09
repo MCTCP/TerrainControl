@@ -90,11 +90,14 @@ public class WorldStandardValues extends Settings
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 112, 1, 500),
 		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
 		CARVER_LAVA_BLOCK_HEIGHT = intSetting("CarverLavaBlockHeight", 10, 0, 255),
-		LOGICAL_HEIGHT = intSetting("LogicalHeight", 256, 0, Integer.MAX_VALUE)
+		LOGICAL_HEIGHT = intSetting("LogicalHeight", 256, 0, Integer.MAX_VALUE),
+		SPAWN_POINT_X = intSetting("SpawnPointX", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
+		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
+		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE)
 	;
 	
 	public static final Setting<Long>
-		FIXED_TIME = longSetting("FixedTime", -1l, 0, 24000)	
+		FIXED_TIME = longSetting("FixedTime", -1l, 0, 24000)
 	;
 	
 	public static final Setting<Boolean>
@@ -139,6 +142,7 @@ public class WorldStandardValues extends Settings
 		BED_WORKS = booleanSetting("BedWorks", true),
 		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", true),
 		HAS_RAIDS = booleanSetting("HasRaids", true),
+		FIXED_SPAWN_POINT = booleanSetting("FixedSpawnPoint", false),
 
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
 		ISOTGPLUS = booleanSetting("IsOTGPlus", false)
@@ -164,6 +168,10 @@ public class WorldStandardValues extends Settings
 			"JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga")
 	;
 
+	public static final Setting<Float>
+		SPAWN_POINT_ANGLE = floatSetting("SpawnPointAngle", 0.0f, Integer.MIN_VALUE, Integer.MAX_VALUE)		
+	;
+	
 	public static final Setting<Double>
 		FROZEN_OCEAN_TEMPERATURE = doubleSetting("OceanFreezingTemperature", 0.15, 0, 2),
 		RAVINE_DEPTH = doubleSetting("RavineDepth", 3, 0.1, 15),
@@ -171,7 +179,7 @@ public class WorldStandardValues extends Settings
 		FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
 		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),
 		COORDINATE_SCALE = doubleSetting("CoordinateScale", 1.0D, 0.0D, Integer.MAX_VALUE),
-		AMBIENT_LIGHT = doubleSetting("AmbientLight", 0.0D, 0.0D, Double.MAX_VALUE)
+		AMBIENT_LIGHT = doubleSetting("AmbientLight", 0.0D, 0.0D, Integer.MAX_VALUE)
 	;
 
 	public static final Setting<Integer>

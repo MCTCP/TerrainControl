@@ -316,13 +316,21 @@ public class WorldConfig extends WorldConfigBase
 		this.infiniburn = reader.getSetting(WorldStandardValues.INFINIBURN, logger);
 		this.effectsLocation = reader.getSetting(WorldStandardValues.EFFECTS_LOCATION, logger);
 		this.ambientLight = reader.getSetting(WorldStandardValues.AMBIENT_LIGHT, logger).floatValue();
-		
+
 		// Portal settings
 
 		this.portalBlocks = reader.getSetting(WorldStandardValues.PORTAL_BLOCKS, logger, materialReader);
 		this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR, logger);
 		this.portalMob = reader.getSetting(WorldStandardValues.PORTAL_MOB, logger);
 		this.portalIgnitionSource = reader.getSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, logger);
+
+		// Spawn point
+
+		this.fixedSpawnPoint = reader.getSetting(WorldStandardValues.FIXED_SPAWN_POINT, logger, materialReader);
+		this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X, logger, materialReader);
+		this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y, logger, materialReader);
+		this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z, logger, materialReader);
+		this.spawnPointAngle = reader.getSetting(WorldStandardValues.SPAWN_POINT_ANGLE, logger, materialReader);
 	}
 
 	private void readTemplateBiomes(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
@@ -836,6 +844,44 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
 		writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
 
+		writer.header1("Spawn point settings");
+
+		writer.putSetting(WorldStandardValues.FIXED_SPAWN_POINT, this.fixedSpawnPoint,
+			"Set this to true to enable SpawnPointX/SpawnPointY/SpawnPointZ/SpawnPointAngle."
+		);
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_X, this.spawnPointX,
+			"When FixedSpawnPoint: true, this sets the world's spawn point."
+		);
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_Y, this.spawnPointY,
+			"When FixedSpawnPoint: true, this sets the world's spawn point."		
+		);
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_Z, this.spawnPointZ,
+			"When FixedSpawnPoint: true, this sets the world's spawn point."				
+		);
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_ANGLE, this.spawnPointAngle,
+			"When FixedSpawnPoint: true, this sets the angle the player is looking when spawned at the spawn point."
+		);
+		
+		writer.header2("Portal settings (Forge)");
+
+		writer.putSetting(WorldStandardValues.PORTAL_BLOCKS, this.portalBlocks,
+			"A list of one or more portal blocks used to build a portal to this dimension, or back to the overworld.",
+			"Only applies for dimensions, not overworld/nether/end."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
+			"The portal color used for this world's portals, only applies for dimensions, not overworld/nether/end.",
+			"Options: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame, gold,",
+			"green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_MOB, this.portalMob,
+			"The mob that spawns from this portal, minecraft:zombified_piglin by default.",
+			"Only applies for dimensions, not overworld/nether/end."
+		);
+		writer.putSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, this.portalIgnitionSource,
+			"The ignition source for this portal, minecraft:flint_and_steel by default.",
+			"Only applies for dimensions, not overworld/nether/end."
+		);
+		
 		writer.header1("Dimension settings (Forge)");
 
 		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? -1 : this.fixedTime.getAsLong(),
@@ -889,26 +935,6 @@ public class WorldConfig extends WorldConfigBase
 		);
 		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight,
 			"The base ambient light level for the world, 0.0 for overworld/end, 0.1 for nether."
-		);
-
-		// Portal settings
-
-		writer.putSetting(WorldStandardValues.PORTAL_BLOCKS, this.portalBlocks,
-			"A list of one or more portal blocks used to build a portal to this dimension, or back to the overworld.",
-			"Only applies for dimensions, not overworld/nether/end."
-		);
-		writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
-			"The portal color used for this world's portals, only applies for dimensions, not overworld/nether/end.",
-			"Options: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame, gold,",
-			"green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default."
-		);
-		writer.putSetting(WorldStandardValues.PORTAL_MOB, this.portalMob,
-			"The mob that spawns from this portal, minecraft:zombified_piglin by default.",
-			"Only applies for dimensions, not overworld/nether/end."
-		);
-		writer.putSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, this.portalIgnitionSource,
-			"The ignition source for this portal, minecraft:flint_and_steel by default.",
-			"Only applies for dimensions, not overworld/nether/end."
 		);
 	}
 }

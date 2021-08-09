@@ -179,6 +179,14 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String portalMob;
 	protected String portalIgnitionSource;
 
+	// Spawn point
+	
+	protected boolean fixedSpawnPoint;
+	protected int spawnPointX;
+	protected int spawnPointY;
+	protected int spawnPointZ;
+	protected float spawnPointAngle;	
+	
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -874,5 +882,32 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public String getPortalIgnitionSource()
 	{
 		return this.portalIgnitionSource;
+	}
+	
+	// Spawn point
+	
+	public boolean getSpawnPointSet()
+	{
+		return fixedSpawnPoint;
+	}
+
+	public int getSpawnPointX()
+	{
+		return spawnPointX;
+	}
+
+	public int getSpawnPointY()
+	{
+		return spawnPointY;
+	}
+
+	public int getSpawnPointZ()
+	{
+		return spawnPointZ;
+	}
+
+	public float getSpawnPointAngle()
+	{
+		return spawnPointAngle;
 	}
 }
