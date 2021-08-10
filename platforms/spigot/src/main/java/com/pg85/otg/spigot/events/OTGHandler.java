@@ -2,19 +2,27 @@ package com.pg85.otg.spigot.events;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+
+import net.minecraft.server.v1_16_R3.WorldServer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.SpawnChangeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.spigot.OTGPlugin;
+import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
+
 import org.bukkit.event.world.WorldLoadEvent;
 
 import java.io.File;
@@ -38,10 +46,12 @@ public class OTGHandler implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void onWorldLoaded(WorldLoadEvent evt) {
+	public void onWorldLoaded(WorldLoadEvent evt)
+	{
 		World world = evt.getWorld();
 		File WORLD_PRELOADED_FILE = new File(world.getWorldFolder() + "/WORLD_PRELOADED");
-		if (!WORLD_PRELOADED_FILE.exists()) {
+		if (!WORLD_PRELOADED_FILE.exists())
+		{
 			Location spawn = world.getSpawnLocation();
 			int Y;
 			for (Y = world.getMaxHeight()-1; world.getBlockAt(spawn.getBlockX(), Y, spawn.getBlockZ()).getType() == Material.AIR; Y--);
@@ -54,6 +64,21 @@ public class OTGHandler implements Listener
 				log.log(LogLevel.WARN, LogCategory.MAIN, "Message: " + e.getMessage());
 				e.printStackTrace();
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void onSpawnChange(SpawnChangeEvent event)
+	{
+		WorldServer world = ((CraftWorld)event.getWorld()).getHandle();
+		if ((world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		{
+			IWorldConfig worldConfig = ((OTGNoiseChunkGenerator)(world.getChunkProvider().getChunkGenerator())).getPreset().getWorldConfig(); 
+			if(worldConfig.getSpawnPointSet())
+			{
+				// TODO: How to cancel the event?
+				event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ(), worldConfig.getSpawnPointAngle());
+			}			
 		}
 	}
 }
