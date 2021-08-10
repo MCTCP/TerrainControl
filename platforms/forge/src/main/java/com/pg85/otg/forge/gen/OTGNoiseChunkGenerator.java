@@ -36,8 +36,6 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
-import com.pg85.otg.util.logging.LogCategory;
-import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
