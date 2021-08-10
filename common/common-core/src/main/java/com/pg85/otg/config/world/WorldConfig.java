@@ -298,6 +298,23 @@ public class WorldConfig extends WorldConfigBase
 		this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, logger);
 		this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, logger);
 
+		// Spawn point
+
+		this.fixedSpawnPoint = reader.getSetting(WorldStandardValues.FIXED_SPAWN_POINT, logger, materialReader);
+		this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X, logger, materialReader);
+		this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y, logger, materialReader);
+		this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z, logger, materialReader);
+		this.spawnPointAngle = reader.getSetting(WorldStandardValues.SPAWN_POINT_ANGLE, logger, materialReader);
+		
+		// Portal settings
+		// Only used when preset is not overworld/dimension/end.
+		// Can be overridden via DimensionConfig.
+
+		this.portalBlocks = reader.getSetting(WorldStandardValues.PORTAL_BLOCKS, logger, materialReader);
+		this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR, logger);
+		this.portalMob = reader.getSetting(WorldStandardValues.PORTAL_MOB, logger);
+		this.portalIgnitionSource = reader.getSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, logger);		
+		
 		// Dimension settings
 		
 		long fixedTime = reader.getSetting(WorldStandardValues.FIXED_TIME, logger);
@@ -317,20 +334,43 @@ public class WorldConfig extends WorldConfigBase
 		this.effectsLocation = reader.getSetting(WorldStandardValues.EFFECTS_LOCATION, logger);
 		this.ambientLight = reader.getSetting(WorldStandardValues.AMBIENT_LIGHT, logger).floatValue();
 
-		// Portal settings
+		// Game rules 
+		// Only used when preset is OTG overworld atm, since gamerules are shared across dimensions.
+		// Can be overridden via DimensionConfig.
 
-		this.portalBlocks = reader.getSetting(WorldStandardValues.PORTAL_BLOCKS, logger, materialReader);
-		this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR, logger);
-		this.portalMob = reader.getSetting(WorldStandardValues.PORTAL_MOB, logger);
-		this.portalIgnitionSource = reader.getSetting(WorldStandardValues.PORTAL_IGNITION_SOURCE, logger);
-
-		// Spawn point
-
-		this.fixedSpawnPoint = reader.getSetting(WorldStandardValues.FIXED_SPAWN_POINT, logger, materialReader);
-		this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X, logger, materialReader);
-		this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y, logger, materialReader);
-		this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z, logger, materialReader);
-		this.spawnPointAngle = reader.getSetting(WorldStandardValues.SPAWN_POINT_ANGLE, logger, materialReader);
+		
+		this.overrideGameRules = reader.getSetting(WorldStandardValues.OVERRIDE_GAME_RULES, logger);
+		this.doFireTick = reader.getSetting(WorldStandardValues.DO_FIRE_TICK, logger);
+		this.mobGriefing = reader.getSetting(WorldStandardValues.MOB_GRIEFING, logger);
+		this.keepInventory = reader.getSetting(WorldStandardValues.KEEP_INVENTORY, logger);
+		this.doMobSpawning = reader.getSetting(WorldStandardValues.DO_MOB_SPAWNING, logger);
+		this.doMobLoot = reader.getSetting(WorldStandardValues.DO_MOB_LOOT, logger);
+		this.doTileDrops = reader.getSetting(WorldStandardValues.DO_TILE_DROPS, logger);
+		this.doEntityDrops = reader.getSetting(WorldStandardValues.DO_ENTITY_DROPS, logger);
+		this.commandBlockOutput = reader.getSetting(WorldStandardValues.COMMAND_BLOCK_OUTPUT, logger);
+		this.naturalRegeneration = reader.getSetting(WorldStandardValues.NATURAL_REGENERATION, logger);
+		this.doDaylightCycle = reader.getSetting(WorldStandardValues.DO_DAY_LIGHT_CYCLE, logger);
+		this.logAdminCommands = reader.getSetting(WorldStandardValues.LOG_ADMIN_COMMANDS, logger);
+		this.showDeathMessages = reader.getSetting(WorldStandardValues.SHOW_DEATH_MESSAGES, logger);
+		this.randomTickSpeed = reader.getSetting(WorldStandardValues.RANDOM_TICK_SPEED, logger);
+		this.sendCommandFeedback = reader.getSetting(WorldStandardValues.SEND_COMMAND_FEEDBACK, logger);
+		this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.SPECTATORS_GENERATE_CHUNKS, logger);
+		this.spawnRadius = reader.getSetting(WorldStandardValues.SPAWN_RADIUS, logger);
+		this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.DISABLE_ELYTRA_MOVEMENT_CHECK, logger);
+		this.maxEntityCramming = reader.getSetting(WorldStandardValues.MAX_ENTITY_CRAMMING, logger);
+		this.doWeatherCycle = reader.getSetting(WorldStandardValues.DO_WEATHER_CYCLE, logger);
+		this.doLimitedCrafting = reader.getSetting(WorldStandardValues.DO_LIMITED_CRAFTING, logger);
+		this.maxCommandChainLength = reader.getSetting(WorldStandardValues.MAX_COMMAND_CHAIN_LENGTH, logger);
+		this.announceAdvancements = reader.getSetting(WorldStandardValues.ANNOUNCE_ADVANCEMENTS, logger);
+		this.disableRaids = reader.getSetting(WorldStandardValues.DISABLE_RAIDS, logger);
+		this.doInsomnia = reader.getSetting(WorldStandardValues.DO_INSOMNIA, logger);
+		this.drowningDamage = reader.getSetting(WorldStandardValues.DROWNING_DAMAGE, logger);
+		this.fallDamage = reader.getSetting(WorldStandardValues.FALL_DAMAGE, logger);
+		this.fireDamage = reader.getSetting(WorldStandardValues.FIRE_DAMAGE, logger);
+		this.doPatrolSpawning = reader.getSetting(WorldStandardValues.DO_PATROL_SPAWNING, logger);
+		this.doTraderSpawning = reader.getSetting(WorldStandardValues.DO_TRADER_SPAWNING, logger);
+		this.forgiveDeadPlayers = reader.getSetting(WorldStandardValues.FORGIVE_DEAD_PLAYERS, logger);
+		this.universalAnger = reader.getSetting(WorldStandardValues.UNIVERSAL_ANGER, logger);
 	}
 
 	private void readTemplateBiomes(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
@@ -936,5 +976,47 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.AMBIENT_LIGHT, (double)this.ambientLight,
 			"The base ambient light level for the world, 0.0 for overworld/end, 0.1 for nether."
 		);
+		
+		writer.header1("Game rules (Forge)",
+			"See: https://minecraft.fandom.com/wiki/Game_rule",
+			"Since game rules are shared across all dimensions, these settings only apply if this preset is used as the overworld.",
+			"These settings can be overridden via a DimensionConfig with a GameRules entry."
+		);
+
+		writer.putSetting(WorldStandardValues.OVERRIDE_GAME_RULES, this.overrideGameRules,
+			"Set this to true to enable the settings below."
+		);
+		
+		writer.putSetting(WorldStandardValues.DO_FIRE_TICK, this.doFireTick); 
+		writer.putSetting(WorldStandardValues.MOB_GRIEFING, this.mobGriefing);
+		writer.putSetting(WorldStandardValues.KEEP_INVENTORY, this.keepInventory);
+		writer.putSetting(WorldStandardValues.DO_MOB_SPAWNING, this.doMobSpawning);
+		writer.putSetting(WorldStandardValues.DO_MOB_LOOT, this.doMobLoot);
+		writer.putSetting(WorldStandardValues.DO_TILE_DROPS, this.doTileDrops);
+		writer.putSetting(WorldStandardValues.DO_ENTITY_DROPS, this.doEntityDrops);
+		writer.putSetting(WorldStandardValues.COMMAND_BLOCK_OUTPUT, this.commandBlockOutput);
+		writer.putSetting(WorldStandardValues.NATURAL_REGENERATION, this.naturalRegeneration);
+		writer.putSetting(WorldStandardValues.DO_DAY_LIGHT_CYCLE, this.naturalRegeneration);
+		writer.putSetting(WorldStandardValues.LOG_ADMIN_COMMANDS, this.logAdminCommands);
+		writer.putSetting(WorldStandardValues.SHOW_DEATH_MESSAGES, this.showDeathMessages);
+		writer.putSetting(WorldStandardValues.RANDOM_TICK_SPEED, this.randomTickSpeed);
+		writer.putSetting(WorldStandardValues.SEND_COMMAND_FEEDBACK, this.sendCommandFeedback);
+		writer.putSetting(WorldStandardValues.SPECTATORS_GENERATE_CHUNKS, this.spectatorsGenerateChunks);
+		writer.putSetting(WorldStandardValues.SPAWN_RADIUS, this.spawnRadius);
+		writer.putSetting(WorldStandardValues.DISABLE_ELYTRA_MOVEMENT_CHECK, this.disableElytraMovementCheck); 
+		writer.putSetting(WorldStandardValues.MAX_ENTITY_CRAMMING, this.maxEntityCramming);
+		writer.putSetting(WorldStandardValues.DO_WEATHER_CYCLE, this.doWeatherCycle);
+		writer.putSetting(WorldStandardValues.DO_LIMITED_CRAFTING, this.doLimitedCrafting); 
+		writer.putSetting(WorldStandardValues.MAX_COMMAND_CHAIN_LENGTH, this.maxCommandChainLength); 
+		writer.putSetting(WorldStandardValues.ANNOUNCE_ADVANCEMENTS, this.announceAdvancements); 
+		writer.putSetting(WorldStandardValues.DISABLE_RAIDS, this.disableRaids); 
+		writer.putSetting(WorldStandardValues.DO_INSOMNIA, this.doInsomnia);
+		writer.putSetting(WorldStandardValues.DROWNING_DAMAGE, this.drowningDamage); 
+		writer.putSetting(WorldStandardValues.FALL_DAMAGE, this.fallDamage);
+		writer.putSetting(WorldStandardValues.FIRE_DAMAGE, this.fireDamage);
+		writer.putSetting(WorldStandardValues.DO_PATROL_SPAWNING, this.doPatrolSpawning);
+		writer.putSetting(WorldStandardValues.DO_TRADER_SPAWNING, this.doTraderSpawning); 
+		writer.putSetting(WorldStandardValues.FORGIVE_DEAD_PLAYERS, this.forgiveDeadPlayers); 
+		writer.putSetting(WorldStandardValues.UNIVERSAL_ANGER, this.universalAnger);
 	}
 }

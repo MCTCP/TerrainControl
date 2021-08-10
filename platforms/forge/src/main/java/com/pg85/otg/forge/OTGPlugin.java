@@ -118,7 +118,7 @@ public class OTGPlugin
 		// Save OTG DimensionTypes to world save folder as datapack json files so they're picked up on world load.
 		// Unfortunately there doesn't appear to be a way to persist them via code(?)
 		if(!event.getWorld().isClientSide())
-		{			
+		{
 			if(((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 			{
 				Path datapackDir = ((ServerWorld)event.getWorld()).getLevel().getServer().getWorldPath(FolderName.DATAPACK_DIR);

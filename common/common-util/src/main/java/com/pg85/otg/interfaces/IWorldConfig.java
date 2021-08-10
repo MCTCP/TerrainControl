@@ -185,4 +185,41 @@ public interface IWorldConfig
 	public int getSpawnPointY();
 	public int getSpawnPointZ();
 	public float getSpawnPointAngle();
+	
+	// Game rules
+	
+	// Game rules
+	
+	public boolean getOverrideGameRules();	
+	public boolean getDoFireTick();
+	public boolean getMobGriefing();
+	public boolean getKeepInventory();
+	public boolean getDoMobSpawning();
+	public boolean getDoMobLoot();
+	public boolean getDoTileDrops();
+	public boolean getDoEntityDrops();
+	public boolean getCommandBlockOutput();
+	public boolean getNaturalRegeneration();
+	public boolean getDoDaylightCycle();
+	public boolean getLogAdminCommands();
+	public boolean getShowDeathMessages();
+	public int getRandomTickSpeed();
+	public boolean getSendCommandFeedback();
+	public boolean getSpectatorsGenerateChunks();
+	public int getSpawnRadius();
+	public boolean getDisableElytraMovementCheck();
+	public int getMaxEntityCramming();
+	public boolean getDoWeatherCycle();
+	public boolean getDoLimitedCrafting();
+	public int getMaxCommandChainLength();
+	public boolean getAnnounceAdvancements();
+	public boolean getDisableRaids();
+	public boolean getDoInsomnia();
+	public boolean getDrowningDamage();
+	public boolean getFallDamage();
+	public boolean getFireDamage();
+	public boolean getDoPatrolSpawning();
+	public boolean getDoTraderSpawning();
+	public boolean getForgiveDeadPlayers();
+	public boolean getUniversalAnger();	
 }

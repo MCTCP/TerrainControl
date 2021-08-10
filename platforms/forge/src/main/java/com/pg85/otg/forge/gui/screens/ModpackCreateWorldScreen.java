@@ -33,7 +33,6 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.resources.ResourcePackList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FileUtil;
 import net.minecraft.util.Util;
 import net.minecraft.util.datafix.codec.DatapackCodec;
@@ -44,7 +43,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
@@ -98,8 +96,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			);
 		
 		return new ModpackCreateWorldScreen(
-			screen, 
-			DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME), 
+			screen,
 			DatapackCodec.DEFAULT, 
 			new WorldOptionsScreen(
 				dynamicregistry, 
@@ -111,7 +108,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		);
 	}
 
-	public ModpackCreateWorldScreen(@Nullable Screen screen, DimensionConfig modpackConfig, DatapackCodec datapackCodec, WorldOptionsScreen worldGenSettingsComponent, DimensionGeneratorSettings dimGenSettings)
+	public ModpackCreateWorldScreen(@Nullable Screen screen, DatapackCodec datapackCodec, WorldOptionsScreen worldGenSettingsComponent, DimensionGeneratorSettings dimGenSettings)
 	{
 		super(screen, datapackCodec, worldGenSettingsComponent);
 		this.initName = I18n.get("selectWorld.newWorld");
@@ -124,42 +121,6 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		{
 			((CreateOTGDimensionsScreen)biomegeneratortypescreens$ifactory.createEditScreen(this, dimGenSettings)).applySettings();
 		}
-		if(modpackConfig.GameRules != null)
-		{
-			// TOOD: tryDeserialize does not call onUpdate, shouldn't be a problem at this point though.
-			// TODO: doImmediateRespawn
-			gameRules.getRule(GameRules.RULE_DOFIRETICK).set(modpackConfig.GameRules.DoFireTick, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(modpackConfig.GameRules.MobGriefing, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_KEEPINVENTORY).set(modpackConfig.GameRules.KeepInventory, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(modpackConfig.GameRules.DoMobSpawning, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DOMOBLOOT).set(modpackConfig.GameRules.DoMobLoot, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DOBLOCKDROPS).set(modpackConfig.GameRules.DoTileDrops, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DOENTITYDROPS).set(modpackConfig.GameRules.DoEntityDrops, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_COMMANDBLOCKOUTPUT).set(modpackConfig.GameRules.CommandBlockOutput, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(modpackConfig.GameRules.NaturalRegeneration, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DAYLIGHT).set(modpackConfig.GameRules.DoDaylightCycle, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_LOGADMINCOMMANDS).set(modpackConfig.GameRules.LogAdminCommands, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES).set(modpackConfig.GameRules.ShowDeathMessages, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_RANDOMTICKING).tryDeserialize(modpackConfig.GameRules.RandomTickSpeed + "");
-			gameRules.getRule(GameRules.RULE_SENDCOMMANDFEEDBACK).set(modpackConfig.GameRules.SendCommandFeedback, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_SPECTATORSGENERATECHUNKS).set(modpackConfig.GameRules.SpectatorsGenerateChunks, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_SPAWN_RADIUS).tryDeserialize(modpackConfig.GameRules.SpawnRadius + "");
-			gameRules.getRule(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK).set(modpackConfig.GameRules.DisableElytraMovementCheck, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_MAX_ENTITY_CRAMMING).tryDeserialize(modpackConfig.GameRules.MaxEntityCramming + "");
-			gameRules.getRule(GameRules.RULE_WEATHER_CYCLE).set(modpackConfig.GameRules.DoWeatherCycle, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_LIMITED_CRAFTING).set(modpackConfig.GameRules.DoLimitedCrafting, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_MAX_COMMAND_CHAIN_LENGTH).tryDeserialize(modpackConfig.GameRules.MaxCommandChainLength + "");
-			gameRules.getRule(GameRules.RULE_ANNOUNCE_ADVANCEMENTS).set(modpackConfig.GameRules.AnnounceAdvancements, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DISABLE_RAIDS).set(modpackConfig.GameRules.DisableRaids, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DOINSOMNIA).set(modpackConfig.GameRules.DoInsomnia, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DROWNING_DAMAGE).set(modpackConfig.GameRules.DrowningDamage, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_FALL_DAMAGE).set(modpackConfig.GameRules.FallDamage, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_FIRE_DAMAGE).set(modpackConfig.GameRules.FireDamage, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DO_PATROL_SPAWNING).set(modpackConfig.GameRules.DoPatrolSpawning, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_DO_TRADER_SPAWNING).set(modpackConfig.GameRules.DoTraderSpawning, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_FORGIVE_DEAD_PLAYERS).set(modpackConfig.GameRules.ForgiveDeadPlayers, (MinecraftServer)null);
-			gameRules.getRule(GameRules.RULE_UNIVERSAL_ANGER).set(modpackConfig.GameRules.UniversalAnger, (MinecraftServer)null);
-		}		
 	}
 	
 	@Override
