@@ -126,7 +126,6 @@ public class DimensionConfig
 		public String PortalColor;
 		public String PortalMob;
 		public String PortalIgnitionSource;
-		public boolean CarversEnabled;
 		public long Seed;
 
 		public OTGDimension() {}

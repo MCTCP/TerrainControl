@@ -74,11 +74,12 @@ public class OTGHandler implements Listener
 		WorldServer world = ((CraftWorld)event.getWorld()).getHandle();
 		if ((world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
 		{
+			// TODO: How to cancel the event?
 			if(this.spawnPointSet)
 			{
 				return;
 			}
-			this.spawnPointSet = true;			
+			this.spawnPointSet = true;
 
 			IWorldConfig worldConfig = ((OTGNoiseChunkGenerator)(world.getChunkProvider().getChunkGenerator())).getPreset().getWorldConfig(); 
 			if(worldConfig.getSpawnPointSet())
@@ -89,7 +90,6 @@ public class OTGHandler implements Listener
 					event.getWorld().getSpawnLocation().getBlockZ() != worldConfig.getSpawnPointZ()
 				)
 				{
-					// TODO: How to cancel the event?
 					event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ(), worldConfig.getSpawnPointAngle());
 				}
 			}
