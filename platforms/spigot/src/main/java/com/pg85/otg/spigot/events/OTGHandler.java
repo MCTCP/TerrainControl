@@ -67,18 +67,32 @@ public class OTGHandler implements Listener
 		}
 	}
 
+	boolean spawnPointSet = false;
 	@EventHandler(priority = EventPriority.LOW)
 	public void onSpawnChange(SpawnChangeEvent event)
-	{
+	{	
 		WorldServer world = ((CraftWorld)event.getWorld()).getHandle();
 		if ((world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
 		{
+			if(this.spawnPointSet)
+			{
+				return;
+			}
+			this.spawnPointSet = true;			
+
 			IWorldConfig worldConfig = ((OTGNoiseChunkGenerator)(world.getChunkProvider().getChunkGenerator())).getPreset().getWorldConfig(); 
 			if(worldConfig.getSpawnPointSet())
 			{
-				// TODO: How to cancel the event?
-				event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ(), worldConfig.getSpawnPointAngle());
-			}			
+				if(
+					event.getWorld().getSpawnLocation().getBlockX() != worldConfig.getSpawnPointX() ||
+					event.getWorld().getSpawnLocation().getBlockY() != worldConfig.getSpawnPointY() ||
+					event.getWorld().getSpawnLocation().getBlockZ() != worldConfig.getSpawnPointZ()
+				)
+				{
+					// TODO: How to cancel the event?
+					event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ(), worldConfig.getSpawnPointAngle());
+				}
+			}
 		}
 	}
 }
