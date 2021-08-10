@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, BEACH, SNOWY
+BiomeDictTags: COLD, BEACH, SNOWY, OVERWORLD
 
 BiomeCategory: plains
 

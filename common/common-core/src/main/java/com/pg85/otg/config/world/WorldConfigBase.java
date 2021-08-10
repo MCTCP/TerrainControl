@@ -172,6 +172,41 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String effectsLocation;
 	protected float ambientLight;
 
+	// Game rules
+	
+	protected boolean overrideGameRules;
+	protected boolean doFireTick;
+	protected boolean mobGriefing;
+	protected boolean keepInventory;
+	protected boolean doMobSpawning;
+	protected boolean doMobLoot;
+	protected boolean doTileDrops;
+	protected boolean doEntityDrops;
+	protected boolean commandBlockOutput;
+	protected boolean naturalRegeneration;
+	protected boolean doDaylightCycle;
+	protected boolean logAdminCommands;
+	protected boolean showDeathMessages;
+	protected int randomTickSpeed;
+	protected boolean sendCommandFeedback;
+	protected boolean spectatorsGenerateChunks;
+	protected int spawnRadius;
+	protected boolean disableElytraMovementCheck;
+	protected int maxEntityCramming;
+	protected boolean doWeatherCycle;
+	protected boolean doLimitedCrafting;
+	protected int maxCommandChainLength;
+	protected boolean announceAdvancements;
+	protected boolean disableRaids;
+	protected boolean doInsomnia;
+	protected boolean drowningDamage;
+	protected boolean fallDamage;
+	protected boolean fireDamage;
+	protected boolean doPatrolSpawning;
+	protected boolean doTraderSpawning;
+	protected boolean forgiveDeadPlayers;
+	protected boolean universalAnger;
+	
 	// Portals
 
 	protected ArrayList<LocalMaterialData> portalBlocks;
@@ -179,6 +214,14 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String portalMob;
 	protected String portalIgnitionSource;
 
+	// Spawn point
+	
+	protected boolean fixedSpawnPoint;
+	protected int spawnPointX;
+	protected int spawnPointY;
+	protected int spawnPointZ;
+	protected float spawnPointAngle;	
+	
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -875,4 +918,230 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.portalIgnitionSource;
 	}
+	
+	// Spawn point
+	
+	@Override
+	public boolean getSpawnPointSet()
+	{
+		return this.fixedSpawnPoint;
+	}
+
+	@Override
+	public int getSpawnPointX()
+	{
+		return this.spawnPointX;
+	}
+
+	@Override
+	public int getSpawnPointY()
+	{
+		return this.spawnPointY;
+	}
+
+	@Override
+	public int getSpawnPointZ()
+	{
+		return this.spawnPointZ;
+	}
+
+	@Override
+	public float getSpawnPointAngle()
+	{
+		return this.spawnPointAngle;
+	}
+	
+	// Game rules
+	
+	@Override
+	public boolean getOverrideGameRules()
+	{
+		return this.overrideGameRules;
+	}
+	
+	@Override
+	public boolean getDoFireTick()
+	{
+		return this.doFireTick;
+	}
+
+	@Override
+	public boolean getMobGriefing()
+	{
+		return this.mobGriefing;
+	}
+
+	@Override
+	public boolean getKeepInventory()
+	{
+		return this.keepInventory;
+	}
+
+	@Override
+	public boolean getDoMobSpawning()
+	{
+		return this.doMobSpawning;
+	}
+
+	@Override
+	public boolean getDoMobLoot()
+	{
+		return this.doMobLoot;
+	}
+
+	@Override
+	public boolean getDoTileDrops()
+	{
+		return this.doTileDrops;
+	}
+
+	@Override
+	public boolean getDoEntityDrops()
+	{
+		return this.doEntityDrops;
+	}
+
+	@Override
+	public boolean getCommandBlockOutput()
+	{
+		return this.commandBlockOutput;
+	}
+
+	@Override
+	public boolean getNaturalRegeneration()
+	{
+		return this.naturalRegeneration;
+	}
+
+	@Override
+	public boolean getDoDaylightCycle()
+	{
+		return this.doDaylightCycle;
+	}
+
+	@Override
+	public boolean getLogAdminCommands()
+	{
+		return this.logAdminCommands;
+	}
+	
+	@Override
+	public boolean getShowDeathMessages()
+	{
+		return this.showDeathMessages;
+	}
+
+	@Override
+	public int getRandomTickSpeed()
+	{
+		return this.randomTickSpeed;
+	}
+
+	@Override
+	public boolean getSendCommandFeedback()
+	{
+		return this.sendCommandFeedback;
+	}
+
+	@Override
+	public boolean getSpectatorsGenerateChunks()
+	{
+		return this.spectatorsGenerateChunks;
+	}
+
+	@Override
+	public int getSpawnRadius()
+	{
+		return this.spawnRadius;
+	}
+
+	@Override
+	public boolean getDisableElytraMovementCheck()
+	{
+		return this.disableElytraMovementCheck;
+	}
+
+	@Override
+	public int getMaxEntityCramming()
+	{
+		return this.maxEntityCramming;
+	}
+
+	@Override
+	public boolean getDoWeatherCycle()
+	{
+		return this.doWeatherCycle;
+	}
+
+	@Override
+	public boolean getDoLimitedCrafting()
+	{
+		return this.doLimitedCrafting;
+	}
+
+	@Override
+	public int getMaxCommandChainLength()
+	{
+		return this.maxCommandChainLength;
+	}
+
+	@Override
+	public boolean getAnnounceAdvancements()
+	{
+		return this.announceAdvancements;
+	}
+
+	@Override
+	public boolean getDisableRaids()
+	{
+		return this.disableRaids;
+	}
+
+	@Override
+	public boolean getDoInsomnia()
+	{
+		return this.doInsomnia;
+	}
+
+	@Override
+	public boolean getDrowningDamage()
+	{
+		return this.drowningDamage;
+	}
+
+	@Override
+	public boolean getFallDamage()
+	{
+		return this.fallDamage;
+	}
+
+	@Override
+	public boolean getFireDamage()
+	{
+		return this.fireDamage;
+	}
+
+	@Override
+	public boolean getDoPatrolSpawning()
+	{
+		return this.doPatrolSpawning;
+	}
+
+	@Override
+	public boolean getDoTraderSpawning()
+	{
+		return this.doTraderSpawning;
+	}
+
+	@Override
+	public boolean getForgiveDeadPlayers()
+	{
+		return this.forgiveDeadPlayers;
+	}
+
+	@Override
+	public boolean getUniversalAnger()
+	{
+		return this.universalAnger;
+	}	
 }

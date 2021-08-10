@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: MESA, SANDY
+BiomeDictTags: MESA, SANDY, OVERWORLD
 
 BiomeCategory: mesa
 

@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, SNOWY, MOUNTAIN
+BiomeDictTags: COLD, SNOWY, MOUNTAIN, OVERWORLD
 
 BiomeCategory: icy
 

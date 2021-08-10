@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: OCEAN
+BiomeDictTags: OCEAN, OVERWORLD
 
 BiomeCategory: ocean
 

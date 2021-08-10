@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: HOT, SAVANNA, PLAINS, SPARSE
+BiomeDictTags: HOT, SAVANNA, PLAINS, SPARSE, OVERWORLD
 
 BiomeCategory: savanna
 

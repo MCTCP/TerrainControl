@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, OCEAN, SNOWY
+BiomeDictTags: COLD, OCEAN, SNOWY, OVERWORLD
 
 BiomeCategory: ocean
 

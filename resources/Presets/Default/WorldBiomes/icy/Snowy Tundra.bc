@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: COLD, SNOWY, WASTELAND
+BiomeDictTags: COLD, SNOWY, WASTELAND, OVERWORLD
 
 BiomeCategory: icy
 

@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: beach
+BiomeDictTags: beach, OVERWORLD
 
 BiomeCategory: plains
 

@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: MOUNTAIN, HILLS
+BiomeDictTags: MOUNTAIN, HILLS, OVERWORLD
 
 BiomeCategory: extreme_hills
 

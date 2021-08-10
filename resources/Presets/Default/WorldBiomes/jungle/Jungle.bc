@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: HOT, WET, DENSE, JUNGLE
+BiomeDictTags: HOT, WET, DENSE, JUNGLE, OVERWORLD
 
 BiomeCategory: jungle
 

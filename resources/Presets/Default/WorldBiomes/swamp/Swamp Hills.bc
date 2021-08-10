@@ -7,7 +7,7 @@
 
 TemplateForBiome: false
 
-BiomeDictTags: WET, SWAMP
+BiomeDictTags: WET, SWAMP, OVERWORLD
 
 BiomeCategory: swamp
 
