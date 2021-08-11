@@ -6,6 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObjectManager;
@@ -99,10 +100,10 @@ public abstract class OTGEngine
 			presetsDir.mkdirs();
 		}
 
-		File modPacksDir = Paths.get(getOTGRootFolder().toString(), Constants.MODPACK_CONFIGS_FOLDER).toFile();
-		if(!modPacksDir.exists())
+		File dimensionConfigsDir = Paths.get(getOTGRootFolder().toString(), Constants.DIMENSION_CONFIGS_FOLDER).toFile();
+		if(!dimensionConfigsDir.exists())
 		{
-			modPacksDir.mkdirs();
+			dimensionConfigsDir.mkdirs();
 		}
 
 		File globalObjectsDir = this.globalObjectsFolder.toFile();
@@ -155,8 +156,10 @@ public abstract class OTGEngine
 					if (wc.exists())
 					{
 						BufferedReader reader = new BufferedReader(new FileReader(wc));
-						int[] oldVer = parseVersion(reader);
-						int[] newVer = new int[0];
+						int oldMajorVer = parseMajorVersion(reader);
+						int oldMinorVer = parseMinorVersion(reader);
+						int newMajorVer = 0;
+						int newMinorVer = 0;
 	
 						while (entries.hasMoreElements())
 						{
@@ -164,18 +167,16 @@ public abstract class OTGEngine
 							if (jarEntry.getName().contains("Default/" + Constants.WORLD_CONFIG_FILE))
 							{
 								reader = new BufferedReader(new BufferedReader(new InputStreamReader(jarFile.getInputStream(jarEntry))));
-								newVer = parseVersion(reader);
+								newMajorVer = parseMajorVersion(reader);
+								newMinorVer = parseMinorVersion(reader);
 							}
 						}
-						int loops = Math.min(oldVer.length, newVer.length);
-						for (int i = 0; i < loops; i++)
+						if(
+							(newMajorVer < oldMajorVer) ||
+							(newMajorVer == oldMajorVer && newMinorVer <= oldMinorVer)
+						)
 						{
-							if (newVer[i] < oldVer[i])
-								return; // This is an older version
-							if (newVer[i] > oldVer[i])
-								break; // This is a newer version
-							if (i == loops -1)
-								return; // The two have the same version, cancel
+							return;
 						}
 					}
 				}
@@ -226,29 +227,33 @@ public abstract class OTGEngine
 		}
 	}
 	
-	private int[] parseVersion(BufferedReader reader) throws IOException
+	private int parseMajorVersion(BufferedReader reader) throws IOException
 	{
-		int[] version = new int[] {0,0};
+		return parseVersion(reader, WorldStandardValues.MAJOR_VERSION.getName());
+	}
+	
+	private int parseMinorVersion(BufferedReader reader) throws IOException
+	{
+		return parseVersion(reader, WorldStandardValues.MINOR_VERSION.getName());
+	}
+	
+	private int parseVersion(BufferedReader reader, String name) throws IOException
+	{
+		int version = -1;
 		String line;
 		// Filter out the line with Version in it
 		while ((line = reader.readLine()) != null)
 		{
-			if (line.contains("Version:"))
+			if (line.contains(name))
 			{
 				break;
 			}
 		}
-
 		if (line != null)
 		{
 			String v = line.split(":")[1];
 			v = v.trim();
-			String[] arr = v.split("\\.");
-			version = new int[arr.length];
-			for (int i = 0, arrLength = arr.length; i < arrLength; i++)
-			{
-				version[i] = Integer.parseInt(arr[i]);
-			}
+			version = Integer.parseInt(v);
 		}
 		return version;
 	}

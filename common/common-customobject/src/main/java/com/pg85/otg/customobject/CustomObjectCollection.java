@@ -162,7 +162,7 @@ public class CustomObjectCollection
 	{
 		synchronized(indexingFilesLock)
 		{
-			if (!customObjectFilesGlobalObjects.containsKey(name.toLowerCase(Locale.ROOT)))
+			if (customObjectFilesGlobalObjects != null && !customObjectFilesGlobalObjects.containsKey(name.toLowerCase(Locale.ROOT)))
 			{
 				customObjectFilesGlobalObjects.put(name.toLowerCase(Locale.ROOT), file);
 			}

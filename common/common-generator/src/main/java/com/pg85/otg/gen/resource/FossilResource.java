@@ -20,7 +20,7 @@ public final class FossilResource extends FrequencyResourceBase
 	public FossilResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(biomeConfig, args, logger, materialReader);
-		assureSize(1, args);
+		assureSize(3, args);
 
 		this.frequency = 1;
 		this.rarity = readInt(args.get(0), 1, Integer.MAX_VALUE);

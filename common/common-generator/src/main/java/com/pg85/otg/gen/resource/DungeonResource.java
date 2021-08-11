@@ -19,8 +19,8 @@ public class DungeonResource extends FrequencyResourceBase
 	public DungeonResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
 		super(biomeConfig, args, logger, materialReader);
-		assureSize(4, args);
-		
+		assureSize(3, args);
+
 		this.frequency = 1;
 		this.rarity = readDouble(args.get(0), 1, Integer.MAX_VALUE);
 		this.minAltitude = readInt(args.get(1), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);

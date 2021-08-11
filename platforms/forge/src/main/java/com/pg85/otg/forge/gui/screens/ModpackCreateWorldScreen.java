@@ -1,6 +1,5 @@
 package com.pg85.otg.forge.gui.screens;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,7 +7,6 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.stream.Stream;
-
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.datafixers.util.Pair;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.dimensions.OTGDimensionType;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.client.Minecraft;
@@ -36,11 +32,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.resources.FolderPackFinder;
-import net.minecraft.resources.IPackNameDecorator;
 import net.minecraft.resources.ResourcePackList;
-import net.minecraft.resources.ServerPackFinder;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FileUtil;
 import net.minecraft.util.Util;
 import net.minecraft.util.datafix.codec.DatapackCodec;
@@ -51,7 +43,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
@@ -67,18 +58,12 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	private static final ITextComponent NAME_LABEL = new TranslationTextComponent("selectWorld.enterName");
 	private static final ITextComponent OUTPUT_DIR_INFO = new TranslationTextComponent("selectWorld.resultFolder");
 	private static final ITextComponent COMMANDS_INFO = new TranslationTextComponent("selectWorld.allowCommands.info");
-	private final Screen lastScreen;
-	private TextFieldWidget nameEdit;
 	private TextFieldWidget seedEdit;
-	private String resultFolder;
 	private ModpackCreateWorldScreen.GameMode gameMode = ModpackCreateWorldScreen.GameMode.SURVIVAL;
 	@Nullable
 	private ModpackCreateWorldScreen.GameMode oldGameMode;
 	private Difficulty selectedDifficulty = Difficulty.NORMAL;
-	private Difficulty effectiveDifficulty = Difficulty.NORMAL;
-	private boolean commands;
 	private boolean commandsChanged;
-	protected DatapackCodec dataPacks;
 	@Nullable
 	private Path tempDataPackDir;
 	@Nullable
@@ -90,51 +75,54 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	private ITextComponent gameModeHelp2;
 	private String initName;
 	private String initSeed = "";
-	private ITextComponent title;
-	private GameRules gameRules = new GameRules();
-	
-	private DimensionGeneratorSettings dimensionGeneratorSettings;
+	private ITextComponent title2;
 
-	public ModpackCreateWorldScreen(@Nullable Screen p_i242064_1_, WorldSettings p_i242064_2_, DimensionGeneratorSettings dimensionGeneratorSettings, @Nullable Path p_i242064_4_, DatapackCodec p_i242064_5_, DynamicRegistries.Impl p_i242064_6_)
+	public static ModpackCreateWorldScreen create(@Nullable Screen screen)
 	{
-		this(p_i242064_1_, p_i242064_5_, new WorldOptionsScreen(p_i242064_6_, dimensionGeneratorSettings, BiomeGeneratorTypeScreens.of(dimensionGeneratorSettings), OptionalLong.of(dimensionGeneratorSettings.seed())));
-		this.dimensionGeneratorSettings = dimensionGeneratorSettings;
-		this.initName = p_i242064_2_.levelName();
-		this.commands = p_i242064_2_.allowCommands();
-		this.commandsChanged = true;
-		this.selectedDifficulty = p_i242064_2_.difficulty();
-		this.effectiveDifficulty = this.selectedDifficulty;
-		this.gameRules.assignFrom(p_i242064_2_.gameRules(), (MinecraftServer)null);
-		if (p_i242064_2_.hardcore())
-		{
-			this.gameMode = ModpackCreateWorldScreen.GameMode.HARDCORE;
-		}
-		else if (p_i242064_2_.gameType().isSurvival())
-		{
-			this.gameMode = ModpackCreateWorldScreen.GameMode.SURVIVAL;
-		}
-		else if (p_i242064_2_.gameType().isCreative())
-		{
-			this.gameMode = ModpackCreateWorldScreen.GameMode.CREATIVE;
-		}
-	
-		this.tempDataPackDir = p_i242064_4_;	
+		DynamicRegistries.Impl dynamicregistry = DynamicRegistries.builtin();
+		DimensionGeneratorSettings dimGenSettings = net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
+			type -> type.create(
+					dynamicregistry, 
+					new java.util.Random().nextLong(), 
+					true, 
+					false
+				)
+			).orElseGet(() -> 
+				DimensionGeneratorSettings.makeDefault(
+					dynamicregistry.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), 
+					dynamicregistry.registryOrThrow(Registry.BIOME_REGISTRY), 
+					dynamicregistry.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
+				)
+			);
+		
+		return new ModpackCreateWorldScreen(
+			screen,
+			DatapackCodec.DEFAULT, 
+			new WorldOptionsScreen(
+				dynamicregistry, 
+				dimGenSettings, 
+				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType(), 
+				OptionalLong.empty()
+			),
+			dimGenSettings
+		);
 	}
 
-	public static ModpackCreateWorldScreen create(@Nullable Screen p_243425_0_)
+	public ModpackCreateWorldScreen(@Nullable Screen screen, DatapackCodec datapackCodec, WorldOptionsScreen worldGenSettingsComponent, DimensionGeneratorSettings dimGenSettings)
 	{
-		DynamicRegistries.Impl dynamicregistries$impl = DynamicRegistries.builtin();
-		return new ModpackCreateWorldScreen(p_243425_0_, DatapackCodec.DEFAULT, new WorldOptionsScreen(dynamicregistries$impl, net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(type -> type.create(dynamicregistries$impl, new java.util.Random().nextLong(), true, false)).orElseGet(() -> DimensionGeneratorSettings.makeDefault(dynamicregistries$impl.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), dynamicregistries$impl.registryOrThrow(Registry.BIOME_REGISTRY), dynamicregistries$impl.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY))), net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType(), OptionalLong.empty()));
-	}
-
-	public ModpackCreateWorldScreen(@Nullable Screen p_i242063_1_, DatapackCodec p_i242063_2_, WorldOptionsScreen p_i242063_3_)
-	{
-		super(p_i242063_1_, p_i242063_2_, p_i242063_3_);
-		this.lastScreen = p_i242063_1_;
+		super(screen, datapackCodec, worldGenSettingsComponent);
 		this.initName = I18n.get("selectWorld.newWorld");
-		this.dataPacks = p_i242063_2_;
-	}
 
+		// Does the same as opening the customisation/dimensions menu and applying, registering the dimensions from the modpack config.
+		Optional<BiomeGeneratorTypeScreens> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
+		BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(preset);
+		biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
+		if (biomegeneratortypescreens$ifactory != null)
+		{
+			((CreateOTGDimensionsScreen)biomegeneratortypescreens$ifactory.createEditScreen(this, dimGenSettings)).applySettings();
+		}
+	}
+	
 	@Override
 	public void tick()
 	{
@@ -245,7 +233,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
 				if (biomegeneratortypescreens$ifactory != null)
 				{
-					this.minecraft.setScreen(biomegeneratortypescreens$ifactory.createEditScreen(this, this.dimensionGeneratorSettings));
+					this.minecraft.setScreen(biomegeneratortypescreens$ifactory.createEditScreen(this, this.worldGenSettingsComponent.makeSettings(this.hardCore)));
 				}
 			}) {
 				public ITextComponent getMessage()
@@ -278,17 +266,20 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				}
 			)
 		);
+
+		this.worldGenSettingsComponent.init(this, this.minecraft, this.font);
+		
 		this.updateDisplayOptions();
 		this.setInitialFocus(this.nameEdit);
 		this.setGameMode(this.gameMode);
 		this.updateResultFolder();
-		
+
 		DimensionConfig modPackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 		if(modPackConfig == null || modPackConfig.ModpackName == null)
 		{
-			this.title = new TranslationTextComponent("otg.createDimensions.customize.title");
+			this.title2 = new TranslationTextComponent("otg.createDimensions.customize.title");
 		} else {
-			this.title = new StringTextComponent(modPackConfig.ModpackName);
+			this.title2 = new StringTextComponent(modPackConfig.ModpackName);
 		}
 	}
 
@@ -330,50 +321,8 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		if (this.copyTempDataPackDirToNewWorld())
 		{
 			this.cleanupTempResources();
-			OptionalLong seed = parseSeed();
-			DimensionConfig modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);			
-			DimensionGeneratorSettings dimensiongeneratorsettings = OTGDimensionType.createOTGSettings(this.worldGenSettingsComponent.registryHolder(), seed.isPresent() ? seed.getAsLong() : -1l, modpackConfig.Settings != null ? modpackConfig.Settings.GenerateStructures : true, modpackConfig.Settings != null ? modpackConfig.Settings.BonusChest : true, Constants.MODPACK_CONFIG_NAME);
-
-			if(modpackConfig.GameRules != null)
-			{
-				// TOOD: tryDeserialize does not call onUpdate, shouldn't be a problem at this point though.
-				// TODO: doImmediateRespawn				
-				this.gameRules.getRule(GameRules.RULE_DOFIRETICK).set(modpackConfig.GameRules.DoFireTick, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(modpackConfig.GameRules.MobGriefing, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_KEEPINVENTORY).set(modpackConfig.GameRules.KeepInventory, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(modpackConfig.GameRules.DoMobSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOMOBLOOT).set(modpackConfig.GameRules.DoMobLoot, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOBLOCKDROPS).set(modpackConfig.GameRules.DoTileDrops, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOENTITYDROPS).set(modpackConfig.GameRules.DoEntityDrops, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_COMMANDBLOCKOUTPUT).set(modpackConfig.GameRules.CommandBlockOutput, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(modpackConfig.GameRules.NaturalRegeneration, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DAYLIGHT).set(modpackConfig.GameRules.DoDaylightCycle, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_LOGADMINCOMMANDS).set(modpackConfig.GameRules.LogAdminCommands, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SHOWDEATHMESSAGES).set(modpackConfig.GameRules.ShowDeathMessages, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_RANDOMTICKING).tryDeserialize(modpackConfig.GameRules.RandomTickSpeed + "");
-				this.gameRules.getRule(GameRules.RULE_SENDCOMMANDFEEDBACK).set(modpackConfig.GameRules.SendCommandFeedback, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SPECTATORSGENERATECHUNKS).set(modpackConfig.GameRules.SpectatorsGenerateChunks, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_SPAWN_RADIUS).tryDeserialize(modpackConfig.GameRules.SpawnRadius + "");
-				this.gameRules.getRule(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK).set(modpackConfig.GameRules.DisableElytraMovementCheck, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MAX_ENTITY_CRAMMING).tryDeserialize(modpackConfig.GameRules.MaxEntityCramming + "");
-				this.gameRules.getRule(GameRules.RULE_WEATHER_CYCLE).set(modpackConfig.GameRules.DoWeatherCycle, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_LIMITED_CRAFTING).set(modpackConfig.GameRules.DoLimitedCrafting, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_MAX_COMMAND_CHAIN_LENGTH).tryDeserialize(modpackConfig.GameRules.MaxCommandChainLength + "");
-				this.gameRules.getRule(GameRules.RULE_ANNOUNCE_ADVANCEMENTS).set(modpackConfig.GameRules.AnnounceAdvancements, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DISABLE_RAIDS).set(modpackConfig.GameRules.DisableRaids, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DOINSOMNIA).set(modpackConfig.GameRules.DoInsomnia, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DROWNING_DAMAGE).set(modpackConfig.GameRules.DrowningDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FALL_DAMAGE).set(modpackConfig.GameRules.FallDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FIRE_DAMAGE).set(modpackConfig.GameRules.FireDamage, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DO_PATROL_SPAWNING).set(modpackConfig.GameRules.DoPatrolSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_DO_TRADER_SPAWNING).set(modpackConfig.GameRules.DoTraderSpawning, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_FORGIVE_DEAD_PLAYERS).set(modpackConfig.GameRules.ForgiveDeadPlayers, (MinecraftServer)null);
-				this.gameRules.getRule(GameRules.RULE_UNIVERSAL_ANGER).set(modpackConfig.GameRules.UniversalAnger, (MinecraftServer)null);
-			}
-
 			WorldSettings worldsettings = new WorldSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, this.effectiveDifficulty, this.commands && !this.hardCore, this.gameRules, this.dataPacks);
-
-			this.minecraft.createLevel(this.resultFolder, worldsettings, this.worldGenSettingsComponent.registryHolder(), dimensiongeneratorsettings);
+			this.minecraft.createLevel(this.resultFolder, worldsettings, this.worldGenSettingsComponent.registryHolder(), this.worldGenSettingsComponent.makeSettings(worldsettings.hardcore()).withSeed(worldsettings.hardcore(), parseSeed()));
 		}
 	}
 	
@@ -475,7 +424,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.renderBackground(p_230430_1_);
-		drawCenteredString(p_230430_1_, this.font, this.title, this.width / 2, 20, -1);
+		drawCenteredString(p_230430_1_, this.font, this.title2, this.width / 2, 20, -1);
 		drawString(p_230430_1_, this.font, NAME_LABEL, this.width / 2 - 150, 47, -6250336);
 		drawString(p_230430_1_, this.font, (new StringTextComponent("")).append(OUTPUT_DIR_INFO).append(" ").append(this.resultFolder), this.width / 2 - 150, 85, -6250336);
 		drawString(p_230430_1_, this.font, "Seed", this.width / 2 + 10, 47, -6250336);
@@ -615,28 +564,6 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		}
 	
 		return mutableobject.getValue();
-	}
-
-	@SuppressWarnings("deprecation")
-	@Nullable
-	private Pair<File, ResourcePackList> getDataPackSelectionSettings()
-	{
-		Path path = this.getTempDataPackDir();
-		if (path != null)
-		{
-			File file1 = path.toFile();
-			if (this.tempDataPackRepository == null)
-			{
-				this.tempDataPackRepository = new ResourcePackList(new ServerPackFinder(), new FolderPackFinder(file1, IPackNameDecorator.DEFAULT));
-				net.minecraftforge.fml.packs.ResourcePackLoader.loadResourcePacks(this.tempDataPackRepository, net.minecraftforge.fml.server.ServerLifecycleHooks::buildPackFinder);
-				this.tempDataPackRepository.reload();
-			}
-	
-			this.tempDataPackRepository.setSelected(this.dataPacks.getEnabled());
-			return Pair.of(file1, this.tempDataPackRepository);
-		} else {
-			return null;
-		}
 	}
 
 	@SuppressWarnings("serial")

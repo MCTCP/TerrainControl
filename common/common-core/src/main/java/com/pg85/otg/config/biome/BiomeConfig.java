@@ -87,6 +87,7 @@ public class BiomeConfig extends BiomeConfigBase
 		RESOURCE_QUEUE_RESOURCES.put("CoralTree", CoralTreeResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("CoralClaw", CoralClawResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("Iceberg", IcebergResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("BasaltColumn", BasaltColumnResource.class);
 	}
 
 	// Private fields, only used when reading/writing
@@ -96,9 +97,7 @@ public class BiomeConfig extends BiomeConfigBase
 	// biomes in otg worlds.
 	private SettingsContainer privateSettings = new SettingsContainer();
 	class SettingsContainer
-	{
-		private String inheritMobsBiomeName;
-		
+	{	
 		private int configWaterLevelMax;
 		private int configWaterLevelMin;
 		
@@ -248,7 +247,7 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
 			this.settings.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
 			this.settings.biomeDictTags = reader.getSetting(BiomeStandardValues.BIOME_DICT_TAGS, logger);
-			this.privateSettings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
+			this.settings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 			this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);
 		} else {
 			this.settings.biomeCategory = BiomeStandardValues.BIOME_CATEGORY.getDefaultValue();
@@ -306,7 +305,7 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.pillagerOutpostSize = BiomeStandardValues.PILLAGER_OUTPOST_SIZE.getDefaultValue();
 			this.settings.bastionRemnantSize = BiomeStandardValues.BASTION_REMNANT_SIZE.getDefaultValue();
 			this.settings.biomeDictTags = BiomeStandardValues.BIOME_DICT_TAGS.getDefaultValue();
-			this.privateSettings.inheritMobsBiomeName = BiomeStandardValues.INHERIT_MOBS_BIOME_NAME.getDefaultValue();
+			this.settings.inheritMobsBiomeName = BiomeStandardValues.INHERIT_MOBS_BIOME_NAME.getDefaultValue();
 			this.settings.useFrozenOceanTemperature = BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE.getDefaultValue();
 		}
 
@@ -470,7 +469,7 @@ public class BiomeConfig extends BiomeConfigBase
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
-	
+
 		if(!isTemplateBiome)
 		{		
 			writer.putSetting(BiomeStandardValues.BIOME_DICT_TAGS, this.settings.biomeDictTags,
@@ -716,6 +715,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_CONTROL, this.settings.foliageColorControl, "Biome foliage color control. See " + BiomeStandardValues.WATER_COLOR_CONTROL + ".");
 	
 			writer.putSetting(BiomeStandardValues.FOG_COLOR, this.settings.fogColor, "Biome fog color.");
+
 			writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.settings.fogDensity, "Biome fog density, from 0.0 to 1.0. 0 will mimic vanilla fog density.");
 	
 			writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.settings.waterFogColor, "Biome water fog color.");
@@ -763,6 +763,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.ADDITIONS_TICK_CHANCE, this.settings.additionsTickChance,
 				"The tick chance that the additions sound plays");
 		}
+
 		writer.header1("Resource queue", "This section controls all resources spawning during decoration.",
 			"The resources will be placed in this order.", "",
 			"Keep in mind that a high size, frequency or rarity may slow down terrain generation.", "",
@@ -779,7 +780,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"Reed(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"SmallLake(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude)",
-			"SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....]",
+			"SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])",
 			"Tree(Frequency,TreeType,TreeTypeChance[,AdditionalTreeType,AdditionalTreeTypeChance.....])",
 			"UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)",
 			"UnderWaterOre(BlockName,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])",
@@ -791,7 +792,8 @@ public class BiomeConfig extends BiomeConfigBase
 			"SeaGrass(Frequency,Rarity,TallChance)", "Kelp(Frequency,Rarity)",
 			"SeaPickle(Frequency,Rarity,Attempts)", "Registry(RegistryKey)", "CoralMushroom(Frequency,Rarity)",
 			"CoralTree(Frequency,Rarity)", "CoralClaw(Frequency,Rarity)", 
-			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", "",
+			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", 
+			"BasaltColumn(BlockName,Frequency,Rarity,BaseSize,SizeVariance,BaseHeight,HeightVariance,BlockSource[,BlockSource2,BlockSource3.....])", "",
 			"BlockName:	  	The name of the block, can include data.",
 			"BlockSource:	List of blocks the resource can spawn on/in. You can also use \"Solid\" or \"All\".",
 			"Frequency:	  	Number of attempts to place this resource in each chunk.",
@@ -984,7 +986,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.privateSettings.inheritMobsBiomeName,
+			writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.settings.inheritMobsBiomeName,
 				"Inherit the internal mobs list of another biome. Inherited mobs can be overridden using",
 				"the mob spawn settings in this biome config. Any mob type defined in this biome config",
 				"will override inherited mob settings for the same mob in the same mob category.",
