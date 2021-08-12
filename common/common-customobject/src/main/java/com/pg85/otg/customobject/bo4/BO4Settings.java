@@ -55,7 +55,8 @@ class BO4Settings extends Settings
 		SMOOTHINGGROUNDBLOCK = stringSetting("SmoothingGroundBlock", ""),
 		MUSTBEINSIDE = stringSetting("MustBeInside", ""),
 		CANNOTBEINSIDE = stringSetting("CannotBeInside", ""),
-		REPLACESBO3 = stringSetting("ReplacesBO3", "")
+		REPLACESBO3 = stringSetting("ReplacesBO3", ""),
+		FIXED_ROTATION = stringSetting("FixedRotation", "")				
 	;
 
 	// Enum settings
