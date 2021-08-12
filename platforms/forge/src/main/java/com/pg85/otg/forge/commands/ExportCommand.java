@@ -51,8 +51,9 @@ public class ExportCommand extends BaseCommand
 	private static final String[] FLAGS = new String[]
 	{ "-o", "-a", "-b" };
 	
-	public ExportCommand() {
-		this.name = "export";
+	public ExportCommand() 
+	{
+		super("export");
 		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
 		this.usage = "Please see /otg export help.";
 	}

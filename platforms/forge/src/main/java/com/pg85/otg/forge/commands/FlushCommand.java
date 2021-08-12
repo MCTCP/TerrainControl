@@ -12,8 +12,9 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class FlushCommand extends BaseCommand
 {	
-	public FlushCommand() {
-		this.name = "flush";
+	public FlushCommand() 
+	{
+		super("flush");
 		this.helpMessage = "Clears all loaded objects, forcing them to be reloaded from disk.";
 		this.usage = "/otg flush";
 	}

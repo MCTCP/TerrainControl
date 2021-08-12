@@ -14,8 +14,9 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class PresetCommand extends BaseCommand
 {
-	public PresetCommand() {
-		this.name = "preset";
+	public PresetCommand() 
+	{
+		super("preset");
 		this.helpMessage = "Displays information about the current world's preset.";
 		this.usage = "/otg preset";
 	}

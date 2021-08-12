@@ -44,8 +44,9 @@ public class MapCommand extends BaseCommand
 	private static final Object queueLock = new Object();
 	private static final Object imgLock = new Object();
 	
-	public MapCommand() {
-		this.name = "map";
+	public MapCommand() 
+	{
+		super("map");
 		this.helpMessage = "Generates an image of the biome or terrain layout.";
 		this.usage = "/otg map <biomes/terrain> [width] [height] [threads]";
 		this.detailedHelp = new String[] { 

@@ -64,8 +64,9 @@ public class EditCommand extends BaseCommand
 	private static final String[] FLAGS = new String[]
 	{ "-nofix", "-update" };
 	
-	public EditCommand() {
-		this.name = "edit";
+	public EditCommand() 
+	{
+		super("edit");
 		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
 		this.usage = "Please see /otg help edit.";
 	}

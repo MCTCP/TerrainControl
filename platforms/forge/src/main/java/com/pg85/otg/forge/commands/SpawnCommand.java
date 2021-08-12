@@ -40,8 +40,9 @@ import net.minecraft.world.storage.FolderName;
 
 public class SpawnCommand extends BaseCommand
 {
-	public SpawnCommand() {
-		this.name = "spawn";
+	public SpawnCommand() 
+	{
+		super("spawn");
 		this.helpMessage = "Spawns a structure from a specific preset.";
 		this.usage = "/otg spawn <preset> <object> [location] [force]";
 		this.detailedHelp = new String[] { 

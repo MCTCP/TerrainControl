@@ -28,8 +28,9 @@ public class DataCommand extends BaseCommand
 	private static final String[] DATA_TYPES = new String[]
 			{ "biome", "block", "entity", "sound", "particle", "configured_feature" };
 	
-	public DataCommand() {
-		this.name = "data";
+	public DataCommand() 
+	{
+		super("data");
 		this.helpMessage = "Dumps various types of game data to files for preset development.";
 		this.usage = "/otg data <type>";
 		this.detailedHelp = new String[] { 

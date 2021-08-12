@@ -22,7 +22,7 @@ public class HelpCommand extends BaseCommand
 {
 	public HelpCommand()
 	{
-		this.name = "help";
+		super("help");
 		this.helpMessage = "Shows help for all OTG commands.";
 		this.usage = "/otg help [command/page]";
 		this.detailedHelp = new String[]

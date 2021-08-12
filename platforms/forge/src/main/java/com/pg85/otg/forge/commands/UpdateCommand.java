@@ -28,7 +28,7 @@ public class UpdateCommand extends BaseCommand
 {
 	public UpdateCommand()
 	{
-		this.name = "update";
+		super("update");
 		this.helpMessage = "Updates all the objects in a preset and places them in a folder";
 		this.usage = "/otg update <preset>.";
 	}
