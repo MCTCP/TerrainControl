@@ -24,7 +24,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 public class StructureCommand extends BaseCommand
 {
 	public StructureCommand() {
-		this.name = "structure";
+		super("structure");
 		this.helpMessage = "Displays information about BO4 structures in your current chunk.";
 		this.usage = "/otg structure";
 	}

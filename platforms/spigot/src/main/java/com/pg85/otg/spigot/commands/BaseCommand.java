@@ -11,11 +11,16 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public abstract class BaseCommand
 {
-	protected String name;
+	protected final String name;
 	protected String helpMessage = "No help message specified.";
 	protected String usage = "No usage message specified.";
 	protected String[] detailedHelp = new String[]
 	{ "No detailed help specified." };
+
+	public BaseCommand(String name)
+	{
+		this.name = name;
+	}
 
 	public String getName()
 	{

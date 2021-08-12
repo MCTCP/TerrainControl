@@ -51,7 +51,7 @@ public class EditCommand extends BaseCommand
 
 	public EditCommand()
 	{
-		this.name = "edit";
+	super("edit");
 		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
 		this.usage = "Please see /otg help edit.";
 	}

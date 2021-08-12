@@ -13,7 +13,7 @@ import com.pg85.otg.util.logging.LogLevel;
 public class FlushCommand extends BaseCommand
 {	
 	public FlushCommand() {
-		this.name = "flush";
+		super("flush");
 		this.helpMessage = "Clears all loaded objects, forcing them to be reloaded from disk.";
 		this.usage = "/otg flush";
 	}

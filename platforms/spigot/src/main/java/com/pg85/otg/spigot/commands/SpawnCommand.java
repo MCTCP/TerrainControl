@@ -34,7 +34,7 @@ import com.pg85.otg.util.logging.LogLevel;
 public class SpawnCommand extends BaseCommand
 {
 	public SpawnCommand() {
-		this.name = "spawn";
+		super("spawn");
 		this.helpMessage = "Spawns a structure from a specific preset.";
 		this.usage = "/otg spawn <preset> <object> [location] [force]";
 		this.detailedHelp = new String[] { 

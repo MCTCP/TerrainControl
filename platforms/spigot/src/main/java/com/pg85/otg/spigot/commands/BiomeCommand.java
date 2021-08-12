@@ -43,7 +43,7 @@ public class BiomeCommand extends BaseCommand
 
 	public BiomeCommand()
 	{
-		this.name = "biome";
+		super("biome");
 		this.helpMessage = "Displays information about the biome you are in.";
 		this.usage = "/otg biome";
 	}

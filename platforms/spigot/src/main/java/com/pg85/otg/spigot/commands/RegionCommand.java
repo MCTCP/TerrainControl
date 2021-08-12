@@ -18,7 +18,7 @@ public class RegionCommand extends BaseCommand
 
 	public RegionCommand()
 	{
-		this.name = "region";
+		super("region");
 		this.helpMessage = "Allows for setting and modifying regions";
 		this.usage = "Please see /otg help region.";
 	}

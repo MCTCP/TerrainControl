@@ -34,7 +34,7 @@ public class MapCommand extends BaseCommand
 	private static final List<String> TYPES = new ArrayList<>(Arrays.asList("biomes", "terrain"));
 	
 	public MapCommand() {
-		this.name = "map";
+		super("map");
 		this.helpMessage = "Generates an image of the biome or terrain layout.";
 		this.usage = "/otg map <biomes/terrain> [width] [height] [threads]";
 		this.detailedHelp = new String[] { 

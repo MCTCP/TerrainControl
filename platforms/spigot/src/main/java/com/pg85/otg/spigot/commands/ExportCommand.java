@@ -42,7 +42,7 @@ public class ExportCommand extends BaseCommand
 
 	public ExportCommand()
 	{
-		this.name = "export";
+		super("export");
 		this.helpMessage = "Allows you to export an area as a BO3 or BO4.";
 		this.usage = "Please see /otg help export.";
 	}

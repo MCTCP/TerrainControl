@@ -8,6 +8,13 @@ import java.util.List;
 
 public class CancelEditCommand extends BaseCommand
 {
+	
+	public CancelEditCommand() {
+		super("canceledit");
+		this.helpMessage = "Cancel and discard your current edit";
+		this.usage = "/otg canceledit";
+	}
+	
 	@Override
 	public List<String> onTabComplete(CommandSender sender, String[] args)
 	{

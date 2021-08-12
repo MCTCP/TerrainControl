@@ -30,7 +30,7 @@ public class TpCommand extends BaseCommand
 
 	public TpCommand()
 	{
-		this.name = "tp";
+		super("tp");
 		this.helpMessage = "Teleports you to a specific OTG biome.";
 		this.usage = "/otg tp <biome> [range]";
 		this.detailedHelp = new String[]

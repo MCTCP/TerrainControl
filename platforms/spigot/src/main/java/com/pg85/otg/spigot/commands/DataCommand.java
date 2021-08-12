@@ -32,7 +32,7 @@ public class DataCommand extends BaseCommand
 	));
 	
 	public DataCommand() {
-		this.name = "data";
+		super("data");
 		this.helpMessage = "Dumps various types of game data to files for preset development.";
 		this.usage = "/otg data <type>";
 		this.detailedHelp = new String[] { 
