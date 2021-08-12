@@ -512,8 +512,6 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("Require a condition at a certain location in order for the BO3 to be spawned.");
 		writer.comment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
 		writer.comment("BlockCheckNot(x,y,z,BlockName[,BlockName[,...]]) - all the blocks must not be at the location");
-		writer.comment("BlockCheckAbsolute(x,y,z,BlockName[,BlockName[,...]]) - same as blockcheck, but the y coordinate is absolute");
-		writer.comment("BlockCheckAbsoluteNot(x,y,z,BlockName[,BlockName[,...]]) - same as blockchecknot, but the y coordinate is absolute");
 		writer.comment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
 		writer.comment("ModCheck(ModName[,ModName[,...]]) - all the mods listed must be loaded");
 		writer.comment("ModCheckNot(ModName[,ModName[,...]]) - all the mods listed must not be loaded");
