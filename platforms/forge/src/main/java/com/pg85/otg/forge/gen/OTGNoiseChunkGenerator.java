@@ -207,7 +207,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		return this.preset;
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public ChunkGenerator withSeed(long seed)
@@ -635,7 +635,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.shadowChunkGenerator.getChunkWithoutLoadingOrCaching(this.internalGenerator, this.preset.getWorldConfig().getWorldHeightCap(), random, chunkCoord);
 	}
 	
-	// TODO: Modpack config specific, move this?
+	// Modpack config
+	// TODO: Move this?
 
 	public String getPortalColor()
 	{
@@ -715,6 +716,4 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 		}
 	}
-	
-	//	
 }

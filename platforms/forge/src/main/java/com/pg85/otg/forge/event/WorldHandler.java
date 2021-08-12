@@ -39,7 +39,7 @@ public class WorldHandler
 					((ServerWorld)event.getWorld()).getWorldServer().setDefaultSpawnPos(new BlockPos(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ()), worldConfig.getSpawnPointAngle());
 				}
 			}
-
+		
 			// If a modpack config is being used, apply the configured gamerules (if any).
 			// TODO: What about non-modpack dimension configs?
 			DimensionConfig modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
@@ -124,8 +124,8 @@ public class WorldHandler
 	// overworld. 
 	// TODO: Improve dimensions implementation, allow separate time/weather/gamerules per dim.
 	@SubscribeEvent
-    public static void onSleepFinished(SleepFinishedTimeEvent event)
-    {
+	public static void onSleepFinished(SleepFinishedTimeEvent event)
+	{
 		if(event.getWorld() instanceof ServerWorld)
 		{
 			if(!((ServerWorld)event.getWorld()).dimension().location().equals(Dimension.OVERWORLD.location()))
@@ -137,5 +137,5 @@ public class WorldHandler
 				}
 			}
 		}
-    }
+	}
 }
