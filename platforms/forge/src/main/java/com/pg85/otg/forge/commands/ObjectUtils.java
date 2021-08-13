@@ -101,7 +101,7 @@ public class ObjectUtils
 		{
 			for (int z1 = min.z-1; z1 <= max.z+1; z1++)
 			{
-				for (int y1 = min.y-1; y1 <= max.y+1; y1++)
+				for (int y1 = max.y+1; y1 >= min.y-1; y1--)
 				{
 					if (preparing)
 					{

@@ -1,15 +1,5 @@
 package com.pg85.otg.forge.commands;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -43,7 +33,6 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
@@ -56,6 +45,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EditCommand extends BaseCommand
 {
@@ -334,27 +329,32 @@ public class EditCommand extends BaseCommand
 
 		for (BlockFunction<?> block : blocks)
 		{
-			if (fixObject && block.material != null && updateMap.contains(((ForgeMaterialData) block.material).internalBlock().getBlock().getRegistryName()))
-			{
-				updates.add(new BlockPos(x + block.x, y + block.y, z + block.z));
-			}
-
-			if (block.material == null ||
-				(
-					block.nbt != null
+			if (
+				block.material == null
+				|| (block.nbt != null
 					|| block instanceof BO3RandomBlockFunction
 					|| block instanceof BO4RandomBlockFunction
-				))
+					|| block.material.isBlank())
+			)
 			{
 				unspawnedBlocks.add(block);
 				continue;
 			}
 
+			// Queue the block coordinate for processing
+			if (fixObject && updateMap.contains(ResourceLocation.tryParse(block.material.getRegistryName())))
+			{
+				updates.add(new BlockPos(x + block.x, y + block.y, z + block.z));
+			}
+
+			// Make sure gravel and sand blocks don't fall down
 			if (gravityBlocksSet.contains(block.material))
 			{
 				gravityBlocksToCheck.add(new BlockPos(x + block.x, y + block.y, z + block.z));
 			}
 
+			// We set all leaves to be persistent so they don't disappear in the process
+			// They lose persistence on export if they are legal
 			if (block.material.isLeaves())
 			{
 				block.material = ForgeMaterialData.ofBlockState(((ForgeMaterialData)block.material).internalBlock()

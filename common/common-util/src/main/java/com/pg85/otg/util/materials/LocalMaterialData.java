@@ -21,9 +21,14 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	public abstract String getRegistryName();
 	
 	public abstract boolean canSnowFallOn();
-	
+
 	public abstract boolean canFall();
-	
+
+	public boolean isBlank()
+	{
+		return isBlank;
+	}
+
 	public abstract boolean isMaterial(LocalMaterialData material);
 	
 	public abstract boolean isBlockTag(LocalMaterialTag tag);

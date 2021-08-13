@@ -37,7 +37,7 @@ public class UpdateCommand extends BaseCommand
 	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("update").then(
-			Commands.argument("preset", StringArgumentType.word())
+			Commands.argument("preset", StringArgumentType.string())
 				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
 				.executes(this::update)));
 	}
@@ -75,6 +75,7 @@ public class UpdateCommand extends BaseCommand
 
 		Runnable updateIteration = ()-> {
 			String objectName = objectNameList.remove(0);
+			//OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Updating object '"+objectName+"'");
 
 			// get object
 			StructuredCustomObject inputObject = EditCommand.getStructuredObject(objectName, presetFolderName);
@@ -130,9 +131,8 @@ public class UpdateCommand extends BaseCommand
 				updateIteration.run();
 				if (count % interval == 0)
 				{
-					int percent = (int) ((double) count / (double) totalLength) *100;
 					//TODO: The progress never updates past 0, find out why
-					source.sendSuccess(new StringTextComponent("Progress: "+percent+"% complete").withStyle(TextFormatting.BLUE), false);
+					source.sendSuccess(new StringTextComponent("Progress: Finished "+count+" of "+totalLength+" objects").withStyle(TextFormatting.BLUE), false);
 				}
 			}
 			source.sendSuccess(new StringTextComponent("Finished updating!").withStyle(TextFormatting.GREEN), false);

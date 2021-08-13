@@ -89,30 +89,39 @@ public class EditCommand extends BaseCommand
 
 		for (BlockFunction<?> block : blocks)
 		{
-			if (fixObject && block.material != null &&
-				updateMap.contains(((SpigotMaterialData) block.material).internalBlock().getBlock().r()))
+			if (
+				block.material == null
+				|| (block.nbt != null
+					|| block instanceof BO3RandomBlockFunction
+					|| block instanceof BO4RandomBlockFunction
+					|| block.material.isBlank())
+			)
+			{
+				unspawnedBlocks.add(block);
+				continue;
+			}
+
+			// Queue the block coordinate for processing
+			if (fixObject && updateMap.contains(MinecraftKey.a(block.material.getRegistryName())))
 			{
 				updates.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
 			}
 
-			if (block.material != null && block.nbt == null && !(block instanceof BO3RandomBlockFunction) && !(block instanceof BO4RandomBlockFunction))
+			// Make sure gravel and sand blocks don't fall down
+			if (gravityBlocksSet.contains(block.material))
 			{
-				if (gravityBlocksSet.contains(block.material))
-				{
-					gravityBlocksToCheck.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
-				}
-
-				if (block.material.isLeaves())
-				{
-					block.material = SpigotMaterialData.ofBlockData(((SpigotMaterialData) block.material).internalBlock().set(BlockLeaves.PERSISTENT, true).set(BlockLeaves.DISTANCE, 7));
-				}
-
-				block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
+				gravityBlocksToCheck.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
 			}
-			else
+
+			// We set all leaves to be persistent so they don't disappear in the process
+			// They lose persistence on export if they are legal
+			if (block.material.isLeaves())
 			{
-				unspawnedBlocks.add(block);
+				block.material = SpigotMaterialData.ofBlockData(((SpigotMaterialData) block.material)
+					.internalBlock().set(BlockLeaves.PERSISTENT, true).set(BlockLeaves.DISTANCE, 7));
 			}
+
+			block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
 		}
 
 		for (BlockPosition pos : gravityBlocksToCheck)
