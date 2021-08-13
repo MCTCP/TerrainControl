@@ -4,11 +4,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.pg85.otg.OTG;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
+import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.presets.Preset;
@@ -60,11 +60,7 @@ public class UpdateCommand extends BaseCommand
 
 		// Create folder for the fixed objects to be exported to
 		Path fixedObjectFolderPath = preset.getPresetFolder()
-			.resolve(
-				preset.getPresetFolder().resolve("WorldObjects").toFile().exists() ?
-				"WorldObjects" :
-				Constants.WORLD_OBJECTS_FOLDER
-			).resolve("Updated Objects");
+			.resolve("Updated Objects");
 		fixedObjectFolderPath.toFile().mkdirs();
 
 		ForgeWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel());
@@ -78,7 +74,16 @@ public class UpdateCommand extends BaseCommand
 			//OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Updating object '"+objectName+"'");
 
 			// get object
-			StructuredCustomObject inputObject = EditCommand.getStructuredObject(objectName, presetFolderName);
+			StructuredCustomObject inputObject = null;
+			try
+			{
+				inputObject = EditCommand.getStructuredObject(objectName, presetFolderName);
+			}
+			catch (InvalidConfigException e)
+			{
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Failed to load object "+objectName);
+				return;
+			}
 			if (inputObject == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);

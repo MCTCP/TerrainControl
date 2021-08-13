@@ -481,7 +481,7 @@ public class BO4Config extends CustomObjectConfigFile
 		return blocksOTGPlus;
 	}
 
-	protected BO4BranchFunction[] getbranches()
+	public BO4BranchFunction[] getbranches()
 	{
 		return this.branchesBO4;
 	}
@@ -491,7 +491,7 @@ public class BO4Config extends CustomObjectConfigFile
 		return this.entityDataBO4;
 	}
 	
-	private void loadInheritedBO3(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	void loadInheritedBO3(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		if(this.inheritBO3 != null && this.inheritBO3.trim().length() > 0 && !this.inheritedBO3Loaded)
 		{
@@ -1239,9 +1239,6 @@ public class BO4Config extends CustomObjectConfigFile
 
 		// Read the resources
 		readResources(logger, materialReader, manager);
-
-		// Merge inherited resources
-		loadInheritedBO3(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	private void writeResources(SettingsWriterBO4 writer, List<BlockFunction<?>> blocksList, List<BranchFunction<?>> branchesList, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException

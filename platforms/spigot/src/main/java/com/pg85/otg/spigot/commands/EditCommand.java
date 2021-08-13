@@ -5,9 +5,12 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
+import com.pg85.otg.customobject.bo4.BO4;
+import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
@@ -33,6 +36,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,14 +60,38 @@ public class EditCommand extends BaseCommand
 		this.usage = "Please see /otg help edit.";
 	}
 
-	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName)
+	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName) throws InvalidConfigException
 	{
 		CustomObject objectToSpawn = ObjectUtils.getObject(objectName, presetFolderName);
-		if (objectToSpawn instanceof StructuredCustomObject)
+		if (objectToSpawn instanceof BO3)
 		{
 			return (StructuredCustomObject) objectToSpawn;
 		}
-		if (objectToSpawn instanceof BO2)
+
+		if (presetFolderName == null)
+		{
+			presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+		}
+
+		if (objectToSpawn instanceof BO4)
+		{
+			File file = ((BO4) objectToSpawn).getConfig().getFile();
+			return new BO4(
+				objectName,
+				file,
+				new BO4Config(
+					new FileSettingsReaderBO4(objectName, file, OTG.getEngine().getLogger()),
+					true,
+					presetFolderName,
+					OTG.getEngine().getOTGRootFolder(),
+					OTG.getEngine().getLogger(),
+					OTG.getEngine().getCustomObjectManager(),
+					OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
+					OTG.getEngine().getCustomObjectResourcesManager(),
+					OTG.getEngine().getModLoadedChecker()));
+		}
+
+		else if (objectToSpawn instanceof BO2)
 		{
 			try
 			{
@@ -268,7 +296,16 @@ public class EditCommand extends BaseCommand
 		boolean doFixing = !flags.contains("-nofix");
 		presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
 		boolean isGlobal = presetFolderName == null;
-		StructuredCustomObject inputObject = getStructuredObject(objectName, presetFolderName);
+		StructuredCustomObject inputObject = null;
+		try
+		{
+			inputObject = getStructuredObject(objectName, presetFolderName);
+		}
+		catch (InvalidConfigException e)
+		{
+			source.sendMessage("Failed to load object " + objectName);
+			return true;
+		}
 		if (inputObject == null)
 		{
 			source.sendMessage("Could not find " + objectName);

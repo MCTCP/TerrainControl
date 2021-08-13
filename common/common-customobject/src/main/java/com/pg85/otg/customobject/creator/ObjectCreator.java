@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ObjectCreator extends BOCreator
@@ -334,6 +335,10 @@ public class ObjectCreator extends BOCreator
 					config.settingsMode = SettingsEnums.ConfigMode.WriteWithoutComments;
 				config.reader = reader;
 				// Write and read the file, as otherwise we'd be doing a *lot* of extra work
+				if (branches == null && config.getbranches() != null)
+				{
+					branches = Arrays.asList(config.getbranches());
+				}
 				FileSettingsWriterBO4.writeToFileWithData
 					(
 						config,

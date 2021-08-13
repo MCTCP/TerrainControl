@@ -10,9 +10,12 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.bo3function.BO3RandomBlockFunction;
+import com.pg85.otg.customobject.bo4.BO4;
+import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.creator.ObjectCreator;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
@@ -46,6 +49,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -118,7 +122,15 @@ public class EditCommand extends BaseCommand
 				return 0;
 			}
 
-			StructuredCustomObject inputObject = getStructuredObject(objectName, presetFolderName);
+			StructuredCustomObject inputObject;
+			try {
+				inputObject = getStructuredObject(objectName, presetFolderName);
+			}
+			catch (InvalidConfigException e)
+			{
+				source.sendSuccess(new StringTextComponent("Error loading object " + objectName), false);
+				return 0;
+			}
 			if (inputObject == null)
 			{
 				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);
@@ -182,15 +194,36 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName)
+	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName) throws InvalidConfigException
 	{
 		CustomObject objectToSpawn = ObjectUtils.getObject(objectName, presetFolderName);
 
-		if (objectToSpawn instanceof StructuredCustomObject)
+		if (objectToSpawn instanceof BO3)
 		{
 			return (StructuredCustomObject) objectToSpawn;
 		}
-		if (objectToSpawn instanceof BO2)
+		if (presetFolderName == null)
+		{
+			presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+		}
+		if (objectToSpawn instanceof BO4)
+		{
+			File file = ((BO4) objectToSpawn).getConfig().getFile();
+			return new BO4(
+				objectName,
+				file,
+				new BO4Config(
+					new FileSettingsReaderBO4(objectName, file, OTG.getEngine().getLogger()),
+					true,
+					presetFolderName,
+					OTG.getEngine().getOTGRootFolder(),
+					OTG.getEngine().getLogger(),
+					OTG.getEngine().getCustomObjectManager(),
+					OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
+					OTG.getEngine().getCustomObjectResourcesManager(),
+					OTG.getEngine().getModLoadedChecker()));
+		}
+		else if (objectToSpawn instanceof BO2)
 		{
 			// Convert the BO2 to a BO3 before editing
 			try

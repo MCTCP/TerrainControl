@@ -98,6 +98,8 @@ public class BO4 implements StructuredCustomObject
 			{
 				FileSettingsWriterBO4.writeToFile(this.config, this.config.settingsMode, logger, materialReader, manager);
 			}
+			// Merge inherited resources (after writing)
+			this.config.loadInheritedBO3(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		}
 		catch(InvalidConfigException ex)
 		{
