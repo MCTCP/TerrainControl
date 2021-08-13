@@ -478,7 +478,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 	protected void readConfigSettings(String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE, logger, materialReader, manager);
-		this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE, logger, materialReader, manager);
+		this.collisionBlockType = readSettings(BO2Settings.COLLISION_BLOCK_TYPE, logger, materialReader, manager);
 		this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT, logger, materialReader, manager);
 		this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS, logger, materialReader, manager);
 		this.spawnWater = readSettings(BO2Settings.SPAWN_WATER, logger, materialReader, manager);

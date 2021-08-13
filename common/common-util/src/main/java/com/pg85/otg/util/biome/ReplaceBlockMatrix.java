@@ -11,9 +11,7 @@ import com.pg85.otg.util.materials.LocalMaterialTag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 public class ReplaceBlockMatrix
 {
@@ -21,14 +19,11 @@ public class ReplaceBlockMatrix
 	
 	private class ReplaceBlockEntry
 	{
-		public final List<ReplacedBlocksInstruction> targetsWithBlockTags = new ArrayList<ReplacedBlocksInstruction>();
-		public final HashMap<Integer, LocalMaterialData> targetsWithBlockData = new HashMap<Integer, LocalMaterialData>();
+		public final List<ReplacedBlocksInstruction> targets = new ArrayList<ReplacedBlocksInstruction>();
 	}
 	
 	public static class ReplacedBlocksInstruction
 	{
-		// TODO: Don't use LocalMaterialBase as generic type and then do type checks  
-		// to test for material/tag. Make separate classes?
 		private final LocalMaterialBase from;
 		private LocalMaterialData to;
 		private final int minHeight;
@@ -36,12 +31,9 @@ public class ReplaceBlockMatrix
 		
 		/**
 		 * Parses the given instruction string.
-		 * 
 		 * @param instruction The instruction string.
-		 * @param maxAllowedY Maximum allowed y height for the replace
-		 *			setting, inclusive.
-		 * @throws InvalidConfigException If the instruction is formatted
-		 *			 incorrectly.
+		 * @param maxAllowedY Maximum allowed y height for the replace setting, inclusive.
+		 * @throws InvalidConfigException If the instruction is formatted incorrectly.
 		 */
 		private ReplacedBlocksInstruction(String instruction, int maxAllowedY, IMaterialReader materialReader) throws InvalidConfigException
 		{
@@ -60,33 +52,29 @@ public class ReplaceBlockMatrix
 			LocalMaterialTag tag = materialReader.readTag(values[0]);
 			if(tag != null)
 			{
-				from = tag;
+				this.from = tag;
 			} else {
-				from = materialReader.readMaterial(values[0]);	
+				this.from = materialReader.readMaterial(values[0]);	
 			}
-			to = materialReader.readMaterial(values[1]);
+			this.to = materialReader.readMaterial(values[1]);
 
 			if (values.length == 4)
 			{
-				minHeight = StringHelper.readInt(values[2], 0, maxAllowedY);
-				maxHeight = StringHelper.readInt(values[3], minHeight, maxAllowedY);
+				this.minHeight = StringHelper.readInt(values[2], 0, maxAllowedY);
+				this.maxHeight = StringHelper.readInt(values[3], this.minHeight, maxAllowedY);
 			} else {
-				minHeight = 0;
-				maxHeight = maxAllowedY;
+				this.minHeight = 0;
+				this.maxHeight = maxAllowedY;
 			}
 		}
 
 		/**
 		 * Creates a ReplacedBlocksInstruction with the given parameters.
 		 * Parameters may not be null.
-		 * 
 		 * @param from The block that will be replaced.
 		 * @param to The block that from will be replaced to.
-		 * @param minHeight Minimum height for this replace, inclusive. Must
-		 *			be smaller than or equal to 0.
-		 * @param maxHeight Maximum height for this replace, inclusive. Must
-		 *			not be larger than
-		 *			{@link ReplaceBlockMatrix#maxHeight}.
+		 * @param minHeight Minimum height for this replace, inclusive. Must be smaller than or equal to 0.
+		 * @param maxHeight Maximum height for this replace, inclusive. Must not be larger than {@link ReplaceBlockMatrix#maxHeight}.
 		 */
 		public ReplacedBlocksInstruction(LocalMaterialBase from, LocalMaterialData to, int minHeight, int maxHeight)
 		{
@@ -103,30 +91,26 @@ public class ReplaceBlockMatrix
 		
 		public LocalMaterialBase getFrom()
 		{
-			return from;
+			return this.from;
 		}
 
 		public LocalMaterialData getTo()
 		{
-			return to;
+			return this.to;
 		}
 
 		public int getMinHeight()
 		{
-			return minHeight;
+			return this.minHeight;
 		}
 
 		public int getMaxHeight()
 		{
-			return maxHeight;
+			return this.maxHeight;
 		}
 	}
 
-	/**
-	 * All {@link ReplacedBlocksInstruction}s must have their
-	 * {@link ReplacedBlocksInstruction#getMaxHeight() maxHeight} smaller than
-	 * or equal to this.
-	 */
+	 // All ReplacedBlocksInstructions must have maxHeight smaller than or equal to this.
 	private final int maxHeight;
 	private List<ReplacedBlocksInstruction> instructions;
 	private final ReplaceBlockEntry[] targetsAtHeights;
@@ -198,42 +182,32 @@ public class ReplaceBlockMatrix
 					this.targetsAtHeights[y] = targetsAtHeight;
 				}
 				
-				// Users can chain replacedblocks to replace replacedblocks, instead of actually
-				// replacing the same block to different materials multiple times, we'll calculate
-				// the end result in advance.
-				// TODO: Can't use this atm, tags can't be used when loading configs at app start.
-				// Will have to move some config loading / registry logic to world creation,
-				// as things like tags can also be added via datapacks. When that's done, reenable this code.
-				for(ReplacedBlocksInstruction entry : targetsAtHeight.targetsWithBlockTags)
+				// Users can chain replacedblocks to replace replacedblocks, instead of actually replacing the 
+				// same block to different materials multiple times, we'll calculate the end result in advance.
+				for(ReplacedBlocksInstruction existing : targetsAtHeight.targets)
 				{
-					if(
-						// BLOCK:X replaces BLOCK:X
-						(!instruction.from.isTag() && instruction.from.hashCode() == entry.to.hashCode()) ||
-						// BLOCK tag replaces all BLOCK:X
-						(instruction.from.isTag() && entry.to.isBlockTag((LocalMaterialTag)instruction.from))
-					)
+					// If this instruction replaces the output of a previously added
+					// instruction, override the output of the previous instruction.
+					LocalMaterialData existingTo = (LocalMaterialData)existing.to;
+					if(!instruction.from.isTag())
 					{
-						entry.to = instruction.to;
+						LocalMaterialData newFrom = (LocalMaterialData)instruction.from;
+						if(
+							(newFrom.isDefaultState() && newFrom.getRegistryName().equals(existingTo.getRegistryName())) ||
+							(!newFrom.isDefaultState() && newFrom.hashCode() == existingTo.hashCode())
+						)
+						{
+							existing.to = instruction.to;
+						}
+					} else {
+						LocalMaterialTag newFrom = (LocalMaterialTag)instruction.from;
+						if(instruction.from.isTag() && existingTo.isBlockTag(newFrom))
+						{
+							existing.to = instruction.to;
+						}
 					}
 				}
-				for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithBlockData.entrySet())
-				{
-					if(
-						// BLOCK:X replaces BLOCK:X
-						(!instruction.from.isTag() && instruction.from.hashCode() == entry.getValue().hashCode()) ||
-						// BLOCK tag replaces all BLOCK:X
-						(instruction.from.isTag() && entry.getValue().isBlockTag((LocalMaterialTag)instruction.from))
-					)
-					{
-						entry.setValue(instruction.to);
-					}
-				}
-				if(instruction.from.isTag())
-				{
-					targetsAtHeight.targetsWithBlockTags.add(instruction.clone());
-				} else {
-					targetsAtHeight.targetsWithBlockData.put(instruction.from.hashCode(), instruction.to);
-				}
+				targetsAtHeight.targets.add(instruction.clone());
 			}
 		}
 		
@@ -333,28 +307,15 @@ public class ReplaceBlockMatrix
 		y = Math.max(Math.min(y, 255), 0);
 
 		ReplaceBlockEntry targetsAtHeight = targetsAtHeights[y];
-		if(targetsAtHeight == null)
+		if(targetsAtHeight != null)
 		{
-			return material;
-		}
-		
-		LocalMaterialData replaceToMaterial = null;
-		for(ReplacedBlocksInstruction instruction : targetsAtHeight.targetsWithBlockTags)
-		{
-			if(material.isBlockTag((LocalMaterialTag)instruction.from))
-			{
-				replaceToMaterial = instruction.to;
+			for(ReplacedBlocksInstruction instruction : targetsAtHeight.targets)
+			{			
+				if(instruction.from.matches(material))
+				{
+					return instruction.to;
+				}
 			}
-		}
-		if(replaceToMaterial != null)
-		{
-			return replaceToMaterial;
-		}
-		
-		replaceToMaterial = targetsAtHeight.targetsWithBlockData.get(material.hashCode());
-		if(replaceToMaterial != null)
-		{
-			return replaceToMaterial;
 		}
 		return material;
 	}

@@ -457,7 +457,9 @@ public class CustomStructurePlotter
 									boolean canSpawnHere;
 
 									int scanDistance = 0;
-									
+
+									Rotation fixedRotation = ((BO4)currentStructureSpawning[0]).getConfig().fixedRotation;
+
 									if(!spawningStructureAtSpawn)
 									{
 										while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
@@ -468,7 +470,14 @@ public class CustomStructurePlotter
 											{
 												// Find more free chunks until both height and width fit, just in case
 												// we can't fit length or width in the y direction.
-												if(right + left + 1 >= structureLength && right + left + 1 >= structureWidth)
+												if(
+													(fixedRotation == null && right + left + 1 >= structureWidth && right + left + 1 >= structureLength) ||
+													(
+														(fixedRotation == Rotation.NORTH || fixedRotation == Rotation.SOUTH) && right + left + 1 >= structureWidth
+													) || (
+														(fixedRotation == Rotation.EAST || fixedRotation == Rotation.WEST) && right + left + 1 >= structureLength
+													)
+												)
 												{
 													rightEdgeFound = true; // leftEdgeFound is already true, since left and right will never spawn in the same pass.
 												}
@@ -552,7 +561,14 @@ public class CustomStructurePlotter
 											{
 												// Find more free chunks until both height and width fit, just in case
 												// we can't fit length or width in the y direction.
-												if(right + left + 1 >= structureLength && right + left + 1 >= structureWidth)
+												if(
+													(fixedRotation == null && right + left + 1 >= structureWidth && right + left + 1 >= structureLength) ||
+													(
+														(fixedRotation == Rotation.NORTH || fixedRotation == Rotation.SOUTH) && right + left + 1 >= structureWidth
+													) || (
+														(fixedRotation == Rotation.EAST || fixedRotation == Rotation.WEST) && right + left + 1 >= structureLength
+													)
+												)												
 												{
 													leftEdgeFound = true; // rightEdgeFound is already true, since left and right will never spawn in the same pass.
 												}
@@ -634,8 +650,15 @@ public class CustomStructurePlotter
 											if(!bottomEdgeFound)
 											{
 												// Find more free chunks until both height and width fit, just in case
-												// we can't fit length or width in the x direction.
-												if(bottom + top + 1 >= structureLength && bottom + top + 1 >= structureWidth)
+												// we can't fit length or width in the x direction.												
+												if(
+													(fixedRotation == null && bottom + top + 1 >= structureWidth && bottom + top + 1 >= structureLength) ||
+													(
+														(fixedRotation == Rotation.NORTH || fixedRotation == Rotation.SOUTH) && bottom + top + 1 >= structureLength
+													) || (
+														(fixedRotation == Rotation.EAST || fixedRotation == Rotation.WEST) && bottom + top + 1 >= structureWidth
+													)
+												)
 												{
 													bottomEdgeFound = true; // topEdgeFound is already true, since left and right will never spawn in the same pass.
 												}
@@ -719,7 +742,13 @@ public class CustomStructurePlotter
 											{
 												// Find more free chunks until both height and width fit, just in case
 												// we can't fit length or width in the x direction.
-												if(bottom + top + 1 >= structureLength && bottom + top + 1 >= structureWidth)
+												if(
+													(fixedRotation == null && bottom + top + 1 >= structureWidth && bottom + top + 1 >= structureLength) ||
+													(
+														(fixedRotation == Rotation.NORTH || fixedRotation == Rotation.SOUTH) && bottom + top + 1 >= structureLength
+													) || (
+														(fixedRotation == Rotation.EAST || fixedRotation == Rotation.WEST) && bottom + top + 1 >= structureWidth
+													)												)
 												{
 													topEdgeFound = true; // bottomEdgeFound is already true, since left and right will never spawn in the same pass.
 												}
@@ -812,8 +841,8 @@ public class CustomStructurePlotter
 
 									// See if the structure will fit
 									if(
-										(structureLength <= areaLength && structureWidth <= areaWidth) ||
-										(structureLength <= areaWidth && structureWidth <= areaLength)
+										((fixedRotation == null || fixedRotation == Rotation.NORTH || fixedRotation == Rotation.SOUTH) && structureLength <= areaLength && structureWidth <= areaWidth) ||
+										((fixedRotation == null || fixedRotation == Rotation.EAST || fixedRotation == Rotation.WEST) && structureLength <= areaWidth && structureWidth <= areaLength)
 									)
 									{
 										// Determine the coordinates of the start BO4 and spawn the structure.
@@ -828,27 +857,31 @@ public class CustomStructurePlotter
 										
 										// Get rotated width/length and start chunk.
 										
-										boolean canSpawnUnrotated = false;
-										boolean canSpawnRotated = false;
-										if(structureLength <= areaLength && structureWidth <= areaWidth)
+										Rotation rotation = fixedRotation;
+										if(rotation == null)
 										{
-											canSpawnUnrotated = true;
+											boolean canSpawnUnrotated = false;
+											boolean canSpawnRotated = false;
+											if(structureLength <= areaLength && structureWidth <= areaWidth)
+											{
+												canSpawnUnrotated = true;
+											}
+											if(structureLength <= areaWidth && structureWidth <= areaLength)
+											{
+												canSpawnRotated = true;
+											}
+																					
+											rotation = rand.nextBoolean() ? Rotation.NORTH : Rotation.SOUTH;
+											if(canSpawnUnrotated && canSpawnRotated)
+											{
+												rotation = Rotation.getRandomRotation(rand);
+											}
+											else if(canSpawnRotated)
+											{
+												rotation = rand.nextBoolean() ? Rotation.EAST : Rotation.WEST;
+											}
 										}
-										if(structureLength <= areaWidth && structureWidth <= areaLength)
-										{
-											canSpawnRotated = true;	
-										}
-																				
-										Rotation rotation = rand.nextBoolean() ? Rotation.NORTH : Rotation.SOUTH;
-										if(canSpawnUnrotated && canSpawnRotated)
-										{
-											rotation = Rotation.getRandomRotation(rand);
-										}
-										else if(canSpawnRotated)
-										{
-											rotation = rand.nextBoolean() ? Rotation.EAST : Rotation.WEST;
-										}
-										
+
 										int structureLengthRotated = 0;
 										int structureWidthRotated = 0;											
 										if(rotation == Rotation.NORTH || rotation == Rotation.SOUTH)

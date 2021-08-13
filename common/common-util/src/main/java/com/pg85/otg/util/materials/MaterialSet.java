@@ -82,28 +82,23 @@ public class MaterialSet
 		if(tag != null)
 		{
 			addTag(new MaterialSetEntry(tag));
-		} else {		
+		} else {
 			LocalMaterialData material = materialReader.readMaterial(input);		
 			if(material == null)
 			{
 				throw new InvalidConfigException("Invalid block check, material \"" + input + "\" could not be found.");
 			}
 			addMaterial(new MaterialSetEntry(material));
-		}		
+		}
 	}
-
-	/**
-	 * Adds the entry to this material set.
-	 *
-	 * @param entry The entry to add, may not be null.
-	 */
+	
 	private void addMaterial(MaterialSetEntry entry)
 	{
 		// Add the appropriate hashCode
 		this.intSetUpToDate = false;
 		this.materials.add(entry);
-	}	
-
+	}
+	
 	private void addTag(MaterialSetEntry entry)
 	{
 		this.tags.add(entry);
@@ -126,7 +121,13 @@ public class MaterialSet
 		int i = 0;
 		for (MaterialSetEntry entry : this.materials)
 		{
-			this.materialIntSet[i] = entry.hashCode();
+			// If the material has no data, it should match all with the same registry name
+			if(!((LocalMaterialData)entry.getMaterial()).isDefaultState())
+			{
+				this.materialIntSet[i] = ((LocalMaterialData)entry.getMaterial()).getRegistryName().hashCode();	
+			} else {
+				this.materialIntSet[i] = entry.hashCode();
+			}
 			i++;
 		}
 		// Sort int set so that we can use Arrays.binarySearch
@@ -165,6 +166,11 @@ public class MaterialSet
 
 		// Check if the material is included
 		if (Arrays.binarySearch(this.materialIntSet, material.hashCode()) >= 0)
+		{
+			return true;
+		}
+		// Check if the material is included without data (matches all of the same registry name)		
+		if (Arrays.binarySearch(this.materialIntSet, material.getRegistryName().hashCode()) >= 0)
 		{
 			return true;
 		}
@@ -251,7 +257,7 @@ public class MaterialSet
 		{
 			rotated.materials.add(material.rotate());
 		}
-		rotated.tags = this.tags;
+		rotated.tags = this.tags; 
 		return rotated;
 	}
 }

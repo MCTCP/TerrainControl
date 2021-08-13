@@ -56,6 +56,7 @@ import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.SkullBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.block.StairsBlock;
@@ -94,8 +95,7 @@ class ForgeLegacyMaterials
 {
 	// TODO: Don't need any names here that match 1.16's
 	static BlockState fromLegacyBlockName(String oldBlockName)
-	{
-		
+	{		
 		switch(oldBlockName)
 		{
 			/*
@@ -141,41 +141,41 @@ class ForgeLegacyMaterials
 			// TODO: This only spawns the bottom half?
 			case "double_plant":
 				return Blocks.SUNFLOWER.defaultBlockState();
-				
+
 			case "wood_stairs":
 			case "oak_stairs":
-				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "birch_wood_stairs":
 			case "birch_stairs":
-				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "spruce_wood_stairs":
 			case "spruce_stairs":
-				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "jungle_wood_stairs":				
 			case "jungle_stairs":
-				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "cobblestone_stairs":
 			case "stone_stairs":
-				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "nether_brick_stairs":
-				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "sandstone_stairs":
-				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "quartz_stairs":
-				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "acacia_stairs":
-				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "dark_oak_stairs":
-				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "red_sandstone_stairs":
-				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "purpur_stairs":
-				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			case "brick_stairs":
-				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);				
+				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);				
 			case "stone_brick_stairs":
 			case "smooth_stairs":
-				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
 			
 			case "quartz_ore":
 				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
@@ -292,7 +292,7 @@ class ForgeLegacyMaterials
 		try
 		{
 			int blockId = Integer.parseInt(blockName);
-			blockName = BlockNames.blockNameFromLegacyBlockId(blockId);
+			blockName = BlockNames.blockNameFromLegacyBlockId(blockId);			
 			if(blockName == null)
 			{
 				return null;
@@ -770,22 +770,7 @@ class ForgeLegacyMaterials
 					}
 				case "skull":
 				case "skeleton_skull":
-					switch(data)
-					{
-						case 0:
-						default:
-							return Blocks.SKELETON_SKULL.defaultBlockState();
-						case 1:
-							return Blocks.WITHER_SKELETON_SKULL.defaultBlockState();
-						case 2:
-							return Blocks.ZOMBIE_HEAD.defaultBlockState();
-						case 3:
-							return Blocks.PLAYER_HEAD.defaultBlockState();
-						case 4:
-							return Blocks.CREEPER_HEAD.defaultBlockState();
-						case 5:
-							return Blocks.DRAGON_HEAD.defaultBlockState();
-					}
+					return Blocks.SKELETON_SKULL.defaultBlockState().setValue(SkullBlock.ROTATION, data);
 				case "sponge":
 					switch(data)
 					{

@@ -11,4 +11,10 @@ public abstract class LocalMaterialTag extends LocalMaterialBase
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean matches(LocalMaterialData material)
+	{
+		return material.isBlockTag(this);
+	}
 }
