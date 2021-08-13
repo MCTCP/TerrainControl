@@ -125,6 +125,11 @@ public class SpigotMaterialReader implements IMaterialReader
 				if (fromLegacyIdName != null)
 				{
 					blockNameCorrected = fromLegacyIdName;
+					blockState = SpigotLegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+					if (blockState != null)
+					{
+						return SpigotMaterialData.ofBlockData(blockState, input);
+					}
 				}
 			}
 			catch (NumberFormatException ignored) { }

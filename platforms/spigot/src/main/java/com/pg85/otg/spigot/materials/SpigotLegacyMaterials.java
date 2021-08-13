@@ -361,8 +361,7 @@ public class SpigotLegacyMaterials
 
 				case "skull":
 				case "skeleton_skull":
-					return IRegistry.BLOCK.get(getFlatKey("minecraft:skull", data)).getBlockData();
-
+					return Blocks.SKELETON_SKULL.getBlockData().set(BlockSkull.a, data);
 				case "sponge":
 					switch (data)
 					{

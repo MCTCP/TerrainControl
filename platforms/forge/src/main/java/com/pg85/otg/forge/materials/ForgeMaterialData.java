@@ -86,7 +86,13 @@ public class ForgeMaterialData extends LocalMaterialData
 				this.name = "Unknown";
 			}
 		} else {
-			if(this.blockData != this.blockData.getBlock().defaultBlockState())
+			if(
+				this.blockData != this.blockData.getBlock().defaultBlockState() &&
+				(
+					// We set distance 1 when parsing minecraft:xxx_leaves, so check for default blocksate + distance 1
+					!(this.blockData.getBlock() instanceof LeavesBlock) || this.blockData != this.blockData.getBlock().defaultBlockState().setValue(LeavesBlock.DISTANCE, 1)
+				)
+			)
 			{
 				this.name = this.blockData.toString()
 					.replace("Block{", "")
@@ -96,6 +102,12 @@ public class ForgeMaterialData extends LocalMaterialData
 			}
 		}
 		return this.name;
+	}
+
+	@Override
+	public String getRegistryName()
+	{
+		return this.blockData == null ? null : this.blockData.getBlock().getRegistryName().toString();
 	}
 
 	@Override

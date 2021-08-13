@@ -56,6 +56,7 @@ import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.SkullBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.block.StairsBlock;
@@ -94,8 +95,7 @@ class ForgeLegacyMaterials
 {
 	// TODO: Don't need any names here that match 1.16's
 	static BlockState fromLegacyBlockName(String oldBlockName)
-	{
-		
+	{		
 		switch(oldBlockName)
 		{
 			/*
@@ -141,7 +141,7 @@ class ForgeLegacyMaterials
 			// TODO: This only spawns the bottom half?
 			case "double_plant":
 				return Blocks.SUNFLOWER.defaultBlockState();
-				
+
 			case "wood_stairs":
 			case "oak_stairs":
 				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
@@ -292,7 +292,7 @@ class ForgeLegacyMaterials
 		try
 		{
 			int blockId = Integer.parseInt(blockName);
-			blockName = BlockNames.blockNameFromLegacyBlockId(blockId);
+			blockName = BlockNames.blockNameFromLegacyBlockId(blockId);			
 			if(blockName == null)
 			{
 				return null;
@@ -770,22 +770,7 @@ class ForgeLegacyMaterials
 					}
 				case "skull":
 				case "skeleton_skull":
-					switch(data)
-					{
-						case 0:
-						default:
-							return Blocks.SKELETON_SKULL.defaultBlockState();
-						case 1:
-							return Blocks.WITHER_SKELETON_SKULL.defaultBlockState();
-						case 2:
-							return Blocks.ZOMBIE_HEAD.defaultBlockState();
-						case 3:
-							return Blocks.PLAYER_HEAD.defaultBlockState();
-						case 4:
-							return Blocks.CREEPER_HEAD.defaultBlockState();
-						case 5:
-							return Blocks.DRAGON_HEAD.defaultBlockState();
-					}
+					return Blocks.SKELETON_SKULL.defaultBlockState().setValue(SkullBlock.ROTATION, data);
 				case "sponge":
 					switch(data)
 					{

@@ -93,14 +93,26 @@ public class SpigotMaterialData extends LocalMaterialData
 				this.name = "Unknown";
 			}
 		} else {
-			if(this.blockData != this.blockData.getBlock().getBlockData())
+			if(
+				this.blockData != this.blockData.getBlock().getBlockData() &&
+				(
+					// We set distance 1 when parsing minecraft:xxx_leaves, so check for default blocksate + distance 1
+					!(this.blockData.getBlock() instanceof BlockLeaves) || this.blockData != this.blockData.getBlock().getBlockData().set(BlockLeaves.DISTANCE, 1)
+				)
+			)
 			{
 				this.name = this.blockData.toString().replace("Block{", "").replace("}", "");
 			} else {
-				this.name = this.blockData.toString().substring(0, this.blockData.toString().indexOf("}")).replace("Block{", "");
+				this.name = getRegistryName();
 			}
 		}		
 		return this.name;
+	}
+
+	@Override
+	public String getRegistryName()
+	{
+		return this.blockData == null ? null : this.blockData.toString().substring(0, this.blockData.toString().indexOf("}")).replace("Block{", "");
 	}
 
 	@Override

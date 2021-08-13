@@ -124,6 +124,11 @@ public class ForgeMaterialReader implements IMaterialReader
 				if(fromLegacyIdName != null)
 				{
 					blockNameCorrected = fromLegacyIdName;
+					blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+					if(blockState != null)
+					{
+						return ForgeMaterialData.ofBlockState(blockState, input);
+					}					
 				}
 			} catch(NumberFormatException ignored) { }
 		}
