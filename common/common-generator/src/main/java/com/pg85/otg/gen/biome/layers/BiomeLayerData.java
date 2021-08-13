@@ -27,14 +27,16 @@ public class BiomeLayerData
 	public final int landSize;
 	public final int landFuzzy;
 	public final int landRarity;
+	public boolean forceLandAtSpawn;
 	public final int oceanBiomeSize;
 	public final int[] oceanTemperatures;
 	public final double frozenOceanTemperature;
 	public final int biomeRarityScale;
 	public final BiomeData oceanBiomeData;
 	public final Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
-	public final int[] cumulativeGroupRarities;
+	private final int[] cumulativeGroupRarities;
 	public final int[] groupMaxRarityPerDepth;
+	public final int[] oldMaxRarities;
 	public final boolean oldGroupRarity;
 	public final List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
 	public final Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
@@ -96,7 +98,9 @@ public class BiomeLayerData
 		this.biomeDepths.addAll(data.biomeDepths);
 		this.cumulativeGroupRarities = data.cumulativeGroupRarities.clone();
 		this.groupMaxRarityPerDepth = data.groupMaxRarityPerDepth.clone();
+		this.oldMaxRarities = data.oldMaxRarities;
 		this.oldGroupRarity = data.oldGroupRarity;
+		this.forceLandAtSpawn = data.forceLandAtSpawn;
 
 		for(Entry<Integer, List<NewBiomeGroup>> entry : data.groups.entrySet())
 		{
@@ -169,7 +173,9 @@ public class BiomeLayerData
 
 		this.cumulativeGroupRarities = new int[this.generationDepth + 1];
 		this.groupMaxRarityPerDepth = new int[this.generationDepth + 1];
+		this.oldMaxRarities = new int[this.generationDepth + 1];
 		this.oldGroupRarity = worldConfig.getOldGroupRarity();
+		this.forceLandAtSpawn = worldConfig.getForceLandAtSpawn();
 
 		if (oceanBiomeConfig == null)
 		{
@@ -211,6 +217,7 @@ public class BiomeLayerData
 				{
 					group.init(biomeIdsByName);
 					cumulativeRarity += group.rarity;
+					oldMaxRarities[entry.getKey()]++;
 				}
 				this.cumulativeGroupRarities[entry.getKey()] = cumulativeRarity;
 			}
@@ -221,6 +228,11 @@ public class BiomeLayerData
 			{
 				this.groupMaxRarityPerDepth[depth] += this.cumulativeGroupRarities[j];
 			}
+		}
+
+		for (int i = 0; i < oldMaxRarities.length; i++)
+		{
+			oldMaxRarities[i] *= 100;
 		}
 
 		for(Entry<Integer, List<BiomeData>> entry : this.isleBiomesAtDepth.entrySet())

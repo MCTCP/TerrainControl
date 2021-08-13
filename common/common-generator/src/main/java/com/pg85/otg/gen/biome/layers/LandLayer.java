@@ -12,10 +12,15 @@ import com.pg85.otg.interfaces.ILayerSampler;
 class LandLayer implements ParentedLayer
 {
 	private final int rarity;
-	LandLayer(int landRarity)
+	private final boolean forceLandAtSpawn;
+	private final boolean spawnLand;
+
+	LandLayer(int landRarity, boolean forceLandAtSpawn)
 	{
 		// Scale rarity from the world config
 		this.rarity = 101 - landRarity;
+		this.forceLandAtSpawn = forceLandAtSpawn;
+		this.spawnLand = landRarity != 0;
 	}
 
 	@Override
@@ -24,12 +29,12 @@ class LandLayer implements ParentedLayer
 		int sample = parent.sample(x, z);
 
 		// Set land based on the rarity
-		if (context.nextInt(this.rarity) == 0)
+		if (context.nextInt(this.rarity) == 0 && spawnLand)
 		{
 			return sample | LAND_BIT;
 		} else {
 			// If we're on the center sample return land to try and make sure that the player doesn't spawn in the ocean.
-			if (x == 0 && z == 0)
+			if (x == 0 && z == 0 && forceLandAtSpawn)
 			{
 				return sample | LAND_BIT;
 			}

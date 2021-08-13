@@ -92,9 +92,9 @@ public class BiomeLayers
 				}
 
 				// If we're at the land size, initialize the land layer with the provided rarity.
-				if (depth == data.landSize)
+				if (depth == data.landSize && data.landRarity > 0)
 				{
-					factory = new LandLayer(data.landRarity).create(contextProvider.apply(1L), factory);
+					factory = new LandLayer(data.landRarity, data.forceLandAtSpawn).create(contextProvider.apply(1L), factory);
 					factory = new FuzzyScaleLayer().create(contextProvider.apply(2000L), factory);
 				}
 
@@ -122,6 +122,7 @@ public class BiomeLayers
 					{
 						factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
 					}
+					// TODO: Do we need an IceLayer for Normal?
 					if (depth == 3) // TODO: Why 3?
 					{
 						factory = new IceLayer(data).create(contextProvider.apply(depth), factory);

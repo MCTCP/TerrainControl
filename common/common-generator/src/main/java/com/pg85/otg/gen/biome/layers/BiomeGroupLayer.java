@@ -23,8 +23,12 @@ class BiomeGroupLayer implements ParentedLayer
 		List<NewBiomeGroup> groups = data.groups.get(depth);
 		if (data.oldGroupRarity)
 		{
-			this.maxRarity = Math.max(data.cumulativeGroupRarities[depth], 100);
+			// With oldGroupRarity, the maxRarity is the number of biome groups on this depth * 100
+			// If there are three groups on depth 2, then they will be compared against a max rarity of 300
+			this.maxRarity = data.oldMaxRarities[depth];
 		} else {
+			// With new group rarity, the maxrarity is the additive rarity of this and subsequent depths
+			// The max group rarity of depth 2 is the total rarities of all remaining groups to be spawned
 			this.maxRarity = data.groupMaxRarityPerDepth[depth];
 		}
 		int cumulativeRarity = 0;

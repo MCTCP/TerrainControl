@@ -62,7 +62,7 @@ public class WorldStandardValues extends Settings
 		WORLD_HEIGHT_CAP_BITS = intSetting("WorldHeightCapBits", 8, 5, 8),
 		GENERATION_DEPTH = intSetting("GenerationDepth", 10, 1, 20),
 		BIOME_RARITY_SCALE = intSetting("BiomeRarityScale", 100, 1, Integer.MAX_VALUE),
-		LAND_RARITY = intSetting("LandRarity", 99, 1, 100),
+		LAND_RARITY = intSetting("LandRarity", 99, 0, 100),
 		LAND_SIZE = intSetting("LandSize", 0, 0, 20),
 		OCEAN_BIOME_SIZE = intSetting("OceanBiomeSize", 6, 0, 20),
 		LAND_FUZZY = intSetting("LandFuzzy", 5, 0, 20),
@@ -105,6 +105,7 @@ public class WorldStandardValues extends Settings
 	;
 	
 	public static final Setting<Boolean>
+		FORCE_LAND_AT_SPAWN = booleanSetting("ForceLandAtSpawn", true),
 		RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
 		RANDOM_RIVERS = booleanSetting("RandomRivers", false),
 		FROZEN_OCEAN = booleanSetting("FrozenOcean", true),

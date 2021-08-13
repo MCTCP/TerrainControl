@@ -197,6 +197,7 @@ public class WorldConfig extends WorldConfigBase
 		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);
 		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
 		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
+		this.forceLandAtSpawn = reader.getSetting(WorldStandardValues.FORCE_LAND_AT_SPAWN, logger);
 		this.oceanBiomeSize = reader.getSetting(WorldStandardValues.OCEAN_BIOME_SIZE, logger);
 		this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger);
 		this.defaultWarmOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_WARM_OCEAN_BIOME, logger);
@@ -562,6 +563,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.LAND_SIZE, this.landSize,
 			"Land size from 0 to GenerationDepth. Higher LandSize numbers will make the size of the land smaller. Landsize number should always be lower than any biome groups."
+		);
+
+		writer.putSetting(WorldStandardValues.FORCE_LAND_AT_SPAWN, this.forceLandAtSpawn,
+			"If enabled, land will always spawn at or near 0,0"
 		);
 
 		writer.putSetting(WorldStandardValues.OCEAN_BIOME_SIZE, this.oceanBiomeSize,

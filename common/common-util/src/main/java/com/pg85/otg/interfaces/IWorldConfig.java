@@ -221,5 +221,6 @@ public interface IWorldConfig
 	public boolean getDoPatrolSpawning();
 	public boolean getDoTraderSpawning();
 	public boolean getForgiveDeadPlayers();
-	public boolean getUniversalAnger();	
+	public boolean getUniversalAnger();
+	boolean getForceLandAtSpawn();
 }

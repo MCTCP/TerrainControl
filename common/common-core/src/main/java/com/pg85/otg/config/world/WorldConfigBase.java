@@ -70,6 +70,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int landFuzzy;
 	protected int landRarity;
 	protected int landSize;
+	protected boolean forceLandAtSpawn;
 	protected int oceanBiomeSize;
 	protected String defaultOceanBiome;
 	protected String defaultWarmOceanBiome;
@@ -220,8 +221,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int spawnPointX;
 	protected int spawnPointY;
 	protected int spawnPointZ;
-	protected float spawnPointAngle;	
-	
+	protected float spawnPointAngle;
+
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -1137,6 +1138,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public boolean getForgiveDeadPlayers()
 	{
 		return this.forgiveDeadPlayers;
+	}
+
+	@Override
+	public boolean getForceLandAtSpawn()
+	{
+		return this.forceLandAtSpawn;
 	}
 
 	@Override
