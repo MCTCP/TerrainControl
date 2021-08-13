@@ -18,6 +18,8 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
 	public abstract String getName();
 	
+	public abstract String getRegistryName();
+	
 	public abstract boolean canSnowFallOn();
 	
 	public abstract boolean canFall();
@@ -40,9 +42,21 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 		
 	public boolean isLogOrLeaves()
 	{
-		return isLog() || isLeaves();
+		return this.isLog() || this.isLeaves();
 	}
-			
+	
+	public boolean isDefaultState()
+	{
+		// TODO: Make this prettier?
+		return this.getName().equals(getRegistryName());
+	}
+
+	@Override
+	public boolean matches(LocalMaterialData material)
+	{
+		return this.isDefaultState() || material.isDefaultState() ? material.getRegistryName().equals(this.getRegistryName()) : material.hashCode() == this.hashCode();
+	}
+	
 	/**
 	 * Gets whether this material can be used as an anchor point for a smoothing area	
 	 * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves.
@@ -207,5 +221,5 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
 	public abstract int hashCode();
 
-	public abstract LocalMaterialData legalOrPersistentLeaves();
+	public abstract LocalMaterialData legalOrPersistentLeaves();	
 }

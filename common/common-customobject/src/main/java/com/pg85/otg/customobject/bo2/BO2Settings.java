@@ -33,6 +33,6 @@ class BO2Settings extends Settings
 
 	static final Setting<MaterialSet>
 		SPAWN_ON_BLOCK_TYPE = materialSetSetting("spawnOnBlockType", LocalMaterials.GRASS_NAME),
-		COLLISTION_BLOCK_TYPE = materialSetSetting("collisionBlockType", "All")
+		COLLISION_BLOCK_TYPE = materialSetSetting("collisionBlockType", "All")
 	;
 }
