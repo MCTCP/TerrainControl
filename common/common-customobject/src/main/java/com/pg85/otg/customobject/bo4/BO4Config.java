@@ -100,13 +100,16 @@ public class BO4Config extends CustomObjectConfigFile
 	private Rotation inheritBO3Rotation;
 	// If this is set to true then any air blocks in the bo3 will not be spawned
 	private boolean removeAir;
+	private boolean configRemoveAir;
 	// Defaults to false. Set to true if this BO3 should spawn at the player spawn point. When the server starts one of the structures that has IsSpawnPoint set to true is selected randomly and is spawned, the others never get spawned.)
 	public boolean isSpawnPoint;
 
 	// Replaces all the non-air blocks that are above this BO3 or its smoothing area with the given block material (should be WATER or AIR or NONE), also applies to smoothing areas although it intentionally leaves some of the terrain above them intact. WATER can be used in combination with SpawnUnderWater to fill any air blocks underneath waterlevel with water (and any above waterlevel with air).
 	public String replaceAbove;
+	public String configReplaceAbove;
 	// Replaces all non-air blocks underneath the BO3 (but not its smoothing area) with the designated material until a solid block is found.
 	public String replaceBelow;
+	public String configReplaceBelow;
 	// Defaults to true. If set to true then every block in the BO3 of the materials defined in ReplaceWithGroundBlock or ReplaceWithSurfaceBlock will be replaced by the GroundBlock or SurfaceBlock materials configured for the biome the block is spawned in.
 	public boolean replaceWithBiomeBlocks;
 	// Replaces all the blocks of the given material in the BO3 with the GroundBlock configured for the biome it spawns in
@@ -1022,17 +1025,14 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("Spawns the BO4 at a Y offset of this value. Handy when using highestBlock for lowering BO4s into the surrounding terrain when there are layers of ground included in the BO4, also handy when using SpawnAtWaterLevel to lower objects like ships into the water.");
 		writer.setting(BO4Settings.HEIGHT_OFFSET, this.heightOffset);
 
-		boolean removeAir = readSettings(BO4Settings.REMOVEAIR, logger, materialReader, manager);
 		writer.comment("If set to true removes all AIR blocks from the BO4 so that it can be flooded or buried.");
-		writer.setting(BO4Settings.REMOVEAIR, removeAir);
+		writer.setting(BO4Settings.REMOVEAIR, this.configRemoveAir);
 
-		String replaceAbove = readSettings(BO4Settings.REPLACEABOVE, logger, materialReader, manager);
 		writer.comment("Replaces all the non-air blocks that are above this BO4 or its smoothing area with the given block material (should be WATER or AIR or NONE), also applies to smoothing areas although OTG intentionally leaves some of the terrain above them intact. WATER can be used in combination with SpawnUnderWater to fill any air blocks underneath waterlevel with water (and any above waterlevel with air).");
-		writer.setting(BO4Settings.REPLACEABOVE, replaceAbove);
+		writer.setting(BO4Settings.REPLACEABOVE, this.configReplaceAbove);
 
-		String replaceBelow = readSettings(BO4Settings.REPLACEBELOW, logger, materialReader, manager);
 		writer.comment("Replaces all air blocks underneath the BO4 (but not its smoothing area) with the specified material until a solid block is found.");
-		writer.setting(BO4Settings.REPLACEBELOW, replaceBelow);
+		writer.setting(BO4Settings.REPLACEBELOW, this.configReplaceBelow);
 
 		writer.comment("Defaults to true. If set to true then every block in the BO4 of the materials defined in ReplaceWithGroundBlock or ReplaceWithSurfaceBlock will be replaced by the GroundBlock or SurfaceBlock materials configured for the biome the block is spawned in.");
 		writer.setting(BO4Settings.REPLACEWITHBIOMEBLOCKS, this.replaceWithBiomeBlocks);
@@ -1108,11 +1108,14 @@ public class BO4Config extends CustomObjectConfigFile
 		this.heightOffset = readSettings(BO4Settings.HEIGHT_OFFSET, logger, materialReader, manager);
 		this.inheritBO3Rotation = readSettings(BO4Settings.INHERITBO3ROTATION, logger, materialReader, manager);
 
-		this.removeAir = readSettings(BO4Settings.REMOVEAIR, logger, materialReader, manager);
+		this.configRemoveAir = readSettings(BO4Settings.REMOVEAIR, logger, materialReader, manager);
+		this.removeAir = this.configRemoveAir;
 		this.isSpawnPoint = readSettings(BO4Settings.ISSPAWNPOINT, logger, materialReader, manager);
 		this.useCenterForHighestBlock = readSettings(BO4Settings.USE_CENTER_FOR_HIGHEST_BLOCK, logger, materialReader, manager);
-		this.replaceAbove = readSettings(BO4Settings.REPLACEABOVE, logger, materialReader, manager);
-		this.replaceBelow = readSettings(BO4Settings.REPLACEBELOW, logger, materialReader, manager);
+		this.configReplaceAbove = readSettings(BO4Settings.REPLACEABOVE, logger, materialReader, manager);
+		this.replaceAbove = this.configReplaceAbove;
+		this.configReplaceBelow = readSettings(BO4Settings.REPLACEBELOW, logger, materialReader, manager);
+		this.replaceBelow = this.configReplaceBelow;
 		this.replaceWithBiomeBlocks = readSettings(BO4Settings.REPLACEWITHBIOMEBLOCKS, logger, materialReader, manager);
 		this.replaceWithGroundBlock = readSettings(BO4Settings.REPLACEWITHGROUNDBLOCK, logger, materialReader, manager);
 		this.replaceWithSurfaceBlock = readSettings(BO4Settings.REPLACEWITHSURFACEBLOCK, logger, materialReader, manager);
@@ -1260,8 +1263,8 @@ public class BO4Config extends CustomObjectConfigFile
 		// Re-read the raw data, if no data was supplied. Don't save any loaded data, since it has been processed/transformed.
 		if(blocksList == null || branchesList == null || entitiesList == null)
 		{
-				blocksList = new ArrayList<>();
-				branchesList = new ArrayList<>();
+			blocksList = new ArrayList<>();
+			branchesList = new ArrayList<>();
 			
 			for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true, logger, materialReader, manager))
 			{
@@ -1290,7 +1293,16 @@ public class BO4Config extends CustomObjectConfigFile
 				}
 			}
 		}
-				
+		else if(blocksList != null)
+		{
+			// The blockslist passed is not used after this,
+			// so it's ok to edit the block objects.
+			for(BlockFunction<?> block : blocksList)
+			{
+				block.x -= this.getXOffset();
+				block.z -= this.getZOffset();
+			}
+		}
 		for(BlockFunction<?> block : blocksList)
 		{
 			writer.function(block);

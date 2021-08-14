@@ -248,7 +248,7 @@ public class ObjectUtils
 			if (verbose && fixedObject != null)
 			{
 				source.sendSuccess(new StringTextComponent("Successfully updated " + type.getType() + " " + inputObject.getName()), false);
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName().toLowerCase(Locale.ROOT), fixedObject.getConfig().getFile(), inputObject);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName(), fixedObject.getConfig().getFile(), inputObject);
 			} else if (verbose) {
 				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
 			}
