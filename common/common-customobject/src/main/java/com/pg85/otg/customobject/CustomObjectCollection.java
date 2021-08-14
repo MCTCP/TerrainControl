@@ -519,10 +519,12 @@ public class CustomObjectCollection
 						String fileExtension = fileInDir.getName().contains(".") ? fileInDir.getName().substring(fileInDir.getName().lastIndexOf(".")).toLowerCase() : null;
 						if (
 							fileExtension != null &&
-							fileExtension.equals(".bo4data") || 
-							fileExtension.equals(".bo4") || 
-							fileExtension.equals(".bo3") || 
-							fileExtension.equals(".bo2")
+							(
+								fileExtension.equals(".bo4data") || 
+								fileExtension.equals(".bo4") || 
+								fileExtension.equals(".bo3") || 
+								fileExtension.equals(".bo2")
+							)
 						) {
 							if (
 								fileExtension.equals(".bo4data") || 
@@ -547,10 +549,12 @@ public class CustomObjectCollection
 				String fileExtension = searchDir.getName().contains(".") ? searchDir.getName().substring(searchDir.getName().lastIndexOf(".")).toLowerCase() : null;				
 				if (
 					fileExtension != null &&
-					fileExtension.equals(".bo4data") || 
-					fileExtension.equals(".bo4") || 
-					fileExtension.equals(".bo3") || 
-					fileExtension.equals(".bo2")
+					(
+						fileExtension.equals(".bo4data") || 
+						fileExtension.equals(".bo4") || 
+						fileExtension.equals(".bo3") || 
+						fileExtension.equals(".bo2")
+					)
 				)
 				{
 					if (
