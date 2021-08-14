@@ -518,6 +518,7 @@ public class CustomObjectCollection
 						String name = fileInDir.getName().contains(".") ? fileInDir.getName().substring(0, fileInDir.getName().lastIndexOf(".")) : fileInDir.getName();
 						String fileExtension = fileInDir.getName().contains(".") ? fileInDir.getName().substring(fileInDir.getName().lastIndexOf(".")).toLowerCase() : null;
 						if (
+							fileExtension != null &&
 							fileExtension.equals(".bo4data") || 
 							fileExtension.equals(".bo4") || 
 							fileExtension.equals(".bo3") || 
@@ -535,7 +536,7 @@ public class CustomObjectCollection
 								}
 							}
 						}
-						else if (fileExtension.equals(".bo3template"))
+						else if (fileExtension != null && fileExtension.equals(".bo3template"))
 						{
 							templateFiles.put(name, fileInDir);
 						}
@@ -545,6 +546,7 @@ public class CustomObjectCollection
 				String name = searchDir.getName().contains(".") ? searchDir.getName().substring(0, searchDir.getName().lastIndexOf(".")) : searchDir.getName();
 				String fileExtension = searchDir.getName().contains(".") ? searchDir.getName().substring(searchDir.getName().lastIndexOf(".")).toLowerCase() : null;				
 				if (
+					fileExtension != null &&
 					fileExtension.equals(".bo4data") || 
 					fileExtension.equals(".bo4") || 
 					fileExtension.equals(".bo3") || 
@@ -564,7 +566,7 @@ public class CustomObjectCollection
 						}
 					}
 				}
-				else if (fileExtension.matches(".+\\.bo[34]template"))
+				else if (fileExtension != null && fileExtension.matches(".+\\.bo[34]template"))
 				{
 					templateFiles.put(name, searchDir);
 				}
