@@ -12,6 +12,7 @@ import com.pg85.otg.util.minecraft.TreeType;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a collection of custom objects. Those objects can be loaded from a
@@ -54,8 +55,7 @@ public class CustomObjectCollection
 					String objectName = fileName.substring(0, index);
 	
 					// Get the object
-					CustomObjectLoader loader = customObjectManager.getObjectLoaders().get(
-							objectType.toLowerCase());
+					CustomObjectLoader loader = customObjectManager.getObjectLoaders().get(objectType.toLowerCase());
 					if (loader != null)
 					{
 						object = loader.loadFromFile(objectName, file, logger);
@@ -121,7 +121,7 @@ public class CustomObjectCollection
 			HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetFolderName);
 			if(presetObjectsByName != null)
 			{
-				presetObjectsByName.remove(object.getName().toLowerCase());
+				presetObjectsByName.remove(object.getName());
 				if (presetObjectsByName.size() == 0)
 				{
 					objectsByNamePerPreset.remove(presetFolderName, presetObjectsByName);
@@ -149,10 +149,10 @@ public class CustomObjectCollection
 	{
 		synchronized(indexingFilesLock)
 		{
-			String lowerCaseName = object.getName().toLowerCase();
-			if (!objectsByNameGlobalObjects.containsKey(lowerCaseName))
+			String name = object.getName();
+			if (!objectsByNameGlobalObjects.containsKey(name))
 			{
-				objectsByNameGlobalObjects.put(lowerCaseName, object);
+				objectsByNameGlobalObjects.put(name, object);
 				objectsGlobalObjects.add(object);
 			}
 		}
@@ -162,9 +162,9 @@ public class CustomObjectCollection
 	{
 		synchronized(indexingFilesLock)
 		{
-			if (customObjectFilesGlobalObjects != null && !customObjectFilesGlobalObjects.containsKey(name.toLowerCase(Locale.ROOT)))
+			if (customObjectFilesGlobalObjects != null && !customObjectFilesGlobalObjects.containsKey(name))
 			{
-				customObjectFilesGlobalObjects.put(name.toLowerCase(Locale.ROOT), file);
+				customObjectFilesGlobalObjects.put(name, file);
 			}
 		}
 	}
@@ -362,7 +362,7 @@ public class CustomObjectCollection
 				HashMap<String, CustomObject> presetObjectsByName = this.objectsByNamePerPreset.get(presetFolderName);
 				if (presetObjectsByName != null)
 				{
-					object = presetObjectsByName.get(name.toLowerCase());
+					object = presetObjectsByName.get(name);
 				}
 			}
 	
@@ -371,7 +371,7 @@ public class CustomObjectCollection
 			if (object == null && presetFolderName != null)
 			{
 				ArrayList<String> presetObjectsNotFoundByName = this.objectsNotFoundPerPreset.get(presetFolderName);
-				if (presetObjectsNotFoundByName != null && presetObjectsNotFoundByName.contains(name.toLowerCase()))
+				if (presetObjectsNotFoundByName != null && presetObjectsNotFoundByName.contains(name))
 				{
 					// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
 					bSearchedPresetObjects = true;
@@ -381,7 +381,7 @@ public class CustomObjectCollection
 			// Only check the GlobalObjects if the preset's Objects directory has already been searched
 			if (object == null && searchGlobalObjects && (presetFolderName == null || bSearchedPresetObjects))
 			{
-				object = this.objectsByNameGlobalObjects.get(name.toLowerCase());
+				object = this.objectsByNameGlobalObjects.get(name);
 			}
 	
 			if (object != null)
@@ -403,7 +403,7 @@ public class CustomObjectCollection
 	
 			boolean bSearchedGlobalObjects = false;
 	
-			if (this.objectsNotFoundGlobalObjects != null && this.objectsNotFoundGlobalObjects.contains(name.toLowerCase()))
+			if (this.objectsNotFoundGlobalObjects != null && this.objectsNotFoundGlobalObjects.contains(name))
 			{
 				// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
 				bSearchedGlobalObjects = true;
@@ -426,7 +426,7 @@ public class CustomObjectCollection
 				HashMap<String, File> presetCustomObjectFiles = this.customObjectFilesPerPreset.get(presetFolderName);
 				if (presetCustomObjectFiles != null)
 				{
-					File searchForFile = presetCustomObjectFiles.get(name.toLowerCase());
+					File searchForFile = presetCustomObjectFiles.get(name);
 					if (searchForFile != null)
 					{
 						object = loadObject(searchForFile, presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -438,7 +438,7 @@ public class CustomObjectCollection
 								presetObjectsByName = new HashMap<String, CustomObject>();
 								this.objectsByNamePerPreset.put(presetFolderName, presetObjectsByName);
 							}
-							presetObjectsByName.put(name.toLowerCase(), object);
+							presetObjectsByName.put(name, object);
 							return object;
 						} else {
 							if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
@@ -457,21 +457,21 @@ public class CustomObjectCollection
 					presetObjectsNotFound = new ArrayList<String>();
 					this.objectsNotFoundPerPreset.put(presetFolderName, presetObjectsNotFound);
 				}
-				presetObjectsNotFound.add(name.toLowerCase());
+				presetObjectsNotFound.add(name);
 			}
 	
 			// Search GlobalObjects
 	
 			if (searchGlobalObjects && !bSearchedGlobalObjects)
 			{
-				object = this.objectsByNameGlobalObjects.get(name.toLowerCase());
+				object = this.objectsByNameGlobalObjects.get(name);
 	
 				if (object != null)
 				{
 					return object;
 				}
 	
-				File searchForFile = this.customObjectFilesGlobalObjects.get(name.toLowerCase());
+				File searchForFile = this.customObjectFilesGlobalObjects.get(name);
 	
 				if (searchForFile != null)
 				{
@@ -479,7 +479,7 @@ public class CustomObjectCollection
 	
 					if (object != null)
 					{
-						this.objectsByNameGlobalObjects.put(name.toLowerCase(), object);
+						this.objectsByNameGlobalObjects.put(name, object);
 						return object;
 					} else {
 						if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
@@ -491,7 +491,7 @@ public class CustomObjectCollection
 				}
 	
 				// Not Found
-				this.objectsNotFoundGlobalObjects.add(name.toLowerCase());
+				this.objectsNotFoundGlobalObjects.add(name);
 			}
 	
 			if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
@@ -514,49 +514,49 @@ public class CustomObjectCollection
 					if (fileInDir.isDirectory())
 					{
 						indexAllCustomObjectFilesInDir(fileInDir, customObjectFiles, templateFiles, logger);
-					} else
-					{
-						if (fileInDir.getName().toLowerCase().endsWith(
-								".bo4data") || fileInDir.getName().toLowerCase().endsWith(
-										".bo4") || fileInDir.getName().toLowerCase().endsWith(
-												".bo3") || fileInDir.getName().toLowerCase().endsWith(".bo2"))
-						{
-							if (fileInDir.getName().toLowerCase().endsWith(
-									".bo4data") || !customObjectFiles.containsKey(
-											fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4",
-													"").replace(".bo3", "").replace(".bo2", "")))
-							{
-								customObjectFiles.put(
-										fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4",
-												"").replace(".bo3", "").replace(".bo2", ""),
-										fileInDir);
+					} else {
+						String name = fileInDir.getName().contains(".") ? fileInDir.getName().substring(0, fileInDir.getName().lastIndexOf(".")) : fileInDir.getName();
+						String fileExtension = fileInDir.getName().contains(".") ? fileInDir.getName().substring(fileInDir.getName().lastIndexOf(".")).toLowerCase() : null;
+						if (
+							fileExtension.equals(".bo4data") || 
+							fileExtension.equals(".bo4") || 
+							fileExtension.equals(".bo3") || 
+							fileExtension.equals(".bo2")
+						) {
+							if (
+								fileExtension.equals(".bo4data") || 
+								!customObjectFiles.containsKey(name)
+							) {
+								customObjectFiles.put(name, fileInDir);
 							} else {
 								if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 								{
-									logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Duplicate file found: " + fileInDir.getName() + ".");
+									logger.log(LogLevel.WARN, LogCategory.CUSTOM_OBJECTS, "Duplicate file found: " + name + ".");
 								}
 							}
 						}
-						else if (fileInDir.getName().toLowerCase().endsWith("bo3template"))
+						else if (fileExtension.equals(".bo3template"))
 						{
-							templateFiles.put(fileInDir.getName().toLowerCase(Locale.ROOT).replace(".bo3template", ""), fileInDir);
+							templateFiles.put(name, fileInDir);
 						}
 					}
 				}
 			} else {
-				if (searchDir.getName().toLowerCase().endsWith(
-						".bo4data") || searchDir.getName().toLowerCase().endsWith(
-								".bo4") || searchDir.getName().toLowerCase().endsWith(
-										".bo3") || searchDir.getName().toLowerCase().endsWith(".bo2"))
+				String name = searchDir.getName().contains(".") ? searchDir.getName().substring(0, searchDir.getName().lastIndexOf(".")) : searchDir.getName();
+				String fileExtension = searchDir.getName().contains(".") ? searchDir.getName().substring(searchDir.getName().lastIndexOf(".")).toLowerCase() : null;				
+				if (
+					fileExtension.equals(".bo4data") || 
+					fileExtension.equals(".bo4") || 
+					fileExtension.equals(".bo3") || 
+					fileExtension.equals(".bo2")
+				)
 				{
-					if (searchDir.getName().toLowerCase().endsWith(".bo4data") || !customObjectFiles.containsKey(
-							searchDir.getName().toLowerCase().replace(".bo4", "").replace(".bo3", "").replace(".bo2",
-									"")))
+					if (
+						fileExtension.endsWith(".bo4data") || 
+						!customObjectFiles.containsKey(name)
+					)
 					{
-						customObjectFiles.put(
-								searchDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(
-										".bo3", "").replace(".bo2", ""),
-								searchDir);
+						customObjectFiles.put(name, searchDir);
 					} else {
 						if (logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 						{
@@ -564,9 +564,9 @@ public class CustomObjectCollection
 						}
 					}
 				}
-				else if (searchDir.getName().toLowerCase().matches(".+\\.bo[34]template"))
+				else if (fileExtension.matches(".+\\.bo[34]template"))
 				{
-					templateFiles.put(searchDir.getName().toLowerCase(Locale.ROOT).replaceAll("\\.bo[34]template", ""), searchDir);
+					templateFiles.put(name, searchDir);
 				}
 			}
 		}

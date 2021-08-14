@@ -8,7 +8,9 @@ import com.pg85.otg.customobject.bo3.BO3Config;
 import com.pg85.otg.customobject.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.bo4.BO4Config;
+import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BranchFunction;
+import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.bofunctions.BranchFunction;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
@@ -54,9 +56,7 @@ public class ObjectCreator extends BOCreator
 			return createStructure(
 				type, min, max, objectName, includeAir, objectPath, localWorld, nbtHelper,
 				template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
-		}
-		else
-		{
+		} else {
 			return createObject(
 				type, min, max, center, centerBlock, objectName, includeAir, objectPath, localWorld, nbtHelper,
 				extraBlocks, template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
@@ -339,10 +339,27 @@ public class ObjectCreator extends BOCreator
 				{
 					branches = Arrays.asList(config.getbranches());
 				}
+				
+				// Re-add any AIR blocks that were in the original BO4
+				List<BlockFunction<?>> mergedBlocks = new ArrayList<>(blocks);
+				BlockFunction<?>[] blocksListOriginal = config.getBlockFunctions(presetFolderName, rootPath, logger, boManager, mr, manager, mlc);				
+				for(BlockFunction<?> block : blocksListOriginal)
+				{
+					if(
+						!(block instanceof BO4RandomBlockFunction) &&
+						block.material != null &&
+						block.material.isAir() && 
+						!blocks.stream().anyMatch(a -> a.x == block.x && a.y == block.y && a.z == block.z)
+					)
+					{
+						mergedBlocks.add(block);
+					}
+				}
+
 				FileSettingsWriterBO4.writeToFileWithData
 					(
 						config,
-						blocks,
+						mergedBlocks,
 						branches,
 						logger, mr, manager
 					)

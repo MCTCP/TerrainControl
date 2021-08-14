@@ -259,7 +259,7 @@ public class BO4CustomStructure extends CustomStructure
 						{
 							for (BO4CustomStructureCoordinate coordObjectToReplace : chunkCoordSet.getValue())
 							{
-								if(((BO4)coordObjectToReplace.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getName().equals(BO3ToReplace))
+								if(((BO4)coordObjectToReplace.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getName().equalsIgnoreCase(BO3ToReplace))
 								{
 									if(checkCollision(coordObject, coordObjectToReplace, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 									{
@@ -1431,7 +1431,7 @@ public class BO4CustomStructure extends CustomStructure
 					{
 						for(String branchName : ((BO4)branchDataItem3.branch.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getInheritedBO3s()) // getInheritedBO3s also contains this BO3
 						{
-							if(branchName.equals(cantBeInsideBO3))
+							if(branchName.equalsIgnoreCase(cantBeInsideBO3))
 							{
 									if(checkCollision(childBranchDataItem.branch, branchDataItem3.branch, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 									{
@@ -1479,19 +1479,19 @@ public class BO4CustomStructure extends CustomStructure
 						{
 							for(String branchName : ((BO4)branchDataItem3.branch.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getInheritedBO3s()) // getInheritedBO3s also contains this BO3
 							{
-								if(branchName.equals(mustBeInsideBO3Name))
+								if(branchName.equalsIgnoreCase(mustBeInsideBO3Name))
 								{
-										if(checkCollision(childBranchDataItem.branch, branchDataItem3.branch, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
-										{
-											bFoundPart = true;
-											break;
-										}
+									if(checkCollision(childBranchDataItem.branch, branchDataItem3.branch, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker))
+									{
+										bFoundPart = true;
+										break;
+									}
 								}
 							}
-								if(bFoundPart)
-								{
-									break;
-								}
+							if(bFoundPart)
+							{
+								break;
+							}
 						}
 					}
 					if(!bFoundPart)
@@ -1620,7 +1620,7 @@ public class BO4CustomStructure extends CustomStructure
 							{
 								for(String branchName : branchDataConfig.getInheritedBO3s())
 								{
-									if(branchName.equals(mustBeInsideBO3Name))
+									if(branchName.equalsIgnoreCase(mustBeInsideBO3Name))
 									{
 										currentBO3Found = true;
 										break;
@@ -1846,7 +1846,7 @@ public class BO4CustomStructure extends CustomStructure
 									{
 										for(String branchName : branchDataItemConfig.getInheritedBO3s())
 										{
-											if(branchName.equals(mustBeInsideBO3Name))
+											if(branchName.equalsIgnoreCase(mustBeInsideBO3Name))
 											{
 												currentBO3Found = true;
 												break;
@@ -1874,7 +1874,7 @@ public class BO4CustomStructure extends CustomStructure
 			}
 		}
 	}
-	
+
 	private void addToCaches(BranchDataItem branchData, BO4 bo3)
 	{
 		AllBranchesBranchData.add(branchData);
@@ -1997,7 +1997,7 @@ public class BO4CustomStructure extends CustomStructure
 				boolean canSpawnHere = false;
 				for(String structureToSpawn : biomeStructures)
 				{
-					if(structureToSpawn.equals(startBO4Config.getName()))
+					if(structureToSpawn.equalsIgnoreCase(startBO4Config.getName()))
 					{
 						canSpawnHere = true;
 						break;
@@ -2067,7 +2067,7 @@ public class BO4CustomStructure extends CustomStructure
 								boolean canSpawnHere = false;
 								for(String structureToSpawn : biomeStructures)
 								{
-									if(structureToSpawn.equals(startBO4Config.getName()))
+									if(structureToSpawn.equalsIgnoreCase(startBO4Config.getName()))
 									{
 										canSpawnHere = true;
 										break;

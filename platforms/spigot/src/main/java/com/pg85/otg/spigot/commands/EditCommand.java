@@ -203,7 +203,7 @@ public class EditCommand extends BaseCommand
 			if (object != null)
 			{
 				source.sendMessage("Successfully edited " + session.type.getType() + " " + object.getName());
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName, object.getName().toLowerCase(Locale.ROOT), object.getConfig().getFile(), object);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName, object.getName(), object.getConfig().getFile(), object);
 			}
 			else
 			{
