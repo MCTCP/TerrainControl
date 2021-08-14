@@ -59,7 +59,7 @@ public class VinesResource extends FrequencyResourceBase
 				sourceBlock = worldGenRegion.getMaterial(x + 1, y, z);
 				break;
 		}
-		return sourceBlock != null && sourceBlock.isSolid();
+		return sourceBlock != null && sourceBlock.isSolid() && !sourceBlock.isMaterial(LocalMaterials.BAMBOO);
 	}
 
 	@Override
