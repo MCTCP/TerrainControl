@@ -113,7 +113,7 @@ public class CustomObjectCollection
 			return object;
 		}
 	}
-		  
+
 	private void removeLoadedObject(String presetFolderName, CustomObject object)
 	{
 		if (presetFolderName != null)

@@ -24,7 +24,6 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 
 public class ObjectUtils
 {

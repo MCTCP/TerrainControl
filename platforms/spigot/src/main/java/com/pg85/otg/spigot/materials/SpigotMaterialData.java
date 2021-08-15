@@ -7,6 +7,7 @@ import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialProperty;
 
 import net.minecraft.server.v1_16_R3.*;
+
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
@@ -222,7 +223,10 @@ public class SpigotMaterialData extends LocalMaterialData
 					}
 				}
 			}
-
+			if (state.b(BlockRotatable.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
+			{
+				state = ((BlockRotatable)state.getBlock()).a(this.blockData, EnumBlockRotation.COUNTERCLOCKWISE_90);
+			}
 			if (state.b(BlockTall.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
