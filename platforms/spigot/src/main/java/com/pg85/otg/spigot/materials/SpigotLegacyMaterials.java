@@ -1379,7 +1379,7 @@ public class SpigotLegacyMaterials
 		int west = getBit(data, 1);
 		int north = getBit(data, 2);
 		int east = getBit(data, 3);
-		int up = data == 0 ? 1 : 0; // TODO: Should also be true if there's a block above, test if this is done dynamically.
+		int up = data == 0 ? 1 : 0; // Up was not stored in data for 1.12.2 (only rotation), fix via otg update.
 		return Blocks.VINE.getBlockData()
 				.set(BlockVine.EAST, east == 1)
 				.set(BlockVine.NORTH, north == 1)
@@ -1427,7 +1427,7 @@ public class SpigotLegacyMaterials
 	{
 		int facing = getBits(data, 0, 2);
 		int age = getBits(data, 2, 2);
-		return Blocks.COCOA.getBlockData().set(BlockCocoa.FACING, getFacingNorthEastSouthWest(facing)).set(BlockCocoa.AGE, age);
+		return Blocks.COCOA.getBlockData().set(BlockCocoa.FACING, getFacingSouthWestNorthEast(facing)).set(BlockCocoa.AGE, age);
 	}
 
 	private static IBlockData getTripWireHookWithData (int data)
@@ -1582,22 +1582,6 @@ public class SpigotLegacyMaterials
 			case 5:
 				return EnumDirection.EAST;
 			case 2:
-			default:
-				return EnumDirection.NORTH;
-		}
-	}
-
-	private static EnumDirection getFacingNorthEastSouthWest (int data)
-	{
-		switch (data)
-		{
-			case 1:
-				return EnumDirection.EAST;
-			case 2:
-				return EnumDirection.SOUTH;
-			case 3:
-				return EnumDirection.WEST;
-			case 0:
 			default:
 				return EnumDirection.NORTH;
 		}

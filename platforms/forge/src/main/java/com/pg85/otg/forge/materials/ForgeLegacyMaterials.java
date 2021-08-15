@@ -1475,7 +1475,7 @@ class ForgeLegacyMaterials
 		switch(material)
 		{
 			case 0:
-				if (bark) return Blocks.ACACIA_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, axisDirection);
+				if (bark) return Blocks.ACACIA_WOOD.defaultBlockState().setValue(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.ACACIA_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, axisDirection);
 			case 1:
 				if (bark) return Blocks.DARK_OAK_WOOD.defaultBlockState().setValue(RotatedPillarBlock.AXIS, axisDirection);
@@ -1484,7 +1484,7 @@ class ForgeLegacyMaterials
 				return Blocks.ACACIA_LOG.defaultBlockState();
 		}
 	}
-	
+
 	private static BlockState getQuartzBlockWithData(int data)
 	{
 		switch(data)
@@ -2001,7 +2001,7 @@ class ForgeLegacyMaterials
 		int west = getBit(data, 1);
 		int north = getBit(data, 2);
 		int east = getBit(data, 3);
-		int up = data == 0 ? 1 : 0; // TODO: Should also be true if there's a block above, test if this is done dynamically.
+		int up = data == 0 ? 1 : 0; // Up was not stored in data for 1.12.2 (only rotation), fix via otg update.
 		return Blocks.VINE.defaultBlockState()
 			.setValue(VineBlock.EAST, east == 1)
 			.setValue(VineBlock.NORTH, north == 1)
@@ -2049,7 +2049,7 @@ class ForgeLegacyMaterials
 	{
 		int facing = getBits(data, 0, 2);
 		int age = getBits(data, 2, 2);
-		return Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.FACING, getFacingNorthEastSouthWest(facing)).setValue(CocoaBlock.AGE, age);
+		return Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.FACING, getFacingSouthWestNorthEast(facing)).setValue(CocoaBlock.AGE, age);
 	}
 	
 	private static BlockState getTripWireHookWithData(int data)
@@ -2208,23 +2208,6 @@ class ForgeLegacyMaterials
 				return Direction.WEST;
 			case 5:
 				return Direction.EAST;				
-			default:
-				return Direction.NORTH;
-		}
-	}
-	
-	private static Direction getFacingNorthEastSouthWest(int data)
-	{
-		switch(data)
-		{
-			case 0:
-				return Direction.NORTH;
-			case 1:
-				return Direction.EAST;
-			case 2:
-				return Direction.SOUTH;
-			case 3:
-				return Direction.WEST;
 			default:
 				return Direction.NORTH;
 		}

@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 
 public class ObjectUtils
 {

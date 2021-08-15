@@ -116,6 +116,7 @@ public class WorldConfig extends WorldConfigBase
 
 		// Rename old settings
 
+		reader.renameOldSetting("SpawnPointSet", WorldStandardValues.FIXED_SPAWN_POINT);
 		reader.renameOldSetting("PopulationBoundsCheck", WorldStandardValues.DECORATION_BOUNDS_CHECK);
 		reader.renameOldSetting("EvenCaveDistrubution", WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 		reader.renameOldSetting("WorldFog", WorldStandardValues.WORLD_FOG_COLOR);

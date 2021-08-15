@@ -10,6 +10,8 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Rotation;
+
 import com.pg85.otg.util.materials.MaterialProperty;
 import com.pg85.otg.util.materials.MaterialProperties;
 import java.util.Collection;
@@ -182,12 +184,13 @@ public class ForgeMaterialData extends LocalMaterialData
 		// Get the rotation if we haven't stored the rotation yet
 		if (rotated == null)
 		{
+			
 			BlockState state = this.blockData;
 			Collection<Property<?>> properties = state.getProperties();
 			// Loop through the blocks properties
 			for (Property<?> property : properties)
 			{
-				// Anything with a direction
+				// Anything with a direction				
 				if (property instanceof DirectionProperty)
 				{
 					Direction direction = (Direction) state.getValue(property);
@@ -211,14 +214,18 @@ public class ForgeMaterialData extends LocalMaterialData
 					}
 				}
 			}
-			if (state.hasProperty(SixWayBlock.EAST)) // fence or glass pane
+			if (state.hasProperty(RotatedPillarBlock.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
+			{
+				state = ((RotatedPillarBlock)state.getBlock()).rotate(this.blockData, Rotation.COUNTERCLOCKWISE_90);
+			}
+			if (state.hasProperty(FourWayBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
-				boolean hasEast = state.getValue(SixWayBlock.EAST);
-				state = state.setValue(SixWayBlock.EAST, state.getValue(SixWayBlock.SOUTH));
-				state = state.setValue(SixWayBlock.SOUTH, state.getValue(SixWayBlock.WEST));
-				state = state.setValue(SixWayBlock.WEST, state.getValue(SixWayBlock.NORTH));
-				state = state.setValue(SixWayBlock.NORTH, hasEast);
+				boolean hasEast = state.getValue(FourWayBlock.EAST);
+				state = state.setValue(FourWayBlock.EAST, state.getValue(FourWayBlock.SOUTH));
+				state = state.setValue(FourWayBlock.SOUTH, state.getValue(FourWayBlock.WEST));
+				state = state.setValue(FourWayBlock.WEST, state.getValue(FourWayBlock.NORTH));
+				state = state.setValue(FourWayBlock.NORTH, hasEast);
 			}
 			// Block is rotated, store a pointer to it
 			this.rotated = ForgeMaterialData.ofBlockState(state);
