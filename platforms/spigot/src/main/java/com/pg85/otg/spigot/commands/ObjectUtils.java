@@ -214,7 +214,7 @@ public class ObjectUtils
 	 * @param verbose Whether to print a success/fail message, as well as whether to register the object after creation
 	 */
 	protected static Runnable getExportRunnable(ObjectType type, RegionCommand.Region region, Corner center, StructuredCustomObject inputObject,
-												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, Player source, LocalWorldGenRegion worldGenRegion)
+												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, boolean leaveIllegalLeaves, Player source, LocalWorldGenRegion worldGenRegion)
 	{
 		return () -> {
 			// Wait for tree to finish
@@ -234,6 +234,7 @@ public class ObjectUtils
 				null,
 				inputObject.getName(),
 				false,
+				leaveIllegalLeaves,
 				exportPath,
 				worldGenRegion,
 				new SpigotNBTHelper(),

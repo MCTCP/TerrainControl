@@ -45,7 +45,7 @@ import java.util.stream.Stream;
 public class EditCommand extends BaseCommand
 {
 	private static final HashMap<Player, EditCommand.EditSession> sessionsMap = new HashMap<>();
-	private static final List<String> FLAGS = Arrays.asList("-nofix", "-update");
+	private static final List<String> FLAGS = Arrays.asList("-nofix", "-update", "-wrongleaves");
 	private static final HashSet<LocalMaterialData> gravityBlocksSet;
 
 	static
@@ -241,7 +241,7 @@ public class EditCommand extends BaseCommand
 
 	public static StructuredCustomObject exportFromSession(EditCommand.EditSession session, Region region)
 	{
-		return ObjectCreator.createObject(session.type, region.getMin(), region.getMax(), session.extraBlocks.isEmpty() ? region.getCenter() : session.originalCenterPoint, null, session.object.getName(), false, session.objectPath, session.genRegion, new SpigotNBTHelper(), session.extraBlocks, session.object.getConfig(), session.presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+		return ObjectCreator.createObject(session.type, region.getMin(), region.getMax(), session.extraBlocks.isEmpty() ? region.getCenter() : session.originalCenterPoint, null, session.object.getName(), false, session.leaveIllegalLeaves, session.objectPath, session.genRegion, new SpigotNBTHelper(), session.extraBlocks, session.object.getConfig(), session.presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 	}
 
 	public List<String> onTabComplete(CommandSender sender, String[] args)
@@ -294,6 +294,7 @@ public class EditCommand extends BaseCommand
 		String flags = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : "";
 		boolean immediate = flags.contains("-update");
 		boolean doFixing = !flags.contains("-nofix");
+		boolean leaveIllegalLeaves = flags.contains("-wrongleaves");
 		presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
 		boolean isGlobal = presetFolderName == null;
 		StructuredCustomObject inputObject = null;
@@ -326,10 +327,10 @@ public class EditCommand extends BaseCommand
 		Path path = ObjectUtils.getObjectFolderPath(isGlobal ? null : preset.getPresetFolder()).resolve(ObjectUtils.getFoldersFromObject(inputObject));
 		if (immediate)
 		{
-			(new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, source, worldGenRegion))).start();
+			(new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, leaveIllegalLeaves, source, worldGenRegion))).start();
 			return true;
 		}
-		sessionsMap.put(source, new EditCommand.EditSession(type, worldGenRegion, inputObject, extraBlocks, path, preset.getFolderName(), center));
+		sessionsMap.put(source, new EditCommand.EditSession(type, worldGenRegion, inputObject, extraBlocks, path, preset.getFolderName(), center, leaveIllegalLeaves));
 		source.sendMessage("You can now edit the object");
 		source.sendMessage("To change the area of the object, use /otg region");
 		source.sendMessage("When you are done editing, do /otg finishedit");
@@ -364,8 +365,9 @@ public class EditCommand extends BaseCommand
 		private final Path objectPath;
 		private final String presetFolderName;
 		private final Corner originalCenterPoint;
+		private final boolean leaveIllegalLeaves;
 
-		public EditSession(ObjectType type, SpigotWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint)
+		public EditSession(ObjectType type, SpigotWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint, boolean leaveIllegalLeaves)
 		{
 			this.type = type;
 			this.genRegion = genRegion;
@@ -374,6 +376,7 @@ public class EditCommand extends BaseCommand
 			this.objectPath = objectPath;
 			this.presetFolderName = presetFolderName;
 			this.originalCenterPoint = originalCenterPoint;
+			this.leaveIllegalLeaves = leaveIllegalLeaves;
 		}
 	}
 	private static final HashSet<MinecraftKey> updateMap = Stream.of(
@@ -462,7 +465,8 @@ public class EditCommand extends BaseCommand
 		"blocks/birch_leaves",
 		"blocks/jungle_leaves",
 		"blocks/acacia_leaves",
-		"blocks/dark_oak_leaves")
+		"blocks/dark_oak_leaves",
+		"blocks/vine")
 		.map(MinecraftKey::new)
 		.collect(Collectors.toCollection(HashSet::new));
 }

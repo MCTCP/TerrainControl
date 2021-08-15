@@ -226,5 +226,5 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	
 	public abstract int hashCode();
 
-	public abstract LocalMaterialData legalOrPersistentLeaves();	
+	public abstract LocalMaterialData legalOrPersistentLeaves(boolean leaveIllegalLeaves);
 }

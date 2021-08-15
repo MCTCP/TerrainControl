@@ -1,7 +1,6 @@
 package com.pg85.otg.customobject.creator;
 
 import com.pg85.otg.constants.SettingsEnums;
-import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Config;
@@ -40,11 +39,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ObjectCreator extends BOCreator
+public class ObjectCreator
 {
 	// Method for creating either object or structure; used by Export to cut down code duplication
 	public static StructuredCustomObject create(
-		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, boolean isStructure, Path objectPath,
+		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, boolean isStructure, boolean leaveIllegalLeaves, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BlockFunction<?>> extraBlocks, CustomObjectConfigFile template,
 		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
@@ -53,18 +52,18 @@ public class ObjectCreator extends BOCreator
 		if (isStructure)
 		{
 			return createStructure(
-				type, min, max, objectName, includeAir, objectPath, localWorld, nbtHelper,
+				type, min, max, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
 				template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
 		} else {
 			return createObject(
-				type, min, max, center, centerBlock, objectName, includeAir, objectPath, localWorld, nbtHelper,
+				type, min, max, center, centerBlock, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
 				extraBlocks, template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
 		}
 	}
 
 	// Method for creating a custom object
 	public static StructuredCustomObject createObject(
-		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, Path exportPath,
+		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path exportPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BlockFunction<?>> extraBlocks, CustomObjectConfigFile template,
 		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
@@ -87,7 +86,7 @@ public class ObjectCreator extends BOCreator
 						}
 		}
 		// Loop through region, getting the block from the localWorld
-		List<BlockFunction<?>> blocks = Extractor.getBlockFunctions(type, min, max, center, localWorld, nbtHelper, includeAir, objectName, exportFolder);
+		List<BlockFunction<?>> blocks = Extractor.getBlockFunctions(type, min, max, center, localWorld, nbtHelper, includeAir, leaveIllegalLeaves, objectName, exportFolder);
 
 		// Add extra blocks in (from updating, mainly)
 		if (extraBlocks != null) blocks.addAll(extraBlocks);
@@ -128,7 +127,7 @@ public class ObjectCreator extends BOCreator
 
 	// Separate branch for creating a structure, since structures need to create branches
 	public static StructuredCustomObject createStructure(
-		ObjectType type, Corner min, Corner max, String objectName, boolean includeAir, Path objectPath,
+		ObjectType type, Corner min, Corner max, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, CustomObjectConfigFile template,
 		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
@@ -169,7 +168,7 @@ public class ObjectCreator extends BOCreator
 				String branchName = objectName + "_C" + branchX + "_r" + branchZ;
 
 				branchGrid[branchX][branchZ] = Extractor.getBlockFunctions(type, branchMin, branchMax, branchCenter,
-					localWorld, nbtHelper, includeAir, branchName, branchFolder);
+					localWorld, nbtHelper, includeAir, leaveIllegalLeaves, branchName, branchFolder);
 				exists[branchX][branchZ] = !branchGrid[branchX][branchZ].isEmpty();
 			}
 		}
@@ -319,8 +318,8 @@ public class ObjectCreator extends BOCreator
 				if (config.settingsMode == SettingsEnums.ConfigMode.WriteDisable)
 					config.settingsMode = SettingsEnums.ConfigMode.WriteWithoutComments;
 				BoundingBox box = BoundingBox.newEmptyBox();
-				box.expandToFit(min.x, min.y, min.z);
-				box.expandToFit(max.x, max.y, max.z);
+				box.expandToFit(min.x - center.x, min.y - center.y, min.z - center.z);
+				box.expandToFit(max.x - center.x, max.y - center.y, max.z - center.z);
 
 				config.setBoundingBox(box);
 				config.extractBlocks(blocks);

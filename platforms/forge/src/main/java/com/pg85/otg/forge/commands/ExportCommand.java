@@ -241,6 +241,7 @@ public class ExportCommand extends BaseCommand
 				objectName,
 				includeAir,
 				isStructure,
+				false,
 				objectPath,
 				worldGenRegion,
 				nbtHelper,

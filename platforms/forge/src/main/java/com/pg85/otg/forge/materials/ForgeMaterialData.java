@@ -315,7 +315,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	}
 
 	@Override
-	public LocalMaterialData legalOrPersistentLeaves()
+	public LocalMaterialData legalOrPersistentLeaves(boolean leaveIllegalLeaves)
 	{
 		if (!this.isLeaves())
 		{
@@ -324,9 +324,15 @@ public class ForgeMaterialData extends LocalMaterialData
 		int i = blockData.getValue(LeavesBlock.DISTANCE);
 		if (i > 6)
 		{
-			return ForgeMaterialData.ofBlockState(blockData.setValue(LeavesBlock.PERSISTENT, true));
+			if (leaveIllegalLeaves)
+				return ForgeMaterialData.ofBlockState(
+					blockData.setValue(LeavesBlock.DISTANCE, 1)
+						.setValue(LeavesBlock.PERSISTENT, false));
+			return ForgeMaterialData.ofBlockState(
+				blockData.setValue(LeavesBlock.PERSISTENT, true));
 		} else {
-			return ForgeMaterialData.ofBlockState(blockData.setValue(LeavesBlock.PERSISTENT, false));
+			return ForgeMaterialData.ofBlockState(
+				blockData.setValue(LeavesBlock.PERSISTENT, false));
 		}
 	}
 }

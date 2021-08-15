@@ -332,7 +332,7 @@ public class SpigotMaterialData extends LocalMaterialData
 	}
 
 	@Override
-	public LocalMaterialData legalOrPersistentLeaves()
+	public LocalMaterialData legalOrPersistentLeaves(boolean leaveIllegalLeaves)
 	{
 		if (!this.isLeaves())
 		{

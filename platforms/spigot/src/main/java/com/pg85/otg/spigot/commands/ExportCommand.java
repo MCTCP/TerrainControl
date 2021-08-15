@@ -193,7 +193,7 @@ public class ExportCommand extends BaseCommand
 		}
 
 		LocalMaterialData centerBlock = centerBlockState == null ? null : SpigotMaterialData.ofBlockData(centerBlockState);
-		StructuredCustomObject object = ObjectCreator.create(type, lowCorner, highCorner, center, centerBlock, objectName, includeAir, isStructure, objectPath, worldGenRegion, nbtHelper, null, template.getConfig(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+		StructuredCustomObject object = ObjectCreator.create(type, lowCorner, highCorner, center, centerBlock, objectName, includeAir, isStructure, false, objectPath, worldGenRegion, nbtHelper, null, template.getConfig(), preset.getFolderName(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 		if (object != null)
 		{
 			source.sendMessage("Successfully created " + type.getType() + " " + objectName);

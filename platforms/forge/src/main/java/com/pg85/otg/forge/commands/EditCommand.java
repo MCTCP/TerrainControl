@@ -61,7 +61,7 @@ public class EditCommand extends BaseCommand
 	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
 	
 	private static final String[] FLAGS = new String[]
-	{ "-nofix", "-update" };
+	{ "-nofix", "-update", "-wrongleaves" };
 	
 	public EditCommand() 
 	{
@@ -97,7 +97,7 @@ public class EditCommand extends BaseCommand
 		try {
 			String presetFolderName = context.getArgument("preset", String.class);
 			String objectName = "";
-			boolean immediate = false, doFixing = true;
+			boolean immediate = false, doFixing = true, leaveIllegalLeaves = false;
 
 			try
 			{
@@ -105,6 +105,7 @@ public class EditCommand extends BaseCommand
 				String flags = context.getArgument("flags", String.class);
 				immediate = flags.contains("-update");
 				doFixing = !flags.contains("-nofix");
+				leaveIllegalLeaves = flags.contains("-wrongleaves");
 			}
 			catch (IllegalArgumentException ignored) {}
 			presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
@@ -168,13 +169,13 @@ public class EditCommand extends BaseCommand
 				.resolve(ObjectUtils.getFoldersFromObject(inputObject));
 			if (immediate)
 			{
-				new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, source, worldGenRegion
+				new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, leaveIllegalLeaves, source, worldGenRegion
 				)).start();
 				return 0;
 			}
 			// Store the info, wait for /otg finishedit
 			sessionsMap.put(source.getEntity(), new EditSession(type, worldGenRegion, inputObject, extraBlocks,
-				path, preset.getFolderName(), center));
+				path, preset.getFolderName(), center, leaveIllegalLeaves));
 			source.sendSuccess(new StringTextComponent("You can now edit the object"), false);
 			source.sendSuccess(new StringTextComponent("To change the area of the object, use /otg region"), false);
 			source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
@@ -299,6 +300,7 @@ public class EditCommand extends BaseCommand
 			null,
 			session.object.getName(),
 			false,
+			session.leaveIllegalLeaves,
 			session.objectPath,
 			session.genRegion,
 			new ForgeNBTHelper(),
@@ -339,8 +341,9 @@ public class EditCommand extends BaseCommand
 		private final Path objectPath;
 		private final String presetFolderName;
 		private final Corner originalCenterPoint;
+		private final boolean leaveIllegalLeaves;
 
-		public EditSession(ObjectType type, ForgeWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint)
+		public EditSession(ObjectType type, ForgeWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint, boolean leaveIllegalLeaves)
 		{
 			this.type = type;
 			this.genRegion = genRegion;
@@ -349,6 +352,7 @@ public class EditCommand extends BaseCommand
 			this.objectPath = objectPath;
 			this.presetFolderName = presetFolderName;
 			this.originalCenterPoint = originalCenterPoint;
+			this.leaveIllegalLeaves = leaveIllegalLeaves;
 		}
 	}
 
@@ -534,7 +538,8 @@ public class EditCommand extends BaseCommand
 		"birch_leaves",
 		"jungle_leaves",
 		"acacia_leaves",
-		"dark_oak_leaves")
+		"dark_oak_leaves",
+		"vine")
 		.map(ResourceLocation::new)
 		.collect(Collectors.toCollection(HashSet::new));
 }

@@ -3,12 +3,15 @@ package com.pg85.otg.forge.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.exceptions.InvalidConfigException;
+import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.presets.Preset;
@@ -16,6 +19,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -23,9 +27,13 @@ import net.minecraft.util.text.TextFormatting;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class UpdateCommand extends BaseCommand
 {
+	private static final String[] FLAGS = new String[]
+		{ "-wrongleaves" };
+
 	public UpdateCommand()
 	{
 		super("update");
@@ -39,7 +47,11 @@ public class UpdateCommand extends BaseCommand
 		builder.then(Commands.literal("update").then(
 			Commands.argument("preset", StringArgumentType.string())
 				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
-				.executes(this::update)));
+				.executes(this::update)
+				.then(
+					Commands.argument("flags", FlagsArgument.create()).executes(this::update).suggests(this::suggestFlags)
+				)
+		));
 	}
 
 	private int update(CommandContext<CommandSource> context)
@@ -48,6 +60,16 @@ public class UpdateCommand extends BaseCommand
 		String presetFolderName = context.getArgument("preset", String.class);
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		CommandSource source = context.getSource();
+		boolean tempLeavesFlag = false;
+
+		try
+		{
+			String flags = context.getArgument("flags", String.class);
+			tempLeavesFlag = flags.contains("-wrongleaves");
+		}
+		catch (IllegalArgumentException ignored) {}
+
+		boolean leaveIllegalLeaves = tempLeavesFlag;
 
 		if (preset == null)
 		{
@@ -104,7 +126,7 @@ public class UpdateCommand extends BaseCommand
 				presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
 				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 
-			Thread t = new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, fixedObjectFolderPath.resolve(ObjectUtils.getFoldersFromObject(inputObject)), extraBlocks, presetFolderName, false, source, worldGenRegion
+			Thread t = new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, fixedObjectFolderPath.resolve(ObjectUtils.getFoldersFromObject(inputObject)), extraBlocks, presetFolderName, false, leaveIllegalLeaves, source, worldGenRegion
 			));
 			t.start();
 
@@ -143,5 +165,11 @@ public class UpdateCommand extends BaseCommand
 			source.sendSuccess(new StringTextComponent("Finished updating!").withStyle(TextFormatting.GREEN), false);
 		}).start();
 		return 0;
+	}
+
+	CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
+												SuggestionsBuilder builder)
+	{
+		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
 }

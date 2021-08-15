@@ -20,7 +20,7 @@ public class Extractor
 {
 	public static List<BlockFunction<?>> getBlockFunctions
 		(ObjectType type, Corner min, Corner max, Corner center, LocalWorldGenRegion localWorld,
-		 LocalNBTHelper nbtHelper, boolean includeAir, String objectName, File objectFolder)
+		 LocalNBTHelper nbtHelper, boolean includeAir, boolean leaveIllegalLeaves, String objectName, File objectFolder)
 	{
 		File nbtFolder = new File(objectFolder, objectName);
 		ArrayList<BlockFunction<?>> blocks = new ArrayList<>();
@@ -43,7 +43,7 @@ public class Extractor
 
 					if (materialData.isLeaves())
 					{
-						materialData = materialData.legalOrPersistentLeaves();
+						materialData = materialData.legalOrPersistentLeaves(leaveIllegalLeaves);
 					}
 
 					BlockFunction<?> block;
