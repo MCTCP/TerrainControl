@@ -52,7 +52,7 @@ public class ObjectCreator
 		if (isStructure)
 		{
 			return createStructure(
-				type, min, max, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
+				type, min, max, center, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
 				template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
 		} else {
 			return createObject(
@@ -127,7 +127,7 @@ public class ObjectCreator
 
 	// Separate branch for creating a structure, since structures need to create branches
 	public static StructuredCustomObject createStructure(
-		ObjectType type, Corner min, Corner max, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path objectPath,
+		ObjectType type, Corner min, Corner max, Corner center, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, CustomObjectConfigFile template,
 		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
@@ -260,7 +260,7 @@ public class ObjectCreator
 
 		CustomObjectConfigFile config = makeNewConfig(type, template, objectName,
 			type.getObjectFilePathFromName(objectName, objectPath),
-			min, max, null, null, branches, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
+			min, max, center, null, branches, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
 
 		switch (type)
 		{
@@ -362,13 +362,24 @@ public class ObjectCreator
 						logger, mr, manager
 					)
 				;
-				BO4 object = (BO4) boManager.getGlobalObjects().loadObject
-					(
+
+				BO4 object = (BO4) boManager.getObjectLoaders().get(type.getType().toLowerCase())
+					.loadFromFile(
+						objectName,
 						objectFilePath.toFile(),
-						presetFolderName,
-						rootPath, logger, boManager, mr, manager, mlc
-					)
-				;
+						logger
+				);
+
+				if (object == null)
+				{
+					throw new RuntimeException("Could not load BO4 "+objectName+" at "+objectFilePath);
+				}
+
+				if (!object.onEnable(presetFolderName, rootPath, logger, boManager, mr, manager, mlc))
+				{
+					throw new RuntimeException("Could not enable BO4 "+objectName);
+				}
+
 				return object.getConfig();
 			}
 			case BO2:
