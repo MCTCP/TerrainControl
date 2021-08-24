@@ -147,11 +147,6 @@ public class SpigotMaterialReader implements IMaterialReader
 		catch (CommandSyntaxException ignored) { }
 		if (blockdata != null)
 		{
-			// For leaves, add DISTANCE 1 to make them not decay.
-			if (blockdata.getMaterial().equals(Material.LEAVES))
-			{
-				return SpigotMaterialData.ofBlockData(blockdata.set(BlockLeaves.DISTANCE, 1), input);
-			}
 			return SpigotMaterialData.ofBlockData(blockdata, input);
 		}
 
@@ -188,11 +183,6 @@ public class SpigotMaterialReader implements IMaterialReader
 			block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
 			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 			{
-				// For leaves, add DISTANCE 1 to make them not decay.
-				if (block.getBlockData().getMaterial().equals(Material.LEAVES))
-				{
-					return SpigotMaterialData.ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
-				}
 				return SpigotMaterialData.ofBlockData(block.getBlockData(), input);
 			}
 		} catch(ResourceKeyInvalidException ignored) { }
