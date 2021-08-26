@@ -157,7 +157,26 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public boolean canSnowFallOn()
 	{
-		return this.blockData != null && this.blockData.getMaterial().isSolid();
+		// Taken from SnowBlock.canSurvive
+		if(
+			this.blockData != null &&
+			!this.blockData.is(Blocks.ICE) && 
+			!this.blockData.is(Blocks.PACKED_ICE) && 
+			!this.blockData.is(Blocks.BARRIER)
+		) {
+			if (
+				!this.blockData.is(Blocks.HONEY_BLOCK) && 
+				!this.blockData.is(Blocks.SOUL_SAND)
+			) {
+				// TODO: Vanilla checks faceFull here, we don't since it requires coords.
+				//return Block.isFaceFull(this.blockData.getCollisionShape(blockPos, blockPos.below()), Direction.UP) || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(LAYERS) == 8);
+				return this.blockData.getMaterial().isSolid() || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(SnowBlock.LAYERS) == 8);
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	@Override
