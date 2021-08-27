@@ -24,10 +24,11 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	private final double rarity;
 	private final LocalMaterialData material;
 	private final int maxAltitude;
-	private int numberOfBlocks;
+	private final int numberOfBlocks;
 	private final int minAltitude;
 	private final MaterialSet sourceBlocks;
-	private final int maxSpawn;
+	private final boolean useExtendedParams;	
+	private final int maxSpawn;	
 
 	public OreResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
@@ -40,16 +41,24 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 		this.rarity = readRarity(args.get(3));
 		this.minAltitude = readInt(args.get(4), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
 		this.maxAltitude = readInt(args.get(5), this.minAltitude, Constants.WORLD_HEIGHT - 1);
-		
+
+		// If there is a boolean parameter "true" after source blocks, read extended parameters (maxSpawn)
+		boolean useExtendedParams = false;		
 		int maxSpawn = 0;
-		try
+		if(args.get(args.size() - 2).toLowerCase().trim().equals("true"))
 		{
-			maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
-			args = args.subList(0, args.size() -1);
+			try
+			{
+				maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
+				// Remove the extended parameters so materials can be read as usual
+				args = args.subList(0, args.size() - 2);
+				useExtendedParams = true;
+			}
+			catch (InvalidConfigException ex) { }
 		}
-		catch (InvalidConfigException ex) { }
+		this.useExtendedParams = useExtendedParams;
 		this.maxSpawn = maxSpawn;
-		
+
 		this.sourceBlocks = readMaterials(args, 6, materialReader);
 	}
 
@@ -233,6 +242,6 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	@Override
 	public String toString()
 	{
-		return "Ore(" + this.material + "," + this.numberOfBlocks + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + (this.maxSpawn > 0 ? "," + this.maxSpawn : "") + ")";
+		return "Ore(" + this.material + "," + this.numberOfBlocks + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + (this.useExtendedParams ? ",true," + this.maxSpawn : "") + ")";
 	}	
 }

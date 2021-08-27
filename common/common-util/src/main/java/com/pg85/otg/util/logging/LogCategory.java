@@ -26,7 +26,7 @@ public enum LogCategory
 				categoryTag = "[CustomObjects]";
 				break;
 			case DECORATION:
-				categoryTag = "[Deocration]";
+				categoryTag = "[Decoration]";
 				break;
 			case MAIN:
 				categoryTag = "[Main]";

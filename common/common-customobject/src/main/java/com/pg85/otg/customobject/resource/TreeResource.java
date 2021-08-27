@@ -29,6 +29,7 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 	private int[] treeObjectMinChances;
 	private int[] treeObjectMaxChances;
 	private boolean treesLoaded = false;
+	private final boolean useExtendedParams;	
 	private final int maxSpawn;
 
 	public TreeResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
@@ -40,15 +41,23 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 		this.treeNames = new ArrayList<String>();
 		this.treeChances = new ArrayList<Integer>();
 
+		// If there is a boolean parameter "true" after source blocks, read extended parameters (maxSpawn)
+		boolean useExtendedParams = false;		
 		int maxSpawn = 0;
-		try
+		if(args.get(args.size() - 2).toLowerCase().trim().equals("true"))
 		{
-			maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
-			args = args.subList(0, args.size() -1);
+			try
+			{
+				maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
+				// Remove the extended parameters so materials can be read as usual
+				args = args.subList(0, args.size() - 2);
+				useExtendedParams = true;
+			}
+			catch (InvalidConfigException ex) { }
 		}
-		catch (InvalidConfigException ex) { }
+		this.useExtendedParams = useExtendedParams;
 		this.maxSpawn = maxSpawn;
-		
+
 		for (int i = 1; i < args.size() - 1; i += 2)
 		{
 			this.treeNames.add(args.get(i));
@@ -169,9 +178,9 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 		{
 			output += "," + this.treeNames.get(i) + "," + this.treeChances.get(i);
 		}
-		if(this.maxSpawn > 0)
+		if(this.useExtendedParams)
 		{
-			output += ", " + this.maxSpawn;
+			output += ",true," + this.maxSpawn;
 		}
 		return output + ")";
 	}	
