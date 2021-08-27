@@ -1,9 +1,12 @@
 package com.pg85.otg.spigot.biome;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
@@ -56,6 +59,18 @@ public class SpigotBiome implements IBiome
 
 		// * Carvers are handled by OTG
 
+		// Register any Registry() resources to the biome, to be handled by MC.
+		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
+		{
+			if (res instanceof RegistryResource)
+			{
+				RegistryResource registryResource = (RegistryResource)res;
+				WorldGenStage.Decoration stage = WorldGenStage.Decoration.valueOf(registryResource.getDecorationStage());
+				WorldGenFeatureConfigured<?, ?> registry = RegistryGeneration.e.get(new MinecraftKey(registryResource.getFeatureKey()));
+				biomeGenerationSettingsBuilder.a(stage, registry);
+			}
+		}
+		
 		// Default structures
 		addVanillaStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
 
