@@ -27,6 +27,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	private int numberOfBlocks;
 	private final int minAltitude;
 	private final MaterialSet sourceBlocks;
+	private final int maxSpawn;
 
 	public OreResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
@@ -39,6 +40,16 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 		this.rarity = readRarity(args.get(3));
 		this.minAltitude = readInt(args.get(4), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
 		this.maxAltitude = readInt(args.get(5), this.minAltitude, Constants.WORLD_HEIGHT - 1);
+		
+		int maxSpawn = 0;
+		try
+		{
+			maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
+			args = args.subList(0, args.size() -1);
+		}
+		catch (InvalidConfigException ex) { }
+		this.maxSpawn = maxSpawn;
+		
 		this.sourceBlocks = readMaterials(args, 6, materialReader);
 	}
 
@@ -59,6 +70,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 
 		int x;
 		int z;
+		int spawned = 0;
 		for (int t = 0; t < this.frequency; t++)
 		{
 			if (random.nextDouble() * 100.0 > this.rarity)
@@ -67,29 +79,36 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 			}
 			x = chunkX + random.nextInt(Constants.CHUNK_SIZE);
 			z = chunkZ + random.nextInt(Constants.CHUNK_SIZE);
-			spawn(worldGenRegion, random, false, x, z, highestBlocksCache, width, height, startX, startZ);
+			if(spawn(worldGenRegion, random, false, x, z, highestBlocksCache, width, height, startX, startZ))
+			{
+				spawned++;
+			}
+			if(this.maxSpawn > 0 && spawned == this.maxSpawn)
+			{
+				return;
+			}
 		}
 	}
 	
-	public void spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, byte[] highestBlocksCache, int width, int height, int startX, int startZ)
+	public boolean spawn(IWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, byte[] highestBlocksCache, int width, int height, int startX, int startZ)
 	{
 		if(worldGenRegion.getWorldConfig().isDisableOreGen())
 		{
 			if(this.material.isOre())
 			{
-				return;
+				return true;
 			}
 		}
 
 		float randomAngle = rand.nextFloat() * (float)Math.PI;
-		double x1 = (double)((float)(x) - MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
-		double x2 = (double)((float)(x) + MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
-		double z1 = (double)((float)(z) - MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
-		double z2 = (double)((float)(z) + MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double randomX1 = (double)((float)(x) - MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double randomX2 = (double)((float)(x) + MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double randomZ1 = (double)((float)(z) - MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double randomZ2 = (double)((float)(z) + MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
 	
 		int randomY = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
-		double y1 = (double)(randomY + rand.nextInt(3) - 2);		
-		double y2 = (double)(randomY + rand.nextInt(3) - 2);
+		double randomY1 = (double)(randomY + rand.nextInt(3) - 2);		
+		double randomY2 = (double)(randomY + rand.nextInt(3) - 2);
 
 		float currentNumberOfBlocksFraction;
 		double xCenter;
@@ -108,15 +127,16 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 		double yDistanceToCenterFraction;
 		double zDistanceToCenterFraction;
 		int highestSolidBlock;
+		boolean hasSpawned = false;
 
 		// NumberOfBlocks determines the radius we try to place ore blobs in, each blob has a 
 		// random diameter between 0 and numberOfBlocks / 16, so numberOfBlocks does two things.
 		for (int currentNumberOfBlocks = 0; currentNumberOfBlocks < this.numberOfBlocks; currentNumberOfBlocks++)
 		{
 			currentNumberOfBlocksFraction = (float)currentNumberOfBlocks / (float)this.numberOfBlocks;
-			xCenter = x2 + (x1 - x2) * (double)currentNumberOfBlocksFraction;
-			yCenter = y1 + (y2 - y1) * (double)currentNumberOfBlocksFraction;
-			zCenter = z2 + (z1 - z2) * (double)currentNumberOfBlocksFraction;
+			xCenter = randomX2 + (randomX1 - randomX2) * (double)currentNumberOfBlocksFraction;
+			yCenter = randomY2 + (randomY1 - randomY2) * (double)currentNumberOfBlocksFraction;
+			zCenter = randomZ2 + (randomZ1 - randomZ2) * (double)currentNumberOfBlocksFraction;
 
 			randomSize = rand.nextDouble() * (double)this.numberOfBlocks / 16.0D;
 			xzRadius = ((double)(MathHelper.sin((float)Math.PI * currentNumberOfBlocksFraction) + 1.0F) * randomSize + 1.0D) / 2.0D;
@@ -197,6 +217,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 									if(this.sourceBlocks.contains(worldGenRegion.getMaterial(worldX, worldY, worldZ)))
 									{
 										worldGenRegion.setBlock(worldX, worldY, worldZ, this.material);
+										hasSpawned = true;
 									}
 								}
 							}
@@ -205,11 +226,13 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 				}
 			}
 		}
+
+		return hasSpawned;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Ore(" + this.material + "," + this.numberOfBlocks + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
+		return "Ore(" + this.material + "," + this.numberOfBlocks + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + (this.maxSpawn > 0 ? "," + this.maxSpawn : "") + ")";
 	}	
 }

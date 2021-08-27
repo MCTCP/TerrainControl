@@ -251,17 +251,22 @@ public class BO3 implements StructuredCustomObject
 		// TODO: Remove this offset for 1.16?
 		int chunkMiddleX = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterX();
 		int chunkMiddleZ = worldGenRegion.getDecorationArea().getChunkBeingDecoratedCenterZ();
+		int spawned = 0;
 		for (int i = 0; i < this.settings.frequency; i++)
 		{
 			if (this.settings.rarity > random.nextDouble() * 100.0)
 			{
 				int x = chunkMiddleX + random.nextInt(Constants.CHUNK_SIZE);
 				int z = chunkMiddleZ + random.nextInt(Constants.CHUNK_SIZE);
-
 				if (spawn(structureCache, worldGenRegion, random, x, z, this.settings.minHeight, this.settings.maxHeight))
 				{
+					spawned++;
 					atLeastOneObjectHasSpawned = true;
 				}
+			}
+			if(this.settings.maxSpawn > 0 && spawned == this.settings.maxSpawn)
+			{
+				break; 
 			}
 		}
 
