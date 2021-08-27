@@ -73,9 +73,19 @@ public class DecorationArea
 		return this.minZ;
 	}
 
+	public int getBottom()
+	{
+		return this.minZ + this.height;
+	}	
+	
 	public int getLeft()
 	{
 		return this.minX;
+	}
+	
+	public int getRight()
+	{
+		return this.minX + this.width;
 	}
 
 	public ChunkCoordinate getChunkBeingDecorated()

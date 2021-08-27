@@ -24,7 +24,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	private final double rarity;
 	private final LocalMaterialData material;
 	private final int maxAltitude;
-	private final int maxSize;
+	private int numberOfBlocks;
 	private final int minAltitude;
 	private final MaterialSet sourceBlocks;
 
@@ -34,7 +34,7 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 		assureSize(7, args);
 
 		this.material = materialReader.readMaterial(args.get(0));
-		this.maxSize = readInt(args.get(1), 1, 128);
+		this.numberOfBlocks = readInt(args.get(1), 1, 128);
 		this.frequency = readInt(args.get(2), 1, 100);
 		this.rarity = readRarity(args.get(3));
 		this.minAltitude = readInt(args.get(4), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
@@ -81,114 +81,122 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 			}
 		}
 
-		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);		
-		float f = rand.nextFloat() * (float)Math.PI;
+		float randomAngle = rand.nextFloat() * (float)Math.PI;
+		double x1 = (double)((float)(x) - MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double x2 = (double)((float)(x) + MathHelper.sin(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double z1 = (double)((float)(z) - MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+		double z2 = (double)((float)(z) + MathHelper.cos(randomAngle) * (float)this.numberOfBlocks / 8.0F);
+	
+		int randomY = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
+		double y1 = (double)(randomY + rand.nextInt(3) - 2);		
+		double y2 = (double)(randomY + rand.nextInt(3) - 2);
 
-		double d0 = (double)((float)(x + 8) + MathHelper.sin(f) * (float)this.maxSize / 8.0F);
-		double d1 = (double)((float)(x + 8) - MathHelper.sin(f) * (float)this.maxSize / 8.0F);
-		double d2 = (double)((float)(z + 8) + MathHelper.cos(f) * (float)this.maxSize / 8.0F);
-		double d3 = (double)((float)(z + 8) - MathHelper.cos(f) * (float)this.maxSize / 8.0F);
-		double d4 = (double)(y + rand.nextInt(3) - 2);
-		double d5 = (double)(y + rand.nextInt(3) - 2);
-		
-		float iFactor;
-		double d6;
-		double d7;
-		double d8;
-		double d9;
-		double d10;
-		double d11;
-		int j;
-		int k;
-		int l;
-		int i1;
-		int j1;
-		int k1; 	
-		double d13;
-		double d14;
-		double d15;		
-		LocalMaterialData material;
+		float currentNumberOfBlocksFraction;
+		double xCenter;
+		double yCenter;
+		double zCenter;
+		double randomSize;
+		double xzRadius;
+		double yRadius;
+		int startWorldX;
+		int startWorldY;
+		int startWorldZ;
+		int endWorldX;
+		int endWorldY;
+		int endWorldZ;
+		double xDistanceToCenterFraction;
+		double yDistanceToCenterFraction;
+		double zDistanceToCenterFraction;
 		int highestSolidBlock;
-				
-		// TODO: This seems to be really poorly optimised, re-design this.
-		for (int i = 0; i < this.maxSize; i++)
+
+		// NumberOfBlocks determines the radius we try to place ore blobs in, each blob has a 
+		// random diameter between 0 and numberOfBlocks / 16, so numberOfBlocks does two things.
+		for (int currentNumberOfBlocks = 0; currentNumberOfBlocks < this.numberOfBlocks; currentNumberOfBlocks++)
 		{
-			iFactor = (float) i / (float) this.maxSize;
-			d6 = d0 + (d1 - d0) * (double)iFactor;
-			d7 = d4 + (d5 - d4) * (double)iFactor;
-			d8 = d2 + (d3 - d2) * (double)iFactor;
+			currentNumberOfBlocksFraction = (float)currentNumberOfBlocks / (float)this.numberOfBlocks;
+			xCenter = x2 + (x1 - x2) * (double)currentNumberOfBlocksFraction;
+			yCenter = y1 + (y2 - y1) * (double)currentNumberOfBlocksFraction;
+			zCenter = z2 + (z1 - z2) * (double)currentNumberOfBlocksFraction;
 
-			d9 = rand.nextDouble() * (double)this.maxSize / 16.0D;
-			d10 = (double)(MathHelper.sin((float)Math.PI * iFactor) + 1.0F) * d9 + 1.0D;
-			d11 = (double)(MathHelper.sin((float)Math.PI * iFactor) + 1.0F) * d9 + 1.0D;
-			
-			j = MathHelper.floor(d6 - d10 / 2.0D);
-			k = MathHelper.floor(d7 - d11 / 2.0D);
-			l = MathHelper.floor(d8 - d10 / 2.0D);
+			randomSize = rand.nextDouble() * (double)this.numberOfBlocks / 16.0D;
+			xzRadius = ((double)(MathHelper.sin((float)Math.PI * currentNumberOfBlocksFraction) + 1.0F) * randomSize + 1.0D) / 2.0D;
+			yRadius = ((double)(MathHelper.sin((float)Math.PI * currentNumberOfBlocksFraction) + 1.0F) * randomSize + 1.0D) / 2.0D;
 
-			i1 = MathHelper.floor(d6 + d10 / 2.0D);
-			j1 = MathHelper.floor(d7 + d11 / 2.0D);
-			k1 = MathHelper.floor(d8 + d10 / 2.0D);			
-			
+			startWorldX = MathHelper.floor(xCenter - xzRadius);
+			startWorldY = MathHelper.floor(yCenter - yRadius);
+			startWorldZ = MathHelper.floor(zCenter - xzRadius);
+
+			endWorldX = MathHelper.floor(xCenter + xzRadius);
+			endWorldY = MathHelper.floor(yCenter + yRadius);
+			endWorldZ = MathHelper.floor(zCenter + xzRadius);
+
 			if(
-				!worldGenRegion.getDecorationArea().isInAreaBeingDecorated(j, l) ||
-				!worldGenRegion.getDecorationArea().isInAreaBeingDecorated(i1, k1)
+				!worldGenRegion.getDecorationArea().isInAreaBeingDecorated(startWorldX, startWorldZ) ||
+				!worldGenRegion.getDecorationArea().isInAreaBeingDecorated(endWorldX, endWorldZ) ||
+				endWorldY < Constants.WORLD_DEPTH ||
+				startWorldY >= Constants.WORLD_HEIGHT
 			)
 			{
 				continue;
 			}
 			
-			if(k < Constants.WORLD_DEPTH)
+			if(startWorldY < Constants.WORLD_DEPTH)
 			{
-				continue;
+				startWorldY = Constants.WORLD_DEPTH;
 			}
-			if(k > Constants.WORLD_HEIGHT - 1)
+			if(endWorldY >= Constants.WORLD_HEIGHT)
 			{
-				continue;
+				endWorldY = Constants.WORLD_HEIGHT;
 			}
-			
-			for (int i3 = j; i3 <= i1; i3++)
+
+			for (int worldX = startWorldX; worldX <= endWorldX; worldX++)
 			{
-				d13 = ((double)i3 + 0.5D - d6) / (d10 / 2.0D);
-				if (d13 * d13 < 1.0D)
-				{					
-					for (int i5 = l; i5 <= k1; i5++)
+				xDistanceToCenterFraction = ((double)worldX + 0.5D - xCenter) / xzRadius;
+				// Get the distance to the center as a fraction, then square it to get rid of negative values. 
+				// The result must be < 1.0D, otherwise it exceeded xzRadius so exclude. 
+				if (xDistanceToCenterFraction * xDistanceToCenterFraction < 1.0D)
+				{
+					for (int worldZ = startWorldZ; worldZ <= endWorldZ; worldZ++)
 					{
-						if(j1 > 63) // Optimisation, don't look for highestblock if we're already looking below 63, default worlds have base terrain height at 63.
+						zDistanceToCenterFraction = ((double)worldZ + 0.5D - zCenter) / xzRadius;
+						// Get the distance to the center as a fraction for xz axes, then square it to get rid of negative values.
+						// Add up all squared results, the result must be < 1.0D, otherwise it exceeded xzRadius so exclude.						
+						if (xDistanceToCenterFraction * xDistanceToCenterFraction + zDistanceToCenterFraction * zDistanceToCenterFraction < 1.0D)
 						{
-							highestSolidBlock = highestBlocksCache[(i3 - startX) * height + (i5 - startZ)] & 0xFF; // byte to int conversion
-							if(highestSolidBlock == 0)  // 0 is default / unset.
+							// Optimisation, don't look for highestblock if we're already looking below 63, default worlds have base terrain height at 63.
+							if(endWorldY > 63) 
 							{
-								highestSolidBlock = worldGenRegion.getHeightMapHeight(i3, i5);
-								// TODO: This causes getHeightMapHeight to be called every time on a 0 height column, 
-								// can't use -1 tho since we're using byte arrays. At least we're aborting the column 
-								// immediately, since OreGen shouldn't be used to spawn things in empty columns. If
-								// that's what you want, make a cloud generator or something, optimised for spawning in 
-								// air/void.
-								if(highestSolidBlock == -1)
+								highestSolidBlock = highestBlocksCache[(worldX - startX) * height + (worldZ - startZ)] & 0xFF; // byte to int conversion
+								if(highestSolidBlock == 0)  // 0 is default / unset.
 								{
-									highestSolidBlock = (byte)0; // Reset
-									break;
-								}
-								highestBlocksCache[(i3 - startX) * height + (i5 - startZ)] = (byte)highestSolidBlock;
-							}
-							if(j1 > highestSolidBlock)
-							{
-								j1 = highestSolidBlock;
-							}
-						}
-						for (int i4 = k; i4 <= j1; i4++)
-						{
-							d14 = ((double)i4 + 0.5D - d7) / (d11 / 2.0D);
-							if (d13 * d13 + d14 * d14 < 1.0D)
-							{
-								d15 = ((double)i5 + 0.5D - d8) / (d10 / 2.0D);
-								if((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D))
-								{
-									material = worldGenRegion.getMaterial(i3, i4, i5);
-									if(this.sourceBlocks.contains(material))
+									highestSolidBlock = worldGenRegion.getHeightMapHeight(worldX, worldZ);
+									// TODO: This causes getHeightMapHeight to be called every time on a 0 height column, 
+									// can't use -1 tho since we're using byte arrays. At least we're aborting the column 
+									// immediately, since OreGen shouldn't be used to spawn things in empty columns. If
+									// that's what you want, make a cloud generator or something, optimised for spawning in 
+									// air/void.
+									if(highestSolidBlock == -1)
 									{
-										worldGenRegion.setBlock(i3, i4, i5, this.material);
+										highestSolidBlock = (byte)0; // Reset
+										break;
+									}
+									highestBlocksCache[(worldX - startX) * height + (worldZ - startZ)] = (byte)highestSolidBlock;
+								}
+								if(endWorldY > highestSolidBlock)
+								{
+									endWorldY = highestSolidBlock;
+								}
+							}
+							for (int worldY = startWorldY; worldY <= endWorldY; worldY++)
+							{
+								yDistanceToCenterFraction = ((double)worldY + 0.5D - yCenter) / yRadius;
+								// Get the distance to the center as a fraction for each axis, then square it to get rid of negative values.
+								// Add up all squared results, the result must be < 1.0D, otherwise it exceeded xzRadius/yRadius so exclude.
+								if (xDistanceToCenterFraction * xDistanceToCenterFraction + yDistanceToCenterFraction * yDistanceToCenterFraction + zDistanceToCenterFraction * zDistanceToCenterFraction < 1.0D)
+								{
+									if(this.sourceBlocks.contains(worldGenRegion.getMaterial(worldX, worldY, worldZ)))
+									{
+										worldGenRegion.setBlock(worldX, worldY, worldZ, this.material);
 									}
 								}
 							}
@@ -202,6 +210,6 @@ public class OreResource extends BiomeResourceBase implements IBasicResource
 	@Override
 	public String toString()
 	{
-		return "Ore(" + this.material + "," + this.maxSize + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
+		return "Ore(" + this.material + "," + this.numberOfBlocks + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
 	}	
 }
