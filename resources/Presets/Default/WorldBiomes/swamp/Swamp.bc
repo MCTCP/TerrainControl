@@ -195,7 +195,7 @@ AdditionsTickChance: 0.0
 # +-----------------------------------------------------------------+ #
 #######################################################################
 
-Registry(minecraft:seagrass_swamp)
+Registry(minecraft:seagrass_swamp,VEGETAL_DECORATION)
 Ore(minecraft:dirt,33,10,100.0,0,255,minecraft:stone)
 Ore(minecraft:gravel,33,8,100.0,0,255,minecraft:stone)
 Ore(minecraft:granite,33,10,100.0,0,79,minecraft:stone)
