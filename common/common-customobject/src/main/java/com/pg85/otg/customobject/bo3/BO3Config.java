@@ -54,6 +54,7 @@ public class BO3Config extends CustomObjectConfigFile
 	boolean tree;
 	int frequency;
 	double rarity;
+	int maxSpawn;
 	protected boolean rotateRandomly;
 	private SpawnHeightEnum spawnHeight;
 	// Extra spawn height settings
@@ -125,6 +126,7 @@ public class BO3Config extends CustomObjectConfigFile
 		clone.tree = tree;
 		clone.frequency = frequency;
 		clone.rarity = rarity;
+		clone.maxSpawn = maxSpawn;
 		clone.rotateRandomly = rotateRandomly;
 		clone.spawnHeight = spawnHeight;
 
@@ -365,6 +367,14 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
 		writer.setting(BO3Settings.RARITY, this.rarity);
 
+		writer.comment("When using Frequency, after this many succesfull spawn attempts, abort spawning.");
+		writer.comment("For example, you can set 100 spawn attempts using Frequency, but stop spawning after 5 successfull spawns via MaxSpawn.");
+		writer.comment("0 by default, which means ignore this setting.");
+		writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
+		writer.setting(BO3Settings.MAX_SPAWN, this.maxSpawn);		
+		
+		this.maxSpawn = readSettings(BO3Settings.MAX_SPAWN, logger, null, null);
+		
 		writer.comment("If you set this to true, the BO3 will be placed with a random rotation.");
 		writer.setting(BO3Settings.ROTATE_RANDOMLY, this.rotateRandomly);
 
@@ -449,6 +459,7 @@ public class BO3Config extends CustomObjectConfigFile
 		this.tree = readSettings(BO3Settings.TREE, logger, null, null);
 		this.frequency = readSettings(BO3Settings.FREQUENCY, logger, null, null);
 		this.rarity = readSettings(BO3Settings.RARITY, logger, null, null);
+		this.maxSpawn = readSettings(BO3Settings.MAX_SPAWN, logger, null, null);
 		this.rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY, logger, null, null);
 		this.spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT, logger, null, null);
 		this.spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET, logger, null, null);

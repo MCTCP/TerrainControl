@@ -3,6 +3,8 @@ package com.pg85.otg.forge.biome;
 import java.util.List;
 import java.util.Optional;
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
@@ -10,6 +12,7 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
+import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
@@ -32,6 +35,9 @@ import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.*;
 import net.minecraft.world.biome.Biome.TemperatureModifier;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.GenerationStage.Decoration;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -90,19 +96,31 @@ public class ForgeBiome implements IBiome
 
 		// Mob spawning
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
-		
+
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
 		// TODO: What if there's no grass around spawn?
 		biomeGenerationSettingsBuilder.surfaceBuilder(ConfiguredSurfaceBuilders.GRASS);
 
 		// Register default carvers, we won't actually use these since we have
-		// our own carvers, but if they're replaced we'll know there are modded carvers. 
+		// our own carvers, but if they're replaced we'll know there are modded carvers.
 		DefaultBiomeFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
 
-		// Default structures
-		addVanillaStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);	
+		// Register any Registry() resources to the biome, to be handled by MC.
+		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
+		{
+			if (res instanceof RegistryResource)
+			{
+				RegistryResource registryResource = (RegistryResource)res;
+				Decoration stage = GenerationStage.Decoration.valueOf(registryResource.getDecorationStage());
+				ConfiguredFeature<?, ?> registry = WorldGenRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
+				biomeGenerationSettingsBuilder.addFeature(stage, registry);
+			}
+		}
 
+		// Default structures
+		addVanillaStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
+		
 		float safeTemperature = biomeConfig.getBiomeTemperature();
 		if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
 		{

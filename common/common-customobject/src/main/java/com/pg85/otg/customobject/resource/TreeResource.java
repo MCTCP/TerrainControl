@@ -29,6 +29,8 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 	private int[] treeObjectMinChances;
 	private int[] treeObjectMaxChances;
 	private boolean treesLoaded = false;
+	private final boolean useExtendedParams;	
+	private final int maxSpawn;
 
 	public TreeResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
@@ -39,12 +41,29 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 		this.treeNames = new ArrayList<String>();
 		this.treeChances = new ArrayList<Integer>();
 
+		// If there is a boolean parameter "true" after source blocks, read extended parameters (maxSpawn)
+		boolean useExtendedParams = false;		
+		int maxSpawn = 0;
+		if(args.get(args.size() - 2).toLowerCase().trim().equals("true"))
+		{
+			try
+			{
+				maxSpawn = readInt(args.get(args.size() - 1), 0, Integer.MAX_VALUE);
+				// Remove the extended parameters so materials can be read as usual
+				args = args.subList(0, args.size() - 2);
+				useExtendedParams = true;
+			}
+			catch (InvalidConfigException ex) { }
+		}
+		this.useExtendedParams = useExtendedParams;
+		this.maxSpawn = maxSpawn;
+
 		for (int i = 1; i < args.size() - 1; i += 2)
 		{
 			this.treeNames.add(args.get(i));
 			this.treeChances.add(readInt(args.get(i + 1), 1, 100));
 		}
-	}	
+	}
 	
 	@Override
 	public void spawnForChunkDecoration(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Path otgRootFolder, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
@@ -54,6 +73,7 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 		int x;
 		int z;
 		CustomObject tree;
+		int spawned = 0;
 		for (int i = 0; i < this.frequency; i++)
 		{			
 			for (int treeNumber = 0; treeNumber < this.treeNames.size(); treeNumber++)
@@ -69,9 +89,14 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 					if(tree != null && tree.spawnAsTree(structureCache, worldGenRegion, random, x, z, this.treeObjectMinChances[treeNumber], this.treeObjectMaxChances[treeNumber]))
 					{
 						// Success!
+						spawned++;
 						break;
 					}
 				}
+			}
+			if(this.maxSpawn > 0 && spawned == this.maxSpawn)
+			{
+				return;
 			}
 		}
 	}
@@ -152,6 +177,10 @@ public class TreeResource extends BiomeResourceBase implements ICustomObjectReso
 		for (int i = 0; i < this.treeNames.size(); i++)
 		{
 			output += "," + this.treeNames.get(i) + "," + this.treeChances.get(i);
+		}
+		if(this.useExtendedParams)
+		{
+			output += ",true," + this.maxSpawn;
 		}
 		return output + ")";
 	}	

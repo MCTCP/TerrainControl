@@ -42,10 +42,10 @@ class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 			}
 			if(thirdBlock != null)
 			{
-				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, thirdBlock, secondBlock, maxNoise));
+				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, secondBlock, thirdBlock, maxNoise));
 				entryLength = 4;
 			} else {
-				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, secondBlock, secondBlock, maxNoise));
+				this.layers.add(new MultipleLayersSurfaceGeneratorLayer(firstBlock, firstBlock, secondBlock, maxNoise));
 				entryLength = 3;
 			}
 		}

@@ -97,7 +97,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			if(
 				this.blockData != this.blockData.getBlock().getBlockData() &&
 				(
-					// We set distance 1 when parsing minecraft:xxx_leaves, so check for default blocksate + distance 1
+					// We set distance 1 when parsing minecraft:xxx_leaves, so check for default blockstate + distance 1
 					!(this.blockData.getBlock() instanceof BlockLeaves) || this.blockData != this.blockData.getBlock().getBlockData().set(BlockLeaves.DISTANCE, 1)
 				)
 			)
@@ -167,8 +167,27 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public boolean canSnowFallOn()
 	{
-		return this.blockData != null && this.blockData.getMaterial().isSolid();
-	}
+		// Taken from SnowBlock.canSurvive
+		if(
+			this.blockData != null &&
+			!this.blockData.a(Blocks.ICE) && 
+			!this.blockData.a(Blocks.PACKED_ICE) && 
+			!this.blockData.a(Blocks.BARRIER)
+		) {
+			if (
+				!this.blockData.a(Blocks.HONEY_BLOCK) && 
+				!this.blockData.a(Blocks.SOUL_SAND)
+			) {
+				// TODO: Vanilla checks faceFull here, we don't since it requires coords.
+				//return Block.isFaceFull(this.blockData.getCollisionShape(blockPos, blockPos.below()), Direction.UP) || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(LAYERS) == 8);
+				return this.blockData.getMaterial().isSolid() || (this.blockData.a(Blocks.SNOW) && this.blockData.get(BlockSnow.LAYERS) == 8);
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}	
 	
 	@Override
 	public boolean isMaterial(LocalMaterialData material)

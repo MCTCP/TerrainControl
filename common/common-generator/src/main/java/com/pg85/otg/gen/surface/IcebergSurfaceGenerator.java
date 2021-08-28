@@ -41,7 +41,7 @@ public class IcebergSurfaceGenerator extends MultipleLayersSurfaceGenerator
 
 		Random random = generatingChunk.random;
 		IBiomeConfig biomeConfig = biome.getBiomeConfig();
-		
+
 		// Bedrock on the ceiling
 		if (biomeConfig.isCeilingBedrock())
 		{

@@ -25,20 +25,21 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 	{
 		super(biomeConfig, args, logger, materialReader);
 		assureSize(4, args);
-		
+
 		int size = (int) Math.floor(args.size() / 3);
-		this.materials = new LocalMaterialData[size]; 
-		this.materials2 = new LocalMaterialData[size]; 
-		this.rarities = new double[size]; 
-		
+		this.materials = new LocalMaterialData[size];
+		this.materials2 = new LocalMaterialData[size];
+		this.rarities = new double[size];
+
 		int pos = 0;
-		for (int i = 0; i < args.size() - 1; i+=3) {
+		for (int i = 0; i < args.size() - 1; i+=3)
+		{
 			this.materials[pos] = materialReader.readMaterial(args.get(i));
 			this.materials2[pos] = materialReader.readMaterial(args.get(i + 1));
 			this.rarities[pos] = readRarity(args.get(i + 2));
 			pos++;
 		}
-		totalRarity = StringHelper.readDouble(args.get(args.size() - 1), 0.000001, Integer.MAX_VALUE);
+		this.totalRarity = StringHelper.readDouble(args.get(args.size() - 1), 0.000001, Integer.MAX_VALUE);
 	}
 
 	@Override
@@ -52,7 +53,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		for (int i = 0; i < this.rarities.length; i++)
 		{
 			currentRarity += this.rarities[i];
-
 			if (currentRarity >= rarity)
 			{
 				material = this.materials[i];
@@ -61,7 +61,8 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 			}
 		}
 		
-		if (material == null) {
+		if (material == null)
+		{
 			return;
 		}
 		
@@ -246,7 +247,6 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		{
 			ellipsec -= (4 - (irandom1 - y1));
 		}
-
 		return ellipsec;
 	}
 
@@ -320,7 +320,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 							world.setBlockDirect(x2, y2, z2, LocalMaterials.AIR);
 							world.setBlockDirect(x2, y2 + 1, z2, LocalMaterials.AIR);	
 						}
-						else if (isIcebergBlock(current, material, material2) )
+						else if (isIcebergBlock(current, material, material2))
 						{
 							LocalMaterialData[] materials =
 							{
@@ -332,7 +332,7 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 							int iheight = 0;
 							for (LocalMaterialData mat : materials)
 							{
-								if (!isIcebergBlock(mat, material, material2) )
+								if (!isIcebergBlock(mat, material, material2))
 								{
 									iheight++;
 								}
