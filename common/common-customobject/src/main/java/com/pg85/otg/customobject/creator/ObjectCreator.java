@@ -163,11 +163,9 @@ public class ObjectCreator
 					branchZ == chunksOnZAxis - 1 ? max.z : branchMin.z + 15
 				);
 
-				Corner branchCenter = new Corner(branchMin.x+8, branchMin.y, branchMin.z+7);
+				String branchName = objectName + "_C" + branchX + "_R" + branchZ;
 
-				String branchName = objectName + "_C" + branchX + "_r" + branchZ;
-
-				branchGrid[branchX][branchZ] = Extractor.getBlockFunctions(type, branchMin, branchMax, branchCenter,
+				branchGrid[branchX][branchZ] = Extractor.getBlockFunctions(type, branchMin, branchMax, branchMin,
 					localWorld, nbtHelper, includeAir, leaveIllegalLeaves, branchName, branchFolder);
 				exists[branchX][branchZ] = !branchGrid[branchX][branchZ].isEmpty();
 			}
@@ -232,15 +230,17 @@ public class ObjectCreator
 					return null;
 				}
 				Corner localmin = new Corner(min.x + (16 * x), min.y, min.z + (16 * z));
+				Corner localmax = new Corner(
+					x == chunksOnXAxis - 1 ? max.x : min.x + (16 * x) + 15,
+					max.y,
+					z == chunksOnZAxis - 1 ? max.z : min.z + (16 * z) + 15);
+
 				CustomObjectConfigFile branchConfig = makeNewConfig(
 					type, branchTemplate,  branchName,
 					branchPath,
 					localmin,
-					new Corner(
-						x == chunksOnXAxis - 1 ? max.x : min.x + (16 * x) + 15,
-						max.y,
-						z == chunksOnZAxis - 1 ? max.z : min.z + (16 * z) + 15),
-					new Corner(localmin.x+8, localmin.y, localmin.z+7),
+					localmax,
+					localmin,
 					branchGrid[x][z], branches, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);
 
 				if (type != ObjectType.BO4) // Already written by MakeNewConfig

@@ -46,10 +46,14 @@ public class CommandUtil
 					str = reader.readString();
 				}
 
-				if (reader.getCursor() < input.length() && reader.peek() == ':')
+				// If the next char is one not read by the stringreader, we add it on to the current argument and then keep reading
+				// If the illegal char is at the end of a word, readString should just return empty because space is another illegal char
+				// I'm not sure what happens if you have multiple spaces after one another, things might get strange
+				if (reader.getCursor() < input.length() && !StringReader.isAllowedInUnquotedString(reader.peek()))
 				{
+					char c = reader.peek();
 					reader.skip();
-					str = str + ':' + reader.readString();
+					str = str + c + reader.readString();
 				}
 
 				if (str.startsWith("-"))
