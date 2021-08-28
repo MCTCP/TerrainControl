@@ -130,7 +130,7 @@ public class ExportCommand extends BaseCommand
 
 		String presetName = args.length > 2 && !args[2].equalsIgnoreCase("global") ? args[2] : null;
 		boolean isGlobal = presetName == null;
-		ObjectType type = args.length >= 4 ? ObjectType.valueOf(args[3]) : ObjectType.BO3;
+		ObjectType type = args.length >= 4 ? ObjectType.valueOf(args[3].toUpperCase(Locale.ROOT)) : ObjectType.BO3;
 		String templateName = args.length >= 5 ? args[4] : "default";
 		String flags = args.length >= 6 ? String.join(" ", Arrays.copyOfRange(args, 5, args.length)) : "";
 		boolean overwrite = flags.contains("-o");

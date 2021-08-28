@@ -182,10 +182,16 @@ public class ObjectCreator
 		{
 			for (int z = 0; z < chunksOnZAxis; z++)
 			{
-				if (exists[x][z] && !processed[x][z])
+				if (!exists[x][z])
+				{
+					continue;
+				}
+
+				if (!processed[x][z])
 				{
 					// This is the head of a graph, save it as such
 					processed[x][z] = true;
+					//logger.log(LogLevel.INFO, LogCategory.MAIN, "Head branch found at "+x+","+z);
 					heads.add(ChunkCoordinate.fromChunkCoords(x, z));
 				}
 
@@ -257,7 +263,7 @@ public class ObjectCreator
 			addBranch(type, branches, objectName, (coord.getChunkX() * 16), 0, (coord.getChunkZ() * 16),
 				coord.getChunkX(), coord.getChunkZ(), logger, mr);
 		}
-
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Creating structure "+objectName+" with "+branches.size()+" direct branches");
 		CustomObjectConfigFile config = makeNewConfig(type, template, objectName,
 			type.getObjectFilePathFromName(objectName, objectPath),
 			min, max, center, null, branches, presetFolderName, logger, rootPath, boManager, mr, manager, mlc);

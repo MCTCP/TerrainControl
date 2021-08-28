@@ -127,7 +127,7 @@ public class ExportCommand extends BaseCommand
 				objectName = context.getArgument("name", String.class);
 				presetName = context.getArgument("preset", String.class);
 				String raw = context.getArgument("type", String.class);
-				type = ObjectType.valueOf(raw);
+				type = ObjectType.valueOf(raw.toUpperCase(Locale.ROOT));
 				templateName = context.getArgument("template", String.class);
 				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
 				String flags = context.getArgument("flags", String.class);
