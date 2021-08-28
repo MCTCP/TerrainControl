@@ -143,6 +143,11 @@ public class ForgeMaterialReader implements IMaterialReader
 		} catch (CommandSyntaxException ignored) { }
 		if(state != null)
 		{
+			// For leaves, add DISTANCE 1 to make them not decay.
+			if(state.getMaterial().equals(Material.LEAVES))
+			{
+				return ForgeMaterialData.ofBlockState(state.setValue(LeavesBlock.DISTANCE, 1), input);
+			}			
 			return ForgeMaterialData.ofBlockState(state, input);
 		}
 		
@@ -178,6 +183,11 @@ public class ForgeMaterialReader implements IMaterialReader
 			block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockNameCorrected));
 			if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
 			{
+				// For leaves, add DISTANCE 1 to make them not decay.
+				if(block.defaultBlockState().getMaterial().equals(Material.LEAVES))
+				{
+					return ForgeMaterialData.ofBlockState(block.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1), input);
+				}				
 				return ForgeMaterialData.ofBlock(block, input);
 			}
 		} catch(net.minecraft.util.ResourceLocationException ignored) { }
