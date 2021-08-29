@@ -144,7 +144,8 @@ public class ForgeMaterialReader implements IMaterialReader
 		if(state != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
-			if(state.getMaterial().equals(Material.LEAVES))
+			// TODO: Maybe only do this for leaves that don't already have distance set to a different value? -auth
+			if(state.getBlock() instanceof LeavesBlock)
 			{
 				return ForgeMaterialData.ofBlockState(state.setValue(LeavesBlock.DISTANCE, 1), input);
 			}			
@@ -184,7 +185,7 @@ public class ForgeMaterialReader implements IMaterialReader
 			if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
 			{
 				// For leaves, add DISTANCE 1 to make them not decay.
-				if(block.defaultBlockState().getMaterial().equals(Material.LEAVES))
+				if(block instanceof LeavesBlock)
 				{
 					return ForgeMaterialData.ofBlockState(block.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1), input);
 				}				

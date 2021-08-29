@@ -148,7 +148,7 @@ public class SpigotMaterialReader implements IMaterialReader
 		if (blockdata != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
-			if (blockdata.getMaterial().equals(Material.LEAVES))
+			if (blockdata.getBlock() instanceof BlockLeaves)
 			{
 				return SpigotMaterialData.ofBlockData(blockdata.set(BlockLeaves.DISTANCE, 1), input);
 			}			
@@ -189,7 +189,7 @@ public class SpigotMaterialReader implements IMaterialReader
 			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 			{
 				// For leaves, add DISTANCE 1 to make them not decay.
-				if (block.getBlockData().getMaterial().equals(Material.LEAVES))
+				if (block instanceof BlockLeaves)
 				{
 					return SpigotMaterialData.ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
 				}				
