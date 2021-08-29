@@ -797,7 +797,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"CoralTree(Frequency,Rarity)", 
 			"CoralClaw(Frequency,Rarity)", 
 			"Iceberg(BlockName1,BlockName2,Chance[,AdditionalBlockName1,AdditionalBlockName2,AdditionalChance.....],TotalChance)", 
-			"BasaltColumn(BlockName,Frequency,Rarity,BaseSize,SizeVariance,BaseHeight,HeightVariance,BlockSource[,BlockSource2,BlockSource3.....])", "",
+			"BasaltColumn(BlockName,Frequency,Rarity,BaseSize,SizeVariance,BaseHeight,HeightVariance,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])", "",
 			"BlockName:	  	The name of the block, can include data.",
 			"BlockSource:	List of blocks the resource can spawn on/in. You can also use \"Solid\" or \"All\".",
 			"Frequency:	  	Number of attempts to place this resource in each chunk.",

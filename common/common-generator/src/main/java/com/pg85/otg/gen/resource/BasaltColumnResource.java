@@ -19,6 +19,8 @@ public class BasaltColumnResource extends FrequencyResourceBase
 	private int sizeVariance;
 	private int baseHeight;
 	private int heightVariance;
+	private int minAltitude;
+	private int maxAltitude;
 	private LocalMaterialData material;
 	private final MaterialSet sourceBlocks;
 
@@ -35,7 +37,9 @@ public class BasaltColumnResource extends FrequencyResourceBase
 		this.sizeVariance = readInt(args.get(4), 0, 5);
 		this.baseHeight = readInt(args.get(5), 1, 5);
 		this.heightVariance = readInt(args.get(6), 0, 5);
-		this.sourceBlocks = readMaterials(args, 7, materialReader);
+		this.minAltitude = readInt(args.get(7), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
+		this.maxAltitude = readInt(args.get(8), Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
+		this.sourceBlocks = readMaterials(args, 9, materialReader);
 
 	}
 
@@ -43,6 +47,9 @@ public class BasaltColumnResource extends FrequencyResourceBase
 	public void spawn(IWorldGenRegion world, Random random, int x, int z)
 	{
 		int y = world.getHighestBlockYAt(x, z, true, false, true, true, true) + 1;
+		
+		if (y < this.minAltitude || y > this.maxAltitude)
+			return;
 
 		if (!canPlaceAt(world, x, y, z))
 			return;
