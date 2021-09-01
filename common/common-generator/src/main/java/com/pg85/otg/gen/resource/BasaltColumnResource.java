@@ -149,7 +149,8 @@ public class BasaltColumnResource extends FrequencyResourceBase
 	@Override
 	public String toString()
 	{
-		return "BasaltColumn(" + this.material + "," + this.frequency + "," + this.rarity + "," + this.baseSize + "," + this.sizeVariance + "," + this.baseHeight + ","
-				+ this.heightVariance + makeMaterials(this.sourceBlocks) + ")";
+		return "BasaltColumn(" + this.material + "," + this.frequency + "," + this.rarity + "," + this.baseSize + ","
+				+ this.sizeVariance + "," + this.baseHeight + "," + this.heightVariance + "," + this.minAltitude + ","
+				+ this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
 	}
 }
