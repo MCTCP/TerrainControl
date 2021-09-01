@@ -17,9 +17,9 @@ repositories
 
 dependencies
 {
-	compile project(':common:common-util')
-	compile project(':common:common-config')
-    compile (
+	implementation project(':common:common-util')
+	implementation project(':common:common-config')
+    implementation (
 		'it.unimi.dsi:fastutil:8.2.1',
 		'com.google.guava:guava:23.0'
     )

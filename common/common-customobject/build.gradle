@@ -17,6 +17,6 @@ repositories
 
 dependencies
 {
-	compile project(':common:common-util')
-	compile project(':common:common-config')
+	implementation project(':common:common-util')
+	implementation project(':common:common-config')
 }

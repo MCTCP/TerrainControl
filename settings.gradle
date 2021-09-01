@@ -5,10 +5,13 @@ pluginManagement {
 			name = 'Fabric'
 			url = 'https://maven.fabricmc.net/'
 		}
+		maven {
+			url = "https://papermc.io/repo/repository/maven-public/"
+		}
 	}
 }
 
 include 'common:common-util', 'common:common-config', 'common:common-customobject', 'common:common-generator', 'common:common-core', 'platforms:forge', 'platforms:fabric'
-include 'platforms:spigot'
-findProject(':platforms:spigot')?.name = 'spigot'
+include 'platforms:paper'
+findProject(':platforms:paper')?.name = 'paper'
 

@@ -1,0 +1,92 @@
+plugins {
+    id 'java-library'
+    id("io.papermc.paperweight.userdev") version "1.1.11"
+    id("xyz.jpenilla.run-paper") version "1.0.4" // Adds runServer and runMojangMappedServer tasks for testing
+    id("net.minecrell.plugin-yml.bukkit") version "0.4.0"
+}
+
+archivesBaseName = "openterraingenerator-paper"
+
+targetCompatibility = 16
+sourceCompatibility = 16
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+
+    maven {
+        url = "https://repo.codemc.io/repository/nms/"
+    }
+    
+    maven { 
+   		url = 'https://maven.enginehub.org/repo/' 
+    }
+
+    maven {
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+}
+
+dependencies {
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.17.1-R0.1-SNAPSHOT")
+    //compileOnly "org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT"
+    implementation project(':common:common-util')
+    implementation project(':common:common-config')
+    implementation project(':common:common-customobject')
+    implementation project(':common:common-generator')
+    implementation project(':common:common-core')
+    
+    implementation ('com.sk89q.worldedit:worldedit-core:7.2.0') {
+		exclude group: 'org.yaml'
+	}
+	
+	// We may not need this, remove if so
+	implementation 'com.sk89q.worldedit:worldedit-bukkit:7.2.0'
+}
+
+// Replace text in plugin.yml
+processResources
+        {
+            // This will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+
+            // Replace stuff in plugin.yml, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include 'plugin.yml'
+
+                // Replace version
+                expand 'version': project.version
+            }
+            // Copy everything else, that's not the plugin.yml
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'plugin.yml'
+            }
+        }
+
+jar {
+    destinationDir = new File(project.buildDir, "distributions")
+    classifier = ''
+    from
+            {
+                project(":common:common-util").sourceSets.main.output.files
+                project(":common:common-config").sourceSets.main.output.files
+                project(":common:common-customobject").sourceSets.main.output.files
+                project(":common:common-generator").sourceSets.main.output.files
+                project(":common:common-core").sourceSets.main.output.files
+            }
+    // This fetches the shared resources from root - avoids duplicating the default preset
+    from (rootDir)
+            {
+                include 'resources/**/*'
+            }
+}
+tasks {
+    // Run reobfJar on build
+    build {
+        dependsOn(reobfJar)
+    }
+}

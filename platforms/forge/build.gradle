@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -28,7 +28,7 @@ repositories {
 
 archivesBaseName = "openterraingenerator-forge"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -101,18 +101,18 @@ dependencies
 
     annotationProcessor 'org.spongepowered:mixin:0.8:processor'
 
-	compile project(':common:common-util')
-	compile project(':common:common-config')
-	compile project(':common:common-customobject')
-	compile project(':common:common-generator')
-	compile project(':common:common-core')
+	implementation project(':common:common-util')
+	implementation project(':common:common-config')
+	implementation project(':common:common-customobject')
+	implementation project(':common:common-generator')
+	implementation project(':common:common-core')
 	
-	compile ('com.sk89q.worldedit:worldedit-core:7.2.0') {
+	implementation ('com.sk89q.worldedit:worldedit-core:7.2.0') {
 		exclude group: 'org.yaml'
 	}
 	
 	// We may not need this, remove if so
-	compile fg.deobf('com.sk89q.worldedit:worldedit-forge-mc1.16.3:7.2.0')
+	implementation fg.deobf('com.sk89q.worldedit:worldedit-forge-mc1.16.3:7.2.0')
 }
 
 // Process resources on build: set the version in the mods.toml
