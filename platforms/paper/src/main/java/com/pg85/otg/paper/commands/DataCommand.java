@@ -16,9 +16,8 @@ import org.bukkit.util.StringUtil;
 
 import com.pg85.otg.OTG;
 
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.RegistryGeneration;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 
 public class DataCommand extends BaseCommand
 {
@@ -58,24 +57,24 @@ public class DataCommand extends BaseCommand
 			return true;
 		}
 
-		IRegistry<?> registry;
+		Registry<?> registry;
 
 		switch (args[0].toLowerCase())
 		{
 			case "biome":
-				registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay);
+				registry = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 				break;
 			case "block":
-				registry = IRegistry.BLOCK;
+				registry = Registry.BLOCK;
 				break;
 			case "entity":
-				registry = IRegistry.ENTITY_TYPE;
+				registry = Registry.ENTITY_TYPE;
 				break;
 			case "sound":
-				registry = IRegistry.SOUND_EVENT;
+				registry = Registry.SOUND_EVENT;
 				break;
 			case "particle":
-				registry = IRegistry.PARTICLE_TYPE;
+				registry = Registry.PARTICLE_TYPE;
 				break;
 			case "configured_feature":
 				registry = RegistryGeneration.e;
@@ -84,7 +83,7 @@ public class DataCommand extends BaseCommand
 				sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
 				return true;
 		}
-		Set<MinecraftKey> set = registry.keySet();
+		Set<ResourceLocation> set = registry.keySet();
 		new Thread(() -> {
 			try
 			{
@@ -98,7 +97,7 @@ public class DataCommand extends BaseCommand
 				String fileName = "data-output-" + args[0] + ".txt".toLowerCase();
 				File output = new File(folder, fileName);
 				FileWriter writer = new FileWriter(output);
-				for (MinecraftKey key : set)
+				for (ResourceLocation key : set)
 				{
 					writer.write(key.toString() + "\n");
 				}

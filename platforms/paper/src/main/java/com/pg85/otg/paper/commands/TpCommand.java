@@ -10,23 +10,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
-import net.minecraft.server.v1_17_R1.BiomeBase;
-import net.minecraft.server.v1_17_R1.BlockPosition;
-import net.minecraft.server.v1_17_R1.ChatMessage;
-import net.minecraft.server.v1_17_R1.HeightMap.Type;
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.ResourceKey;
-import net.minecraft.server.v1_17_R1.WorldServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
 
 public class TpCommand extends BaseCommand
 {
 	private static final DynamicCommandExceptionType ERROR_BIOME_NOT_FOUND = new DynamicCommandExceptionType(
-			object -> new ChatMessage("commands.locatebiome.notFound", object));
+			object -> new TranslatableComponent("commands.locatebiome.notFound", object));
 
 	public TpCommand()
 	{
@@ -48,9 +48,9 @@ public class TpCommand extends BaseCommand
 			return true;
 		}
 		Player player = (Player) sender;
-		WorldServer world = ((CraftWorld) player.getWorld()).getHandle();
+		ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
 
-		if (!(world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			sender.sendMessage("OTG is not enabled in this world");
 			return true;
@@ -59,12 +59,12 @@ public class TpCommand extends BaseCommand
 		if (args.length >= 1)
 		{
 			String biome = args[0];
-			Preset preset = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator()).getPreset();
+			Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getPreset();
 
-			MinecraftKey key = new MinecraftKey(new OTGBiomeResourceLocation(preset.getPresetFolder(),
+			ResourceLocation key = new ResourceLocation(new OTGBiomeResourceLocation(preset.getPresetFolder(),
 					preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
 
-			BiomeBase biomeBase = (world.r().b(IRegistry.ay).a(ResourceKey.a(IRegistry.ay, key)));
+			Biome biomeBase = (world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(ResourceKey.create(Registry.BIOME_REGISTRY, key)));
 
 			if (biomeBase == null)
 			{
@@ -83,9 +83,9 @@ public class TpCommand extends BaseCommand
 				}
 			}
 
-			BlockPosition playerPos = new BlockPosition(player.getLocation().getBlockX(),
+			BlockPos playerPos = new BlockPos(player.getLocation().getBlockX(),
 					player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-			BlockPosition pos = world.a(biomeBase, playerPos, range, 8);
+			BlockPos pos = world.findNearestBiome(biomeBase, playerPos, range, 8);
 
 			if (pos == null)
 			{
@@ -93,8 +93,8 @@ public class TpCommand extends BaseCommand
 				return true;
 			} else
 			{
-				int y = world.getChunkProvider().getChunkGenerator().getBaseHeight(pos.getX(), pos.getZ(),
-						Type.MOTION_BLOCKING_NO_LEAVES);
+				int y = world.getChunkSource().getGenerator().getBaseHeight(pos.getX(), pos.getZ(),
+						Types.MOTION_BLOCKING_NO_LEAVES);
 				player.teleport(new Location(player.getWorld(), pos.getX(), y, pos.getZ()));
 				player.sendMessage("Teleporting you to the nearest " + biome + ".");
 			}
@@ -109,11 +109,11 @@ public class TpCommand extends BaseCommand
 		List<String> options = new ArrayList<>();
 		if (args.length == 2 && sender instanceof Player)
 		{
-			WorldServer serverWorld = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
-			if (serverWorld.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator)
+			ServerLevel serverWorld = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
+			if (serverWorld.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 			{
 				List<String> biomeNames = new ArrayList<>();
-				for (String name : ((OTGNoiseChunkGenerator) serverWorld.getChunkProvider().getChunkGenerator())
+				for (String name : ((OTGNoiseChunkGenerator) serverWorld.getChunkSource().getGenerator())
 						.getPreset().getAllBiomeNames())
 				{
 					biomeNames.add(name.replace(' ', '_'));

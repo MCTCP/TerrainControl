@@ -1,5 +1,24 @@
 package com.pg85.otg.paper.commands;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
@@ -20,27 +39,22 @@ import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.commands.RegionCommand.Region;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.util.PaperNBTHelper;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.server.v1_17_R1.*;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.v1_17_R1.*;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeavesBlock;
 
 public class EditCommand extends BaseCommand
 {
@@ -110,8 +124,8 @@ public class EditCommand extends BaseCommand
 	protected static ArrayList<BlockFunction<?>> spawnAndFixObject(int x, int y, int z, StructuredCustomObject object, PaperWorldGenRegion worldGenRegion, boolean fixObject, String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BlockFunction<?>[] blocks = object.getConfig().getBlockFunctions(presetFolderName, otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker);
-		HashSet<BlockPosition> updates = new HashSet<>();
-		HashSet<BlockPosition> gravityBlocksToCheck = new HashSet<>();
+		HashSet<BlockPos> updates = new HashSet<>();
+		HashSet<BlockPos> gravityBlocksToCheck = new HashSet<>();
 		Random random = new Random();
 		ArrayList<BlockFunction<?>> unspawnedBlocks = new ArrayList<>();
 
@@ -130,15 +144,15 @@ public class EditCommand extends BaseCommand
 			}
 
 			// Queue the block coordinate for processing
-			if (fixObject && updateMap.contains(MinecraftKey.a(block.material.getRegistryName())))
+			if (fixObject && updateMap.contains(ResourceLocation.a(block.material.getRegistryName())))
 			{
-				updates.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
+				updates.add(new BlockPos(x + block.x, y + block.y, z + block.z));
 			}
 
 			// Make sure gravel and sand blocks don't fall down
 			if (gravityBlocksSet.contains(block.material))
 			{
-				gravityBlocksToCheck.add(new BlockPosition(x + block.x, y + block.y, z + block.z));
+				gravityBlocksToCheck.add(new BlockPos(x + block.x, y + block.y, z + block.z));
 			}
 
 			// We set all leaves to be persistent so they don't disappear in the process
@@ -146,13 +160,13 @@ public class EditCommand extends BaseCommand
 			if (block.material.isLeaves())
 			{
 				block.material = PaperMaterialData.ofBlockData(((PaperMaterialData) block.material)
-					.internalBlock().set(BlockLeaves.PERSISTENT, true).set(BlockLeaves.DISTANCE, 7));
+					.internalBlock().set(LeavesBlock.PERSISTENT, true).set(LeavesBlock.DISTANCE, 7));
 			}
 
 			block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
 		}
 
-		for (BlockPosition pos : gravityBlocksToCheck)
+		for (BlockPos pos : gravityBlocksToCheck)
 		{
 			if (worldGenRegion.getMaterial(pos.getX(), pos.getY() - 1, pos.getZ()).isMaterial(LocalMaterials.STRUCTURE_VOID))
 			{
@@ -162,10 +176,10 @@ public class EditCommand extends BaseCommand
 
 		if (fixObject)
 		{
-			for (BlockPosition pos : updates)
+			for (BlockPos pos : updates)
 			{
 				IBlockData blockstate = worldGenRegion.getBlockData(pos);
-				if (blockstate.a(TagsBlock.LEAVES))
+				if (blockstate.a(BlockTags.LEAVES))
 				{
 					worldGenRegion.getInternal().getBlockTickList().a(pos, blockstate.getBlock(), 1);
 				}
@@ -379,7 +393,7 @@ public class EditCommand extends BaseCommand
 			this.leaveIllegalLeaves = leaveIllegalLeaves;
 		}
 	}
-	private static final HashSet<MinecraftKey> updateMap = Stream.of(
+	private static final HashSet<ResourceLocation> updateMap = Stream.of(
 		"blocks/oak_fence",
 		"blocks/birch_fence",
 		"blocks/nether_brick_fence",
@@ -467,6 +481,6 @@ public class EditCommand extends BaseCommand
 		"blocks/acacia_leaves",
 		"blocks/dark_oak_leaves",
 		"blocks/vine")
-		.map(MinecraftKey::new)
+		.map(ResourceLocation::new)
 		.collect(Collectors.toCollection(HashSet::new));
 }

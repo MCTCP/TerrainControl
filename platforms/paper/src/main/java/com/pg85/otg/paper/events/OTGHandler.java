@@ -1,13 +1,7 @@
 package com.pg85.otg.paper.events;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.interfaces.ILogger;
-import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
-import com.pg85.otg.util.logging.LogCategory;
-import com.pg85.otg.util.logging.LogLevel;
-
-import net.minecraft.server.v1_17_R1.WorldServer;
+import java.io.File;
+import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,15 +13,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.SpawnChangeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-
-import com.pg85.otg.constants.Constants;
-import com.pg85.otg.paper.OTGPlugin;
-import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
-
 import org.bukkit.event.world.WorldLoadEvent;
 
-import java.io.File;
-import java.io.IOException;
+import com.pg85.otg.OTG;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.interfaces.ILogger;
+import com.pg85.otg.interfaces.IWorldConfig;
+import com.pg85.otg.paper.OTGPlugin;
+import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
+
+import net.minecraft.server.level.ServerLevel;
 
 public class OTGHandler implements Listener
 {
@@ -70,8 +68,8 @@ public class OTGHandler implements Listener
 	@EventHandler(priority = EventPriority.LOW)
 	public void onSpawnChange(SpawnChangeEvent event)
 	{
-		WorldServer world = ((CraftWorld)event.getWorld()).getHandle();
-		if ((world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		ServerLevel world = ((CraftWorld)event.getWorld()).getHandle();
+		if ((world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			// TODO: How to cancel the event?
 			if(this.spawnPointSet)
@@ -80,7 +78,7 @@ public class OTGHandler implements Listener
 			}
 			this.spawnPointSet = true;
 
-			IWorldConfig worldConfig = ((OTGNoiseChunkGenerator)(world.getChunkProvider().getChunkGenerator())).getPreset().getWorldConfig();
+			IWorldConfig worldConfig = ((OTGNoiseChunkGenerator)(world.getChunkSource().getGenerator())).getPreset().getWorldConfig();
 			if(worldConfig.getSpawnPointSet())
 			{
 				if(

@@ -1,5 +1,10 @@
 package com.pg85.otg.paper.biome;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,18 +15,20 @@ import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
-import net.minecraft.server.v1_17_R1.*;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Biomes;
 
 // Spigot name: WorldChunkManager
 // Forge name: BiomeProvider
-public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
+public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 {
 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
@@ -29,18 +36,18 @@ public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
 			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
 			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
-			RegistryLookupCodec.a(IRegistry.ay).forGetter((provider) -> provider.registry)
+			RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
 	private final long seed;
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
-	private final IRegistry<BiomeBase> registry;
+	private final Registry<Biome> registry;
 	private final ThreadLocal<CachingLayerSampler> layer;
-	private final Int2ObjectMap<ResourceKey<BiomeBase>> keyLookup;
+	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
 
-	public OTGBiomeProvider (String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, IRegistry<BiomeBase> registry)
+	public OTGBiomeProvider (String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
 		super(getAllBiomesByPreset(presetFolderName, registry));
 		this.presetFolderName = presetFolderName;
@@ -59,16 +66,14 @@ public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 		{
 			IBiomeConfig config = biomeLookup[biomeId].getBiomeConfig();
 
-			// Forge method: RegistryKey.getOrCreateKey()
-			// Spigot method: ResourceKey.a()
-			ResourceKey<BiomeBase> key = ResourceKey.a(IRegistry.ay, new MinecraftKey(config.getRegistryKey().toResourceLocationString()));
+			ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
 			this.keyLookup.put(biomeId, key);
 		}
 	}
 
-	private static Stream<Supplier<BiomeBase>> getAllBiomesByPreset (String presetFolderName, IRegistry<BiomeBase> registry)
+	private static Stream<Supplier<Biome>> getAllBiomesByPreset (String presetFolderName, Registry<Biome> registry)
 	{
-		List<ResourceKey<BiomeBase>> biomesForPreset = ((PaperPresetLoader) OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
+		List<ResourceKey<Biome>> biomesForPreset = ((PaperPresetLoader) OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
 		if (biomesForPreset == null)
 		{
 			((PaperPresetLoader) OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
@@ -78,15 +83,11 @@ public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 			biomesForPreset = new ArrayList<>();
 		}
 		return biomesForPreset.stream().map(
-			// Forge method: getOrThrow
-			// Spigot method: d
-			(p_242638_1_) -> () -> registry.d(p_242638_1_)
+			(p_242638_1_) -> () -> registry.getOrThrow(p_242638_1_)
 		);
 	}
 
-	// Forge name: getBiomeProviderCodec
-	// Spigot name: a
-	protected Codec<? extends WorldChunkManager> a ()
+	protected Codec<? extends BiomeSource> codec ()
 	{
 		return CODEC;
 	}
@@ -94,11 +95,9 @@ public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 	// TODO: This is only used by MC internally, OTG fetches all biomes via CachedBiomeProvider.
 	// Could make this use the cache too?
 	@Override
-	public BiomeBase getBiome (int biomeX, int biomeY, int biomeZ)
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		// Forge name: getValueForKey
-		// Spigot name: a
-		return registry.a(keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
+		return registry.get(keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
 	}
 
 	@Override
@@ -106,4 +105,11 @@ public class OTGBiomeProvider extends WorldChunkManager implements ILayerSource
 	{
 		return this.layer.get();
 	}
+	
+	@Override
+	public BiomeSource withSeed(long seed)
+	{
+		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
+	}
+
 }

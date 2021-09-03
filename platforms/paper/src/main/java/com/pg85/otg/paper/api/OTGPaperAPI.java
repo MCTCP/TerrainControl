@@ -16,7 +16,7 @@ public class OTGPaperAPI
 	{
 		ServerLevel world = ((CraftWorld) location.getWorld()).getHandle();
 
-		if (!(world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			return null;
 		}

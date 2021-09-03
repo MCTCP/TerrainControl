@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
+import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.OTGChunkGenerator;
@@ -25,24 +25,22 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.v1_16_R3.BiomeBase;
-import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R3.ChunkGenerator;
 import net.minecraft.server.v1_16_R3.DefinedStructureManager;
-import net.minecraft.server.v1_16_R3.HeightMap;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.IRegistryCustom;
-import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.SeededRandom;
-import net.minecraft.server.v1_16_R3.StructureFeature;
-import net.minecraft.server.v1_16_R3.StructureManager;
-import net.minecraft.server.v1_16_R3.StructureSettings;
 import net.minecraft.server.v1_16_R3.StructureSettingsFeature;
 import net.minecraft.server.v1_16_R3.WorldChunkManager;
 import net.minecraft.server.v1_16_R3.WorldGenVillage;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.levelgen.StructureSettings;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
 /**
  * Shadow chunk generation means generating base terrain for chunks
@@ -140,7 +138,7 @@ public class ShadowChunkGenerator
 				int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
 				for (int y = 0; y <= endY; y++)
 				{
-					BlockPosition pos = new BlockPosition(x, y, z);
+					BlockPos pos = new BlockPos(x, y, z);
 					data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getType(pos));
 				}
 			}
@@ -172,7 +170,7 @@ public class ShadowChunkGenerator
 				int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
 				for (int y = 0; y <= endY; y++)
 				{
-					BlockPosition pos = new BlockPosition(x, y, z);
+					BlockPos pos = new BlockPos(x, y, z);
 					chunk.setType(pos, cachedChunk.getType(pos), false);
 				}
 			}
@@ -336,7 +334,7 @@ public class ShadowChunkGenerator
 		IBlockData blockInChunk;
 		for (short y = 0; y < 256; y++)
 		{
-			blockInChunk = chunk.getType(new BlockPosition(blockX, y, blockZ));
+			blockInChunk = chunk.getType(new BlockPos(blockX, y, blockZ));
 			if (blockInChunk != null)
 			{
 				blocksInColumn[y] = PaperMaterialData.ofBlockData(blockInChunk);

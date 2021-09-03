@@ -16,15 +16,15 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.ISaplingSpawner;
 import com.pg85.otg.interfaces.IWorldGenRegion;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.materials.PaperMaterialData;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.SaplingType;
 
-import net.minecraft.server.v1_17_R1.BlockPosition;
+import net.minecraft.core.BlockPos;
 
 public class SaplingHandler
 {
@@ -35,7 +35,7 @@ public class SaplingHandler
     		return;
     	}		
 		
-        BlockPosition blockPos = new BlockPosition(event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
+        BlockPos blockPos = new BlockPos(event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
 		PaperWorldGenRegion worldGenRegion;
 		Preset preset;
 		if(((CraftWorld)event.getWorld()).getGenerator() instanceof OTGSpigotChunkGen)
@@ -61,7 +61,7 @@ public class SaplingHandler
         IBiomeConfig biomeConfig = worldGenRegion.getCachedBiomeProvider().getBiomeConfig(blockPos.getX(), blockPos.getZ());
         PaperMaterialData material = (PaperMaterialData)worldGenRegion.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 
-        BlockPosition result = findFourSaplings(blockPos, material, worldGenRegion);
+        BlockPos result = findFourSaplings(blockPos, material, worldGenRegion);
         boolean wideTrunk = false;
         if (result != null)
         {
@@ -218,7 +218,7 @@ public class SaplingHandler
      *
      * @return BlockPos of sapling with lowest X and Z, or null if not four saplings
      */
-    private BlockPosition findFourSaplings(BlockPosition blockPos, LocalMaterialData material, IWorldGenRegion worldGenRegion)
+    private BlockPos findFourSaplings(BlockPos blockPos, LocalMaterialData material, IWorldGenRegion worldGenRegion)
     {
         int x = blockPos.getX();
         int y = blockPos.getY();

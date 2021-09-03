@@ -4,6 +4,8 @@ import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.materials.LocalMaterialData;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.v1_17_R1.BlockPosition;
 import net.minecraft.server.v1_17_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_17_R1.IBlockData;
@@ -15,7 +17,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class PaperChunkBuffer extends ChunkBuffer
 {
-	private final BlockPosition.MutableBlockPosition mutable = new BlockPosition.MutableBlockPosition();
+	private final BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 	private ChunkCoordinate chunkCoord = null;
 	private ChunkGenerator.ChunkData chunkData = null;
 	private ProtoChunk chunk = null;

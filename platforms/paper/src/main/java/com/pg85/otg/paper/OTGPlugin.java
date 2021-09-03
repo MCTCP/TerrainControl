@@ -18,24 +18,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.biome.OTGBiomeProvider;
 import com.pg85.otg.paper.commands.OTGCommandExecutor;
 import com.pg85.otg.paper.events.OTGHandler;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
 import com.pg85.otg.paper.networking.NetworkingListener;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.server.v1_17_R1.BiomeBase;
-import net.minecraft.server.v1_17_R1.ChunkProviderServer;
-import net.minecraft.server.v1_17_R1.GeneratorSettingBase;
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.IRegistryWritable;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.PlayerChunkMap;
-import net.minecraft.server.v1_17_R1.WorldServer;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener
@@ -70,22 +69,22 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	@Override
 	public void onEnable ()
 	{
-		IRegistry.a(IRegistry.BIOME_SOURCE, new MinecraftKey(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
-		IRegistry.a(IRegistry.CHUNK_GENERATOR, new MinecraftKey(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
+		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 
 		OTG.startEngine(new PaperEngine(this));
 		Bukkit.getPluginCommand("OTG").setExecutor(new OTGCommandExecutor());
 		// Does this go here?
 		OTG.getEngine().getPresetLoader().registerBiomes();
 
-		IRegistryWritable<BiomeBase> biome_registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay);
+		WritableRegistry<Biome> biome_registry = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
 		int i = 0;
 
 		if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 		{
 			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "-----------------");
 			OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Registered biomes:");
-			for (BiomeBase biomeBase : biome_registry)
+			for (Biome biomeBase : biome_registry)
 			{
 				OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, (i++) + ": " + biomeBase.toString());
 			}
@@ -134,9 +133,9 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		}
 
 		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Taking over world " + world.getName());
-		WorldServer serverWorld = ((CraftWorld) world).getHandle();
+		ServerLevel serverWorld = ((CraftWorld) world).getHandle();
 
-		net.minecraft.server.v1_17_R1.ChunkGenerator generator = serverWorld.getChunkProvider().getChunkGenerator();
+		net.minecraft.world.level.chunk.ChunkGenerator generator = serverWorld.getChunkSource().getGenerator();
 		if (!(generator instanceof CustomChunkGenerator))
 		{
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Mission failed, we'll get them next time");
@@ -157,7 +156,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		{
 			OTGDelegate = new OTGNoiseChunkGenerator(
 				OTGGen.getPreset().getFolderName(),
-				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)),
 				world.getSeed(),
 				GeneratorSettingBase::i
 			);
@@ -167,15 +166,19 @@ public class OTGPlugin extends JavaPlugin implements Listener
 
 		try
 		{
-			Field finalGenerator = ChunkProviderServer.class.getDeclaredField("chunkGenerator");
+			//
+			// TODO: Does reflection get remapped?
+			//
+			
+			Field finalGenerator = ServerChunkCache.class.getDeclaredField("generator");
 			finalGenerator.setAccessible(true);
 
-			finalGenerator.set(serverWorld.getChunkProvider(), OTGDelegate);
+			finalGenerator.set(serverWorld.getChunkSource(), OTGDelegate);
 
-			Field pcmGen = PlayerChunkMap.class.getDeclaredField("chunkGenerator");
+			Field pcmGen = ChunkMap.class.getDeclaredField("generator");
 			pcmGen.setAccessible(true);
 
-			pcmGen.set(serverWorld.getChunkProvider().playerChunkMap, OTGDelegate);
+			pcmGen.set(serverWorld.getChunkSource().chunkMap, OTGDelegate);
 		} catch (ReflectiveOperationException ex)
 		{
 			ex.printStackTrace();

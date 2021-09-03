@@ -1,6 +1,5 @@
 package com.pg85.otg.paper.commands;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,74 +15,53 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_17_R1.BiomeBase;
-import net.minecraft.server.v1_17_R1.BiomeSettingsMobs.c;
-import net.minecraft.server.v1_17_R1.BlockPosition;
-import net.minecraft.server.v1_17_R1.EnumCreatureType;
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.WeightedRandom.WeightedRandomChoice;
-import net.minecraft.server.v1_17_R1.WorldServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 
-public class BiomeCommand extends BaseCommand
-{
+public class BiomeCommand extends BaseCommand {
 	private static final List<String> TYPES = new ArrayList<>(Arrays.asList("info", "spawns"));
-	private static Field weightField;
 
-	static
-	{
-		try
-		{
-			weightField = WeightedRandomChoice.class.getDeclaredField("a");
-			weightField.setAccessible(true);
-		} catch (ReflectiveOperationException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public BiomeCommand()
-	{
+	public BiomeCommand() {
 		super("biome");
 		this.helpMessage = "Displays information about the biome you are in.";
 		this.usage = "/otg biome";
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
-	{
+	public List<String> onTabComplete(CommandSender sender, String[] args) {
 		return StringUtil.copyPartialMatches(args[1], TYPES, new ArrayList<>());
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args)
-	{
-		if (!(sender instanceof Player))
-		{
+	public boolean execute(CommandSender sender, String[] args) {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage("Only players can execute this command");
 			return true;
 		}
 		Player player = (Player) sender;
-		WorldServer world = ((CraftWorld) player.getWorld()).getHandle();
+		ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
 
-		if (!(world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
-		{
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)) {
 			sender.sendMessage("OTG is not enabled in this world");
 			return true;
 		}
 
-		BiomeBase biome = world.getBiome(new BlockPosition(player.getLocation().getBlockX(),
-				player.getLocation().getBlockY(), player.getLocation().getBlockZ()));
+		Biome biome = world.getBiome(new BlockPos(player.getLocation().getBlockX(), player.getLocation().getBlockY(),
+				player.getLocation().getBlockZ()));
 
-		String MCBiome = ((CraftServer) Bukkit.getServer()).getServer().getCustomRegistry().b(IRegistry.ay)
-				.getKey(biome).toString();
-		IBiomeConfig config = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator())
-				.getCachedBiomeProvider()
+		String MCBiome = ((CraftServer) Bukkit.getServer()).getServer().registryAccess()
+				.registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome).toString();
+		IBiomeConfig config = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getCachedBiomeProvider()
 				.getBiomeConfig(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
 
 		String option = "";
 
-		if (args.length >= 1)
-		{
+		if (args.length >= 1) {
 			option = args[0];
 		}
 
@@ -93,8 +71,7 @@ public class BiomeCommand extends BaseCommand
 		sender.spigot().sendMessage(
 				createComponent("Biome registry name: ", MCBiome, ChatColor.GOLD, ChatColor.GREEN).create());
 
-		switch (option)
-		{
+		switch (option) {
 		case "info":
 			showBiomeInfo(player, biome, config);
 			break;
@@ -108,11 +85,10 @@ public class BiomeCommand extends BaseCommand
 		return true;
 	}
 
-	private void showBiomeInfo(Player sender, BiomeBase biome, IBiomeConfig config)
-	{
+	private void showBiomeInfo(Player sender, Biome biome, IBiomeConfig config) {
 
-		sender.spigot().sendMessage(
-				createComponent("Biome Category: ", biome.t().toString(), ChatColor.GOLD, ChatColor.GREEN).create());
+		sender.spigot().sendMessage(createComponent("Biome Category: ", biome.getBiomeCategory().toString(),
+				ChatColor.GOLD, ChatColor.GREEN).create());
 		sender.spigot().sendMessage(
 				createComponent("Inherit Mobs: ", config.getInheritMobsBiomeName(), ChatColor.GOLD, ChatColor.GREEN)
 						.create());
@@ -134,54 +110,46 @@ public class BiomeCommand extends BaseCommand
 								ChatColor.GOLD, ChatColor.GREEN).create())
 						.create());
 
-		sender.spigot().sendMessage(
-				createComponent("Base Temperature: ", String.format("%.2f", biome.k()), ChatColor.GOLD, ChatColor.GREEN)
-						.append(createComponent(" Current Temperature: ",
-								String.format("%.2f",
-										biome.getAdjustedTemperature(new BlockPosition(sender.getLocation().getX(),
-												sender.getLocation().getY(), sender.getLocation().getZ()))),
-								ChatColor.GOLD, ChatColor.GREEN).create())
-						.create());
+		sender.spigot()
+				.sendMessage(createComponent("Base Temperature: ", String.format("%.2f", biome.getBaseTemperature()),
+						ChatColor.GOLD, ChatColor.GREEN)
+								.append(createComponent(" Current Temperature: ",
+										String.format("%.2f",
+												biome.getTemperature(new BlockPos(sender.getLocation().getX(),
+														sender.getLocation().getY(), sender.getLocation().getZ()))),
+										ChatColor.GOLD, ChatColor.GREEN).create())
+								.create());
 	}
 
-	private void showBiomeMobs(Player sender, BiomeBase biome, IBiomeConfig config)
-	{
+	private void showBiomeMobs(Player sender, Biome biome, IBiomeConfig config) {
 		sender.spigot().sendMessage(createComponent("Spawns:", ChatColor.GOLD));
 		sender.spigot().sendMessage(createComponent("  Monsters:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.MONSTER));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.MONSTER));
 		sender.spigot().sendMessage(createComponent("  Creatures:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.CREATURE));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.CREATURE));
 		sender.spigot().sendMessage(createComponent("  Water Creatures:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.CREATURE));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.CREATURE));
 		sender.spigot().sendMessage(createComponent("  Ambient Creatures:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.AMBIENT));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.AMBIENT));
 		sender.spigot().sendMessage(createComponent("  Water Ambient:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.WATER_AMBIENT));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.WATER_AMBIENT));
 		sender.spigot().sendMessage(createComponent("  Misc:", ChatColor.GOLD));
-		showSpawns(sender, biome.b().a(EnumCreatureType.MISC));
+		showSpawns(sender, biome.getMobSettings().getMobs(MobCategory.MISC));
 
 	}
 
-	public void showSpawns(Player sender, List<c> list)
-	{
-		list.forEach(spawn ->
-		{
-			try
-			{
-				sender.spigot()
-						.sendMessage(createComponent("   - Entity: ", IRegistry.ENTITY_TYPE.getKey(spawn.c).toString(),
-								ChatColor.GOLD, ChatColor.GREEN).append(
-										createComponent(", Weight: ", Integer.toString(weightField.getInt(spawn)),
-												ChatColor.GOLD, ChatColor.GREEN).create())
-										.append(createComponent(", Min: ", Integer.toString(spawn.d), ChatColor.GOLD,
-												ChatColor.GREEN).create())
-										.append(createComponent(", Max: ", Integer.toString(spawn.e), ChatColor.GOLD,
-												ChatColor.GREEN).create())
-										.create());
-			} catch (ReflectiveOperationException e)
-			{
-				e.printStackTrace();
-			}
+	public void showSpawns(Player sender, WeightedRandomList<SpawnerData> list) {
+		list.unwrap().forEach(spawn -> {
+			sender.spigot()
+					.sendMessage(createComponent("   - Entity: ", Registry.ENTITY_TYPE.getKey(spawn.type).toString(),
+							ChatColor.GOLD, ChatColor.GREEN)
+									.append(createComponent(", Weight: ", Integer.toString(spawn.getWeight().asInt()),
+											ChatColor.GOLD, ChatColor.GREEN).create())
+									.append(createComponent(", Min: ", Integer.toString(spawn.minCount), ChatColor.GOLD,
+											ChatColor.GREEN).create())
+									.append(createComponent(", Max: ", Integer.toString(spawn.maxCount), ChatColor.GOLD,
+											ChatColor.GREEN).create())
+									.create());
 		});
 	}
 }

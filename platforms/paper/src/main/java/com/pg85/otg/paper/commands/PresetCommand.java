@@ -7,10 +7,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.presets.Preset;
 
-import net.minecraft.server.v1_17_R1.WorldServer;
+import net.minecraft.server.level.ServerLevel;
 
 public class PresetCommand extends BaseCommand
 {
@@ -29,15 +29,15 @@ public class PresetCommand extends BaseCommand
 			return true;
 		}
 		Player player = (Player) sender;
-		WorldServer world = ((CraftWorld) player.getWorld()).getHandle();
+		ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
 
-		if (!(world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			sender.sendMessage("OTG is not enabled in this world");
 			return true;
 		}
 
-		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator()).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator() ).getPreset();
 		sender.sendMessage("Preset: " + preset.getFolderName() + 
 				"\nDescription: " + preset.getDescription() + 
 				"\nMajor version: " + preset.getMajorVersion());

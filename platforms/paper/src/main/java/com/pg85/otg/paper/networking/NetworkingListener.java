@@ -11,15 +11,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.interfaces.IBiomeConfig;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.OTGPlugin;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_17_R1.PacketDataSerializer;
-import net.minecraft.server.v1_17_R1.WorldServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.
 
 public class NetworkingListener implements Listener
 {
@@ -44,14 +44,14 @@ public class NetworkingListener implements Listener
 
 	private void sendDataPacket(Player player)
 	{
-		WorldServer world = ((CraftWorld) player.getWorld()).getHandle();
+		ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
 
-		if (!(world.getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			return;
 		}
 
-		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkProvider().getChunkGenerator()).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getPreset();
 
 		PacketDataSerializer buffer = new PacketDataSerializer(Unpooled.buffer(32766));
 		String presetName = preset.getFolderName().toLowerCase();

@@ -25,9 +25,8 @@ import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-import net.minecraft.server.v1_17_R1.BlockPosition;
-import net.minecraft.server.v1_17_R1.Blocks;
-import net.minecraft.server.v1_17_R1.IBlockData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 
 public class MapCommand extends BaseCommand
 {
@@ -102,13 +101,13 @@ public class MapCommand extends BaseCommand
 			sender.sendMessage("Only in-game for now");
 			return true;
 		}
-		if (!(world.getHandle().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		if (!(world.getHandle().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			sender.sendMessage("This is not an OTG world");
 			return true;
 		}
 
-		ICachedBiomeProvider provider = ((OTGNoiseChunkGenerator)world.getHandle().getChunkProvider().getChunkGenerator()).getCachedBiomeProvider();
+		ICachedBiomeProvider provider = ((OTGNoiseChunkGenerator)world.getHandle().getChunkSource().getGenerator()).getCachedBiomeProvider();
 
 		BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 
@@ -174,7 +173,7 @@ public class MapCommand extends BaseCommand
 			sender.sendMessage("Only in-game for now");
 			return true;
 		}
-		if (!(world.getHandle().getChunkProvider().chunkGenerator.getWorldChunkManager() instanceof OTGBiomeProvider))
+		if (!(world.getHandle().getChunkSource().getGenerator().getBiomeSource() instanceof OTGBiomeProvider))
 		{
 			sender.sendMessage("This is not an OTG world");
 			return true;
@@ -264,7 +263,7 @@ public class MapCommand extends BaseCommand
 		IBlockData blockInChunk;
 		for (int y = chunk.getHighestBlockForColumn(internalX, internalZ); y >= 0; y--)
 		{
-			blockInChunk = chunk.getChunk().getType(new BlockPosition(internalX, y, internalZ));
+			blockInChunk = chunk.getChunk().getType(new BlockPos(internalX, y, internalZ));
 			if (blockInChunk != null && blockInChunk.getBlock() != Blocks.AIR)
 			{
 				return new HighestBlockInfo((PaperMaterialData) PaperMaterialData.ofBlockData(blockInChunk), y);

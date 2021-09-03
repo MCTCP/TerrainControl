@@ -1,5 +1,8 @@
 package com.pg85.otg.paper.biome;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -14,25 +17,30 @@ import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import net.minecraft.server.v1_17_R1.*;
-import net.minecraft.server.v1_17_R1.BiomeBase.TemperatureModifier;
-
-import java.util.List;
-import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.Music;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.TemperatureModifier;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 
 public class PaperBiome implements IBiome
 {
-	private final BiomeBase biomeBase;
+	private final Biome biomeBase;
 	private final IBiomeConfig biomeConfig;
 
-	public PaperBiome(BiomeBase biomeBase, IBiomeConfig biomeConfig)
+	public PaperBiome(Biome biomeBase, IBiomeConfig biomeConfig)
 	{
 		this.biomeBase = biomeBase;
 		this.biomeConfig = biomeConfig;
 	}
 
-	public BiomeBase getBiomeBase()
+	public Biome getBiome()
 	{
 		return this.biomeBase;
 	}	
@@ -43,7 +51,7 @@ public class PaperBiome implements IBiome
 		return this.biomeConfig;
 	}	
 	
-	public static BiomeBase createOTGBiome (boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
+	public static Biome createOTGBiome (boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// BiomeSettingsGeneration.a == BiomeGenerationSettings.Builder in forge
 		BiomeSettingsGeneration.a biomeGenerationSettingsBuilder = new BiomeSettingsGeneration.a();
@@ -66,7 +74,7 @@ public class PaperBiome implements IBiome
 			{
 				RegistryResource registryResource = (RegistryResource)res;
 				WorldGenStage.Decoration stage = WorldGenStage.Decoration.valueOf(registryResource.getDecorationStage());
-				WorldGenFeatureConfigured<?, ?> registry = RegistryGeneration.e.get(new MinecraftKey(registryResource.getFeatureKey()));
+				WorldGenFeatureConfigured<?, ?> registry = RegistryGeneration.e.get(new ResourceLocation(registryResource.getFeatureKey()));
 				biomeGenerationSettingsBuilder.a(stage, registry);
 			}
 		}
@@ -92,13 +100,13 @@ public class PaperBiome implements IBiome
 		;
 
 
-		Optional<Particle<?>> particleType = IRegistry.PARTICLE_TYPE.getOptional(new MinecraftKey(biomeConfig.getParticleType()));
+		Optional<Particle<?>> particleType = Registry.PARTICLE_TYPE.getOptional(new ResourceLocation(biomeConfig.getParticleType()));
 		if (particleType.isPresent() && particleType.get() instanceof ParticleParam)
 		{
 			biomeAmbienceBuilder.a(new BiomeParticles((ParticleParam) particleType.get(), biomeConfig.getParticleProbability()));
 		}
 
-		Optional<SoundEffect> music = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMusic()));
+		Optional<SoundEvent> music = Registry.SOUND_EVENT.getOptional(new ResourceLocation(biomeConfig.getMusic()));
 		music.ifPresent(soundEffect -> 
 			biomeAmbienceBuilder.a(
 				new Music(
@@ -110,10 +118,10 @@ public class PaperBiome implements IBiome
 			)
 		);
 
-		Optional<SoundEffect> ambientSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAmbientSound()));
+		Optional<SoundEvent> ambientSound = Registry.SOUND_EVENT.getOptional(new ResourceLocation(biomeConfig.getAmbientSound()));
 		ambientSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(ambientSound.get()));
 
-		Optional<SoundEffect> moodSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMoodSound()));
+		Optional<SoundEvent> moodSound = Registry.SOUND_EVENT.getOptional(new ResourceLocation(biomeConfig.getMoodSound()));
 		moodSound.ifPresent(soundEffect -> 
 			biomeAmbienceBuilder.a(
 				new CaveSoundSettings(
@@ -125,7 +133,7 @@ public class PaperBiome implements IBiome
 			)
 		);
 
-		Optional<SoundEffect> additionsSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAdditionsSound()));
+		Optional<SoundEvent> additionsSound = Registry.SOUND_EVENT.getOptional(new ResourceLocation(biomeConfig.getAdditionsSound()));
 		additionsSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSound(additionsSound.get(), biomeConfig.getAdditionsTickChance())));
 
 		if (biomeConfig.getFoliageColor() != 0xffffff)
@@ -150,11 +158,11 @@ public class PaperBiome implements IBiome
 				break;
 		}
 
-		BiomeBase.a builder = new BiomeBase.a()
+		Biome.a builder = new Biome.a()
 			// Precipitation
-			.a(biomeConfig.getBiomeWetness() <= 0.0001 ? BiomeBase.Precipitation.NONE :
-				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
-				BiomeBase.Precipitation.SNOW)
+			.a(biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE :
+				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN :
+				Biome.Precipitation.SNOW)
 			// depth
 			.a(biomeConfig.getBiomeHeight())
 			.b(biomeConfig.getBiomeVolatility())
@@ -172,8 +180,8 @@ public class PaperBiome implements IBiome
 			builder.a(TemperatureModifier.FROZEN);
 		}		
 		
-		BiomeBase.Geography category = BiomeBase.Geography.a(biomeConfig.getBiomeCategory());
-		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.NONE);
+		Biome.Geography category = Biome.Geography.a(biomeConfig.getBiomeCategory());
+		builder.a(category != null ? category : isOceanBiome ? Biome.Geography.OCEAN : Biome.Geography.NONE);
 		if (category == null)
 		{
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
@@ -384,13 +392,13 @@ public class PaperBiome implements IBiome
 		// Nether Fossils
 		if (worldConfig.getNetherFossilsEnabled() && biomeConfig.getNetherFossilEnabled())
 		{
-			biomeGenerationSettingsBuilder.a(StructureFeatures.p);
+			biomeGenerationSettingsBuilder.a(StructureFeatures.NETHER_FOSSIL);
 		}
 
 		// End Cities
 		if (worldConfig.getEndCitiesEnabled() && biomeConfig.getEndCityEnabled())
 		{
-			biomeGenerationSettingsBuilder.a(StructureFeatures.q);
+			biomeGenerationSettingsBuilder.a(StructureFeatures.END_CITY);
 		}
 
 		// Ruined Portals
@@ -399,25 +407,25 @@ public class PaperBiome implements IBiome
 			switch (biomeConfig.getRuinedPortalType())
 			{
 				case normal:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.y);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_STANDARD);
 					break;
 				case desert:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.z);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_DESERT);
 					break;
 				case jungle:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.A);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_JUNGLE);
 					break;
 				case swamp:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.B);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_SWAMP);
 					break;
 				case mountain:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.C);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_MOUNTAIN);
 					break;
 				case ocean:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.D);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_OCEAN);
 					break;
 				case nether:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.E);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.RUINED_PORTAL_NETHER);
 					break;
 				case disabled:
 					break;
@@ -472,6 +480,6 @@ public class PaperBiome implements IBiome
 	@Override
 	public float getTemperatureAt (int x, int y, int z)
 	{
-		return this.biomeBase.getAdjustedTemperature(new BlockPosition(x, y, z));
+		return this.biomeBase.getTemperature(new BlockPos(x, y, z));
 	}
 }

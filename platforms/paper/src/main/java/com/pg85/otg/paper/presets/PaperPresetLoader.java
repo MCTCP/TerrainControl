@@ -13,9 +13,8 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
@@ -32,35 +31,34 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IBiomeResourceLocation;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.presets.LocalPresetLoader;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.biome.PaperBiome;
 import com.pg85.otg.paper.materials.PaperMaterialReader;
 import com.pg85.otg.paper.networking.BiomeSettingSyncWrapper;
 import com.pg85.otg.paper.networking.OTGClientSyncManager;
 import com.pg85.otg.paper.util.MobSpawnGroupHelper;
+import com.pg85.otg.presets.LocalPresetLoader;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
 
-import net.minecraft.server.v1_17_R1.BiomeBase;
-import net.minecraft.server.v1_17_R1.EnumCreatureType;
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.IRegistryWritable;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.RegistryGeneration;
-import net.minecraft.server.v1_17_R1.ResourceKey;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.Biome;
 
 public class PaperPresetLoader extends LocalPresetLoader
 {
-	private final Map<String, List<ResourceKey<BiomeBase>>> biomesByPresetFolderName = new LinkedHashMap<>();
+	private final Map<String, List<ResourceKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();
 	private final HashMap<String, IBiome[]> globalIdMapping = new HashMap<>();	
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();	
 	// We have to store biomes, since Spigot doesn't expose registry key on BiomeBase.
-	private final Map<BiomeBase, IBiomeConfig> biomeConfigsByBiome = new HashMap<>();	
+	private final Map<Biome, IBiomeConfig> biomeConfigsByBiome = new HashMap<>();	
 
-	private final ResourceKey<IRegistry<BiomeBase>> BIOME_KEY = IRegistry.ay;
+	private final ResourceKey<Registry<Biome>> BIOME_KEY = Registry.BIOME_REGISTRY;
 
 	public PaperPresetLoader(File otgRootFolder)
 	{
@@ -87,14 +85,14 @@ public class PaperPresetLoader extends LocalPresetLoader
 
 	private void registerBiomesForPreset(boolean refresh, Preset preset)
 	{
-		IRegistryWritable<BiomeBase> biomeRegistry = ((CraftServer)Bukkit.getServer()).getServer().customRegistry.b(BIOME_KEY);
+		WritableRegistry<Biome> biomeRegistry = ((CraftServer)Bukkit.getServer()).getServer().registryHolder.ownedRegistryOrThrow(BIOME_KEY);
 		// Index BiomeColors for FromImageMode and /otg map
 		HashMap<Integer, Integer> biomeColorMap = new HashMap<Integer, Integer>();
 		
 		// Start at 1, 0 is the fallback for the biome generator (the world's ocean biome).
 		int currentId = 1;
 		
-		List<ResourceKey<BiomeBase>> presetBiomes = new ArrayList<>();
+		List<ResourceKey<Biome>> presetBiomes = new ArrayList<>();
 		this.biomesByPresetFolderName.put(preset.getFolderName(), presetBiomes);
 
 		IWorldConfig worldConfig = preset.getWorldConfig();
@@ -138,9 +136,9 @@ public class PaperPresetLoader extends LocalPresetLoader
 
 			// When using TemplateForBiome, we'll fetch the non-OTG biome from the registry, including any settings registered to it.
 			// For normal biomes we create our own new OTG biome and apply settings from the biome config.
-			MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getKey().toResourceLocationString());
-			ResourceKey<BiomeBase> registryKey;
-			BiomeBase biome;
+			ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getKey().toResourceLocationString());
+			ResourceKey<Biome> registryKey;
+			Biome biome;
 			if(biomeConfig.getValue().getTemplateForBiome())
 			{
 				biome = biomeRegistry.get(resourceLocation);
@@ -152,7 +150,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 					}
 					continue;
 				}
-				registryKey = ResourceKey.a(BIOME_KEY, resourceLocation);
+				registryKey = ResourceKey.create(BIOME_KEY, resourceLocation);
 				presetBiomes.add(registryKey);
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
@@ -167,15 +165,15 @@ public class PaperPresetLoader extends LocalPresetLoader
 				}				
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
- 				registryKey = ResourceKey.a(BIOME_KEY, resourceLocation);
+ 				registryKey = ResourceKey.create(BIOME_KEY, resourceLocation);
 				presetBiomes.add(registryKey);
  				biome = PaperBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
 
 				if(!refresh)
 				{
-					biomeRegistry.a(registryKey, biome, Lifecycle.experimental());
+					biomeRegistry.register(registryKey, biome, Lifecycle.experimental());
 				} else {
-					biomeRegistry.a(OptionalInt.empty(), registryKey, biome, Lifecycle.experimental());
+					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.experimental());
 				}
 			}
 
@@ -380,12 +378,12 @@ public class PaperPresetLoader extends LocalPresetLoader
 		this.presetGenerationData.put(preset.getFolderName(), data);
 	}
 
-	public IBiomeConfig getBiomeConfig(BiomeBase biome)
+	public IBiomeConfig getBiomeConfig(Biome biome)
 	{
 		return this.biomeConfigsByBiome.get(biome);
 	}	
 
-	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys (String presetFolderName)
+	public List<ResourceKey<Biome>> getBiomeRegistryKeys (String presetFolderName)
 	{
 		return this.biomesByPresetFolderName.get(presetFolderName);
 	}
@@ -425,24 +423,23 @@ public class PaperPresetLoader extends LocalPresetLoader
 		
 		if(location != null)
 		{
-			Biome biome = Registry.BIOME.get(location);
-			BiomeBase biomeBase = null;
+			org.bukkit.block.Biome biome = org.bukkit.Registry.BIOME.get(location);
+			Biome biomeBase = null;
 			if(biome != null)
 			{
-				biomeBase = RegistryGeneration.WORLDGEN_BIOME.get(new MinecraftKey(biome.getKey().toString()));		
+				biomeBase = RegistryGeneration.WORLDGEN_BIOME.get(new ResourceLocation(biome.getKey().toString()));		
 			}
 			if(biomeBase != null)
 			{
 				// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
 				// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 				// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
-				
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.MONSTER), EntityCategory.MONSTER);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.AMBIENT), EntityCategory.AMBIENT_CREATURE);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.CREATURE), EntityCategory.CREATURE);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.WATER_CREATURE), EntityCategory.WATER_CREATURE);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, EnumCreatureType.MISC), EntityCategory.MISC);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.MONSTER), EntityCategory.MONSTER);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.CREATURE), EntityCategory.CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.MISC), EntityCategory.MISC);
 				return;
 			}
 		}

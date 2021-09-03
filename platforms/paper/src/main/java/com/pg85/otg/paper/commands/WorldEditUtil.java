@@ -4,7 +4,9 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import net.minecraft.server.v1_17_R1.BlockPosition;
+
+import net.minecraft.core.BlockPos;
+
 import org.bukkit.entity.Player;
 
 public class WorldEditUtil
@@ -31,8 +33,8 @@ public class WorldEditUtil
 		}
 	}
 
-	private static BlockPosition getPosFromVector3(BlockVector3 vector)
+	private static BlockPos getPosFromVector3(BlockVector3 vector)
 	{
-		return new BlockPosition(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+		return new BlockPos(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
 	}
 }

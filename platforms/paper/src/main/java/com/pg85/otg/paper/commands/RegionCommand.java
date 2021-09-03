@@ -1,16 +1,18 @@
 package com.pg85.otg.paper.commands;
 
-import com.pg85.otg.customobject.util.Corner;
-import net.minecraft.server.v1_17_R1.BlockPosition;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import com.pg85.otg.customobject.util.Corner;
+
+import net.minecraft.core.BlockPos;
 
 public class RegionCommand extends BaseCommand
 {
@@ -197,25 +199,25 @@ public class RegionCommand extends BaseCommand
 	
 	public static class Region
 	{
-		private BlockPosition pos1 = null;
-		private BlockPosition pos2 = null;
+		private BlockPos pos1 = null;
+		private BlockPos pos2 = null;
 		private Corner center = null;
 		private boolean flip = true;
 
 		public boolean setPos(Location loc)
 		{
-			return setPos(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+			return setPos(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 		}
 		
 		// Returns whether it set pos1 or not
-		public boolean setPos(BlockPosition BlockPosition)
+		public boolean setPos(BlockPos BlockPos)
 		{
 			// alternate between setting min and max
 			// Flip initializes as true, meaning we set min first
 			if (flip)
-				pos1 = BlockPosition;
+				pos1 = BlockPos;
 			else
-				pos2 = BlockPosition;
+				pos2 = BlockPos;
 			flip = !flip;
 			return !flip;
 		}
@@ -258,10 +260,10 @@ public class RegionCommand extends BaseCommand
 
 		public void setPos1(Location loc)
 		{
-			setPos1(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+			setPos1(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 		}
 
-		public void setPos1(BlockPosition pos)
+		public void setPos1(BlockPos pos)
 		{
 			flip = false;
 			this.pos1 = pos;
@@ -269,10 +271,10 @@ public class RegionCommand extends BaseCommand
 
 		public void setPos2(Location loc)
 		{
-			setPos2(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+			setPos2(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 		}
 
-		public void setPos2(BlockPosition pos)
+		public void setPos2(BlockPos pos)
 		{
 			flip = true;
 			this.pos2 = pos;
