@@ -1,5 +1,9 @@
 package com.pg85.otg.paper.gen;
 
+import java.util.Random;
+
+import org.apache.commons.lang.NotImplementedException;
+
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -7,15 +11,14 @@ import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
 
-import net.minecraft.server.v1_17_R1.*;
-
-import java.util.Random;
-
-import org.apache.commons.lang.NotImplementedException;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
 
 public class MCWorldGenRegion extends PaperWorldGenRegion
 {
@@ -55,7 +58,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		}
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		IChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 
 		// Tried to query an unloaded chunk outside the area being decorated
 		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
@@ -66,7 +69,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPosition(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
 	}
 
 
@@ -76,7 +79,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 
 		// Tried to query an unloaded chunk outside the area being decorated
 		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
@@ -87,7 +90,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE, internalX, internalZ);
+		int heightMapY = chunk.getHighestBlock(Types.WORLD_SURFACE, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
 	}
 	
@@ -106,7 +109,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 			return;
 		}
 
-		BlockPosition pos = new BlockPosition(x, y, z);
+		BlockPos pos = new BlockPos(x, y, z);
 		this.worldGenRegion.setTypeAndData(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
 
 		if (material.isLiquid())

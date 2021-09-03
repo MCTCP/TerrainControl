@@ -179,15 +179,15 @@ public class RegionCommand extends BaseCommand
 				break;
 			case "up": // positive y
 				if (region.pos2.getY() >= region.pos1.getY())
-					region.setPos2(region.pos2.up(value));
+					region.setPos2(region.pos2.above(value));
 				else
-					region.setPos1(region.pos1.up(value));
+					region.setPos1(region.pos1.above(value));
 				break;
 			case "down": // negative y
 				if (region.pos2.getY() < region.pos1.getY())
-					region.setPos2(region.pos2.down(value));
+					region.setPos2(region.pos2.below(value));
 				else
-					region.setPos1(region.pos1.down(value));
+					region.setPos1(region.pos1.below(value));
 				break;
 			default:
 				source.sendMessage("Unrecognized direction " + direction);

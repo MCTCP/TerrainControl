@@ -12,14 +12,9 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.minecraft.BlockNames;
 
-import net.minecraft.server.v1_17_R1.ArgumentBlock;
-import net.minecraft.server.v1_17_R1.Block;
-import net.minecraft.server.v1_17_R1.BlockLeaves;
-import net.minecraft.server.v1_17_R1.Blocks;
-import net.minecraft.server.v1_17_R1.IBlockData;
-import net.minecraft.server.v1_17_R1.IRegistry;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.ResourceKeyInvalidException;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
+
 
 public class PaperMaterialReader implements IMaterialReader
 {
@@ -147,9 +142,9 @@ public class PaperMaterialReader implements IMaterialReader
 		if (blockdata != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
-			if (blockdata.getBlock() instanceof BlockLeaves)
+			if (blockdata.getBlock() instanceof LeavesBlock)
 			{
-				return PaperMaterialData.ofBlockData(blockdata.set(BlockLeaves.DISTANCE, 1), input);
+				return PaperMaterialData.ofBlockData(blockdata.set(LeavesBlock.DISTANCE, 1), input);
 			}			
 			return PaperMaterialData.ofBlockData(blockdata, input);
 		}
@@ -188,9 +183,9 @@ public class PaperMaterialReader implements IMaterialReader
 			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 			{
 				// For leaves, add DISTANCE 1 to make them not decay.
-				if (block instanceof BlockLeaves)
+				if (block instanceof LeavesBlock)
 				{
-					return PaperMaterialData.ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
+					return PaperMaterialData.ofBlockData(block.getBlockData().set(LeavesBlock.DISTANCE, 1), input);
 				}				
 				return PaperMaterialData.ofBlockData(block.getBlockData(), input);
 			}
@@ -208,6 +203,6 @@ public class PaperMaterialReader implements IMaterialReader
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
 		}
 
-		return PaperMaterialData.ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);
+		return PaperMaterialData.ofBlockData(Blocks.NOTE_BLOCK.defaultBlockState(), input);
 	}	
 }

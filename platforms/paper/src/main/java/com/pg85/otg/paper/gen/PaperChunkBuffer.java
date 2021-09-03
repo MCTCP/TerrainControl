@@ -11,6 +11,7 @@ import net.minecraft.server.v1_17_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_17_R1.IBlockData;
 import net.minecraft.server.v1_17_R1.IChunkAccess;
 import net.minecraft.server.v1_17_R1.ProtoChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
@@ -69,7 +70,7 @@ public class PaperChunkBuffer extends ChunkBuffer
 		return blockData == null ? null : PaperMaterialData.ofBlockData(blockData);
 	}
 
-	public IChunkAccess getChunk()
+	public ChunkAccess getChunk()
 	{
 		return this.chunk;
 	}

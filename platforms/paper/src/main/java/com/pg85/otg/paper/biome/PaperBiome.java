@@ -17,7 +17,6 @@ import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -25,8 +24,12 @@ import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 
 public class PaperBiome implements IBiome
@@ -56,7 +59,7 @@ public class PaperBiome implements IBiome
 		// BiomeSettingsGeneration.a == BiomeGenerationSettings.Builder in forge
 		BiomeSettingsGeneration.a biomeGenerationSettingsBuilder = new BiomeSettingsGeneration.a();
 
-		BiomeSettingsMobs.a mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
+		MobSpawnSettings.a mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 	
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// a() == withSurfaceBuilder() in forge
@@ -158,7 +161,7 @@ public class PaperBiome implements IBiome
 				break;
 		}
 
-		Biome.a builder = new Biome.a()
+		Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
 			// Precipitation
 			.a(biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE :
 				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN :
@@ -180,8 +183,8 @@ public class PaperBiome implements IBiome
 			builder.a(TemperatureModifier.FROZEN);
 		}		
 		
-		Biome.Geography category = Biome.Geography.a(biomeConfig.getBiomeCategory());
-		builder.a(category != null ? category : isOceanBiome ? Biome.Geography.OCEAN : Biome.Geography.NONE);
+		Biome.BiomeCategory category = Biome.BiomeCategory.a(biomeConfig.getBiomeCategory());
+		builder.a(category != null ? category : isOceanBiome ? Biome.BiomeCategory.OCEAN : Biome.BiomeCategory.NONE);
 		if (category == null)
 		{
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
@@ -268,16 +271,16 @@ public class PaperBiome implements IBiome
 			switch (biomeConfig.getRareBuildingType())
 			{
 				case desertPyramid:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.f);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.DESERT_PYRAMID);
 					break;
 				case igloo:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.g);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.IGLOO);
 					break;
 				case jungleTemple:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.e);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.JUNGLE_TEMPLE);
 					break;
 				case swampHut:
-					biomeGenerationSettingsBuilder.a(StructureFeatures.j);
+					biomeGenerationSettingsBuilder.a(StructureFeatures.SWAMP_HUT);
 					break;
 				case disabled:
 					break;
@@ -442,32 +445,31 @@ public class PaperBiome implements IBiome
 		return RegistryGeneration.a(RegistryGeneration.f, name, structure);
 	}
 	
-	private static BiomeSettingsMobs.a createMobSpawnInfo (IBiomeConfig biomeConfig)
+	private static MobSpawnSettings.Builder createMobSpawnInfo (IBiomeConfig biomeConfig)
 	{
-		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() for forge
-		BiomeSettingsMobs.a mobSpawnInfoBuilder = new BiomeSettingsMobs.a();
-		addMobGroup(EnumCreatureType.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(EnumCreatureType.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(EnumCreatureType.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(EnumCreatureType.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(EnumCreatureType.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(EnumCreatureType.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		MobSpawnSettings.Builder mobSpawnInfoBuilder = new MobSpawnSettings.Builder();
+		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
 
 		// a() == isValidSpawnBiomeForPlayer()
 		mobSpawnInfoBuilder.a();
 		return mobSpawnInfoBuilder;
 	}
 
-	private static void addMobGroup(EnumCreatureType creatureType, BiomeSettingsMobs.a mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	private static void addMobGroup(MobCategory creatureType, MobSpawnSettings.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
 	{
 		for (WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
 			// a() == byKey() in forge
-			Optional<EntityTypes<?>> entityType = EntityTypes.a(mobSpawnGroup.getInternalName());
+			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
 			if (entityType.isPresent())
 			{
 				// a() == withSpawner() in forge
-				mobSpawnInfoBuilder.a(creatureType, new BiomeSettingsMobs.c(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.addSpawn(creatureType, new SpawnerData(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{

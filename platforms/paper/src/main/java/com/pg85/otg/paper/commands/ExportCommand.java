@@ -14,8 +14,8 @@ import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.util.PaperNBTHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
-import net.minecraft.server.v1_17_R1.ArgumentTile;
-import net.minecraft.server.v1_17_R1.IBlockData;
+import net.minecraft.world.level.block.state.BlockState;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
@@ -112,7 +112,7 @@ public class ExportCommand extends BaseCommand
 			return true;
 		}
 		String objectName = args[0];
-		IBlockData centerBlockState = null;
+		BlockState centerBlockState = null;
 
 		try
 		{

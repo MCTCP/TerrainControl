@@ -1,5 +1,12 @@
 package com.pg85.otg.paper.commands;
 
+import java.nio.file.Path;
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.entity.Player;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
@@ -9,21 +16,16 @@ import com.pg85.otg.customobject.creator.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.gen.MCWorldGenRegion;
 import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.util.PaperNBTHelper;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.server.v1_17_R1.BlockPosition;
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
 
-import java.nio.file.Path;
-import java.util.List;
+import net.minecraft.core.BlockPos;
 
 public class ObjectUtils
 {
@@ -144,7 +146,7 @@ public class ObjectUtils
 	 */
 	protected static RegionCommand.Region getRegionFromObject(Location loc, StructuredCustomObject object)
 	{
-		BlockPosition pos = new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+		BlockPos pos = new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 		RegionCommand.Region region = new RegionCommand.Region();
 		BoundingBox box = object.getBoundingBox(Rotation.NORTH);
 		// Make the object not spawn on top of the player
@@ -167,11 +169,11 @@ public class ObjectUtils
 
 		Corner center = new Corner(pos.getX() + 2 + (box.getWidth() / 2), pos.getY() + yshift, pos.getZ() + 2 + (box.getDepth() / 2));
 
-		region.setPos(new BlockPosition(
+		region.setPos(new BlockPos(
 			center.x + box.getMinX(),
 			lowestElevation + yshift,
 			center.z + box.getMinZ()));
-		region.setPos(new BlockPosition(
+		region.setPos(new BlockPos(
 			center.x + box.getMinX() + box.getWidth(),
 			highestElevation + yshift,
 			center.z + box.getMinZ() + box.getDepth()));

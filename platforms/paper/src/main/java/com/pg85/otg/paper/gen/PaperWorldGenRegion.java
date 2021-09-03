@@ -1,5 +1,9 @@
 package com.pg85.otg.paper.gen;
 
+import java.text.MessageFormat;
+import java.util.Optional;
+import java.util.Random;
+
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -15,19 +19,20 @@ import com.pg85.otg.paper.util.PaperNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplaceBlockMatrix;
-import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
+import com.pg85.otg.util.nbt.NamedBinaryTag;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import net.minecraft.server.v1_17_R1.*;
-
-import java.text.MessageFormat;
-import java.util.Optional;
-import java.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class PaperWorldGenRegion extends LocalWorldGenRegion
@@ -90,7 +95,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public ChunkCoordinate getSpawnChunk()
 	{
-		BlockPosition spawnPos = this.worldGenRegion.getMinecraftWorld().getSpawn();
+		BlockPos spawnPos = this.worldGenRegion.getMinecraftWorld().getSpawn();
 		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 	}
 
@@ -128,7 +133,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public LocalMaterialData getMaterialDirect(int x, int y, int z)
 	{
-		return PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPosition(x, y, z)));
+		return PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPos(x, y, z)));
 	}
 	
 	@Override
@@ -142,7 +147,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunkAccess chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -160,7 +165,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPosition(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
 	}
 
 	@Override
@@ -237,7 +242,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 
 		for (int i = heightMapY; i >= 0; i--)
 		{
-			blockState = chunk.getType(new BlockPosition(internalX, i, internalZ));
+			blockState = chunk.getType(new BlockPos(internalX, i, internalZ));
 			block = blockState.getBlock();
 			material = PaperMaterialData.ofBlockData(blockState);
 			isLiquid = material.isLiquid();
@@ -318,7 +323,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		if (chunk != null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
-			return this.worldGenRegion.getLightLevel(new BlockPosition(x, y, z));
+			return this.worldGenRegion.getLightLevel(new BlockPos(x, y, z));
 		}
 		return -1;
 	}
@@ -333,7 +338,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y);
 		}
-		this.worldGenRegion.setTypeAndData(new BlockPosition(x, y, z), ((PaperMaterialData)material).internalBlock(), 3);
+		this.worldGenRegion.setTypeAndData(new BlockPos(x, y, z), ((PaperMaterialData)material).internalBlock(), 3);
 	}
 
 	@Override
@@ -381,7 +386,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
 
-			BlockPosition pos = new BlockPosition(x, y, z);
+			BlockPos pos = new BlockPos(x, y, z);
 			// Notify world: (2 | 16) == update client, don't update observers
 			this.worldGenRegion.setTypeAndData(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
 
@@ -408,7 +413,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		nms.set("y", NBTTagInt.a(y));
 		nms.set("z", NBTTagInt.a(z));
 
-		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPosition(x, y, z));
+		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)
 		{
 			try {
@@ -445,7 +450,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 	
-	public TileEntity getTileEntity(BlockPosition blockPos)
+	public TileEntity getTileEntity(BlockPos blockPos)
 	{
 		return worldGenRegion.getTileEntity(blockPos);
 	}
@@ -458,7 +463,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			return false;
 		}
-		BlockPosition blockPos = new BlockPosition(x, y, z);
+		BlockPos blockPos = new BlockPos(x, y, z);
 		try
 		{
 			// Features -> BiomeDecoratorGroups
@@ -690,7 +695,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 			if (entity instanceof EntityInsentient)
 			{
 				// If the block is a solid block or entity is a fish out of water, cancel
-				LocalMaterialData block = PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())));
+				LocalMaterialData block = PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
 				if (
 					block.isSolid() ||
 					(
@@ -721,7 +726,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 				mobEntity.setPersistent();
 
 				GroupDataEntity ilivingentitydata = null;
-				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPosition(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
 				this.worldGenRegion.addAllEntities(mobEntity);
 			}
 		}
@@ -730,13 +735,13 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));		
+		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));		
 	}
 
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
+		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
@@ -748,7 +753,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 
 		if (feature.isPresent())
 		{
-			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
 			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
 			{
@@ -768,12 +773,12 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	// TODO: We already have getMaterial/setBlock, rename/refactor these
 	// so it's clear they are/should be used only in a specific context.	
 
-	public IBlockData getBlockData(BlockPosition blockpos)
+	public IBlockData getBlockData(BlockPos blockpos)
 	{
 		return this.worldGenRegion.getType(blockpos);
 	}
 
-	public void setBlockState(BlockPosition blockpos, IBlockData blockstate1, int i)
+	public void setBlockState(BlockPos blockpos, IBlockData blockstate1, int i)
 	{
 		this.worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
@@ -808,7 +813,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPosition(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
 	}	
 	
 	@Override

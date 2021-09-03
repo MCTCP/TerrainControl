@@ -26,18 +26,9 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.v1_16_R3.BiomeBase;
-import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R3.DefinedStructureManager;
-import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.IChunkAccess;
-import net.minecraft.server.v1_16_R3.IRegistryCustom;
-import net.minecraft.server.v1_16_R3.SeededRandom;
-import net.minecraft.server.v1_16_R3.StructureSettingsFeature;
-import net.minecraft.server.v1_16_R3.WorldChunkManager;
-import net.minecraft.server.v1_16_R3.WorldGenVillage;
-import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -59,7 +50,7 @@ public class ShadowChunkGenerator
 {
 	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
-	private final FifoMap<ChunkCoordinate, IChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunkAccess>(512);
+	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunkAccess>(512);
 	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
 	static Field heightMaps;
@@ -109,9 +100,9 @@ public class ShadowChunkGenerator
 		return buffer;
 	}
 
-	public IChunkAccess getChunkFromCache(ChunkCoordinate chunkCoord)
+	public ChunkAccess getChunkFromCache(ChunkCoordinate chunkCoord)
 	{
-		IChunkAccess cachedChunk = this.unloadedChunksCache.get(chunkCoord);
+		ChunkAccess cachedChunk = this.unloadedChunksCache.get(chunkCoord);
 		if(cachedChunk != null)
 		{
 			return cachedChunk;
@@ -135,7 +126,7 @@ public class ShadowChunkGenerator
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
-				int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
+				int endY = cachedChunk.a(Types.WORLD_SURFACE_WG).a(x, z);
 				for (int y = 0; y <= endY; y++)
 				{
 					BlockPos pos = new BlockPos(x, y, z);
@@ -167,7 +158,7 @@ public class ShadowChunkGenerator
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
-				int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
+				int endY = cachedChunk.a(Types.WORLD_SURFACE_WG).a(x, z);
 				for (int y = 0; y <= endY; y++)
 				{
 					BlockPos pos = new BlockPos(x, y, z);
@@ -320,7 +311,7 @@ public class ShadowChunkGenerator
 			return cachedColumn;
 		}
 
-		IChunkAccess chunk = getChunkFromCache(chunkCoord);
+		ChunkAccess chunk = getChunkFromCache(chunkCoord);
 		if (chunk == null)
 		{
 			// Generate a chunk without loading/decorating it
