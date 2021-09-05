@@ -15,8 +15,6 @@ import net.minecraft.data.BuiltinRegistries;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
-import org.jetbrains.annotations.Nullable;
-
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfigFinder;

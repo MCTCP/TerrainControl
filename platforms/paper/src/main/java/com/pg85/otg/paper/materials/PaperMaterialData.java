@@ -249,18 +249,18 @@ public class PaperMaterialData extends LocalMaterialData
 					}
 				}
 			}
-			if (state.b(BlockRotatable.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
+			if (state.b(RotatedPillarBlock.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
 			{
-				state = ((BlockRotatable)state.getBlock()).a(this.blockData, EnumBlockRotation.COUNTERCLOCKWISE_90);
+				state = ((RotatedPillarBlock)state.getBlock()).a(this.blockData, Rotation.COUNTERCLOCKWISE_90);
 			}
-			if (state.b(BlockTall.EAST)) // fence or glass pane
+			if (state.b(CrossCollisionBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
-				boolean hasEast = state.get(BlockTall.EAST);
-				state = state.set(BlockTall.EAST, state.get(BlockTall.SOUTH));
-				state = state.set(BlockTall.SOUTH, state.get(BlockTall.WEST));
-				state = state.set(BlockTall.WEST, state.get(BlockTall.NORTH));
-				state = state.set(BlockTall.NORTH, hasEast);
+				boolean hasEast = state.getValue(CrossCollisionBlock.EAST);
+				state = state.setValue(CrossCollisionBlock.EAST, state.getValue(CrossCollisionBlock.SOUTH));
+				state = state.setValue(CrossCollisionBlock.SOUTH, state.getValue(CrossCollisionBlock.WEST));
+				state = state.setValue(CrossCollisionBlock.WEST, state.getValue(CrossCollisionBlock.NORTH));
+				state = state.setValue(CrossCollisionBlock.NORTH, hasEast);
 			}
 			// Block is rotated, store a pointer to it			
 			this.rotated = PaperMaterialData.ofBlockData(state);

@@ -13,7 +13,6 @@ import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.minecraft.BlockNames;
 
 import net.minecraft.ResourceLocationException;
-import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

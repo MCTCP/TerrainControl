@@ -8,8 +8,6 @@ import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.server.v1_17_R1.*;
-
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Map;

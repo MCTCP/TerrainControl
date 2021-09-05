@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -260,7 +261,7 @@ public class MapCommand extends BaseCommand
 	private HighestBlockInfo getHighestBlockInfoInUnloadedChunk(PaperChunkBuffer chunk, int internalX, int internalZ)
 	{
 		// TODO: Just use heightmaps?
-		IBlockData blockInChunk;
+		BlockData blockInChunk;
 		for (int y = chunk.getHighestBlockForColumn(internalX, internalZ); y >= 0; y--)
 		{
 			blockInChunk = chunk.getChunk().getType(new BlockPos(internalX, y, internalZ));

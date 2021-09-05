@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -51,7 +52,6 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.v1_17_R1.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -178,14 +178,12 @@ public class EditCommand extends BaseCommand
 		{
 			for (BlockPos pos : updates)
 			{
-				IBlockData blockstate = worldGenRegion.getBlockData(pos);
+				BlockData blockstate = worldGenRegion.getBlockData(pos);
 				if (blockstate.a(BlockTags.LEAVES))
 				{
 					worldGenRegion.getInternal().getBlockTickList().a(pos, blockstate.getBlock(), 1);
-				}
-				else
-				{
-					IBlockData blockstate1 = Block.b(blockstate, worldGenRegion.getInternal(), pos);
+				} else {
+					BlockData blockstate1 = Block.b(blockstate, worldGenRegion.getInternal(), pos);
 					worldGenRegion.setBlockState(pos, blockstate1, 20);
 				}
 			}

@@ -4,6 +4,9 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
+import org.bukkit.HeightMap;
+import org.bukkit.block.data.BlockData;
+
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -29,15 +32,25 @@ import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class PaperWorldGenRegion extends LocalWorldGenRegion
 {
-	protected final GeneratorAccessSeed worldGenRegion;
+	protected final LevelAccessor worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
@@ -45,7 +58,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, RegionLimitedWorldAccess worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.a(), worldGenRegion.b(), chunkGenerator.getCachedBiomeProvider());
 		this.worldGenRegion = worldGenRegion;
@@ -53,7 +66,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, LevelAccessor worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -61,7 +74,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, LevelAccessor worldGenRegion)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -99,7 +112,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 	}
 
-	public GeneratorAccessSeed getInternal()
+	public LevelAccessor getInternal()
 	{
 		return this.worldGenRegion;
 	}
@@ -210,7 +223,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunkAccess chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -228,16 +241,16 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE, internalX, internalZ);
+		int heightMapY = chunk.getHighestBlock(HeightMap.WORLD_SURFACE, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
 	}
 
-	protected int getHighestBlockYAt(IChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	protected int getHighestBlockYAt(ChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		LocalMaterialData material;
 		boolean isSolid;
 		boolean isLiquid;
-		IBlockData blockState;
+		BlockData blockState;
 		Block block;
 
 		for (int i = heightMapY; i >= 0; i--)
@@ -304,7 +317,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHeightMapHeight (int x, int z)
 	{
-		return this.worldGenRegion.a(HeightMap.Type.WORLD_SURFACE_WG, x, z);
+		return this.worldGenRegion.a(HeightMap.WORLD_SURFACE_WG, x, z);
 	}
 
 	@Override
@@ -319,7 +332,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Check if this causes problems with BO3 LightChecks.
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		IChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		if (chunk != null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
@@ -406,7 +419,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 
-	protected void attachNBT(int x, int y, int z, NamedBinaryTag nbt, IBlockData state)
+	protected void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockData state)
 	{
 		NBTTagCompound nms = PaperNBTHelper.getNMSFromNBTTagCompound(nbt);
 		nms.set("x", NBTTagInt.a(x));
@@ -469,68 +482,66 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 			// Features -> BiomeDecoratorGroups
 			// ConfiguredFeature.feature -> WorldGenFeatureConfigured.e
 			// ConfiguredFeature.config -> WorldGenFeatureConfigured.f
-			WorldGenFeatureConfigured<WorldGenFeatureTreeConfiguration, ?> tree = null;
-			WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?> other = null;
+			ConfiguredFeature<TreeConfiguration, ?> tree = null;
+			ConfiguredFeature<FeatureConfiguration, ?> other = null;
 			switch (type)
 			{
 				case Acacia:
-					tree = BiomeDecoratorGroups.ACACIA;
+					tree = Features.ACACIA;
 					break;
 				case BigTree:
-					tree = BiomeDecoratorGroups.FANCY_OAK;
+					tree = Features.FANCY_OAK;
 					break;
 				case Forest:
 				case Birch:
-					tree = BiomeDecoratorGroups.BIRCH;
+					tree = Features.BIRCH;
 					break;
 				case JungleTree:
-					tree = BiomeDecoratorGroups.MEGA_JUNGLE_TREE;
+					tree = Features.MEGA_JUNGLE_TREE;
 					break;
 				case CocoaTree:
-					tree = BiomeDecoratorGroups.JUNGLE_TREE;
+					tree = Features.JUNGLE_TREE;
 					break;
 				case DarkOak:
-					tree = BiomeDecoratorGroups.DARK_OAK;
+					tree = Features.DARK_OAK;
 					break;
 				case GroundBush:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.JUNGLE_BUSH;
+					tree = Features.JUNGLE_BUSH;
 					break;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
-						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
-					}
-					else
-					{
-						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
+						other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
+					} else {
+						other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
 					}
 					break;
 				case HugeRedMushroom:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
+					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
 					break;
 				case HugeBrownMushroom:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
+					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
 					break;
 				case SwampTree:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.SWAMP_TREE;
+					tree = Features.SWAMP_OAK;
 					break;
 				case Taiga1:
-					tree = BiomeDecoratorGroups.PINE;
+					tree = Features.PINE;
 					break;
 				case Taiga2:
-					tree = BiomeDecoratorGroups.SPRUCE;
+					tree = Features.SPRUCE;
 					break;
 				case HugeTaiga1:
-					tree = BiomeDecoratorGroups.MEGA_PINE;
+					tree = Features.MEGA_PINE;
 					break;
 				case HugeTaiga2:
-					tree = BiomeDecoratorGroups.MEGA_SPRUCE;
+					tree = Features.MEGA_SPRUCE;
 					break;
 				case TallBirch:
-					tree = BiomeDecoratorGroups.SUPER_BIRCH_BEES_0002;
+					tree = Features.SUPER_BIRCH_BEES_0002;
 					break;
 				case Tree:
-					tree = BiomeDecoratorGroups.OAK;
+					tree = Features.OAK;
 					break;
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());
@@ -572,8 +583,8 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		
 		// Fetch entity type for Entity() mob name
 		Entity entity = null;
-		Optional<EntityTypes<?>> type1 = EntityTypes.a(entityData.getResourceLocation().toString());
-		EntityTypes<?> type2 = null;
+		Optional<EntityType<?>> type1 = EntityType.byString(entityData.getResourceLocation().toString());
+		EntityType<?> type2 = null;
 		if(type1.isPresent())
 		{
 			type2 = type1.get();
@@ -692,7 +703,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 			}
 		
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
-			if (entity instanceof EntityInsentient)
+			if (entity instanceof Mob)
 			{
 				// If the block is a solid block or entity is a fish out of water, cancel
 				LocalMaterialData block = PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
@@ -700,8 +711,8 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 					block.isSolid() ||
 					(
 						(
-							((EntityInsentient)entity).getMonsterType() == EnumMonsterType.WATER_MOB
-							|| entity instanceof EntityGuardian
+							((Mob)entity).getMonsterType() == EnumMonsterType.WATER_MOB
+							|| entity instanceof Guardian
 						)
 						&& !block.isLiquid()
 					)
@@ -714,7 +725,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 					continue;
 				}
 				
-				EntityInsentient mobEntity = (EntityInsentient)entity;
+				Mob mobEntity = (Mob)entity;
 				
 				// Attach nametag if one was provided via Entity()
 				String nameTag = entityData.getNameTagOrNBTFileName();
@@ -735,21 +746,21 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		WorldGenerator.MONSTER_ROOM.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));		
+		Feature.MONSTER_ROOM.b(FeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));		
 	}
 
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		WorldGenerator.FOSSIL.b(WorldGenFeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.FOSSIL.b(FeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
 	{
 		IRegistryCustom registries = this.worldGenRegion.getMinecraftWorld().r();
-		IRegistry<WorldGenFeatureConfigured<?, ?>> registry = registries.b(IRegistry.au);
-		Optional<WorldGenFeatureConfigured<?, ?>> feature = registry.getOptional(new MinecraftKey(id));
+		IRegistry<ConfiguredFeature<?, ?>> registry = registries.b(IRegistry.au);
+		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
 
 		if (feature.isPresent())
 		{
@@ -773,12 +784,12 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	// TODO: We already have getMaterial/setBlock, rename/refactor these
 	// so it's clear they are/should be used only in a specific context.	
 
-	public IBlockData getBlockData(BlockPos blockpos)
+	public BlockData getBlockData(BlockPos blockpos)
 	{
 		return this.worldGenRegion.getType(blockpos);
 	}
 
-	public void setBlockState(BlockPos blockpos, IBlockData blockstate1, int i)
+	public void setBlockState(BlockPos blockpos, BlockData blockstate1, int i)
 	{
 		this.worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
@@ -796,7 +807,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunkAccess chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -822,7 +833,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunkAccess chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -841,7 +852,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(HeightMap.Type.WORLD_SURFACE_WG, internalX, internalZ);
+		int heightMapY = chunk.getHighestBlock(HeightMap.WORLD_SURFACE_WG, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}
 

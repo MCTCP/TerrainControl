@@ -7,18 +7,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import net.minecraft.server.v1_17_R1.NBTBase;
-import net.minecraft.server.v1_17_R1.NBTTagByte;
-import net.minecraft.server.v1_17_R1.NBTTagCompound;
-import net.minecraft.server.v1_17_R1.NBTTagDouble;
-import net.minecraft.server.v1_17_R1.NBTTagFloat;
-import net.minecraft.server.v1_17_R1.NBTTagInt;
-import net.minecraft.server.v1_17_R1.NBTTagIntArray;
-import net.minecraft.server.v1_17_R1.NBTTagList;
-import net.minecraft.server.v1_17_R1.NBTTagLong;
-import net.minecraft.server.v1_17_R1.NBTTagShort;
-import net.minecraft.server.v1_17_R1.NBTTagString;
-
 // TODO: most methods used to throw an NBTException, but that no longer exists
 // log proper warnings/errors and make sure return values are picked up properly.
 public class JsonToNBT
