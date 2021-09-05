@@ -1,10 +1,17 @@
 package com.pg85.otg.paper.materials;
 
 import com.pg85.otg.util.materials.LocalMaterials;
+
+import net.minecraft.world.level.block.BambooBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.TallSeagrassBlock;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
+import net.minecraft.world.level.block.state.properties.BambooLeaves;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -262,26 +269,26 @@ public class PaperMaterials extends LocalMaterials
 		RED_MUSHROOM = PaperMaterialData.ofBlockData(Blocks.RED_MUSHROOM.defaultBlockState());
 		BROWN_MUSHROOM = PaperMaterialData.ofBlockData(Blocks.BROWN_MUSHROOM.defaultBlockState());
 
-		DOUBLE_TALL_GRASS_LOWER = PaperMaterialData.ofBlockData(Blocks.TALL_GRASS.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		DOUBLE_TALL_GRASS_UPPER = PaperMaterialData.ofBlockData(Blocks.TALL_GRASS.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-		LARGE_FERN_LOWER = PaperMaterialData.ofBlockData(Blocks.LARGE_FERN.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		LARGE_FERN_UPPER = PaperMaterialData.ofBlockData(Blocks.LARGE_FERN.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-		LILAC_LOWER = PaperMaterialData.ofBlockData(Blocks.LILAC.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		LILAC_UPPER = PaperMaterialData.ofBlockData(Blocks.LILAC.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-		PEONY_LOWER = PaperMaterialData.ofBlockData(Blocks.PEONY.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		PEONY_UPPER = PaperMaterialData.ofBlockData(Blocks.PEONY.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-		ROSE_BUSH_LOWER = PaperMaterialData.ofBlockData(Blocks.ROSE_BUSH.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		ROSE_BUSH_UPPER = PaperMaterialData.ofBlockData(Blocks.ROSE_BUSH.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-		SUNFLOWER_LOWER = PaperMaterialData.ofBlockData(Blocks.SUNFLOWER.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-		SUNFLOWER_UPPER = PaperMaterialData.ofBlockData(Blocks.SUNFLOWER.defaultBlockState().setValue(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+		DOUBLE_TALL_GRASS_LOWER = PaperMaterialData.ofBlockData(Blocks.TALL_GRASS.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		DOUBLE_TALL_GRASS_UPPER = PaperMaterialData.ofBlockData(Blocks.TALL_GRASS.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		LARGE_FERN_LOWER = PaperMaterialData.ofBlockData(Blocks.LARGE_FERN.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		LARGE_FERN_UPPER = PaperMaterialData.ofBlockData(Blocks.LARGE_FERN.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		LILAC_LOWER = PaperMaterialData.ofBlockData(Blocks.LILAC.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		LILAC_UPPER = PaperMaterialData.ofBlockData(Blocks.LILAC.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		PEONY_LOWER = PaperMaterialData.ofBlockData(Blocks.PEONY.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		PEONY_UPPER = PaperMaterialData.ofBlockData(Blocks.PEONY.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		ROSE_BUSH_LOWER = PaperMaterialData.ofBlockData(Blocks.ROSE_BUSH.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		ROSE_BUSH_UPPER = PaperMaterialData.ofBlockData(Blocks.ROSE_BUSH.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		SUNFLOWER_LOWER = PaperMaterialData.ofBlockData(Blocks.SUNFLOWER.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		SUNFLOWER_UPPER = PaperMaterialData.ofBlockData(Blocks.SUNFLOWER.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
 
-		ACACIA_SAPLING = PaperMaterialData.ofBlockData(Blocks.ACACIA_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
+		ACACIA_SAPLING = PaperMaterialData.ofBlockData(Blocks.ACACIA_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
 		BAMBOO_SAPLING = PaperMaterialData.ofBlockData(Blocks.BAMBOO_SAPLING.defaultBlockState());
-		BIRCH_SAPLING = PaperMaterialData.ofBlockData(Blocks.BIRCH_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
-		DARK_OAK_SAPLING = PaperMaterialData.ofBlockData(Blocks.DARK_OAK_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
-		JUNGLE_SAPLING = PaperMaterialData.ofBlockData(Blocks.JUNGLE_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
-		OAK_SAPLING = PaperMaterialData.ofBlockData(Blocks.OAK_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
-		SPRUCE_SAPLING = PaperMaterialData.ofBlockData(Blocks.SPRUCE_SAPLING.defaultBlockState().setValue(BlockSapling.STAGE, 1));
+		BIRCH_SAPLING = PaperMaterialData.ofBlockData(Blocks.BIRCH_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
+		DARK_OAK_SAPLING = PaperMaterialData.ofBlockData(Blocks.DARK_OAK_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
+		JUNGLE_SAPLING = PaperMaterialData.ofBlockData(Blocks.JUNGLE_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
+		OAK_SAPLING = PaperMaterialData.ofBlockData(Blocks.OAK_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
+		SPRUCE_SAPLING = PaperMaterialData.ofBlockData(Blocks.SPRUCE_SAPLING.defaultBlockState().setValue(SaplingBlock.STAGE, 1));
 
 		PUMPKIN = PaperMaterialData.ofBlockData(Blocks.PUMPKIN.defaultBlockState());
 		CACTUS = PaperMaterialData.ofBlockData(Blocks.CACTUS.defaultBlockState());
@@ -289,21 +296,21 @@ public class PaperMaterials extends LocalMaterials
 		VINE = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState());
 		WATER_LILY = PaperMaterialData.ofBlockData(Blocks.LILY_PAD.defaultBlockState());
 		SUGAR_CANE_BLOCK = PaperMaterialData.ofBlockData(Blocks.SUGAR_CANE.defaultBlockState());
-		BlockState bambooState = Blocks.BAMBOO.defaultBlockState().setValue(BlockBamboo.d, 1).setValue(BlockBamboo.e, BlockPropertyBambooSize.NONE).setValue(BlockBamboo.f, 0);
+		BlockState bambooState = Blocks.BAMBOO.defaultBlockState().setValue(BambooBlock.AGE, 1).setValue(BambooBlock.LEAVES, BambooLeaves.NONE).setValue(BambooBlock.STAGE, 0);
 		BAMBOO = PaperMaterialData.ofBlockData(bambooState);
-		BAMBOO_SMALL = PaperMaterialData.ofBlockData(bambooState.setValue(BlockBamboo.e, BlockPropertyBambooSize.SMALL));
-		BAMBOO_LARGE = PaperMaterialData.ofBlockData(bambooState.setValue(BlockBamboo.e, BlockPropertyBambooSize.LARGE));
-		BAMBOO_LARGE_GROWING = PaperMaterialData.ofBlockData(bambooState.setValue(BlockBamboo.e, BlockPropertyBambooSize.LARGE).setValue(BlockBamboo.f, 1));
+		BAMBOO_SMALL = PaperMaterialData.ofBlockData(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.SMALL));
+		BAMBOO_LARGE = PaperMaterialData.ofBlockData(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.LARGE));
+		BAMBOO_LARGE_GROWING = PaperMaterialData.ofBlockData(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.LARGE).setValue(BambooBlock.STAGE, 1));
 		PODZOL = PaperMaterialData.ofBlockData(Blocks.PODZOL.defaultBlockState());
 		SEAGRASS = PaperMaterialData.ofBlockData(Blocks.SEAGRASS.defaultBlockState());
-		TALL_SEAGRASS_LOWER = PaperMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.LOWER));
-		TALL_SEAGRASS_UPPER = PaperMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.UPPER));
+		TALL_SEAGRASS_LOWER = PaperMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrassBlock.HALF, DoubleBlockHalf.LOWER));
+		TALL_SEAGRASS_UPPER = PaperMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrassBlock.HALF, DoubleBlockHalf.UPPER));
 		KELP = PaperMaterialData.ofBlockData(Blocks.KELP.defaultBlockState());
 		KELP_PLANT = PaperMaterialData.ofBlockData(Blocks.KELP_PLANT.defaultBlockState());
-		VINE_SOUTH = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(BlockVine.SOUTH, true));
-		VINE_NORTH = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(BlockVine.NORTH, true));
-		VINE_WEST = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(BlockVine.WEST, true));
-		VINE_EAST = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(BlockVine.EAST, true));
+		VINE_SOUTH = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(VineBlock.SOUTH, true));
+		VINE_NORTH = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(VineBlock.NORTH, true));
+		VINE_WEST = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(VineBlock.WEST, true));
+		VINE_EAST = PaperMaterialData.ofBlockData(Blocks.VINE.defaultBlockState().setValue(VineBlock.EAST, true));
 		SEA_PICKLE = PaperMaterialData.ofBlockData(Blocks.SEA_PICKLE.defaultBlockState());
 
 		// Ores
