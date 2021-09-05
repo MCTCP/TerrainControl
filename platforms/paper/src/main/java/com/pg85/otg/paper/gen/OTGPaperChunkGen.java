@@ -11,13 +11,13 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
 
-public class OTGSpigotChunkGen extends ChunkGenerator
+public class OTGPaperChunkGen extends ChunkGenerator
 {
 	public OTGNoiseChunkGenerator generator = null;
 	private final FifoMap<ChunkCoordinate, ChunkData> chunkDataCache = new FifoMap<>(128);
 	private final Preset preset;
 	
-	public OTGSpigotChunkGen(Preset preset)
+	public OTGPaperChunkGen(Preset preset)
 	{
 		this.preset = preset;
 	}

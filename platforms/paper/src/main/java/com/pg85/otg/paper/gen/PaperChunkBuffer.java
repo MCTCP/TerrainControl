@@ -6,13 +6,11 @@ import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.v1_17_R1.BlockPosition;
-import net.minecraft.server.v1_17_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_17_R1.IBlockData;
-import net.minecraft.server.v1_17_R1.IChunkAccess;
-import net.minecraft.server.v1_17_R1.ProtoChunk;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
+import net.minecraft.world.level.chunk.ProtoChunk;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -41,7 +39,7 @@ public class PaperChunkBuffer extends ChunkBuffer
 		{
 			return chunkCoord;
 		}
-		ChunkCoordIntPair pos = this.chunk.getPos();
+		ChunkPos pos = this.chunk.getPos();
 		return ChunkCoordinate.fromChunkCoords(pos.x, pos.z);
 	}
 
@@ -54,7 +52,7 @@ public class PaperChunkBuffer extends ChunkBuffer
 		} else {
 			// Forge: setPos()
 			// Spigot: d()
-			this.chunk.setType(this.mutable.d(blockX, blockY, blockZ), ((PaperMaterialData) material).internalBlock(), false);
+			this.chunk.setBlockState(this.mutable.set(blockX, blockY, blockZ), ((PaperMaterialData) material).internalBlock(), false);
 		}
 	}
 
@@ -66,7 +64,7 @@ public class PaperChunkBuffer extends ChunkBuffer
 			Material material = this.chunkData.getType(blockX, blockY, blockZ);
 			return material == null ? null : PaperMaterialData.ofSpigotMaterial(material);
 		}
-		IBlockData blockData = this.chunk.getType(this.mutable.d(blockX, blockY, blockZ));
+		BlockState blockData = this.chunk.getType(this.mutable.set(blockX, blockY, blockZ));
 		return blockData == null ? null : PaperMaterialData.ofBlockData(blockData);
 	}
 

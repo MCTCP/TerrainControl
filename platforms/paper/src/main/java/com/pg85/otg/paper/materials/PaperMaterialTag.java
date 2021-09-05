@@ -3,10 +3,9 @@ package com.pg85.otg.paper.materials;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
-import net.minecraft.server.v1_17_R1.Block;
-import net.minecraft.server.v1_17_R1.MinecraftKey;
-import net.minecraft.server.v1_17_R1.Tag;
-import net.minecraft.server.v1_17_R1.TagsBlock;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.block.Block;
 
 public class PaperMaterialTag extends LocalMaterialTag
 {
@@ -22,10 +21,10 @@ public class PaperMaterialTag extends LocalMaterialTag
 				return new PaperMaterialTag(blockTag, Constants.MOD_ID_SHORT + ":" + name.trim().toLowerCase().replace(Constants.MOD_ID_SHORT + ":", ""));
 			}
 		}
-		final MinecraftKey resourceLocation;
+		final ResourceLocation resourceLocation;
 		try
 		{
-			resourceLocation = new MinecraftKey(name.trim().toLowerCase());	
+			resourceLocation = new ResourceLocation(name.trim().toLowerCase());
 		} catch(Exception ex) {
 			return null;
 		}

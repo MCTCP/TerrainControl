@@ -19,7 +19,7 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.paper.biome.OTGBiomeProvider;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperChunkBuffer;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -194,7 +194,7 @@ public class MapCommand extends BaseCommand
 		{
 			for (int chunkZ = 0; chunkZ < (int)Math.ceil(img.getHeight() / 16f); chunkZ++)
 			{
-				PaperChunkBuffer chunk = ((OTGSpigotChunkGen)world.getHandle().generator).generator.getChunkWithoutLoadingOrCaching(world.getHandle().getRandom(), ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+				PaperChunkBuffer chunk = ((OTGPaperChunkGen)world.getHandle().generator).generator.getChunkWithoutLoadingOrCaching(world.getHandle().getRandom(), ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
 				for(int internalX = 0; internalX < Constants.CHUNK_SIZE; internalX++)
 				{
 					for(int internalZ = 0; internalZ < Constants.CHUNK_SIZE; internalZ++)

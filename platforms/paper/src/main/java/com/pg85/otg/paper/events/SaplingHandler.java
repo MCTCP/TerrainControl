@@ -16,7 +16,7 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.ISaplingSpawner;
 import com.pg85.otg.interfaces.IWorldGenRegion;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.presets.Preset;
@@ -38,14 +38,14 @@ public class SaplingHandler
         BlockPos blockPos = new BlockPos(event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
 		PaperWorldGenRegion worldGenRegion;
 		Preset preset;
-		if(((CraftWorld)event.getWorld()).getGenerator() instanceof OTGSpigotChunkGen)
+		if(((CraftWorld)event.getWorld()).getGenerator() instanceof OTGPaperChunkGen)
 		{
-			preset = ((OTGSpigotChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator.getPreset();
+			preset = ((OTGPaperChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator.getPreset();
 			worldGenRegion = new PaperWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
 				((CraftWorld)event.getWorld()).getHandle(),
-				((OTGSpigotChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator
+				((OTGPaperChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator
 			);
 		} else { 
 			return;

@@ -1,5 +1,6 @@
 package com.pg85.otg.paper.networking;
 
+import net.minecraft.network.FriendlyByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -19,7 +20,6 @@ import com.pg85.otg.util.logging.LogLevel;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.network.
 
 public class NetworkingListener implements Listener
 {
@@ -53,12 +53,12 @@ public class NetworkingListener implements Listener
 
 		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getPreset();
 
-		PacketDataSerializer buffer = new PacketDataSerializer(Unpooled.buffer(32766));
+		FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer(32766));
 		String presetName = preset.getFolderName().toLowerCase();
 		
 		buffer.writeByte((byte) 1);
 		buffer.writeInt(preset.getAllBiomeConfigs().size());
-		buffer.a(presetName);
+		buffer.writeUtf(presetName);
 
 		for (IBiomeConfig biome : preset.getAllBiomeConfigs())
 		{
@@ -67,7 +67,7 @@ public class NetworkingListener implements Listener
 
 			if (wrapper != null)
 			{
-				buffer.a(key.replace(Constants.MOD_ID_SHORT + ":" + presetName + ".", ""));
+				buffer.writeUtf(key.replace(Constants.MOD_ID_SHORT + ":" + presetName + ".", ""));
 				wrapper.encode(buffer);
 			}
 		}

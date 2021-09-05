@@ -22,7 +22,7 @@ import com.pg85.otg.paper.biome.OTGBiomeProvider;
 import com.pg85.otg.paper.commands.OTGCommandExecutor;
 import com.pg85.otg.paper.events.OTGHandler;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.networking.NetworkingListener;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
@@ -110,7 +110,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			return null;
 		}
 		worlds.put(worldName, id);
-		return new OTGSpigotChunkGen(preset);
+		return new OTGPaperChunkGen(preset);
 	}
 
 	@EventHandler
@@ -141,13 +141,13 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Mission failed, we'll get them next time");
 			return;
 		}
-		if (!(world.getGenerator() instanceof OTGSpigotChunkGen))
+		if (!(world.getGenerator() instanceof OTGPaperChunkGen))
 		{
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
 			return;
 		}
 		// We have a CustomChunkGenerator and a NoiseChunkGenerator
-		OTGSpigotChunkGen OTGGen = (OTGSpigotChunkGen) world.getGenerator();
+		OTGPaperChunkGen OTGGen = (OTGPaperChunkGen) world.getGenerator();
 		OTGNoiseChunkGenerator OTGDelegate;
 		// If generator is null, it has not been initialized yet. Initialize it.
 		// The lock is used to avoid the accidental creation of two separate objects, in case

@@ -6,10 +6,13 @@ import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialProperty;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FallingBlock;
-import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Material;
 
 import org.bukkit.block.data.BlockData;
@@ -174,17 +177,17 @@ public class PaperMaterialData extends LocalMaterialData
 		// Taken from SnowBlock.canSurvive
 		if(
 			this.blockData != null &&
-			!this.blockData.a(Blocks.ICE) && 
-			!this.blockData.a(Blocks.PACKED_ICE) && 
-			!this.blockData.a(Blocks.BARRIER)
+			!this.blockData.is(Blocks.ICE) &&
+			!this.blockData.is(Blocks.PACKED_ICE) &&
+			!this.blockData.is(Blocks.BARRIER)
 		) {
 			if (
-				!this.blockData.a(Blocks.HONEY_BLOCK) && 
-				!this.blockData.a(Blocks.SOUL_SAND)
+				!this.blockData.is(Blocks.HONEY_BLOCK) &&
+				!this.blockData.is(Blocks.SOUL_SAND)
 			) {
 				// TODO: Vanilla checks faceFull here, we don't since it requires coords.
 				//return Block.isFaceFull(this.blockData.getCollisionShape(blockPos, blockPos.below()), Direction.UP) || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(LAYERS) == 8);
-				return this.blockData.getMaterial().isSolid() || (this.blockData.a(Blocks.SNOW) && this.blockData.get(BlockSnow.LAYERS) == 8);
+				return this.blockData.getMaterial().isSolid() || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(SnowLayerBlock.LAYERS) == 8);
 			} else {
 				return true;
 			}
@@ -218,30 +221,30 @@ public class PaperMaterialData extends LocalMaterialData
 		if (rotated == null)
 		{
 			BlockState state = this.blockData;
-			Collection<IBlockState<?>> properties = state.r();
+			Collection<Property<?>> properties = state.getProperties();
 			// Loop through the blocks properties
-			for (IBlockState<?> property : properties)
+			for (Property<?> property : properties)
 			{
 				// Anything with a direction
-				if (property instanceof BlockStateDirection)
+				if (property instanceof DirectionProperty)
 				{
-					EnumDirection direction = (EnumDirection) state.get(property);
+					Direction direction = (Direction) state.getValue(property);
 					switch (direction)
 					{
 						case DOWN:
 						case UP:
 							break;
 						case NORTH:
-							state = state.set((BlockStateDirection) property, EnumDirection.WEST);
+							state = state.setValue((DirectionProperty) property, Direction.WEST);
 							break;
 						case SOUTH:
-							state = state.set((BlockStateDirection) property, EnumDirection.EAST);
+							state = state.setValue((DirectionProperty) property, Direction.EAST);
 							break;
 						case WEST:
-							state = state.set((BlockStateDirection) property, EnumDirection.SOUTH);
+							state = state.setValue((DirectionProperty) property, Direction.SOUTH);
 							break;
 						case EAST:
-							state = state.set((BlockStateDirection) property, EnumDirection.NORTH);
+							state = state.setValue((DirectionProperty) property, Direction.NORTH);
 							break;
 					}
 				}
@@ -275,31 +278,31 @@ public class PaperMaterialData extends LocalMaterialData
 	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
 	{
 		@SuppressWarnings("rawtypes")
-		IBlockState property = null;
+		Property property = null;
 		T finalVal = value;
 
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
 		if (materialProperty == MaterialProperties.AGE_0_25)
 		{
-			property = BlockProperties.ak;
+			property = BlockStateProperties.AGE_25;
 		}
 		else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{
-			property = BlockProperties.ay;
+			property = BlockStateProperties.PICKLES;
 		} else if (materialProperty == MaterialProperties.SNOWY)
 		{
-			property = BlockProperties.z;
+			property = BlockStateProperties.SNOWY;
 		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
 		{
 			// Extremely ugly hack for directions
-			property = BlockProperties.O;
-			EnumDirection direction = EnumDirection.values()[((OTGDirection)value).ordinal()];
-			return PaperMaterialData.ofBlockData(this.blockData.set(property, direction));
+			property = BlockStateProperties.HORIZONTAL_FACING;
+			Direction direction = Direction.values()[((OTGDirection)value).ordinal()];
+			return PaperMaterialData.ofBlockData(this.blockData.setValue(property, direction));
 		} else {
 			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}
 
-		return PaperMaterialData.ofBlockData(this.blockData.set(property, finalVal));
+		return PaperMaterialData.ofBlockData(this.blockData.setValue(property, finalVal));
 	}
 	
 	@Override

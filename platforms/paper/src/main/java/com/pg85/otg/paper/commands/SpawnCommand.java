@@ -24,7 +24,7 @@ import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.gen.MCWorldGenRegion;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
@@ -88,7 +88,7 @@ public class SpawnCommand extends BaseCommand
 
 		if(objectToSpawn instanceof BO4)
 		{
-	    	if(!(((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGSpigotChunkGen))
+	    	if(!(((CraftWorld)((Player)sender).getWorld()).getGenerator() instanceof OTGPaperChunkGen))
 	    	{
 	    		sender.sendMessage("BO4 objects can only be spawned in OTG worlds/dimensions.");
 	    		return true;
@@ -139,7 +139,7 @@ public class SpawnCommand extends BaseCommand
         		return true;
         	}
         	
-    		CustomStructureCache cache = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
+    		CustomStructureCache cache = ((OTGPaperChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath());
 
         	// Try spawning the structure in available chunks around the player
             int maxRadius = 1000;  

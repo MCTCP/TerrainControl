@@ -12,8 +12,15 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.minecraft.BlockNames;
 
+import net.minecraft.ResourceLocationException;
+import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.commands.arguments.blocks.BlockStateParser;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 
 public class PaperMaterialReader implements IMaterialReader
@@ -97,7 +104,7 @@ public class PaperMaterialReader implements IMaterialReader
 			return PaperMaterialData.blank;
 		}
 
-		IBlockData blockState;
+		BlockState blockState;
 		String blockNameCorrected = input.trim().toLowerCase();
 		// Try parsing as legacy block name / id
 		if (!blockNameCorrected.contains(":"))
@@ -132,11 +139,11 @@ public class PaperMaterialReader implements IMaterialReader
 		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
 
 		// Use mc /setblock command logic to parse block string for us <3
-		IBlockData blockdata = null;
+		BlockState blockdata = null;
 		try
 		{
 			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
-			blockdata = new ArgumentBlock(new StringReader(newInput), true).a(true).getBlockData();
+			blockdata = new BlockStateParser(new StringReader(newInput), true).parse(true).getState();
 		}
 		catch (CommandSyntaxException ignored) { }
 		if (blockdata != null)
@@ -144,7 +151,7 @@ public class PaperMaterialReader implements IMaterialReader
 			// For leaves, add DISTANCE 1 to make them not decay.
 			if (blockdata.getBlock() instanceof LeavesBlock)
 			{
-				return PaperMaterialData.ofBlockData(blockdata.set(LeavesBlock.DISTANCE, 1), input);
+				return PaperMaterialData.ofBlockData(blockdata.setValue(LeavesBlock.DISTANCE, 1), input);
 			}			
 			return PaperMaterialData.ofBlockData(blockdata, input);
 		}
@@ -179,17 +186,17 @@ public class PaperMaterialReader implements IMaterialReader
 		try
 		{
 			// This returns AIR if block is not found ><. ----Does it for spigot too?
-			block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
+			block = Registry.BLOCK.get(new ResourceLocation(blockNameCorrected));
 			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 			{
 				// For leaves, add DISTANCE 1 to make them not decay.
 				if (block instanceof LeavesBlock)
 				{
-					return PaperMaterialData.ofBlockData(block.getBlockData().set(LeavesBlock.DISTANCE, 1), input);
+					return PaperMaterialData.ofBlockData(block.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1), input);
 				}				
-				return PaperMaterialData.ofBlockData(block.getBlockData(), input);
+				return PaperMaterialData.ofBlockData(block.defaultBlockState(), input);
 			}
-		} catch(ResourceKeyInvalidException ignored) { }
+		} catch(ResourceLocationException ignored) { }
 
 		// Try legacy name again, without data.
 		blockState = PaperLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));

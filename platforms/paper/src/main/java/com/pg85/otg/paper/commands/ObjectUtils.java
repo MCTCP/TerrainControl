@@ -17,7 +17,7 @@ import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.paper.gen.MCWorldGenRegion;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.util.PaperNBTHelper;
 import com.pg85.otg.presets.Preset;
@@ -261,13 +261,13 @@ public class ObjectUtils
 
 	protected static PaperWorldGenRegion getWorldGenRegion(Preset preset, CraftWorld level)
 	{
-		if (level.getGenerator() instanceof OTGSpigotChunkGen)
+		if (level.getGenerator() instanceof OTGPaperChunkGen)
 		{
 			return new PaperWorldGenRegion(
 				preset.getFolderName(),
 				preset.getWorldConfig(),
 				level.getHandle(),
-				((OTGSpigotChunkGen) level.getGenerator()).generator
+				((OTGPaperChunkGen) level.getGenerator()).generator
 			);
 		}
 		else

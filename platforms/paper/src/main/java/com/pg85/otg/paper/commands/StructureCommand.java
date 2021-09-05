@@ -18,7 +18,7 @@ import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.paper.gen.OTGSpigotChunkGen;
+import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.util.ChunkCoordinate;
 
 public class StructureCommand extends BaseCommand
@@ -42,13 +42,13 @@ public class StructureCommand extends BaseCommand
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)((Player)sender).getLocation().getBlockX(), (int)((Player)sender).getLocation().getBlockZ());
 		// if the player is in range
 
-		CustomStructure worldInfoChunk = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath()).getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGPaperChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath()).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
 			ILogger logger = OTG.getEngine().getLogger();
 			CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).getPreset().getFolderName());
+			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGPaperChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).getPreset().getFolderName());
 			CustomObjectResourcesManager manager = OTG.getEngine().getCustomObjectResourcesManager();
 			IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 			

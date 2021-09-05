@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.OptionalInt;
 import java.util.Set;
 
+import net.minecraft.data.BuiltinRegistries;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
@@ -427,7 +428,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 			Biome biomeBase = null;
 			if(biome != null)
 			{
-				biomeBase = RegistryGeneration.WORLDGEN_BIOME.get(new ResourceLocation(biome.getKey().toString()));		
+				biomeBase = BuiltinRegistries.BIOME.get(new ResourceLocation(biome.getKey().toString()));
 			}
 			if(biomeBase != null)
 			{

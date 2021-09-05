@@ -21,7 +21,7 @@ public class MobSpawnGroupHelper
 		{
 			// Removing "entities/" since the key returned is "minecraft:entities/chicken" for vanilla biomes/mobs.
 			// TODO: Make sure this works for all mobs.
-			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.c.i().toString().replace("entities/", ""), spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount);
+			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getDescriptionId().toString().replace("entities/", ""), spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount);
 			if(wMSG != null)
 			{
 				result.add(wMSG);
