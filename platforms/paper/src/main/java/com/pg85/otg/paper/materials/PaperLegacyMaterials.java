@@ -10,11 +10,19 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.BlockStateData;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.ComparatorMode;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.PistonType;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.block.state.properties.StructureMode;
 
 public class PaperLegacyMaterials
 {
@@ -797,7 +805,6 @@ public class PaperLegacyMaterials
 		return new ResourceLocation(result);
 	}
 
-
 	private static BlockState getAnvilWithData (int material, int data)
 	{
 		Direction orientation = getBit(data, 0) == 0 ? Direction.NORTH : Direction.WEST;
@@ -1083,28 +1090,28 @@ public class PaperLegacyMaterials
 				return null;
 		}
 		return half == 0 ?
-				blockState
-						.setValue(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.LOWER)
-						.setValue(BlockDoor.FACING, getFacingEastSouthWestNorth(facing))
-						.setValue(BlockDoor.OPEN, open == 1)
-						 : blockState
-						.setValue(BlockDoor.HALF, BlockPropertyDoubleBlockHalf.UPPER)
-						.setValue(BlockDoor.HINGE, hinge == 0 ? BlockPropertyDoorHinge.LEFT : BlockPropertyDoorHinge.RIGHT)
-						.setValue(BlockDoor.POWERED, powered == 1)
-				;
+			blockState
+				.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER)
+				.setValue(DoorBlock.FACING, getFacingEastSouthWestNorth(facing))
+				.setValue(DoorBlock.OPEN, open == 1)
+			 : blockState
+				.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER)
+				.setValue(DoorBlock.HINGE, hinge == 0 ? DoorHingeSide.LEFT : DoorHingeSide.RIGHT)
+				.setValue(DoorBlock.POWERED, powered == 1)
+		;
 	}
 
 	private static BlockState getSignPostWithData (int data)
 	{
 		int rotation = getBits(data, 0, 4);
 		// TODO: Hopefully rotation is still mapped to the same int values as 1.12..
-		return Blocks.OAK_SIGN.defaultBlockState().setValue(BlockFloorSign.ROTATION, rotation);
+		return Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, rotation);
 	}
 
 	private static BlockState getWallSignWithData (int data)
 	{
 		int facing = getBits(data, 0, 3);
-		return Blocks.OAK_WALL_SIGN.defaultBlockState().setValue(BlockWallSign.FACING, getFacingNorthSouthWestEast(facing));
+		return Blocks.OAK_WALL_SIGN.defaultBlockState().setValue(WallSignBlock.FACING, getFacingNorthSouthWestEast(facing));
 	}
 
 	// TODO: Can't find information on 1.12 command block block data, what about facing?
@@ -1204,9 +1211,9 @@ public class PaperLegacyMaterials
 			case 3:
 				return Blocks.TRAPPED_CHEST.defaultBlockState().setValue(TrappedChestBlock.FACING, getFacingNorthSouthWestEast(facing));
 			case 4:
-				return Blocks.FURNACE.defaultBlockState().setValue(BlockFurnace.FACING, getFacingNorthSouthWestEast(facing)).setValue(BlockFurnace.LIT, false);
+				return Blocks.FURNACE.defaultBlockState().setValue(FurnaceBlock.FACING, getFacingNorthSouthWestEast(facing)).setValue(FurnaceBlock.LIT, false);
 			case 5:
-				return Blocks.FURNACE.defaultBlockState().setValue(BlockFurnace.FACING, getFacingNorthSouthWestEast(facing)).setValue(BlockFurnace.LIT, true);
+				return Blocks.FURNACE.defaultBlockState().setValue(FurnaceBlock.FACING, getFacingNorthSouthWestEast(facing)).setValue(FurnaceBlock.LIT, true);
 			default:
 				return null;
 		}
@@ -1219,11 +1226,11 @@ public class PaperLegacyMaterials
 		switch (material)
 		{
 			case 0:
-				return Blocks.DISPENSER.defaultBlockState().setValue(BlockDispenser.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(BlockDispenser.TRIGGERED, active == 1);
+				return Blocks.DISPENSER.defaultBlockState().setValue(DispenserBlock.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(DispenserBlock.TRIGGERED, active == 1);
 			case 1:
-				return Blocks.DROPPER.defaultBlockState().setValue(BlockDropper.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(BlockDropper.TRIGGERED, active == 1);
+				return Blocks.DROPPER.defaultBlockState().setValue(DropperBlock.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(DropperBlock.TRIGGERED, active == 1);
 			case 2:
-				return Blocks.HOPPER.defaultBlockState().setValue(BlockHopper.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(BlockHopper.ENABLED, active == 1);
+				return Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(HopperBlock.ENABLED, active == 1);
 			default:
 				return null;
 		}
@@ -1235,9 +1242,9 @@ public class PaperLegacyMaterials
 		switch (material)
 		{
 			case 0:
-				return Blocks.CARVED_PUMPKIN.defaultBlockState().setValue(BlockPumpkinCarved.FACING, getFacingSouthWestNorthEast(facing));
+				return Blocks.CARVED_PUMPKIN.defaultBlockState().setValue(CarvedPumpkinBlock.FACING, getFacingSouthWestNorthEast(facing));
 			case 1:
-				return Blocks.JACK_O_LANTERN.defaultBlockState().setValue(BlockPumpkinCarved.FACING, getFacingSouthWestNorthEast(facing));
+				return Blocks.JACK_O_LANTERN.defaultBlockState().setValue(CarvedPumpkinBlock.FACING, getFacingSouthWestNorthEast(facing));
 			default:
 				return null;
 		}
@@ -1247,7 +1254,7 @@ public class PaperLegacyMaterials
 	{
 		int facing = getBits(data, 0, 3);
 		int powered = getBit(data, 3);
-		return Blocks.OBSERVER.defaultBlockState().setValue(BlockObserver.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(BlockObserver.b, powered == 1);
+		return Blocks.OBSERVER.defaultBlockState().setValue(ObserverBlock.FACING, getFacingDownUpNorthSouthWestEast(facing)).setValue(ObserverBlock.POWERED, powered == 1);
 	}
 
 	private static BlockState getRepeaterWithData (int material, int data)
@@ -1258,18 +1265,18 @@ public class PaperLegacyMaterials
 		switch (material)
 		{
 			case 0:
-				blockState = Blocks.REPEATER.defaultBlockState().setValue(BlockRepeater.c, false);
+				blockState = Blocks.REPEATER.defaultBlockState().setValue(RepeaterBlock.POWERED, false);
 				break;
 			case 1:
-				blockState = Blocks.REPEATER.defaultBlockState().setValue(BlockRepeater.c, true);
+				blockState = Blocks.REPEATER.defaultBlockState().setValue(RepeaterBlock.POWERED, true);
 				break;
 			default:
 				return null;
 		}
 		return blockState
-				.setValue(BlockRepeater.DELAY, delay)
-				.setValue(BlockRepeater.FACING, getFacingSouthWestNorthEast(facing))
-				;
+			.setValue(RepeaterBlock.DELAY, delay)
+			.setValue(RepeaterBlock.FACING, getFacingSouthWestNorthEast(facing))
+		;
 	}
 
 	private static BlockState getComparatorWithData (int material, int data)
@@ -1278,10 +1285,10 @@ public class PaperLegacyMaterials
 		int mode = getBit(data, 2);
 		int powered = material == 1 ? 1 : getBit(data, 3);
 		return Blocks.COMPARATOR.defaultBlockState()
-				.setValue(BlockRedstoneComparator.FACING, getFacingSouthWestNorthEast(facing))
-				.setValue(BlockRedstoneComparator.MODE, mode == 0 ? BlockPropertyComparatorMode.COMPARE : BlockPropertyComparatorMode.SUBTRACT)
-				.setValue(BlockRedstoneComparator.c, powered == 1)
-				;
+			.setValue(ComparatorBlock.FACING, getFacingSouthWestNorthEast(facing))
+			.setValue(ComparatorBlock.MODE, mode == 0 ? ComparatorMode.COMPARE : ComparatorMode.SUBTRACT)
+			.setValue(ComparatorBlock.POWERED, powered == 1)
+		;
 	}
 
 	private static BlockState getBedBlockWithData (int data)
@@ -1290,10 +1297,10 @@ public class PaperLegacyMaterials
 		int occupied = getBit(data, 2);
 		int part = getBit(data, 3);
 		return Blocks.RED_BED.defaultBlockState()
-				.setValue(BlockBed.FACING, getFacingSouthWestNorthEast(facing))
-				.setValue(BlockBed.OCCUPIED, occupied == 1)
-				.setValue(BlockBed.PART, part == 0 ? BlockPropertyBedPart.FOOT : BlockPropertyBedPart.HEAD)
-				;
+			.setValue(BedBlock.FACING, getFacingSouthWestNorthEast(facing))
+			.setValue(BedBlock.OCCUPIED, occupied == 1)
+			.setValue(BedBlock.PART, part == 0 ? BedPart.FOOT : BedPart.HEAD)
+		;
 	}
 
 	private static BlockState getTrapDoorBlockWithData (int material, int data)
@@ -1314,10 +1321,10 @@ public class PaperLegacyMaterials
 				return null;
 		}
 		return blockState
-				.setValue(BlockTrapdoor.FACING, getFacingSouthNorthEastWest(facing))
-				.setValue(BlockTrapdoor.HALF, half == 0 ? Half.BOTTOM : Half.TOP)
-				.setValue(BlockTrapdoor.OPEN, open == 1)
-				;
+			.setValue(TrapDoorBlock.FACING, getFacingSouthNorthEastWest(facing))
+			.setValue(TrapDoorBlock.HALF, half == 0 ? Half.BOTTOM : Half.TOP)
+			.setValue(TrapDoorBlock.OPEN, open == 1)
+		;
 	}
 
 	private static BlockState getPistonWithData (int material, int data)
@@ -1327,9 +1334,9 @@ public class PaperLegacyMaterials
 		switch (material)
 		{
 			case 0:
-				return Blocks.PISTON.defaultBlockState().setValue(BlockPiston.EXTENDED, extended == 1).setValue(BlockPiston.FACING, getFacingDownUpNorthSouthWestEast(facing));
+				return Blocks.PISTON.defaultBlockState().setValue(PistonBaseBlock.EXTENDED, extended == 1).setValue(PistonBaseBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
 			case 1:
-				return Blocks.STICKY_PISTON.defaultBlockState().setValue(BlockPiston.EXTENDED, extended == 1).setValue(BlockPiston.FACING, getFacingDownUpNorthSouthWestEast(facing));
+				return Blocks.STICKY_PISTON.defaultBlockState().setValue(PistonBaseBlock.EXTENDED, extended == 1).setValue(PistonBaseBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
 			default:
 				return null;
 		}
@@ -1340,9 +1347,9 @@ public class PaperLegacyMaterials
 		int facing = getBits(data, 0, 3);
 		int type = getBit(data, 3);
 		return Blocks.PISTON_HEAD.defaultBlockState()
-				.setValue(BlockPistonExtension.FACING, getFacingDownUpNorthSouthWestEast(facing))
-				.setValue(BlockPistonExtension.TYPE, type == 0 ? BlockPropertyPistonType.DEFAULT : BlockPropertyPistonType.STICKY)
-				;
+			.setValue(PistonHeadBlock.FACING, getFacingDownUpNorthSouthWestEast(facing))
+			.setValue(PistonHeadBlock.TYPE, type == 0 ? PistonType.DEFAULT : PistonType.STICKY)
+		;
 	}
 
 	private static BlockState getHugeMushroomWithData (int material, int data)
@@ -1373,13 +1380,13 @@ public class PaperLegacyMaterials
 			}
 		}
 		return blockState
-				.setValue(HugeMushroomBlock.DOWN, down)
-				.setValue(HugeMushroomBlock.UP, up)
-				.setValue(HugeMushroomBlock.NORTH, north)
-				.setValue(HugeMushroomBlock.EAST, east)
-				.setValue(HugeMushroomBlock.SOUTH, south)
-				.setValue(HugeMushroomBlock.WEST, west)
-				;
+			.setValue(HugeMushroomBlock.DOWN, down)
+			.setValue(HugeMushroomBlock.UP, up)
+			.setValue(HugeMushroomBlock.NORTH, north)
+			.setValue(HugeMushroomBlock.EAST, east)
+			.setValue(HugeMushroomBlock.SOUTH, south)
+			.setValue(HugeMushroomBlock.WEST, west)
+		;
 	}
 
 	private static BlockState getVineWithData (int data)
@@ -1390,12 +1397,12 @@ public class PaperLegacyMaterials
 		int east = getBit(data, 3);
 		int up = data == 0 ? 1 : 0; // Up was not stored in data for 1.12.2 (only rotation), fix via otg update.
 		return Blocks.VINE.defaultBlockState()
-				.setValue(VineBlock.EAST, east == 1)
-				.setValue(VineBlock.NORTH, north == 1)
-				.setValue(VineBlock.SOUTH, south == 1)
-				.setValue(VineBlock.WEST, west == 1)
-				.setValue(VineBlock.UP, up == 1)
-				;
+			.setValue(VineBlock.EAST, east == 1)
+			.setValue(VineBlock.NORTH, north == 1)
+			.setValue(VineBlock.SOUTH, south == 1)
+			.setValue(VineBlock.WEST, west == 1)
+			.setValue(VineBlock.UP, up == 1)
+		;
 	}
 
 	private static BlockState getFenceGateWithData (int material, int data)
@@ -1427,16 +1434,16 @@ public class PaperLegacyMaterials
 				return null;
 		}
 		return blockState
-				.setValue(FenceGateBlock.FACING, getFacingSouthWestNorthEast(facing))
-				.setValue(FenceGateBlock.OPEN, open == 1)
-				;
+			.setValue(FenceGateBlock.FACING, getFacingSouthWestNorthEast(facing))
+			.setValue(FenceGateBlock.OPEN, open == 1)
+		;
 	}
 
 	private static BlockState getCocoaWithData (int data)
 	{
 		int facing = getBits(data, 0, 2);
 		int age = getBits(data, 2, 2);
-		return Blocks.COCOA.defaultBlockState().setValue(BlockCocoa.FACING, getFacingSouthWestNorthEast(facing)).setValue(BlockCocoa.AGE, age);
+		return Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.FACING, getFacingSouthWestNorthEast(facing)).setValue(CocoaBlock.AGE, age);
 	}
 
 	private static BlockState getTripWireHookWithData (int data)
@@ -1445,23 +1452,23 @@ public class PaperLegacyMaterials
 		int attached = getBit(data, 2);
 		int powered = getBit(data, 3);
 		return Blocks.TRIPWIRE_HOOK.defaultBlockState()
-				.setValue(BlockTripwireHook.ATTACHED, attached == 1)
-				.setValue(BlockTripwireHook.FACING, getFacingSouthWestNorthEast(facing))
-				.setValue(BlockTripwireHook.POWERED, powered == 1)
-				;
+			.setValue(TripWireHookBlock.ATTACHED, attached == 1)
+			.setValue(TripWireHookBlock.FACING, getFacingSouthWestNorthEast(facing))
+			.setValue(TripWireHookBlock.POWERED, powered == 1)
+		;
 	}
 
 	private static BlockState getEndPortalFrameWithData (int data)
 	{
 		int facing = getBits(data, 0, 2);
 		int eye = getBit(data, 2);
-		return Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(BlockEnderPortalFrame.EYE, eye == 1).setValue(BlockEnderPortalFrame.FACING, getFacingSouthWestNorthEast(facing));
+		return Blocks.END_PORTAL_FRAME.defaultBlockState().setValue(EndPortalFrameBlock.HAS_EYE, eye == 1).setValue(EndPortalFrameBlock.FACING, getFacingSouthWestNorthEast(facing));
 	}
 
 	private static BlockState getStructureBlockWithData (int data)
 	{
-		BlockPropertyStructureMode structureBlockMode = data == 0 ? BlockPropertyStructureMode.DATA : data == 1 ? BlockPropertyStructureMode.SAVE : data == 2 ? BlockPropertyStructureMode.LOAD : data == 3 ? BlockPropertyStructureMode.LOAD : BlockPropertyStructureMode.DATA;
-		return Blocks.STRUCTURE_BLOCK.defaultBlockState().setValue(BlockStructure.a, structureBlockMode);
+		StructureMode structureBlockMode = data == 0 ? StructureMode.DATA : data == 1 ? StructureMode.SAVE : data == 2 ? StructureMode.LOAD : data == 3 ? StructureMode.LOAD : StructureMode.DATA;
+		return Blocks.STRUCTURE_BLOCK.defaultBlockState().setValue(StructureBlock.MODE, structureBlockMode);
 	}
 
 	private static BlockState getGlazedTerracottaWithData (int material, int data)
@@ -1521,7 +1528,7 @@ public class PaperLegacyMaterials
 			default:
 				return Blocks.BLACK_GLAZED_TERRACOTTA.defaultBlockState();
 		}
-		return blockState.setValue(BlockGlazedTerracotta.FACING, getFacingSouthWestNorthEast(facing));
+		return blockState.setValue(GlazedTerracottaBlock.FACING, getFacingSouthWestNorthEast(facing));
 	}
 
 	private static BlockState getTripWireWithData (int data)
@@ -1530,10 +1537,10 @@ public class PaperLegacyMaterials
 		int attached = getBit(data, 2);
 		int disarmed = getBit(data, 3);
 		return Blocks.TRIPWIRE.defaultBlockState()
-				.setValue(BlockTripwire.POWERED, active == 1)
-				.setValue(BlockTripwire.ATTACHED, attached == 1)
-				.setValue(BlockTripwire.DISARMED, disarmed == 1)
-				;
+			.setValue(TripWireBlock.POWERED, active == 1)
+			.setValue(TripWireBlock.ATTACHED, attached == 1)
+			.setValue(TripWireBlock.DISARMED, disarmed == 1)
+		;
 	}
 
 	//	
