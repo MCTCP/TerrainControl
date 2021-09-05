@@ -4,6 +4,18 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.*;
 import org.bukkit.HeightMap;
 import org.bukkit.block.data.BlockData;
 
@@ -29,44 +41,40 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
 import com.pg85.otg.util.nbt.NamedBinaryTag;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.worldgen.Features;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class PaperWorldGenRegion extends LocalWorldGenRegion
 {
-	protected final LevelAccessor worldGenRegion;
+	protected final WorldGenLevel worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
 	// It may query the same chunk multiple times, so use a fixed size cache.
-	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
+	private final FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<>(2048);
 
 	/** Creates a LocalWorldGenRegion to be used during decoration for OTG worlds. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.a(), worldGenRegion.b(), chunkGenerator.getCachedBiomeProvider());
+		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger(), worldGenRegion.getCenter().x, worldGenRegion.getCenter().z, chunkGenerator.getCachedBiomeProvider());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
 
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, LevelAccessor worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -74,7 +82,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, LevelAccessor worldGenRegion)
+	public PaperWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -108,7 +116,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public ChunkCoordinate getSpawnChunk()
 	{
-		BlockPos spawnPos = this.worldGenRegion.getMinecraftWorld().getSpawn();
+		BlockPos spawnPos = this.worldGenRegion.getMinecraftWorld().getSharedSpawnPos();
 		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 	}
 
@@ -146,7 +154,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public LocalMaterialData getMaterialDirect(int x, int y, int z)
 	{
-		return PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPos(x, y, z)));
+		return PaperMaterialData.ofBlockData(this.worldGenRegion.getBlockState(new BlockPos(x, y, z)));
 	}
 	
 	@Override
@@ -166,11 +174,11 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return null;
 		}
@@ -178,7 +186,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
 	}
 
 	@Override
@@ -229,11 +237,11 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return -1;
 		}
@@ -241,7 +249,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(HeightMap.WORLD_SURFACE, internalX, internalZ);
+		int heightMapY = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
 	}
 
@@ -250,12 +258,12 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		LocalMaterialData material;
 		boolean isSolid;
 		boolean isLiquid;
-		BlockData blockState;
+		BlockState blockState;
 		Block block;
 
 		for (int i = heightMapY; i >= 0; i--)
 		{
-			blockState = chunk.getType(new BlockPos(internalX, i, internalZ));
+			blockState = chunk.getBlockState(new BlockPos(internalX, i, internalZ));
 			block = blockState.getBlock();
 			material = PaperMaterialData.ofBlockData(blockState);
 			isLiquid = material.isLiquid();
@@ -317,7 +325,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHeightMapHeight (int x, int z)
 	{
-		return this.worldGenRegion.a(HeightMap.WORLD_SURFACE_WG, x, z);
+		return this.worldGenRegion.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
 	}
 
 	@Override
@@ -332,11 +340,11 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Check if this causes problems with BO3 LightChecks.
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		if (chunk != null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
+		ChunkAccess chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+		if (chunk != null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
-			return this.worldGenRegion.getLightLevel(new BlockPos(x, y, z));
+			return this.worldGenRegion.getLightEmission(new BlockPos(x, y, z));
 		}
 		return -1;
 	}
@@ -351,7 +359,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y);
 		}
-		this.worldGenRegion.setTypeAndData(new BlockPos(x, y, z), ((PaperMaterialData)material).internalBlock(), 3);
+		this.worldGenRegion.setBlock(new BlockPos(x, y, z), ((PaperMaterialData)material).internalBlock(), 3);
 	}
 
 	@Override
@@ -401,36 +409,38 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 
 			BlockPos pos = new BlockPos(x, y, z);
 			// Notify world: (2 | 16) == update client, don't update observers
-			this.worldGenRegion.setTypeAndData(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
+			this.worldGenRegion.setBlock(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
 
 			if (material.isLiquid())
 			{
-				this.worldGenRegion.getFluidTickList().a(pos, ((PaperMaterialData)material).internalBlock().getFluid().getType(), 0);
+				this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getFluidState().getType(), 0);
 			}
 			else if (material.isMaterial(LocalMaterials.COMMAND_BLOCK))
 			{
-				this.worldGenRegion.getBlockTickList().a(pos, ((PaperMaterialData)material).internalBlock().getBlock(), 0);
+				this.worldGenRegion.getBlockTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getBlock(), 0);
 			}
 
 			if (nbt != null)
 			{
-				this.attachNBT(x, y, z, nbt, worldGenRegion.getType(pos));
+				this.attachNBT(x, y, z, nbt);
 			}
 		}
 	}
 
-	protected void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockData state)
+	protected void attachNBT(int x, int y, int z, NamedBinaryTag nbt)
 	{
-		NBTTagCompound nms = PaperNBTHelper.getNMSFromNBTTagCompound(nbt);
-		nms.set("x", NBTTagInt.a(x));
-		nms.set("y", NBTTagInt.a(y));
-		nms.set("z", NBTTagInt.a(z));
+		CompoundTag nms = PaperNBTHelper.getNMSFromNBTTagCompound(nbt);
+		nms.put("x", IntTag.valueOf(x));
+		nms.put("y", IntTag.valueOf(y));
+		nms.put("z", IntTag.valueOf(z));
 
-		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPos(x, y, z));
+		BlockEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)
 		{
 			try {
-				tileEntity.load(state, nms);
+				// TODO: Check that this doesn't break anything
+				//tileEntity.load(state, nms);
+				tileEntity.load(nms);
 			}
 			catch (JsonSyntaxException e)
 			{
@@ -463,9 +473,9 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 	
-	public TileEntity getTileEntity(BlockPos blockPos)
+	public BlockEntity getTileEntity(BlockPos blockPos)
 	{
-		return worldGenRegion.getTileEntity(blockPos);
+		return worldGenRegion.getBlockEntity(blockPos);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -544,17 +554,17 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 					tree = Features.OAK;
 					break;
 				default:
-					throw new RuntimeException("Failed to handle tree of type " + type.toString());
+					throw new RuntimeException("Failed to handle tree of type " + type);
 			}
 			if (tree != null)
 			{
-				tree.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.f);
+				tree.feature.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.config));
 			}
 			else if (other != null)
 			{
-				other.e.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.f);
+				other.feature.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.config));
 			} else {
-				throw new RuntimeException("Incorrect handling of tree of type " + type.toString());
+				throw new RuntimeException("Incorrect handling of tree of type " + type);
 			}
 			return true;
 		}
@@ -562,7 +572,8 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
 			{
-				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, String.format("Treegen caused an error: ", (Object[])ex.getStackTrace()));
+				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Treegen caused an error: ");
+				this.logger.printStackTrace(LogLevel.ERROR, LogCategory.DECORATION, ex);
 			}
 			// Return true to prevent further attempts.
 			return true;
@@ -582,12 +593,11 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		}
 		
 		// Fetch entity type for Entity() mob name
-		Entity entity = null;
-		Optional<EntityType<?>> type1 = EntityType.byString(entityData.getResourceLocation().toString());
-		EntityType<?> type2 = null;
-		if(type1.isPresent())
+		Optional<EntityType<?>> optionalType = EntityType.byString(entityData.getResourceLocation());
+		EntityType<?> type;
+		if(optionalType.isPresent())
 		{
-			type2 = type1.get();
+			type = optionalType.get();
 		} else {
 			if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 			{
@@ -597,7 +607,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		}
 		
 		// Check for any .txt or .nbt file containing nbt data for the entity
-		NBTTagCompound nbtTagCompound = null;
+		CompoundTag compoundTag = null;
 		if(
 			entityData.getNameTagOrNBTFileName() != null &&
 			(
@@ -606,12 +616,13 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 			)
 		)
 		{
-			nbtTagCompound = new NBTTagCompound();
+			compoundTag = new CompoundTag();
 			if(entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt"))
 			{
-				try {
-					nbtTagCompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
-				} catch (Exception e) {
+
+				compoundTag = JsonToNBT.getTagFromJson(entityData.getMetaData());
+				if (compoundTag == null)
+				{
 					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
 						this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not parse nbt for Entity() " + entityData.makeString() + ", file: " + entityData.getNameTagOrNBTFileName());
@@ -619,152 +630,95 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 					return;
 				}
 				// Specify which type of entity to spawn
-				nbtTagCompound.setString("id", entityData.getResourceLocation());
+				compoundTag.putString("id", entityData.getResourceLocation());
 			}
 			else if (entityData.getNBTTag() != null)
 			{
-				nbtTagCompound = PaperNBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
+				compoundTag = PaperNBTHelper.getNMSFromNBTTagCompound(entityData.getNBTTag());
 			}
 		}
-		
-		if(nbtTagCompound == null)
-		{
-			// Create entity without nbt data
-			try {
-				entity = type2.a(this.worldGenRegion.getMinecraftWorld());
-			} catch (Exception exception) {
-				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-				{
-					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", exception: " + exception.getMessage());
-				}
-				return;
-			}
-			if (entity == null)
-			{
-				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-				{
-					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
-				}
-				return;
-			} else {
-				entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-				worldGenRegion.addAllEntities(entity);
-			}
-		} else {
-			// Create entity with nbt data
-			entity = EntityTypes.a(nbtTagCompound, this.worldGenRegion.getMinecraftWorld(), (entity1) ->
-			{
-				entity1.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-				return entity1;
-			});
-			if (entity == null)
-			{
-				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
-				{
-					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not create entity for Entity() " + entityData.makeString() + ", MC returned null.");
-				}
-				return;
-			}
-			worldGenRegion.addAllEntities(entity);
-		}
+
 		// Create and spawn entities according to group size
 		for (int r = 0; r < entityData.getGroupSize(); r++)
 		{
-			if(r != 0)
+			Entity entity = type.create(this.worldGenRegion.getMinecraftWorld());
+			if (entity == null)
 			{
-				if(nbtTagCompound == null)
+				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					// Create entity without nbt data
-					try {
-						entity = type2.a(this.worldGenRegion.getMinecraftWorld());
-					} catch (Exception exception) {
-						return;
-					}
-					if (entity == null)
-					{
-						return;
-					} else {
-						entity.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-					}
-					worldGenRegion.addAllEntities(entity);
-				} else {
-					// Create entity with nbt data
-					entity = EntityTypes.a(nbtTagCompound, this.worldGenRegion.getMinecraftWorld(), (entity1) ->
-					{
-						entity1.setPositionRotation(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-						return entity1;
-					});
-					worldGenRegion.addAllEntities(entity);
+					this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to make basic entity for " + entityData.makeString());
 				}
-				if (entity == null)
-				{
-					return;
-				}
+				return;
+			}
+			if (compoundTag != null)
+			{
+				entity.load(compoundTag);
+			}
+			entity.setRot(this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+			entity.setPos(entityData.getX(), entityData.getY(), entityData.getZ());
+
+			// Attach nametag if one was provided via Entity()
+			String nameTag = entityData.getNameTagOrNBTFileName();
+			if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+			{
+				entity.setCustomName(new TextComponent(nameTag));
 			}
 		
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
-			if (entity instanceof Mob)
+			if (entity instanceof LivingEntity)
 			{
 				// If the block is a solid block or entity is a fish out of water, cancel
-				LocalMaterialData block = PaperMaterialData.ofBlockData(this.worldGenRegion.getType(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
+				LocalMaterialData block = PaperMaterialData.ofBlockData(this.worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
 				if (
 					block.isSolid() ||
 					(
-						(
-							((Mob)entity).getMonsterType() == EnumMonsterType.WATER_MOB
-							|| entity instanceof Guardian
-						)
+						((LivingEntity) entity).getMobType() == MobType.WATER
 						&& !block.isLiquid()
 					)
 				)
 				{
-					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
+					if (this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
 						this.logger.log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Could not spawn entity at " + entityData.getX() + " " + entityData.getY() + " " + entityData.getZ() + " for Entity() " + entityData.makeString() + ", a solid block was found or a water mob tried to spawn outside of water.");
 					}
 					continue;
 				}
-				
-				Mob mobEntity = (Mob)entity;
-				
-				// Attach nametag if one was provided via Entity()
-				String nameTag = entityData.getNameTagOrNBTFileName();
-				if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
-				{
-					entity.setCustomName(new ChatComponentText(nameTag));
-				}
-				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
-				mobEntity.setPersistent();
 
-				GroupDataEntity ilivingentitydata = null;
-				ilivingentitydata = mobEntity.prepare(this.worldGenRegion, this.worldGenRegion.getDamageScaler(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), EnumMobSpawn.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
-				this.worldGenRegion.addAllEntities(mobEntity);
 			}
+
+			if (entity instanceof Mob mobEntity)
+			{
+				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
+				mobEntity.setPersistenceRequired();
+				mobEntity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), MobSpawnType.CHUNK_GENERATION, null, compoundTag);
+			}
+			this.worldGenRegion.addEntity(entity, CreatureSpawnEvent.SpawnReason.DEFAULT);
 		}
 	}
 
 	@Override
 	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		Feature.MONSTER_ROOM.b(FeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));		
+		Feature.MONSTER_ROOM.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z), FeatureConfiguration.NONE));
 	}
 
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		Feature.FOSSIL.b(FeatureConfiguration.k).a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		// TODO: Add customization to fossile configuration?
+		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
 	{
-		IRegistryCustom registries = this.worldGenRegion.getMinecraftWorld().r();
-		IRegistry<ConfiguredFeature<?, ?>> registry = registries.b(IRegistry.au);
+		RegistryAccess registries = this.worldGenRegion.getMinecraftWorld().registryAccess();
+		Registry<ConfiguredFeature<?, ?>> registry = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
 
 		if (feature.isPresent())
 		{
-			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+			feature.get().place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
 			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
 			{
@@ -784,14 +738,14 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	// TODO: We already have getMaterial/setBlock, rename/refactor these
 	// so it's clear they are/should be used only in a specific context.	
 
-	public BlockData getBlockData(BlockPos blockpos)
+	public BlockState getBlockData(BlockPos blockpos)
 	{
-		return this.worldGenRegion.getType(blockpos);
+		return this.worldGenRegion.getBlockState(blockpos);
 	}
 
-	public void setBlockState(BlockPos blockpos, BlockData blockstate1, int i)
+	public void setBlockState(BlockPos blockpos, BlockState blockstate1, int i)
 	{
-		this.worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
+		this.worldGenRegion.setBlock(blockpos, blockstate1, i);
 	}
 
 	// Shadowgen
@@ -813,10 +767,10 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		}
 		// isAtLeast() -> b()
-		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
+		if ((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
 			return this.chunkGenerator.getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z);
 		}
@@ -824,7 +778,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
 	}	
 	
 	@Override
@@ -839,12 +793,12 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		}
 
 		// If the chunk doesn't exist and we're doing something outside the
 		// decoration sequence, return the material without loading the chunk.
-		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)))
+		if ((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
 			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 		}
@@ -852,7 +806,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(HeightMap.WORLD_SURFACE_WG, internalX, internalZ);
+		int heightMapY = chunk.getHeight(Heightmap.Types.WORLD_SURFACE_WG, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}
 

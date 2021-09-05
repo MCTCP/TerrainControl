@@ -45,16 +45,8 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 */
 	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, CompoundNBT compoundNBT)
 	{
-		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name, new NamedBinaryTag[]{new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
-
-		// Get the child tags using some reflection magic
-		//Map<String, INBT> nmsChildTags = ObfuscationReflectionHelper.getPrivateValue(CompoundNBT.class, compoundNBT, "field_74784_a");
-
-		//if (nmsChildTags == null)
-		//{
-		// Cannot load the tag, return an empty tag
-		//	return compoundTag;
-		//}
+		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name,
+			new NamedBinaryTag[]{new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
 
 		Set<String> keys = compoundNBT.getAllKeys();
 
@@ -67,7 +59,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 			{
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{
-					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT property " + key + " from tag " + compoundNBT.getId());
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CUSTOM_OBJECTS, "Failed to read NBT property " + key + " from tag " + compoundNBT.getAsString());
 				}
 				continue;
 			}
@@ -75,8 +67,6 @@ public class ForgeNBTHelper extends LocalNBTHelper
 			NamedBinaryTag.Type type = NamedBinaryTag.Type.values()[nmsChildTag.getId()];
 			switch (type)
 			{
-				case TAG_End:
-					break;
 				case TAG_Byte:
 				case TAG_Short:
 				case TAG_Int:
@@ -98,6 +88,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 				case TAG_Compound:
 					compoundTag.addTag(getNBTFromNMSTagCompound(key, (CompoundNBT) nmsChildTag));
 					break;
+				case TAG_End:
 				default:
 					break;
 			}

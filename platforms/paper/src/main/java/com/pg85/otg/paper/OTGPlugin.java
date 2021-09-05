@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
@@ -123,7 +124,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		}
 	}
 
-	public static void injectInternalGenerator(World world)
+	public void injectInternalGenerator(World world)
 	{
 		initLock.lock();
 		if (processedWorlds.contains(world.getName()))
@@ -158,7 +159,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				OTGGen.getPreset().getFolderName(),
 				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)),
 				world.getSeed(),
-				GeneratorSettingBase::i
+				NoiseGeneratorSettings::structureSettings
 			);
 		} else {
 			OTGDelegate = OTGGen.generator;

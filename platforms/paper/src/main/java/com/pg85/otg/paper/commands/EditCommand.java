@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.ChatColor;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -144,7 +144,7 @@ public class EditCommand extends BaseCommand
 			}
 
 			// Queue the block coordinate for processing
-			if (fixObject && updateMap.contains(ResourceLocation.a(block.material.getRegistryName())))
+			if (fixObject && updateMap.contains(ResourceLocation.tryParse(block.material.getRegistryName())))
 			{
 				updates.add(new BlockPos(x + block.x, y + block.y, z + block.z));
 			}
@@ -160,7 +160,7 @@ public class EditCommand extends BaseCommand
 			if (block.material.isLeaves())
 			{
 				block.material = PaperMaterialData.ofBlockData(((PaperMaterialData) block.material)
-					.internalBlock().set(LeavesBlock.PERSISTENT, true).set(LeavesBlock.DISTANCE, 7));
+					.internalBlock().setValue(LeavesBlock.PERSISTENT, true).setValue(LeavesBlock.DISTANCE, 7));
 			}
 
 			block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
@@ -178,12 +178,12 @@ public class EditCommand extends BaseCommand
 		{
 			for (BlockPos pos : updates)
 			{
-				BlockData blockstate = worldGenRegion.getBlockData(pos);
-				if (blockstate.a(BlockTags.LEAVES))
+				BlockState blockstate = worldGenRegion.getBlockData(pos);
+				if (blockstate.is(BlockTags.LEAVES))
 				{
-					worldGenRegion.getInternal().getBlockTickList().a(pos, blockstate.getBlock(), 1);
+					worldGenRegion.getInternal().getBlockTicks().scheduleTick(pos, blockstate.getBlock(), 1);
 				} else {
-					BlockData blockstate1 = Block.b(blockstate, worldGenRegion.getInternal(), pos);
+					BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, worldGenRegion.getInternal(), pos);
 					worldGenRegion.setBlockState(pos, blockstate1, 20);
 				}
 			}
@@ -285,12 +285,11 @@ public class EditCommand extends BaseCommand
 
 	public boolean execute(CommandSender sender, String[] args)
 	{
-		if (!(sender instanceof Player))
+		if (!(sender instanceof Player source))
 		{
 			sender.sendMessage("Only players can execute this command");
 			return true;
 		}
-		Player source = (Player) sender;
 		if (args.length == 0)
 		{
 			this.help(source);
@@ -309,7 +308,7 @@ public class EditCommand extends BaseCommand
 		boolean leaveIllegalLeaves = flags.contains("-wrongleaves");
 		presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
 		boolean isGlobal = presetFolderName == null;
-		StructuredCustomObject inputObject = null;
+		StructuredCustomObject inputObject;
 		try
 		{
 			inputObject = getStructuredObject(objectName, presetFolderName);
@@ -368,29 +367,18 @@ public class EditCommand extends BaseCommand
 		source.sendMessage(" - An object is \"complex\" if it contains NBT or RandomBlock");
 	}
 
-	private static class EditSession
-	{
-		private final ObjectType type;
-		private final PaperWorldGenRegion genRegion;
-		private final StructuredCustomObject object;
-		private final ArrayList<BlockFunction<?>> extraBlocks;
-		private final Path objectPath;
-		private final String presetFolderName;
-		private final Corner originalCenterPoint;
-		private final boolean leaveIllegalLeaves;
+	private record EditSession(
+		ObjectType type,
+		PaperWorldGenRegion genRegion,
+		StructuredCustomObject object,
+		ArrayList<BlockFunction<?>> extraBlocks,
+		Path objectPath,
+		String presetFolderName,
+		Corner originalCenterPoint,
+		boolean leaveIllegalLeaves
+	) {}
 
-		public EditSession(ObjectType type, PaperWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint, boolean leaveIllegalLeaves)
-		{
-			this.type = type;
-			this.genRegion = genRegion;
-			this.object = object;
-			this.extraBlocks = extraBlocks;
-			this.objectPath = objectPath;
-			this.presetFolderName = presetFolderName;
-			this.originalCenterPoint = originalCenterPoint;
-			this.leaveIllegalLeaves = leaveIllegalLeaves;
-		}
-	}
+
 	private static final HashSet<ResourceLocation> updateMap = Stream.of(
 		"blocks/oak_fence",
 		"blocks/birch_fence",

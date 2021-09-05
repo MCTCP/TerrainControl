@@ -38,14 +38,14 @@ public class SaplingHandler
         BlockPos blockPos = new BlockPos(event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
 		PaperWorldGenRegion worldGenRegion;
 		Preset preset;
-		if(((CraftWorld)event.getWorld()).getGenerator() instanceof OTGPaperChunkGen)
+		if(event.getWorld().getGenerator() instanceof OTGPaperChunkGen)
 		{
-			preset = ((OTGPaperChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator.getPreset();
+			preset = ((OTGPaperChunkGen) event.getWorld().getGenerator()).generator.getPreset();
 			worldGenRegion = new PaperWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
 				((CraftWorld)event.getWorld()).getHandle(),
-				((OTGPaperChunkGen)((CraftWorld)event.getWorld()).getGenerator()).generator
+				((OTGPaperChunkGen) event.getWorld().getGenerator()).generator
 			);
 		} else { 
 			return;
@@ -62,7 +62,7 @@ public class SaplingHandler
         PaperMaterialData material = (PaperMaterialData)worldGenRegion.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 
         BlockPos result = findFourSaplings(blockPos, material, worldGenRegion);
-        boolean wideTrunk = false;
+        boolean wideTrunk;
         if (result != null)
         {
             blockPos = result;
@@ -73,7 +73,7 @@ public class SaplingHandler
         }        
         
         // Get the sapling generator
-        ISaplingSpawner sapling = biomeConfig.getCustomSaplingGen(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()), wideTrunk);
+        ISaplingSpawner sapling = biomeConfig.getCustomSaplingGen(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().defaultBlockState()), wideTrunk);
         if(sapling != null && sapling.hasWideTrunk() && !wideTrunk)
         {
         	return;
@@ -85,12 +85,12 @@ public class SaplingHandler
         	if(wideTrunk)
         	{
         		// Try to find big (2x2) sapling
-        		saplingType = getBigSaplingType(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()));
+        		saplingType = getBigSaplingType(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().defaultBlockState()));
         	}
             // If not big sapling, try to find small sapling
             if (saplingType == null)
             {
-                saplingType = getSmallSaplingType(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().getBlockData()));
+                saplingType = getSmallSaplingType(PaperMaterialData.ofBlockData(material.internalBlock().getBlock().defaultBlockState()));
             }
             if (saplingType != null)
             {
@@ -154,7 +154,7 @@ public class SaplingHandler
      * Gets the sapling type, based on the assumption that the sapling is
      * not placed in a 2x2 pattern.
      *
-     * @param data The block data of the sapling block.
+     * @param saplingMaterial The sapling material
      * @return The sapling type, or null if not found.
      */
     private SaplingType getSmallSaplingType(LocalMaterialData saplingMaterial)
@@ -191,7 +191,7 @@ public class SaplingHandler
      * be placed in a 2x2 pattern. Will never return one of the smaller
      * sapling types.
      *
-     * @param data The block data of the sapling block.
+     * @param saplingMaterial The material of the sapling.
      * @return The sapling type, or null if not found.
      */
     private SaplingType getBigSaplingType(LocalMaterialData saplingMaterial)
@@ -235,7 +235,7 @@ public class SaplingHandler
         		)
                 {
                     // Found! Adjust internal position
-                    return blockPos.b(treeOffsetX, 0, treeOffsetZ);
+                    return blockPos.offset(treeOffsetX, 0, treeOffsetZ);
                 }
             }
         }

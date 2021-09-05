@@ -1,5 +1,7 @@
 package com.pg85.otg.paper.gen;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.paper.PaperEngine;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.OTGPlugin;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -33,7 +35,7 @@ public class OTGPaperChunkGen extends ChunkGenerator
 	{		
 		if (generator == null)
 		{
-			OTGPlugin.injectInternalGenerator(world);
+			((PaperEngine) OTG.getEngine()).getPlugin().injectInternalGenerator(world);
 			generator.fixBiomes(chunkX, chunkZ);
 		}
 

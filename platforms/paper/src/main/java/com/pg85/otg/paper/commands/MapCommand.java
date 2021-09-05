@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.bukkit.block.data.BlockData;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -26,7 +26,6 @@ import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 
 public class MapCommand extends BaseCommand
@@ -216,7 +215,7 @@ public class MapCommand extends BaseCommand
 							distance = -min + highestBlockInfo.y;
 							relativeDistance = (float)distance / (float)range;
 							shadePercentage = (int)Math.floor(relativeDistance * 2 * 100);
-							rgbColor = shadeColor(highestBlockInfo.material.internalBlock().getBlock().s().rgb, shadePercentage);
+							rgbColor = shadeColor(highestBlockInfo.material.internalBlock().getBlock().defaultMaterialColor().col, shadePercentage);
 							img.setRGB(chunkX * Constants.CHUNK_SIZE + internalX, chunkZ * Constants.CHUNK_SIZE + internalZ, rgbColor);						
 						}
 					}
@@ -249,11 +248,11 @@ public class MapCommand extends BaseCommand
 		int blue = rgbColor & 0xFF;
 		
 		red = red * percent / 100;
-		red = red > 255 ? 255 : red;
+		red = Math.min(red, 255);
 		green = green * percent / 100;
-		green = green > 255 ? 255 : green;
+		green = Math.min(green, 255);
 		blue = blue * percent / 100;
-		blue = blue > 255 ? 255 : blue;
+		blue = Math.min(blue, 255);
 
 		return 65536 * red + 256 * green + blue;
 	}
@@ -261,27 +260,17 @@ public class MapCommand extends BaseCommand
 	private HighestBlockInfo getHighestBlockInfoInUnloadedChunk(PaperChunkBuffer chunk, int internalX, int internalZ)
 	{
 		// TODO: Just use heightmaps?
-		BlockData blockInChunk;
+		BlockState blockInChunk;
 		for (int y = chunk.getHighestBlockForColumn(internalX, internalZ); y >= 0; y--)
 		{
-			blockInChunk = chunk.getChunk().getType(new BlockPos(internalX, y, internalZ));
-			if (blockInChunk != null && blockInChunk.getBlock() != Blocks.AIR)
+			blockInChunk = chunk.getChunk().getType(internalX, y, internalZ);
+			if (blockInChunk.getBlock() != Blocks.AIR)
 			{
 				return new HighestBlockInfo((PaperMaterialData) PaperMaterialData.ofBlockData(blockInChunk), y);
 			}
 		}
-		return new HighestBlockInfo((PaperMaterialData)LocalMaterials.AIR, 63);
+		return new HighestBlockInfo((PaperMaterialData) LocalMaterials.AIR, 63);
 	}
-	
-	public class HighestBlockInfo
-	{
-		public final PaperMaterialData material;
-		public final int y;
-		
-		public HighestBlockInfo(PaperMaterialData material, int y)
-		{
-			this.material = material;
-			this.y = y;
-		}
-	}
+
+	public record HighestBlockInfo(PaperMaterialData material, int y) {}
 }

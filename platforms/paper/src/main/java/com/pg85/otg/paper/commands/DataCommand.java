@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.data.BuiltinRegistries;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
@@ -77,7 +78,7 @@ public class DataCommand extends BaseCommand
 				registry = Registry.PARTICLE_TYPE;
 				break;
 			case "configured_feature":
-				registry = RegistryGeneration.e;
+				registry = BuiltinRegistries.CONFIGURED_FEATURE;
 				break;
 			default:
 				sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));

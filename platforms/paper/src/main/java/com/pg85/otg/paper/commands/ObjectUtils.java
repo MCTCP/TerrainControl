@@ -127,16 +127,12 @@ public class ObjectUtils
 		Corner max = region.getMax();
 		int xlen = Math.abs(max.x - min.x);
 		int zlen = Math.abs(max.z - min.z);
-		switch (type)
-		{
-			case BO3:
-				return xlen > 31 || zlen > 31;
-			case BO4:
-				return xlen > 15 || zlen > 15;
-			case BO2:
-			default:
-				return false;
-		}
+		return switch (type)
+			{
+				case BO3 -> xlen > 31 || zlen > 31;
+				case BO4 -> xlen > 15 || zlen > 15;
+				default -> false;
+			};
 	}
 
 	/** Gets a region large enough to fit an object, positioned away from the player
@@ -151,7 +147,7 @@ public class ObjectUtils
 		BoundingBox box = object.getBoundingBox(Rotation.NORTH);
 		// Make the object not spawn on top of the player
 
-		pos = pos.b(3, 0, 3);
+		pos = pos.offset(3, 0, 3);
 
 		int lowestElevation = pos.getY() + box.getMinY();
 		int highestElevation = pos.getY() + box.getMinY() + box.getHeight();

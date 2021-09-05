@@ -62,10 +62,10 @@ public class PaperChunkBuffer extends ChunkBuffer
 		if (chunkData != null)
 		{
 			Material material = this.chunkData.getType(blockX, blockY, blockZ);
-			return material == null ? null : PaperMaterialData.ofSpigotMaterial(material);
+			return PaperMaterialData.ofSpigotMaterial(material);
 		}
-		BlockState blockData = this.chunk.getType(this.mutable.set(blockX, blockY, blockZ));
-		return blockData == null ? null : PaperMaterialData.ofBlockData(blockData);
+		BlockState blockData = this.chunk.getBlockState(this.mutable.set(blockX, blockY, blockZ));
+		return PaperMaterialData.ofBlockData(blockData);
 	}
 
 	public ChunkAccess getChunk()

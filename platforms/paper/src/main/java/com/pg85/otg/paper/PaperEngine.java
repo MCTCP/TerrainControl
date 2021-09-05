@@ -14,9 +14,9 @@ import java.nio.charset.StandardCharsets;
 
 public class PaperEngine extends OTGEngine
 {
-	private final JavaPlugin plugin;
+	private final OTGPlugin plugin;
 
-	protected PaperEngine(JavaPlugin plugin)
+	protected PaperEngine(OTGPlugin plugin)
 	{
 		super(
 			new PaperLogger(),
@@ -34,7 +34,7 @@ public class PaperEngine extends OTGEngine
 		super.onStart();
 	}
 
-	public JavaPlugin getPlugin()
+	public OTGPlugin getPlugin()
 	{
 		return this.plugin;
 	}

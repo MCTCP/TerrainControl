@@ -21,7 +21,6 @@ import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import com.pg85.otg.util.minecraft.EntityCategory;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -32,15 +31,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.NaturalSpawner;
-import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -68,9 +63,7 @@ import net.minecraft.world.level.levelgen.synth.SurfaceNoise;
 
 import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.generator.BiomeProvider;
-import org.bukkit.util.noise.NoiseGenerator;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
 import javax.annotation.Nullable;
 
@@ -165,7 +158,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();
-		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1, ((PaperPresetLoaderOTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
+		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1, ((PaperPresetLoader) OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
 
@@ -227,7 +220,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Generates the base terrain for a chunk. Spigot compatible.
 	// IWorld -> GeneratorAccess
-	public void buildNoiseSpigot (WorldServer world, org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
+	public void buildNoiseSpigot (ServerLevel world, org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
 	{
 		ChunkBuffer buffer = new PaperChunkBuffer(chunk, chunkCoord);
 		ChunkAccess cachedChunk = this.shadowChunkGenerator.getChunkFromCache(chunkCoord);
@@ -289,7 +282,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Generates the base terrain for a chunk.
 	// IWorld -> GeneratorAccess
 	@Override
-	public void buildNoise (GeneratorAccess world, StructureManager manager, ChunkAccess chunk)
+	public void buildNoise (LevelAccessor world, StructureManager manager, ChunkAccess chunk)
 	{
 		// If we've already generated and cached this
 		// chunk while it was unloaded, use cached data.
@@ -300,7 +293,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (fixBiomesForChunk != null && fixBiomesForChunk.equals(chunkCoord))
 		{
 			// Should only run when first creating the world, on a single chunk
-			this.createStructures(world.getMinecraftWorld().r(), world.getMinecraftWorld().getStructureManager(), chunk,
+			this.createStructures(world.getMinecraftWorld().registryAccess(), world.getMinecraftWorld().getStructureManager(), chunk,
 				world.getMinecraftWorld().n(), world.getMinecraftWorld().getSeed());
 			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay), chunk);
 			fixBiomesForChunk = null;
@@ -714,7 +707,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Shadowgen
 
-	public Boolean checkHasVanillaStructureWithoutLoading(WorldServer world, ChunkCoordinate chunkCoord)
+	public Boolean checkHasVanillaStructureWithoutLoading(ServerLevel world, ChunkCoordinate chunkCoord)
 	{
 		return this.shadowChunkGenerator.checkHasVanillaStructureWithoutLoading(world, this, this.biomeSource, this.getSettings(), chunkCoord, this.internalGenerator.getCachedBiomeProvider());
 	}

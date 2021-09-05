@@ -14,6 +14,7 @@ import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.util.PaperNBTHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
+import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.bukkit.ChatColor;
@@ -119,7 +120,7 @@ public class ExportCommand extends BaseCommand
 			if (args.length >= 2)
 			{
 				if (!args[1].equalsIgnoreCase("any"))
-					centerBlockState = ArgumentTile.a().parse(new StringReader(args[1])).a();
+					centerBlockState = BlockStateArgument.block().parse(new StringReader(args[1])).getState();
 			}
 		}
 		catch (CommandSyntaxException var25)

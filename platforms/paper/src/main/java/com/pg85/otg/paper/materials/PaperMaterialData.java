@@ -249,11 +249,11 @@ public class PaperMaterialData extends LocalMaterialData
 					}
 				}
 			}
-			if (state.b(RotatedPillarBlock.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
+			if (state.hasProperty(RotatedPillarBlock.AXIS)) // All pillar blocks (logs, hay, chain(?), basalt, purpur, quartz)
 			{
-				state = ((RotatedPillarBlock)state.getBlock()).a(this.blockData, Rotation.COUNTERCLOCKWISE_90);
+				state = ((RotatedPillarBlock)state.getBlock()).rotate(this.blockData, Rotation.COUNTERCLOCKWISE_90);
 			}
-			if (state.b(CrossCollisionBlock.EAST)) // fence or glass pane
+			if (state.hasProperty(CrossCollisionBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
 				boolean hasEast = state.getValue(CrossCollisionBlock.EAST);
@@ -323,7 +323,7 @@ public class PaperMaterialData extends LocalMaterialData
 			Tag<Block> blockTag = spigotTag.getTag();
 			if(blockTag != null)
 			{
-				return this.blockData.a(blockTag);	
+				return this.blockData.is(blockTag);
 			}
 		}
 		return false;

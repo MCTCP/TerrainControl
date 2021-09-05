@@ -2,6 +2,8 @@ package com.pg85.otg.paper.gen;
 
 import java.util.Random;
 
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.pg85.otg.constants.Constants;
@@ -26,7 +28,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 	 * Creates a LocalWorldGenRegion to be used for non-OTG worlds, used for /otg spawn/edit/export.
 	 * Cannot use any functionality requiring OTGNoiseChhunkGenerator or OTGBiomeProvider 
 	 * */
-	public MCWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, GeneratorAccessSeed worldGenRegion)
+	public MCWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion)
 	{
 		super(presetFolderName, worldConfig, worldGenRegion);
 	}
@@ -58,10 +60,10 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		}
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 
 		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return null;
 		}
@@ -69,7 +71,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(new BlockPos(internalX, y, internalZ)));
+		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
 	}
 
 
@@ -79,10 +81,10 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		ChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 
 		// Tried to query an unloaded chunk outside the area being decorated
-		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return -1;
 		}
@@ -90,7 +92,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapY = chunk.getHighestBlock(Types.WORLD_SURFACE, internalX, internalZ);
+		int heightMapY = chunk.getHeight(Types.WORLD_SURFACE, internalX, internalZ);
 		return getHighestBlockYAt(chunk, internalX, heightMapY, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);		
 	}
 	
@@ -110,16 +112,16 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		}
 
 		BlockPos pos = new BlockPos(x, y, z);
-		this.worldGenRegion.setTypeAndData(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
+		this.worldGenRegion.setBlock(pos, ((PaperMaterialData) material).internalBlock(), 2 | 16);
 
 		if (material.isLiquid())
 		{
-			this.worldGenRegion.getFluidTickList().a(pos, ((PaperMaterialData)material).internalBlock().getFluid().getType(), 0);
+			this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getFluidState().getType(), 0);
 		}
 
 		if (nbt != null)
 		{
-			this.attachNBT(x, y, z, nbt, worldGenRegion.getType(pos));
+			this.attachNBT(x, y, z, nbt);
 		}
 	}
 
@@ -165,5 +167,10 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{
 		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
-	}	
+	}
+	@Override
+	public long getSeed()
+	{
+		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
+	}
 }
