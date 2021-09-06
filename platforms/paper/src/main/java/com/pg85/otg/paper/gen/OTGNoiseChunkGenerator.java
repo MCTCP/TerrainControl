@@ -1,21 +1,33 @@
 package com.pg85.otg.paper.gen;
 
+import java.nio.file.Path;
+import java.util.BitSet;
+import java.util.Random;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkDecorator;
+import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.paper.biome.PaperBiome;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.DecorationArea;
@@ -33,9 +45,15 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.NaturalSpawner;
+import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -48,6 +66,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.StructureSettings;
@@ -55,23 +74,12 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 import net.minecraft.world.level.levelgen.synth.SurfaceNoise;
-
-import org.bukkit.Bukkit;
-import org.bukkit.HeightMap;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
-
-import javax.annotation.Nullable;
-
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
 {	
@@ -239,7 +247,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 			StructureManager manager = world.getStructureManager();
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for (StructureGenerator<?> structure : StructureGenerator.t) {
+			for (StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
 				manager.a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
@@ -295,7 +303,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			// Should only run when first creating the world, on a single chunk
 			this.createStructures(world.getMinecraftWorld().registryAccess(), world.getMinecraftWorld().getStructureManager(), chunk,
 				world.getMinecraftWorld().n(), world.getMinecraftWorld().getSeed());
-			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay), chunk);
+			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), chunk);
 			fixBiomesForChunk = null;
 		}
 		// ChunkPrimer -> ProtoChunk
@@ -315,7 +323,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startZ = chunkZ << 4;
 
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for(StructureGenerator<?> structure : StructureGenerator.t) {
+			for(StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
 				manager.a(SectionPos.a(pos, 0), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
@@ -369,10 +377,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		int i = chunkpos.x;
 		int j = chunkpos.z;
 		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		sharedseedrandom.a(i, j);
+		sharedseedrandom.setBaseChunkSeed(i, j);
 		ChunkPos chunkpos1 = chunk.getPos();
-		int chunkMinX = chunkpos1.d();
-		int chunkMinZ = chunkpos1.e();
+		int chunkMinX = chunkpos1.getMinBlockX();
+		int chunkMinZ = chunkpos1.getMinBlockZ();
 		int worldX;
 		int worldZ;
 		int i2;
@@ -388,9 +396,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
 				if(biome.getBiomeConfig().getTemplateForBiome())
 				{
-					i2 = chunk.getHighestBlock(HeightMap.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
-					d1 = this.surfaceNoise.a((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
-					((PaperBiome)biome).getBiome().a(sharedseedrandom, chunk, chunkMinX, chunkMinZ, worldX, d1, defaultFluid, defaultBlock, worldZ, i2);
+					i2 = chunk.getHeight(Types.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
+					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
+					
+					// TODO this method needs an additional long now
+					((PaperBiome)biome).getBiome().buildSurfaceAt(sharedseedrandom, chunk, chunkMinX, chunkMinZ, worldX, d1, defaultFluid, defaultBlock, worldZ, i2);
 				}
 			}
 		}
@@ -539,14 +549,18 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Noise
 
 	@Override
+	
+	//TODO version without LevelHeightAccessor seems to be gone? Can we remove this?
 	public int getBaseHeight (int x, int z, Heightmap.Types heightmapType)
 	{
 		return this.sampleHeightmap(x, z, null, heightmapType.e());
 	}
 
 	// Provides a sample of the full column for structure generation.
+	
+	// TODO IBlockReader -> NoiseColumn
 	@Override
-	public IBlockAccess a (int x, int z)
+	public IBlockReader a(int x, int z)
 	{
 		BlockState[] ablockstate = new BlockState[256];
 		this.sampleHeightmap(x, x, ablockstate, null);
@@ -613,7 +627,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 				yLerp = (double) pieceY / 8.0;
 				// Density at this position given the current y interpolation
 				// MathHelper.lerp3() -> MathHelper.a()
-				density = MathHelper.a(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
+				density = Mth.lerp3(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
 
 				// Get the real y position (translate noise chunk and noise piece)
 				y = (noiseY * 8) + pieceY;

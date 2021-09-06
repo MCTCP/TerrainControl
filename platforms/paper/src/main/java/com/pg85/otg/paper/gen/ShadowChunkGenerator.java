@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -35,7 +36,11 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.StructureSettings;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.VillageFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
 /**
@@ -131,11 +136,11 @@ public class ShadowChunkGenerator
 		{
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
-				int endY = cachedChunk.a(Types.WORLD_SURFACE_WG).a(x, z);
+				int endY = cachedChunk.getHeight(Types.WORLD_SURFACE_WG, x, z);
 				for (int y = 0; y <= endY; y++)
 				{
 					BlockPos pos = new BlockPos(x, y, z);
-					data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getType(pos));
+					data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getBlockState(pos));
 				}
 			}
 		}
@@ -239,12 +244,13 @@ public class ShadowChunkGenerator
 
 				// TODO: Optimise this for biome lookups, fetch a whole region of noise biome info at once?
 				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-				for(Supplier<StructureFeature<?, ?>> supplier : ((PaperBiome)biome).getBiomeBase().e().a())
+				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((PaperBiome)biome).getBiome().getGenerationSettings().structures())
 				{
 					// *TODO: Do we need to avoid any structures other than villages?
-					if(supplier.get().d instanceof WorldGenVillage)
+					if(supplier.get().feature instanceof VillageFeature)
 					{
-						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((PaperBiome)biome).getBiomeBase()))
+						// TODO why so many unused arguments?
+						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((PaperBiome)biome).getBiome()))
 						{
 							chunksHandled.put(chunkToHandle, true);
 							synchronized(this.hasVanillaStructureChunkCache)
@@ -266,13 +272,14 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	private static boolean hasStructureStart(StructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, IRegistryCustom dynamicRegistries, StructureManager structureManager, ChunkAccess chunk, DefinedStructureManager templateManager, ChunkGenerator chunkGenerator, WorldChunkManager biomeProvider, long seed, ChunkPos chunkPos, BiomeBase biome)
+	// TODO why so many unused arguments? Can we remove them?
+	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, IRegistryCustom dynamicRegistries, StructureManager structureManager, ChunkAccess chunk, DefinedStructureManager templateManager, ChunkGenerator chunkGenerator, WorldChunkManager biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
-		StructureSettingsFeature structureSeparationSettings = dimensionStructuresSettings.a(structureFeature.d);
+		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
 		{
-			SeededRandom sharedSeedRandom = new SeededRandom();
-			ChunkPos chunkPosPotential = structureFeature.d.a(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
+			WorldgenRandom sharedSeedRandom = new WorldgenRandom();
+			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
 			if (
 				chunkPos.x == chunkPosPotential.x &&
 				chunkPos.z == chunkPosPotential.z
