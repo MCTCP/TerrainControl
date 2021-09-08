@@ -3,12 +3,20 @@ package com.pg85.otg.paper.gen;
 import java.nio.file.Path;
 import java.util.BitSet;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
+import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
@@ -48,12 +56,6 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.NaturalSpawner;
-import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -64,13 +66,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseSettings;
-import net.minecraft.world.level.levelgen.StructureSettings;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
@@ -237,6 +233,53 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunkCoord, chunk, cachedChunk);
 		} else {
 			// Setup jigsaw data
+//			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
+//			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+//			ChunkPos pos = new ChunkPos(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+//			int chunkX = pos.x;
+//			int chunkZ = pos.z;
+//			int startX = chunkX << 4;
+//			int startZ = chunkZ << 4;
+//
+//			StructureManager manager = world.getStructureManager();
+//			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
+//			for (StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
+//				// Get all structure starts in this chunk
+//				manager.a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
+//					// Iterate through the pieces in the structure
+//					for (StructurePiece piece : start.d()) {
+//						// Check if it intersects with this chunk
+//						if (piece.a(pos, 12)) {
+//							StructureBoundingBox box = piece.g();
+//
+//							if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
+//								WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
+//								// Add to the list if it's a rigid piece
+//								if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
+//									structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, villagePiece.d(), box.f, true, 0, 0, 0));
+//								}
+//
+//								// Get all the junctions in this piece
+//								for (WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
+//									int sourceX = junction.a();
+//									int sourceZ = junction.c();
+//
+//									// If the junction is in this chunk, then add to list
+//									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
+//										junctions.add(new JigsawStructureData(0, 0, 0, 0, 0, 0, false, junction.a(), junction.b(), junction.c()));
+//									}
+//								}
+//							} else {
+//								structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, 0, box.f, false, 0, 0, 0));
+//							}
+//						}
+//					}
+//
+//				});
+//			}
+
+			StructureFeatureManager manager = world.structureFeatureManager();
+			// Setup jigsaw data
 			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
 			ChunkPos pos = new ChunkPos(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -245,36 +288,34 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startX = chunkX << 4;
 			int startZ = chunkZ << 4;
 
-			StructureManager manager = world.getStructureManager();
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for (StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
+			for(StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
-				manager.a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
+				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
-					for (StructurePiece piece : start.d()) {
+					for(StructurePiece piece : start.getPieces()) {
 						// Check if it intersects with this chunk
-						if (piece.a(pos, 12)) {
-							StructureBoundingBox box = piece.g();
+						if (piece.isCloseToChunk(pos, 12)) {
+							BoundingBox box = piece.getBoundingBox();
 
-							if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
-								WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
+							if (piece instanceof PoolElementStructurePiece villagePiece) {
 								// Add to the list if it's a rigid piece
-								if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
-									structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, villagePiece.d(), box.f, true, 0, 0, 0));
+								if (villagePiece.getElement().getProjection() == StructureTemplatePool.Projection.RIGID) {
+									structures.add(new JigsawStructureData(box.minX(), box.minY(), box.minZ(),box.maxX(), villagePiece.getGroundLevelDelta(), box.maxZ(), true, 0, 0, 0));
 								}
 
 								// Get all the junctions in this piece
-								for (WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
-									int sourceX = junction.a();
-									int sourceZ = junction.c();
+								for(JigsawJunction junction : villagePiece.getJunctions()) {
+									int sourceX = junction.getSourceX();
+									int sourceZ = junction.getSourceZ();
 
 									// If the junction is in this chunk, then add to list
 									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
-										junctions.add(new JigsawStructureData(0, 0, 0, 0, 0, 0, false, junction.a(), junction.b(), junction.c()));
+										junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.getSourceX(), junction.getSourceGroundY(), junction.getSourceZ()));
 									}
 								}
 							} else {
-								structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, 0, box.f, false, 0, 0, 0));
+								structures.add(new JigsawStructureData(box.minX(), box.minY(), box.minZ(),box.maxX(), 0, box.maxZ(),  false, 0, 0, 0));
 							}
 						}
 					}
@@ -287,11 +328,20 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
+
+	@Override
+	public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, StructureFeatureManager accessor, ChunkAccess chunk)
+	{
+		buildNoise(accessor, chunk);
+
+		return CompletableFuture.completedFuture(chunk);
+	}
+
 	// Generates the base terrain for a chunk.
 	// IWorld -> GeneratorAccess
-	@Override
-	public void buildNoise (LevelAccessor world, StructureManager manager, ChunkAccess chunk)
+	public void buildNoise (StructureFeatureManager manager, ChunkAccess chunk)
 	{
+		LevelAccessor world = chunk.getLevel();
 		// If we've already generated and cached this
 		// chunk while it was unloaded, use cached data.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
@@ -301,8 +351,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (fixBiomesForChunk != null && fixBiomesForChunk.equals(chunkCoord))
 		{
 			// Should only run when first creating the world, on a single chunk
-			this.createStructures(world.getMinecraftWorld().registryAccess(), world.getMinecraftWorld().getStructureManager(), chunk,
-				world.getMinecraftWorld().n(), world.getMinecraftWorld().getSeed());
+			this.createStructures(world.getMinecraftWorld().registryAccess(), world.getMinecraftWorld().structureFeatureManager(), chunk,
+				world.getMinecraftWorld().getStructureManager(), world.getMinecraftWorld().getSeed());
 			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), chunk);
 			fixBiomesForChunk = null;
 		}
@@ -325,32 +375,31 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
 			for(StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
-				manager.a(SectionPos.a(pos, 0), structure).forEach((start) -> {
+				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
-					for(StructurePiece piece : start.d()) {
+					for(StructurePiece piece : start.getPieces()) {
 						// Check if it intersects with this chunk
-						if (piece.a(pos, 12)) {
-							StructureBoundingBox box = piece.g();
+						if (piece.isCloseToChunk(pos, 12)) {
+							BoundingBox box = piece.getBoundingBox();
 
-							if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
-								WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
+							if (piece instanceof PoolElementStructurePiece villagePiece) {
 								// Add to the list if it's a rigid piece
-								if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
-									structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, villagePiece.d(), box.f, true, 0, 0, 0));
+								if (villagePiece.getElement().getProjection() == StructureTemplatePool.Projection.RIGID) {
+									structures.add(new JigsawStructureData(box.minX(), box.minY(), box.minZ(),box.maxX(), villagePiece.getGroundLevelDelta(), box.maxZ(), true, 0, 0, 0));
 								}
 
 								// Get all the junctions in this piece
-								for(WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
-									int sourceX = junction.a();
-									int sourceZ = junction.c();
+								for(JigsawJunction junction : villagePiece.getJunctions()) {
+									int sourceX = junction.getSourceX();
+									int sourceZ = junction.getSourceZ();
 
 									// If the junction is in this chunk, then add to list
 									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
-										junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.a(), junction.b(), junction.c()));
+										junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.getSourceX(), junction.getSourceGroundY(), junction.getSourceZ()));
 									}
 								}
 							} else {
-								structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, 0, box.f,  false, 0, 0, 0));
+								structures.add(new JigsawStructureData(box.minX(), box.minY(), box.minZ(),box.maxX(), 0, box.maxZ(),  false, 0, 0, 0));
 							}
 						}
 					}
@@ -400,7 +449,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
 					
 					// TODO this method needs an additional long now
-					((PaperBiome)biome).getBiome().buildSurfaceAt(sharedseedrandom, chunk, chunkMinX, chunkMinZ, worldX, d1, defaultFluid, defaultBlock, worldZ, i2);
+					((PaperBiome)biome).getBiome().buildSurfaceAt(sharedseedrandom, chunk, worldX, worldZ, i2, d1, defaultBlock, defaultFluid, this.getSeaLevel(), 50, worldSeed);
 				}
 			}
 		}
@@ -547,24 +596,25 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Noise
-
-	@Override
 	
 	//TODO version without LevelHeightAccessor seems to be gone? Can we remove this?
-	public int getBaseHeight (int x, int z, Heightmap.Types heightmapType)
+	@Override
+	public int getBaseHeight(int x, int z, Heightmap.Types heightmap, LevelHeightAccessor world)
 	{
-		return this.sampleHeightmap(x, z, null, heightmapType.e());
+		return this.sampleHeightmap(x, z, null, heightmap.isOpaque());
 	}
 
 	// Provides a sample of the full column for structure generation.
-	
+
+
+
 	// TODO IBlockReader -> NoiseColumn
 	@Override
-	public IBlockReader a(int x, int z)
+	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world)
 	{
 		BlockState[] ablockstate = new BlockState[256];
 		this.sampleHeightmap(x, x, ablockstate, null);
-		return new BlockColumn(ablockstate);
+		return new NoiseColumn(0, ablockstate);
 	}
 
 	// Samples the noise at a column and provides a view of the blockstates, or fills a heightmap.
@@ -665,6 +715,13 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Getters / misc
 
+
+	@Override
+	public ChunkGenerator withSeed(long seed)
+	{
+		return new OTGNoiseChunkGenerator(this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
+	}
+
 	@Override
 	protected Codec<? extends ChunkGenerator> codec()
 	{
@@ -680,19 +737,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public int getSeaLevel ()
 	{
+		// TODO: remove supplier
 		return this.dimensionSettingsSupplier.get().seaLevel();
-	}
-
-	@Override
-	public int getBaseHeight(int x, int z, Heightmap.Types heightmap, LevelHeightAccessor world)
-	{
-		return 0;
-	}
-
-	@Override
-	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world)
-	{
-		return null;
 	}
 
 	public Preset getPreset()
