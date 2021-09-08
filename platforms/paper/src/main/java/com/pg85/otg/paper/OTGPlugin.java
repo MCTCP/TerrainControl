@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.pg85.otg.paper.util.ObfuscationHelper;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -167,16 +168,13 @@ public class OTGPlugin extends JavaPlugin implements Listener
 
 		try
 		{
-			//
-			// TODO: Does reflection get remapped?
-			//
 			
-			Field finalGenerator = ServerChunkCache.class.getDeclaredField("generator");
+			Field finalGenerator = ObfuscationHelper.getField(ServerChunkCache.class, "generator", "d");
 			finalGenerator.setAccessible(true);
 
 			finalGenerator.set(serverWorld.getChunkSource(), OTGDelegate);
 
-			Field pcmGen = ChunkMap.class.getDeclaredField("generator");
+			Field pcmGen = ObfuscationHelper.getField(ChunkMap.class, "generator", "r");
 			pcmGen.setAccessible(true);
 
 			pcmGen.set(serverWorld.getChunkSource().chunkMap, OTGDelegate);

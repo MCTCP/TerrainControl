@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import com.pg85.otg.paper.util.ObfuscationHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -73,13 +74,13 @@ public class ShadowChunkGenerator
 	{
 		try
 		{
-			heightMaps = ProtoChunk.class.getDeclaredField("f");
+			heightMaps = ObfuscationHelper.getField(ProtoChunk.class, "heightmaps", "f");
 			heightMaps.setAccessible(true);
 
-			light = ProtoChunk.class.getDeclaredField("l");
+			light = ObfuscationHelper.getField(ProtoChunk.class, "lights", "l");
 			light.setAccessible(true);
 
-			sections = ProtoChunk.class.getDeclaredField("j");
+			sections = ObfuscationHelper.getField(ProtoChunk.class, "sections", "j");
 			sections.setAccessible(true);
 		} catch (ReflectiveOperationException ex)
 		{
