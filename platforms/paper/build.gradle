@@ -79,6 +79,11 @@ jar {
 reobfJar {
 	outputJar = new File(project.buildDir, 'distributions/' + project.archivesBaseName + '-' + project.version + '.jar')
 }
+
+runPaper {
+    disablePluginJarDetection()
+}
+
 tasks {
     // Run reobfJar on build
     build {

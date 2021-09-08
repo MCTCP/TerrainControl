@@ -69,6 +69,8 @@ session.lock
 /platforms/forge/white-list.txt
 /platforms/forge/run/
 
+/platforms/paper/run/
+
 # Filesystem dust
 Thumbs.db
 .DS_Store
