@@ -7,8 +7,7 @@ plugins {
 
 archivesBaseName = "openterraingenerator-paper"
 
-targetCompatibility = 16
-sourceCompatibility = 16
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
@@ -61,6 +60,7 @@ processResources
 jar {
     destinationDir = new File(project.buildDir, "distributions")
     classifier = ''
+	archiveFileName = project.archivesBaseName + '-' + project.version + '.jar'
     from
             {
                 project(":common:common-util").sourceSets.main.output.files
