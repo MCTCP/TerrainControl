@@ -466,7 +466,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
 			ChunkBuffer chunkBuffer = new PaperChunkBuffer(protoChunk);
-			BitSet carvingMask = protoChunk.getCarvingMask(stage);
+			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, true, true); //TODO: Don't use hardcoded true
 		}
 		super.applyCarvers(seed, biomeManager, chunk, stage);
