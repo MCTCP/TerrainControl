@@ -96,7 +96,8 @@ public class ShadowChunkGenerator
 
 	private PaperChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
+		// TODO: need to get the chunk for real, this code path is never visited (as of 1.17 initial update) so it's not a big deal
+		ProtoChunk chunk = null;
 		PaperChunkBuffer buffer = new PaperChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.

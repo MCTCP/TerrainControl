@@ -19,9 +19,9 @@ public class PaperChunkBuffer extends ChunkBuffer
 	private final BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 	private ChunkCoordinate chunkCoord = null;
 	private ChunkGenerator.ChunkData chunkData = null;
-	private ProtoChunk chunk = null;
+	private ChunkAccess chunk = null;
 
-	public PaperChunkBuffer(ProtoChunk chunk)
+	public PaperChunkBuffer(ChunkAccess chunk)
 	{
 		this.chunk = chunk;
 	}

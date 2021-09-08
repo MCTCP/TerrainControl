@@ -108,7 +108,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	protected final BlockState defaultFluid;
 
 	private final ShadowChunkGenerator shadowChunkGenerator;
-	private final OTGChunkGenerator internalGenerator;
+	public final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
 	private final SurfaceNoise surfaceNoise;
 	private final String presetFolderName;

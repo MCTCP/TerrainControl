@@ -9,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.BlockStateData;
+import net.minecraft.util.datafix.fixes.ItemStackTheFlatteningFix;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
@@ -797,7 +798,7 @@ public class PaperLegacyMaterials
 
 	private static ResourceLocation getFlatKey (String name, int data) throws NullPointerException
 	{
-		String result = BlockStateData.a(name, data);
+		String result = ItemStackTheFlatteningFix.updateItem(name, data);
 		if (result == null)
 		{
 			throw new NullPointerException();

@@ -7,10 +7,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import com.pg85.otg.util.gen.JigsawStructureData;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ProtoChunk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -194,7 +200,14 @@ public class MapCommand extends BaseCommand
 		{
 			for (int chunkZ = 0; chunkZ < (int)Math.ceil(img.getHeight() / 16f); chunkZ++)
 			{
-				PaperChunkBuffer chunk = ((OTGPaperChunkGen)world.getHandle().generator).generator.getChunkWithoutLoadingOrCaching(world.getHandle().getRandom(), ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+//				PaperChunkBuffer chunk = ((OTGPaperChunkGen)world.getHandle().generator).generator.getChunkWithoutLoadingOrCaching(world.getHandle().getRandom(), ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+				// TODO: make caching work again
+				PaperChunkBuffer chunk = new PaperChunkBuffer(new ProtoChunk(new ChunkPos(chunkX, chunkZ), null, world.getHandle(), world.getHandle()));
+				ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
+				ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+
+				((OTGPaperChunkGen)world.getHandle().generator).generator.internalGenerator.populateNoise(256, new Random(/*TODO seed!*/), chunk, chunk.getChunkCoordinate(), structures, junctions);
+
 				for(int internalX = 0; internalX < Constants.CHUNK_SIZE; internalX++)
 				{
 					for(int internalZ = 0; internalZ < Constants.CHUNK_SIZE; internalZ++)
