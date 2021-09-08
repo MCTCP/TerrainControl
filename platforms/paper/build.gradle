@@ -60,7 +60,7 @@ processResources
 jar {
     destinationDir = new File(project.buildDir, "distributions")
     classifier = ''
-	archiveFileName = project.archivesBaseName + '-' + project.version + '.jar'
+	archiveFileName = project.archivesBaseName + '-' + project.version + 'deob.jar'
     from
             {
                 project(":common:common-util").sourceSets.main.output.files
@@ -74,6 +74,10 @@ jar {
             {
                 include 'resources/**/*'
             }
+}
+
+reobfJar {
+	outputJar = new File(project.buildDir, 'distributions/' + project.archivesBaseName + '-' + project.version + '.jar')
 }
 tasks {
     // Run reobfJar on build
