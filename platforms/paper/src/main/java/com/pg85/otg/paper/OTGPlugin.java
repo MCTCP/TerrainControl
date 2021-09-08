@@ -159,7 +159,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				OTGGen.getPreset().getFolderName(),
 				new OTGBiomeProvider(OTGGen.getPreset().getFolderName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)),
 				world.getSeed(),
-				NoiseGeneratorSettings::structureSettings
+				NoiseGeneratorSettings::bootstrap
 			);
 		} else {
 			OTGDelegate = OTGGen.generator;

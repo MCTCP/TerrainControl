@@ -4,6 +4,7 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 
@@ -28,7 +29,7 @@ public class PaperMaterialTag extends LocalMaterialTag
 		} catch(Exception ex) {
 			return null;
 		}
-		Tag<Block> blockTag = TagsBlock.b().stream().filter(n -> n.a().equals(resourceLocation)).findFirst().orElse(null);
+		Tag<Block> blockTag = BlockTags.getAllTags().getTag(resourceLocation);
 		return blockTag == null ? null : new PaperMaterialTag(blockTag, resourceLocation.toString());
 	}
 	

@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
@@ -203,7 +205,7 @@ public class ShadowChunkGenerator
 		IBiome biome;
 		ChunkCoordinate searchChunk;
 		Boolean result;
-		if (serverWorld.getServer().getGenerateStructures())
+		if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
 		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<ChunkCoordinate>();
 			Map<ChunkCoordinate,Boolean> chunksHandled = new HashMap<ChunkCoordinate,Boolean>();
@@ -236,7 +238,7 @@ public class ShadowChunkGenerator
 			}
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld);
+				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld);
 				chunkpos = chunk.getPos();
 
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
@@ -250,7 +252,7 @@ public class ShadowChunkGenerator
 					if(supplier.get().feature instanceof VillageFeature)
 					{
 						// TODO why so many unused arguments?
-						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((PaperBiome)biome).getBiome()))
+						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.getStructureManager(), chunk, serverWorld.structureFeatureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((PaperBiome)biome).getBiome()))
 						{
 							chunksHandled.put(chunkToHandle, true);
 							synchronized(this.hasVanillaStructureChunkCache)
@@ -273,7 +275,7 @@ public class ShadowChunkGenerator
 
 	// Taken from PillagerOutpostStructure.isNearVillage
 	// TODO why so many unused arguments? Can we remove them?
-	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, IRegistryCustom dynamicRegistries, StructureManager structureManager, ChunkAccess chunk, DefinedStructureManager templateManager, ChunkGenerator chunkGenerator, WorldChunkManager biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
+	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, RegistryAccess dynamicRegistries, StructureManager structureManager, ChunkAccess chunk, StructureFeatureManager templateManager, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
 		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
