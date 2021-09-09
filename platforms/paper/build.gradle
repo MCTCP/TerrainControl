@@ -58,8 +58,8 @@ processResources
         }
 
 jar {
-    destinationDir = new File(project.buildDir, "distributions")
-    classifier = ''
+    destinationDirectory = new File(project.buildDir, "distributions")
+    archiveClassifier.set(null)
 	archiveFileName = project.archivesBaseName + '-' + project.version + 'deob.jar'
     from
             {
@@ -88,5 +88,9 @@ tasks {
     // Run reobfJar on build
     build {
         dependsOn(reobfJar)
+    }
+
+    runServer {
+        pluginJars.from(rootProject.tasks.createReleaseJar.outputs.files)
     }
 }

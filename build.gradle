@@ -81,6 +81,8 @@ task buildSubProjects {
 }
 
 task createReleaseJar {
+    def output = new File(project.buildDir, 'releases/OpenTerrainGenerator-'+project.version+'.jar')
+    outputs.file(output)
     dependsOn project.buildSubProjects
     doLast {
         // We're including common only for the external libraries that are packaged with it (using Forge jar-in-jar).
@@ -88,12 +90,11 @@ task createReleaseJar {
         //File forgeFile = getJarFile(project(":platforms:forge"))
 		File fabricFile = getJarFile(project(":platforms:fabric"))
         File paperFile = getJarFile(project(":platforms:paper"))
-        File ourFile = new File(project.buildDir, 'releases/OpenTerrainGenerator-'+project.version+'.jar')
 
         if (paperFile.exists() && fabricFile.exists()) // && forgeFile.exists())
         {
-            ourFile.getParentFile().mkdirs()
-            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
+            output.getParentFile().mkdirs()
+            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(output))
             Set<String> alreadyAddedFiles = new HashSet<String>()
 
             //addToZip(forgeFile, outputStream, alreadyAddedFiles) // Add Forge first so its jar manifest is used
