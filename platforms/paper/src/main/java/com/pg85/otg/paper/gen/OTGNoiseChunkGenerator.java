@@ -195,7 +195,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		for (Supplier<ConfiguredStructureFeature<?, ?>> supplier : biomebase.getGenerationSettings().structures())
 		{
 			ConfiguredStructureFeature<?, ?> structurefeature = supplier.get();
-			if (structurefeature.LIST_CODEC == StructureFeatures.STRONGHOLD)
+			if (structurefeature == StructureFeatures.STRONGHOLD)
 			{
 				synchronized(structurefeature)
 				{
