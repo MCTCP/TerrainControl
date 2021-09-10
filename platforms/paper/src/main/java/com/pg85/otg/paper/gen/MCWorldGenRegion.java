@@ -60,7 +60,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		}
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		ChunkAccess chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+		ChunkAccess chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 
 		// Tried to query an unloaded chunk outside the area being decorated
 		if (chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))

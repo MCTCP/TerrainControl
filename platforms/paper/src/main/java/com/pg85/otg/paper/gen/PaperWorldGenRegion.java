@@ -174,7 +174,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+			chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
@@ -237,7 +237,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea == null || this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+			chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 		}
 
 		// Tried to query an unloaded chunk outside the area being decorated
@@ -341,7 +341,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Check if this causes problems with BO3 LightChecks.
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		ChunkAccess chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+		ChunkAccess chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 		if (chunk != null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
@@ -768,7 +768,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+			chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 		}
 		// isAtLeast() -> b()
 		if ((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
@@ -795,7 +795,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// into separate classes, one for decoration, one for non-decoration.		
 		if (this.decorationArea != null && this.decorationArea.isInAreaBeingDecorated(x, z))
 		{
-			chunk = this.worldGenRegion.getChunkIfLoadedImmediately(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+			chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ(), ChunkStatus.EMPTY, false);
 		}
 
 		// If the chunk doesn't exist and we're doing something outside the
