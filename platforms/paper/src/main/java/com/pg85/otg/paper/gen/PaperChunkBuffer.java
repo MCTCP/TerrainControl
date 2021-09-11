@@ -10,7 +10,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
-import net.minecraft.world.level.chunk.ProtoChunk;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
 

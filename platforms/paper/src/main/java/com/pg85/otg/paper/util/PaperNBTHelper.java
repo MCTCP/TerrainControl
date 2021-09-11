@@ -42,7 +42,6 @@ public class PaperNBTHelper extends LocalNBTHelper
 	 */
 	// ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
 	// So it is safe to suppress this warning
-	@SuppressWarnings("unchecked")
 	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, CompoundTag nmsTag)
 	{
 		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name,

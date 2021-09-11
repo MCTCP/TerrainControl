@@ -11,12 +11,6 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import com.pg85.otg.util.gen.JigsawStructureData;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ProtoChunk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
@@ -29,10 +23,15 @@ import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperChunkBuffer;
 import com.pg85.otg.paper.materials.PaperMaterialData;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ProtoChunk;
 
 public class MapCommand extends BaseCommand
 {

@@ -475,7 +475,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Population / decoration
 
 	// Does decoration for a given pos/chunk
-	@SuppressWarnings("deprecation")
 	@Override
 	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureFeatureManager structureManager)
 	{

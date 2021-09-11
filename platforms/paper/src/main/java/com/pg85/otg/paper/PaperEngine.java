@@ -5,7 +5,6 @@ import com.pg85.otg.paper.materials.PaperMaterials;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
 import com.pg85.otg.paper.util.PaperLogger;
 import com.pg85.otg.paper.util.PaperPluginLoadedChecker;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

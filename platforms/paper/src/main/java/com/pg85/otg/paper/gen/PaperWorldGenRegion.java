@@ -11,13 +11,10 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.*;
-import org.bukkit.HeightMap;
-import org.bukkit.block.data.BlockData;
 
 import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;

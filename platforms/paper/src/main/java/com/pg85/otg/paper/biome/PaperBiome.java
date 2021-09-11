@@ -17,7 +17,6 @@ import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;

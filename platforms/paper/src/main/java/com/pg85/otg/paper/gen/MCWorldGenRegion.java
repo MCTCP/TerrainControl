@@ -2,7 +2,6 @@ package com.pg85.otg.paper.gen;
 
 import java.util.Random;
 
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import org.apache.commons.lang.NotImplementedException;
 
