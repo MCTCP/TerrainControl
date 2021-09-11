@@ -552,11 +552,13 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 					tree = Features.OAK;
 					break;
 				case CrimsonFungi:
-					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CRIMSON_FUNGI;
-					break;
+					ConfiguredFeature<HugeFungusConfiguration, ?> crimsonFungi = Features.CRIMSON_FUNGI_PLANTED;
+					crimsonFungi.feature.place(new FeaturePlaceContext<>(worldGenRegion, chunkGenerator, rand, blockPos, HugeFungusConfiguration.HUGE_CRIMSON_FUNGI_NOT_PLANTED_CONFIG));
+					return true;
 				case WarpedFungi:
-					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.WARPED_FUNGI;
-					break;
+					ConfiguredFeature<HugeFungusConfiguration, ?> warpedFungi = Features.WARPED_FUNGI_PLANTED;
+					warpedFungi.feature.place(new FeaturePlaceContext<>(worldGenRegion, chunkGenerator, rand, blockPos, HugeFungusConfiguration.HUGE_WARPED_FUNGI_NOT_PLANTED_CONFIG));
+					return true;
 				case ChorusPlant:
 					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CHORUS_PLANT;
 					break;	
