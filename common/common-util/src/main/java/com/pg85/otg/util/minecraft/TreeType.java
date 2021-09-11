@@ -18,6 +18,7 @@ public enum TreeType
 	CrimsonFungi,
 	WarpedFungi,
 	ChorusPlant,
+	Azalea,
 	GroundBush,
 	HugeMushroom,
 	HugeRedMushroom,

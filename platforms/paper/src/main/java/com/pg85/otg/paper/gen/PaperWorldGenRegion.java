@@ -551,6 +551,18 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 				case Tree:
 					tree = Features.OAK;
 					break;
+				case CrimsonFungi:
+					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CRIMSON_FUNGI;
+					break;
+				case WarpedFungi:
+					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.WARPED_FUNGI;
+					break;
+				case ChorusPlant:
+					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CHORUS_PLANT;
+					break;	
+				case Azalea:
+					tree = Features.AZALEA_TREE;
+					break;	
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type);
 			}
