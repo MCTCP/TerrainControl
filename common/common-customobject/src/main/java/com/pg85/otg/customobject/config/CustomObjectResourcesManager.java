@@ -67,6 +67,7 @@ public class CustomObjectResourcesManager implements ICustomObjectResourcesManag
 		{
 			try
 			{
+				// TODO fix deprecated method usages
 				configFunction = (CustomObjectConfigFunction<T>) clazz.newInstance();
 			} catch (Exception e)
 			{

@@ -343,7 +343,7 @@ public class ShadowChunkGenerator
 					{
 						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
 						{
-							chunksHandled.put(chunkToHandle, new Boolean(true));
+							chunksHandled.put(chunkToHandle, Boolean.TRUE);
 							synchronized(this.hasVanillaStructureChunkCache)
 							{
 								this.hasVanillaStructureChunkCache.putAll(chunksHandled);
@@ -352,7 +352,7 @@ public class ShadowChunkGenerator
 						}
 					}
 				}
-				chunksHandled.put(chunkToHandle, new Boolean(false));
+				chunksHandled.put(chunkToHandle, Boolean.FALSE);
 			}
 			synchronized(this.hasVanillaStructureChunkCache)
 			{

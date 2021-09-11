@@ -893,7 +893,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return hasDefaultStructure.booleanValue();
 		}
 		hasDefaultStructure = this.chunkGenerator.checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
-		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
+		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
 		return hasDefaultStructure;
 	}
 }

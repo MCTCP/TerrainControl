@@ -115,7 +115,7 @@ public final class BiomeGroupManager
 	private HashMap<Integer, TreeMap<Integer, BiomeGroup>> cachedGroupDepthMaps = new HashMap<Integer, TreeMap<Integer, BiomeGroup>>();
 	public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
 	{
-		TreeMap<Integer, BiomeGroup> map = cachedGroupDepthMaps.get(new Integer(depth));
+		TreeMap<Integer, BiomeGroup> map = cachedGroupDepthMaps.get(Integer.valueOf(depth));
 		if(map != null)
 		{
 			return map;
@@ -136,7 +136,7 @@ public final class BiomeGroupManager
 			map.put(map.size() * 100, null);
 		}
 		
-		cachedGroupDepthMaps.put(new Integer(depth), map);
+		cachedGroupDepthMaps.put(Integer.valueOf(depth), map);
 		
 		return map;
 	}
