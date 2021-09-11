@@ -41,6 +41,7 @@ import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.PillagerOutpostFeature;
 import net.minecraft.world.level.levelgen.feature.VillageFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -252,8 +253,7 @@ public class ShadowChunkGenerator
 					// *TODO: Do we need to avoid any structures other than villages?
 					if(supplier.get().feature instanceof VillageFeature)
 					{
-						// TODO why so many unused arguments?
-						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.getStructureManager(), chunk, serverWorld.structureFeatureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((PaperBiome)biome).getBiome()))
+						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
 						{
 							chunksHandled.put(chunkToHandle, true);
 							synchronized(this.hasVanillaStructureChunkCache)
@@ -275,8 +275,7 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	// TODO why so many unused arguments? Can we remove them?
-	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, RegistryAccess dynamicRegistries, StructureManager structureManager, ChunkAccess chunk, StructureFeatureManager templateManager, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
+	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, long seed, ChunkPos chunkPos)
 	{
 		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
