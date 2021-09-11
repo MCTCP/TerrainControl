@@ -12,11 +12,13 @@ import com.pg85.otg.paper.util.ObfuscationHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+
 import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
@@ -95,10 +97,12 @@ public class ShadowChunkGenerator
 
 	public ShadowChunkGenerator() { }
 
-	private PaperChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
+	private PaperChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate, LevelHeightAccessor level)
 	{
-		// TODO: need to get the chunk for real, this code path is never visited (as of 1.17 initial update) so it's not a big deal
-		ProtoChunk chunk = null;
+		// Make a dummy chunk, we'll fill this with base terrain data ourselves, without touching any MC worldgen logic.
+		// As an optimisation, we cache the dummy chunk in a limited size FIFO cache. Later when MC requests the chunk 
+		// during world generation, we swap the dummy chunk's data into the real chunk.
+		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, null);
 		PaperChunkBuffer buffer = new PaperChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -299,9 +303,9 @@ public class ShadowChunkGenerator
 	// resources used for worldgen or bo4 shadowgen, since the chunks aren't actually supposed to generate in the world.
 	// We won't get any density based smoothing applied to noisegen for vanilla structures, but that's ok for /otg mapterrain.
 
-	public PaperChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
+	public PaperChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate, LevelHeightAccessor level)
 	{
-		return getUnloadedChunk(otgChunkGenerator, worldHeightCap, random, chunkCoordinate);
+		return getUnloadedChunk(otgChunkGenerator, worldHeightCap, random, chunkCoordinate, level);
 	}
 
 	// BO4's / Smoothing Areas
@@ -309,7 +313,7 @@ public class ShadowChunkGenerator
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks during decoration.
 	// Shadowgen is used to do this without causing cascades. Shadowgenned chunks are requested on-demand for the worldgen thread (BO4's).
 
-	private LocalMaterialData[] getBlockColumnInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z)
+	private LocalMaterialData[] getBlockColumnInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, LevelHeightAccessor level)
 	{
 		BlockPos2D blockPos = new BlockPos2D(x, z);
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
@@ -329,7 +333,7 @@ public class ShadowChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without loading/decorating it
-			chunk = getUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, chunkCoord).getChunk();
+			chunk = getUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, chunkCoord, level).getChunk();
 			this.unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -352,17 +356,17 @@ public class ShadowChunkGenerator
 		return blocksInColumn;
 	}
 
-	public LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z)
+	public LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z, LevelHeightAccessor level)
 	{
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z, level);
 		return blockColumn[y];
 	}
 
-	public int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	public int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, LevelHeightAccessor level)
 	{
 		int height = -1;
 
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z, level);
 		PaperMaterialData material;
 		boolean isLiquid;
 		boolean isSolid;

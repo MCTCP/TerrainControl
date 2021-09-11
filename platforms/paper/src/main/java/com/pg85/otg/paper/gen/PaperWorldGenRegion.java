@@ -782,8 +782,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// isAtLeast() -> b()
 		if ((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// TODO: this says it won't load but it does. TODO refactor
-			chunk = this.worldGenRegion.getChunk(x >> 4, z >> 4);
+			return this.chunkGenerator.getMaterialInUnloadedChunk(this.getWorldRandom(), x, y, z, this.worldGenRegion);
 		}
 
 		// Get internal coordinates for block in chunk
@@ -811,8 +810,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// decoration sequence, return the material without loading the chunk.
 		if ((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)))
 		{
-			// TODO: this says it won't load but it does. TODO refactor
-			chunk = this.worldGenRegion.getChunk(x >> 4, z >> 4);
+			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this.getWorldRandom(), x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, this.worldGenRegion);
 		}
 
 		// Get internal coordinates for block in chunk
