@@ -26,8 +26,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 
-// Spigot name: WorldChunkManager
-// Forge name: BiomeProvider
 public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 {
 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(

@@ -49,8 +49,6 @@ public class PaperChunkBuffer extends ChunkBuffer
 		{
 			this.chunkData.setBlock(blockX, blockY, blockZ, ((PaperMaterialData) material).toSpigotBlockData());
 		} else {
-			// Forge: setPos()
-			// Spigot: d()
 			this.chunk.setBlockState(this.mutable.set(blockX, blockY, blockZ), ((PaperMaterialData) material).internalBlock(), false);
 		}
 	}

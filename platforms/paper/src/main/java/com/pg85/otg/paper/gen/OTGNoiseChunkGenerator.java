@@ -137,7 +137,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	private OTGNoiseChunkGenerator (String presetFolderName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
 	{
-		// getStructures() -> a()
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
 		structSettings = dimensionSettingsSupplier.get().structureSettings();
 		if (!(biomeProvider1 instanceof ILayerSource))
@@ -149,9 +148,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.worldSeed = seed;
 		NoiseGeneratorSettings dimensionsettings = dimensionSettingsSupplier.get();
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
-		// getNoise() -> b()
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
-		// func_236169_a_() -> a()
 		this.noiseHeight = noisesettings.height();
 
 		this.defaultBlock = dimensionsettings.getDefaultBlock();
@@ -223,7 +220,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Base terrain gen
 
 	// Generates the base terrain for a chunk. Spigot compatible.
-	// IWorld -> GeneratorAccess
 	public void buildNoiseSpigot (ServerLevel world, org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
 	{
 		ChunkBuffer buffer = new PaperChunkBuffer(chunk, chunkCoord);
@@ -338,7 +334,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Generates the base terrain for a chunk.
-	// IWorld -> GeneratorAccess
 	public void buildNoise (StructureFeatureManager manager, ChunkAccess chunk)
 	{
 		LevelAccessor world = chunk.getLevel();
@@ -356,8 +351,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), chunk);
 			fixBiomesForChunk = null;
 		}
-		// ChunkPrimer -> ProtoChunk
-		ChunkBuffer buffer = new PaperChunkBuffer((ProtoChunk)chunk);
+		ChunkBuffer buffer = new PaperChunkBuffer(chunk);
 		ChunkAccess cachedChunk = this.shadowChunkGenerator.getChunkFromCache(chunkCoord);
 		if (cachedChunk != null)
 		{
@@ -414,7 +408,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 
 	// Replaces surface and ground blocks in base terrain and places bedrock.
-	// WorldGenRegion -> RegionLimitedWorldAccess
 	@Override
 	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, ChunkAccess chunk)
 	{
@@ -458,7 +451,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Carvers: Caves and ravines
 
-	// GenerationStage -> WorldGenStage, Carver -> Features
 	@Override
 	public void applyCarvers(long seed, BiomeManager biomeManager, ChunkAccess chunk, GenerationStep.Carving stage)
 	{
@@ -484,18 +476,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 
 		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
-		
 		// Taken from vanilla
-		// getMainChunkX -> a()
-		// getMainChunkZ -> b()
 		int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
 		int worldZ = worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
 		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
-		// SharedSeedRandom -> WorldgenRandom
 		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		// setDecorationSeed() -> a()
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);
-		//
 		
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
 		PaperWorldGenRegion spigotWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
@@ -517,10 +503,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 		catch (Exception exception)
 		{
-			// makeCrashReport() -> a()
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
-			// crashReport.makeCategory() -> crashReport.a()
-			// crashReport.addDetail() -> crashReport.a()
 			crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
@@ -539,36 +522,27 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		//TODO: Make this respect the doMobSpawning game rule
 
-		// getMainChunkX -> a()
-		// getMainChunkZ -> b()
 		int chunkX = worldGenRegion.getCenter().x;
 		int chunkZ = worldGenRegion.getCenter().z;
 		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, chunkZ * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);	
 		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		// setDecorationSeed() -> a()
 		sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
-		// performWorldGenSpawning() -> a()
 		NaturalSpawner.spawnMobsForChunkGeneration(worldGenRegion, ((PaperBiome)biome).getBiome(), worldGenRegion.getCenter(), (Random)sharedseedrandom);
 	}
 
 	// Mob spawning on chunk tick
-	// EntityClassification -> EnumCreatureType
 	@Override
 	public WeightedRandomList<MobSpawnSettings.SpawnerData> getMobsAt(Biome biome, StructureFeatureManager structureManager, MobCategory entityClassification, BlockPos blockPos)
 	{
-		// getStructureStart() -> a()
-		// isValid() -> e()
 		if (structureManager.getStructureAt(blockPos, true, StructureFeature.SWAMP_HUT).isValid())
 		{
 			if (entityClassification == MobCategory.MONSTER)
 			{
-				// getSpawnList() -> c()
 				return StructureFeature.SWAMP_HUT.getSpecialEnemies();
 			}
 
 			if (entityClassification == MobCategory.CREATURE)
 			{
-				// getCreatureSpawnList() -> j()
 				return StructureFeature.SWAMP_HUT.getSpecialAnimals();
 			}
 		}
@@ -595,8 +569,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Noise
-	
-	//TODO version without LevelHeightAccessor seems to be gone? Can we remove this?
 	@Override
 	public int getBaseHeight(int x, int z, Heightmap.Types heightmap, LevelHeightAccessor world)
 	{
@@ -604,10 +576,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Provides a sample of the full column for structure generation.
-
-
-
-	// TODO IBlockReader -> NoiseColumn
 	@Override
 	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world)
 	{
@@ -675,7 +643,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				yLerp = (double) pieceY / 8.0;
 				// Density at this position given the current y interpolation
-				// MathHelper.lerp3() -> MathHelper.a()
 				density = Mth.lerp3(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
 
 				// Get the real y position (translate noise chunk and noise piece)
@@ -713,7 +680,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Getters / misc
-
 
 	@Override
 	public ChunkGenerator withSeed(long seed)

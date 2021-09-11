@@ -64,14 +64,11 @@ public class PaperBiome implements IBiome
 
 	public static Biome createOTGBiome (boolean isOceanBiome, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
-		// BiomeSettingsGeneration.a == BiomeGenerationSettings.Builder in forge
 		BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder = new BiomeGenerationSettings.Builder();
 
 		MobSpawnSettings.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
-		// a() == withSurfaceBuilder() in forge
-		// WorldGenSurfaceComposites.j == ConfiguredSurfaceBuilders.field_244184_p in forge
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
 		// TODO: What if there's no grass around spawn?
 		biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
@@ -101,7 +98,7 @@ public class PaperBiome implements IBiome
 
 		// BiomeFog == BiomeAmbient in forge
 		BiomeSpecialEffects.Builder biomeAmbienceBuilder =
-				new BiomeSpecialEffects.Builder() // fog, water, water fog, sky -> a, b, c, d
+				new BiomeSpecialEffects.Builder()
 						.fogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
 						.waterColor(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
 						.waterFogColor(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
@@ -169,18 +166,14 @@ public class PaperBiome implements IBiome
 		}
 
 		Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
-				// Precipitation
 				.precipitation(biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE :
 						biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN :
 								Biome.Precipitation.SNOW)
-				// depth
 				.depth(biomeConfig.getBiomeHeight())
 				.scale(biomeConfig.getBiomeVolatility())
 				.temperature(safeTemperature)
 				.downfall(biomeConfig.getBiomeWetness())
-				// Ambience (colours/sounds)
 				.specialEffects(biomeAmbienceBuilder.build())
-				// Mob spawning
 				.mobSpawnSettings(mobSpawnInfoBuilder.build())
 				// All other biome settings...
 				.generationSettings(biomeGenerationSettingsBuilder.build());
@@ -207,9 +200,7 @@ public class PaperBiome implements IBiome
 	private static int getSkyColorForTemp (float safeTemperature)
 	{
 		float lvt_1_1_ = safeTemperature / 3.0F;
-		// a == clamp
 		lvt_1_1_ = Mth.clamp(lvt_1_1_, -1.0F, 1.0F);
-		// f == hsvToRGB
 		return Mth.hsvToRgb(0.62222224F - lvt_1_1_ * 0.05F, 0.5F + lvt_1_1_ * 0.1F, 1.0F);
 	}
 
@@ -256,7 +247,6 @@ public class PaperBiome implements IBiome
 							)
 					)
 			);
-			// a() == withStructure() in forge
 			biomeGenerationSettingsBuilder.addStructureStart(customVillage);
 		}
 
@@ -447,15 +437,11 @@ public class PaperBiome implements IBiome
 	// StructureFeatures.register()
 	private static <FC extends FeatureConfiguration, F extends StructureFeature<FC>> ConfiguredStructureFeature<FC, F> register (String name, ConfiguredStructureFeature<FC, F> structure)
 	{
-		// RegistryGeneration == WorldGenRegistries
-		// a() == register()
-		// f == CONFIGURED_STRUCTURE_FEATURE
 		return Registry.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, name, structure);
 	}
 
 	private static MobSpawnSettings.Builder createMobSpawnInfo (IBiomeConfig biomeConfig)
 	{
-		// BiomeSettingsMobs.a == MobSpawnInfo.Builder() for forge
 		MobSpawnSettings.Builder mobSpawnInfoBuilder = new MobSpawnSettings.Builder();
 		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
 		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
@@ -464,7 +450,6 @@ public class PaperBiome implements IBiome
 		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
 		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
 
-		// a() == isValidSpawnBiomeForPlayer()
 		mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}
@@ -473,11 +458,9 @@ public class PaperBiome implements IBiome
 	{
 		for (WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
-			// a() == byKey() in forge
 			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
 			if (entityType.isPresent())
 			{
-				// a() == withSpawner() in forge
 				mobSpawnInfoBuilder.addSpawn(creatureType, new MobSpawnSettings.SpawnerData(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
