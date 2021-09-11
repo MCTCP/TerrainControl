@@ -137,8 +137,7 @@ public class PaperMaterialData extends LocalMaterialData
 	@Override
 	public boolean isSolid()
 	{
-		// TODO: This should check for isSolid and isSolidBlocking, there is no isSolidBlocking for Spigot tho?
-		return this.blockData != null && this.blockData.getMaterial().isSolid();
+		return this.blockData != null && this.blockData.getMaterial().isSolid() && this.blockData.getMaterial().isSolidBlocking();
 	}
 
 	@Override
