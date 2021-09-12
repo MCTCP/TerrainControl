@@ -1,13 +1,11 @@
 package com.pg85.otg.paper.commands;
 
-import java.util.List;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import org.bukkit.command.CommandSender;
-
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 
 public abstract class BaseCommand
 {
@@ -17,11 +15,10 @@ public abstract class BaseCommand
 	protected String[] detailedHelp = new String[]
 	{ "No detailed help specified." };
 
-	public BaseCommand(String name)
-	{
+	public BaseCommand(String name) {
 		this.name = name;
 	}
-
+	
 	public String getName()
 	{
 		return name;
@@ -41,26 +38,10 @@ public abstract class BaseCommand
 	{
 		return this.detailedHelp;
 	}
-
-	public ComponentBuilder createComponent(String text1, String text2, ChatColor color1, ChatColor color2)
-	{
-		TextComponent component1 = new TextComponent(text1);
-		component1.setColor(color1);
-		TextComponent component2 = new TextComponent(text2);
-		component2.setColor(color2);
-
-		return new ComponentBuilder(component1).append(component2);
+	
+	public MutableComponent createComponent(String text, String text2, ChatFormatting color1, ChatFormatting color2) {
+		return new TextComponent(text).withStyle(color1).append(new TextComponent(text2).withStyle(color2));
 	}
 
-	public BaseComponent createComponent(String text, ChatColor color)
-	{
-		TextComponent component = new TextComponent(text);
-		component.setColor(color);
-
-		return component;
-	}
-
-	public abstract List<String> onTabComplete(CommandSender sender, String[] args);
-
-	public abstract boolean execute(CommandSender sender, String[] args);
+	public abstract void build(LiteralArgumentBuilder<CommandSourceStack> builder);
 }

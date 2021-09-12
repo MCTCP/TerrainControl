@@ -1,83 +1,63 @@
 package com.pg85.otg.paper.commands;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.util.StringUtil;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-public class OTGCommandExecutor implements TabCompleter, CommandExecutor
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+
+public class OTGCommandExecutor
 {
-	private static final Map<String, BaseCommand> commandMap = new TreeMap<>(Comparator.naturalOrder());
-
-	public OTGCommandExecutor()
+	private static final List<BaseCommand> commands = new ArrayList<>();
+	
+	//
+	// TODO our command is registered as minecraft:otg, which is not ideal
+	//
+	public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
 	{
-		commandMap.put("data", new DataCommand());
-		commandMap.put("edit", new EditCommand());
-		commandMap.put("export", new ExportCommand());
-		commandMap.put("flush", new FlushCommand());
-		commandMap.put("spawn", new SpawnCommand());
-		commandMap.put("structure", new StructureCommand());
-		commandMap.put("map", new MapCommand());
-		commandMap.put("help", new HelpCommand());
-		commandMap.put("biome", new BiomeCommand());
-		commandMap.put("tp", new TpCommand());
-		commandMap.put("preset", new PresetCommand());
-		commandMap.put("region", new RegionCommand());
-		commandMap.put("finishedit", new FinishEditCommand());
-		commandMap.put("canceledit", new CancelEditCommand());
-	}
+		HelpCommand helpCommand = new HelpCommand();
+		
+		commands.clear();
+		commands.add(helpCommand);
+		commands.add(new MapCommand());
+		commands.add(new DataCommand());
+		commands.add(new PresetCommand());
+		commands.add(new FlushCommand());
+		commands.add(new StructureCommand());
+		commands.add(new BiomeCommand());
+		commands.add(new TpCommand());
+		commands.add(new SpawnCommand());
+		commands.add(new EditCommand());
+		commands.add(new ExportCommand());
+		commands.add(new RegionCommand());
+		
+		commands.sort(Comparator.comparing(BaseCommand::getName));
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String alias, String[] strings)
-	{
-		String cmd;
-		String[] args = strings.length >= 2 ? Arrays.copyOfRange(strings, 1, strings.length) : new String[0];
-
-		if (strings.length >= 1)
-			cmd = strings[0].toLowerCase();
-		else
-			cmd = "help";
-
-		BaseCommand otgCommand = commandMap.get(cmd);
-
-		if (otgCommand != null)
-		{
-			return otgCommand.execute(sender, args);
+		LiteralArgumentBuilder<CommandSourceStack> commandBuilder = Commands.literal("otg").requires(
+				(context) -> context.hasPermission(2)
+			).executes(
+					context -> helpCommand.showHelp(context.getSource(), "")
+			);
+		
+		for (BaseCommand command : commands) {
+			command.build(commandBuilder);
 		}
-		return true; // TODO usage message
-	}
-
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args)
-	{
-		List<String> commands = new ArrayList<>(commandMap.keySet());
-
-		if (args.length == 0)
-			return commands;
-		if (args.length == 1)
-			return StringUtil.copyPartialMatches(args[0], commands, new ArrayList<>());
-
-		BaseCommand otgCommand = commandMap.get(args[0]);
-
-		if (otgCommand != null)
-		{
-			return otgCommand.onTabComplete(sender, args);
-		}
-
-		return Collections.emptyList();
+		
+		dispatcher.register(commandBuilder);
 	}
 	
-	public static Collection<BaseCommand> getAllCommands() {
-		return commandMap.values(); 
+	// 
+	// TODO I had to remove our custom flag argument, so we need another way to handle trailing flags in command arguments
+	// 
+	public static void registerArguments() {
+		//ArgumentTypes.register("flags", FlagsArgument.class, new EmptyArgumentSerializer<>(FlagsArgument::create));
+	}
+	
+	public static List<BaseCommand> getCommands() {
+		return commands;
 	}
 }

@@ -1,22 +1,27 @@
 package com.pg85.otg.paper.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.customobject.util.Corner;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 public class RegionCommand extends BaseCommand
 {
-	protected static final HashMap<Player, Region> playerSelectionMap = new HashMap<>();
+	protected static HashMap<Entity, Region> playerSelectionMap = new HashMap<>();
 
 	public RegionCommand()
 	{
@@ -25,130 +30,108 @@ public class RegionCommand extends BaseCommand
 		this.usage = "Please see /otg help region.";
 	}
 
-	private static final List<String> directions = Arrays.asList("down", "east", "north", "south", "up", "west");
-	private static final List<String> regionSubCommands = Arrays.asList("clear","expand", "mark", "shrink");
-	private static final List<String> points = Arrays.asList("pos1","pos2", "center");
-
 	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] strings)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		if (strings.length == 2)
-		{
-			return StringUtil.copyPartialMatches(strings[1], regionSubCommands, new ArrayList<>());
-		}
-
-		if (strings[1].equalsIgnoreCase("expand") || strings[1].equalsIgnoreCase("shrink")) {
-			if (strings.length == 3)
-			{
-				return StringUtil.copyPartialMatches(strings[2], directions, new ArrayList<>());
-			}
-		}
-
-		if (strings[1].equalsIgnoreCase("mark"))
-		{
-			return StringUtil.copyPartialMatches(strings[2], points, new ArrayList<>());
-		}
-
-		return new ArrayList<>();
+		builder.then(
+			Commands.literal("region").then(
+				Commands.literal("mark").executes(
+					context -> mark(context.getSource())
+				).then(Commands.argument("point", StringArgumentType.word()).suggests(this::suggestMarkerTypes).executes(
+					context -> mark(context.getSource(), context.getArgument("point", String.class))
+				))
+			).then(
+				Commands.literal("clear").executes(
+					context ->clear(context.getSource())
+				)
+			).then(
+				Commands.literal("expand").then(
+					Commands.argument("direction", StringArgumentType.word()).suggests(this::suggestDirections).then(
+						Commands.argument("value", IntegerArgumentType.integer()).executes(
+							context -> expand(context.getSource(),
+								context.getArgument("direction", String.class),
+								context.getArgument("value", Integer.class))
+						)
+					)
+				)
+			).then(
+				Commands.literal("shrink").then(
+					Commands.argument("direction", StringArgumentType.word()).suggests(this::suggestDirections).then(
+						Commands.argument("value", IntegerArgumentType.integer()).executes(
+							context -> shrink(context.getSource(),
+								context.getArgument("direction", String.class),
+								context.getArgument("value", Integer.class))
+						)
+					)
+				)
+			)
+		);
 	}
 
-	@Override
-	public boolean execute(CommandSender source, String[] args)
+	public int mark(CommandSourceStack source)
 	{
-		if (!(source instanceof Player))
+		if (checkForNonPlayer(source)) return 0;
+		if (playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition()))
 		{
-			source.sendMessage("Only players can execute this command");
-			return false;
+			source.sendSuccess(new TextComponent("Point 1 marked"), false);
+		} else {
+			source.sendSuccess(new TextComponent("Point 2 marked"), false);
 		}
-		Player player = ((Player) source);
-		if (!playerSelectionMap.containsKey(player))
-		{
-			playerSelectionMap.put(player, new Region());
-		}
-
-		if (args.length == 0)
-		{
-			source.sendMessage("placeholder help message");
-			return true;
-		}
-		
-		Region region = playerSelectionMap.get(player);
-
-		switch (args[0])
-		{
-			case "mark":
-				if (args.length > 1)
-				{
-					mark(player, args[1]);
-				}
-				else if (region.setPos(player.getLocation()))
-				{
-					source.sendMessage("Point 1 marked");
-				} else {
-					source.sendMessage("Point 2 marked");
-				}
-				return true;
-			case "clear":
-				region.clear();
-				player.sendMessage("Position cleared");
-				return true;
-			case "shrink":
-			case "expand":
-				if (region.getMax() == null) {
-					source.sendMessage("Please mark two positions before modifying or exporting the region");return true; }
-				if (args.length < 3) {
-					source.sendMessage("Please specify a direction and an amount to expand by"); return true;}
-				String direction = args[1];
-				int value = Integer.parseInt(args[2]);
-				if (args[0].equalsIgnoreCase("shrink")) value = -value;
-				expand(player, direction, value);
-				return true;
-			default:
-				return false;
-		}
+		return 0;
 	}
 
-	public void mark(Player source, String input)
+	public int mark(CommandSourceStack source, String input)
 	{
-		Region r = playerSelectionMap.get(source);
+		if (checkForNonPlayer(source)) return 0;
+		Region r = playerSelectionMap.get(source.getEntity());
 		switch(input)
 		{
 			case "min":
 			case "pos1":
 			case "1":
 			{
-				r.setPos1(source.getLocation());
-				source.sendMessage("Point 1 marked");
-				return;
+				r.setPos1(source.getEntity().blockPosition());
+				source.sendSuccess(new TextComponent("Point 1 marked"), false);
+				return 0;
 			}
 			case "max":
 			case "pos2":
 			case "2":
 			{
-				r.setPos2(source.getLocation());
-				source.sendMessage("Point 2 marked");
-				return;
+				r.setPos2(source.getEntity().blockPosition());
+				source.sendSuccess(new TextComponent("Point 2 marked"), false);
+				return 0;
 			}
 			case "center":
 			{
-				r.setCenter(Region.cornerFromLocation(source.getLocation()));
-				source.sendMessage("Center marked");
-				return;
+				r.setCenter(Region.cornerFromBlockPos(source.getEntity().blockPosition()));
+				source.sendSuccess(new TextComponent("Center marked"), false);
+				return 0;
 			}
 			default:
 			{
-				source.sendMessage(input + " is not recognized");
+				source.sendSuccess(new TextComponent(input + " is not recognized"), false);
+				return 0;
 			}
 		}
 	}
 
-	public void expand(Player source, String direction, Integer value)
+	public int clear(CommandSourceStack source)
 	{
-		Region region = playerSelectionMap.get(source);
+		if (checkForNonPlayer(source)) return 0;
+		playerSelectionMap.get(source.getEntity()).clear();
+		source.sendSuccess(new TextComponent("Position cleared"), false);
+		return 0;
+	}
+
+	public int expand(CommandSourceStack source, String direction, Integer value)
+	{
+		if (checkForNonPlayer(source)) return 0;
+		Region region = playerSelectionMap.get(source.getEntity());
 		if (region.getMax() == null)
 		{
-			source.sendMessage("Please mark two positions before modifying or exporting the region");
-			return;
+			source.sendSuccess(new TextComponent("Please mark two positions before modifying or exporting the region"), false);
+			return 0;
 		}
 
 		switch (direction)
@@ -190,13 +173,36 @@ public class RegionCommand extends BaseCommand
 					region.setPos1(region.pos1.below(value));
 				break;
 			default:
-				source.sendMessage("Unrecognized direction " + direction);
-				return;
+				source.sendSuccess(new TextComponent("Unrecognized direction " + direction), false);
+				return 0;
 		}
 
-		source.sendMessage("Region modified");
+		source.sendSuccess(new TextComponent("Region modified"), false);
+		return 0;
 	}
-	
+
+	public int shrink(CommandSourceStack source, String direction, Integer value)
+	{
+		if (checkForNonPlayer(source)) return 0;
+
+		expand(source, direction, -value);
+
+		return 0;
+	}
+
+	private static boolean checkForNonPlayer(CommandSourceStack source)
+	{
+		if (!(source.getEntity() instanceof ServerPlayer))
+		{
+			source.sendSuccess(new TextComponent("Only players can execute this command"), false);
+			return true;
+		}
+		if (!playerSelectionMap.containsKey(source.getEntity()))
+		{
+			playerSelectionMap.put(source.getEntity(), new Region());
+		}
+		return false;
+	}
 	public static class Region
 	{
 		private BlockPos pos1 = null;
@@ -204,27 +210,22 @@ public class RegionCommand extends BaseCommand
 		private Corner center = null;
 		private boolean flip = true;
 
-		public boolean setPos(Location loc)
-		{
-			return setPos(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-		}
-		
 		// Returns whether it set pos1 or not
-		public boolean setPos(BlockPos BlockPos)
+		public boolean setPos(BlockPos blockPos)
 		{
 			// alternate between setting min and max
 			// Flip initializes as true, meaning we set min first
 			if (flip)
-				pos1 = BlockPos;
+				pos1 = blockPos;
 			else
-				pos2 = BlockPos;
+				pos2 = blockPos;
 			flip = !flip;
 			return !flip;
 		}
 
-		public static Corner cornerFromLocation(Location loc)
+		public static Corner cornerFromBlockPos(BlockPos blockPos)
 		{
-			return new Corner(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+			return new Corner(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 		}
 
 		public void clear()
@@ -258,20 +259,10 @@ public class RegionCommand extends BaseCommand
 			);
 		}
 
-		public void setPos1(Location loc)
-		{
-			setPos1(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-		}
-
 		public void setPos1(BlockPos pos)
 		{
 			flip = false;
 			this.pos1 = pos;
-		}
-
-		public void setPos2(Location loc)
-		{
-			setPos2(new BlockPos(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 		}
 
 		public void setPos2(BlockPos pos)
@@ -289,5 +280,19 @@ public class RegionCommand extends BaseCommand
 		{
 			this.center = center;
 		}
+	}
+	
+	private static final String[] DIRECTION_OPTIONS = new String[]{"north", "south", "east", "west", "up", "down"};
+	private CompletableFuture<Suggestions> suggestDirections(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
+	{
+		return SharedSuggestionProvider.suggest(DIRECTION_OPTIONS, builder);
+	}
+	
+	private static final String[] REGION_MARKER_OPTIONS = new String[] {"1", "2", "center"};
+	private CompletableFuture<Suggestions> suggestMarkerTypes(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
+	{
+		return SharedSuggestionProvider.suggest(REGION_MARKER_OPTIONS, builder);
 	}
 }

@@ -3,23 +3,20 @@ package com.pg85.otg.paper.commands;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
+import org.bukkit.Location;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
@@ -40,7 +37,8 @@ import com.pg85.otg.interfaces.ICustomObjectManager;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.paper.commands.RegionCommand.Region;
+import com.pg85.otg.paper.commands.arguments.BiomeObjectArgument;
+import com.pg85.otg.paper.commands.arguments.PresetArgument;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.util.PaperNBTHelper;
@@ -50,43 +48,172 @@ import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+
 
 public class EditCommand extends BaseCommand
 {
-	private static final HashMap<Player, EditCommand.EditSession> sessionsMap = new HashMap<>();
-	private static final List<String> FLAGS = Arrays.asList("-nofix", "-update", "-wrongleaves");
-	private static final HashSet<LocalMaterialData> gravityBlocksSet;
-
-	static
+	private static final HashMap<Entity, EditSession> sessionsMap = new HashMap<>();
+	
+	private static final String[] FLAGS = new String[]
+	{ "-nofix", "-update", "-wrongleaves" };
+	
+	public EditCommand() 
 	{
-		gravityBlocksSet = Stream.of(LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL).collect(Collectors.toCollection(HashSet::new));
-	}
-
-	public EditCommand()
-	{
-	super("edit");
+		super("edit");
 		this.helpMessage = "Allows you to edit existing BO3 and BO4 files.";
 		this.usage = "Please see /otg help edit.";
+	}
+
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	{
+		builder.then(Commands.literal("edit")
+			.executes(this::help).then(
+				Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
+				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
+					Commands.argument("object", StringArgumentType.word()).executes(this::execute)
+					.suggests(BiomeObjectArgument::suggest
+						).then(
+						Commands.argument("flags", StringArgumentType.word()).executes(this::execute).suggests(this::suggestFlags)
+					)
+				)
+			)
+		);
+		builder.then(Commands.literal("canceledit")
+			.executes(this::cancelSession));
+		builder.then(Commands.literal("finishedit")
+			.executes(this::finish));
+	}
+
+	public int execute(CommandContext<CommandSourceStack> context)
+	{
+		CommandSourceStack source = context.getSource();
+		try {
+			String presetFolderName = context.getArgument("preset", String.class);
+			String objectName = "";
+			boolean immediate = false, doFixing = true, leaveIllegalLeaves = false;
+
+			try
+			{
+				objectName = context.getArgument("object", String.class);
+				String flags = context.getArgument("flags", String.class);
+				immediate = flags.contains("-update");
+				doFixing = !flags.contains("-nofix");
+				leaveIllegalLeaves = flags.contains("-wrongleaves");
+			}
+			catch (IllegalArgumentException ignored) {}
+			presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
+			boolean isGlobal = presetFolderName == null;
+				
+			if (objectName.equals(""))
+			{
+				source.sendSuccess(new TextComponent("Please supply an object name"), false);
+				return 0;
+			}
+
+			if (source.getEntity() == null)
+			{
+				source.sendSuccess(new TextComponent("Only players can run this command"), false);
+				return 0;
+			}
+
+			StructuredCustomObject inputObject;
+			try {
+				inputObject = getStructuredObject(objectName, presetFolderName);
+			}
+			catch (InvalidConfigException e)
+			{
+				source.sendSuccess(new TextComponent("Error loading object " + objectName), false);
+				return 0;
+			}
+			if (inputObject == null)
+			{
+				source.sendSuccess(new TextComponent("Could not find " + objectName), false);
+				return 0;
+			}
+
+			ObjectType type = inputObject.getType();
+
+			Preset preset = ObjectUtils.getPresetOrDefault(presetFolderName);
+			if (preset == null)
+			{
+				source.sendSuccess(new TextComponent("Could not find preset " + (presetFolderName == null ? "" : presetFolderName)), false);
+				return 0;
+			}
+
+			// Use ForgeWorldGenRegion as a wrapper for the world that ObjectCreator can interact with
+			PaperWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel().getWorld());
+
+			BlockPos pos = source.getEntity().blockPosition();
+			RegionCommand.Region region = ObjectUtils.getRegionFromObject(new Location(source.getBukkitWorld(), pos.getX(), pos.getY(), pos.getZ()), inputObject);
+			Corner center = region.getCenter();
+
+			// Prepare area for spawning
+
+			ObjectUtils.cleanArea(worldGenRegion, region.getMin(), region.getMax(), true);
+
+			// -- Spawn and update --
+
+			// Spawn code, taken and modified from BO3.java :: spawnForced()
+			ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, inputObject, worldGenRegion, doFixing,
+				presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
+				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+
+			// Save the object and clean the area
+			Path path = ObjectUtils.getObjectFolderPath(isGlobal ? null : preset.getPresetFolder())
+				.resolve(ObjectUtils.getFoldersFromObject(inputObject));
+			if (immediate)
+			{
+				new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, leaveIllegalLeaves, source, worldGenRegion
+				)).start();
+				return 0;
+			}
+			// Store the info, wait for /otg finishedit
+			sessionsMap.put(source.getEntity(), new EditSession(type, worldGenRegion, inputObject, extraBlocks,
+				path, preset.getFolderName(), center, leaveIllegalLeaves));
+			source.sendSuccess(new TextComponent("You can now edit the object"), false);
+			source.sendSuccess(new TextComponent("To change the area of the object, use /otg region"), false);
+			source.sendSuccess(new TextComponent("When you are done editing, do /otg finishedit"), false);
+			source.sendSuccess(new TextComponent("To cancel, do /otg canceledit"), false);
+
+			if (!extraBlocks.isEmpty())
+				source.sendSuccess(new TextComponent("This object's center cannot be moved"), false);
+
+			RegionCommand.playerSelectionMap.put(source.getEntity(), region);
+		}
+		catch (Exception e)
+		{
+			source.sendSuccess(new TextComponent("Edit command encountered an error, please check the logs."), false);
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: "+e.getClass().getName() + " - " +e.getMessage());
+			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
+		}
+		return 0;
 	}
 
 	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName) throws InvalidConfigException
 	{
 		CustomObject objectToSpawn = ObjectUtils.getObject(objectName, presetFolderName);
+
 		if (objectToSpawn instanceof BO3)
 		{
 			return (StructuredCustomObject) objectToSpawn;
 		}
-
 		if (presetFolderName == null)
 		{
 			presetFolderName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
 		}
-
 		if (objectToSpawn instanceof BO4)
 		{
 			File file = ((BO4) objectToSpawn).getConfig().getFile();
@@ -104,21 +231,136 @@ public class EditCommand extends BaseCommand
 					OTG.getEngine().getCustomObjectResourcesManager(),
 					OTG.getEngine().getModLoadedChecker()));
 		}
-
 		else if (objectToSpawn instanceof BO2)
 		{
+			// Convert the BO2 to a BO3 before editing
 			try
 			{
-				return new BO3(objectToSpawn.getName(), ObjectType.BO3.getObjectFilePathFromName(objectToSpawn.getName(), ((BO2) objectToSpawn).getFile().getParentFile().toPath()).toFile(), ((BO2) objectToSpawn).getConvertedConfig(presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()));
+				return new BO3(
+					objectToSpawn.getName(),
+					ObjectType.BO3.getObjectFilePathFromName(
+						objectToSpawn.getName(),
+						((BO2) objectToSpawn).getFile().getParentFile().toPath()).toFile(),
+					((BO2) objectToSpawn).getConvertedConfig(presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
+						OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker())
+				);
 			}
-			catch (InvalidConfigException var4)
+			catch (InvalidConfigException e)
 			{
-				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Failed to convert BO2 " + objectName);
-				OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, var4);
+				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Failed to convert BO2 "+objectName);
+				OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 			}
 		}
-
 		return null;
+	}
+
+	public int finish(CommandContext<CommandSourceStack> context)
+	{
+		CommandSourceStack source = context.getSource();
+		try
+		{
+			EditSession session = sessionsMap.get(source.getEntity());
+			RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
+
+			if (session == null)
+			{
+				source.sendSuccess(new TextComponent("No active session, do '/otg edit' to start one"), false);
+				return 0;
+			}
+			else if (ObjectUtils.isOutsideBounds(region, session.type))
+			{
+				source.sendSuccess(new TextComponent("Selection is too big! Maximum size is 16x16 for BO4 and 32x32 for BO3"), false);
+				return 0;
+			} else {
+				source.sendSuccess(new TextComponent("Cleaning up..."), false);
+			}
+
+			StructuredCustomObject object = exportFromSession(session, region);
+
+			if (object != null)
+			{
+				source.sendSuccess(new TextComponent("Successfully edited "+session.type.getType()+" " + object.getName()), false);
+				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName,  object.getName(), object.getConfig().getFile(), object);
+			} else {
+				source.sendSuccess(new TextComponent("Failed to edit "+session.type.getType()+" " + session.object.getName()), false);
+			}
+			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
+			sessionsMap.put(source.getEntity(), null);
+		}
+		catch (Exception e)
+		{
+			source.sendSuccess(new TextComponent("Edit command encountered an error, please check logs."), false);
+			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: ");
+			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
+		}
+		return 0;
+	}
+
+	public static StructuredCustomObject exportFromSession(EditSession session, RegionCommand.Region region)
+	{
+		return ObjectCreator.createObject(
+			session.type,
+			region.getMin(),
+			region.getMax(),
+			// Don't let someone change the center if there are non-spawned blocks
+			session.extraBlocks.isEmpty() ? region.getCenter() : session.originalCenterPoint,
+			null,
+			session.object.getName(),
+			false,
+			session.leaveIllegalLeaves,
+			session.objectPath,
+			session.genRegion,
+			new PaperNBTHelper(),
+			session.extraBlocks,
+			session.object.getConfig(),
+			session.presetFolderName,
+			OTG.getEngine().getOTGRootFolder(),
+			OTG.getEngine().getLogger(),
+			OTG.getEngine().getCustomObjectManager(),
+			OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName),
+			OTG.getEngine().getCustomObjectResourcesManager(),
+			OTG.getEngine().getModLoadedChecker()
+		);
+	}
+
+	public int cancelSession(CommandContext<CommandSourceStack> context)
+	{
+		CommandSourceStack source = context.getSource();
+		EditSession session = sessionsMap.get(source.getEntity());
+		RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
+
+		if (session != null && region != null)
+		{
+			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
+			sessionsMap.put(source.getEntity(), null);
+			source.sendSuccess(new TextComponent("Edit session cancelled"), false);
+		} else {
+			source.sendSuccess(new TextComponent("No active edit session to cancel"), false);
+		}
+		return 0;
+	}
+
+	private static class EditSession {
+		private final ObjectType type;
+		private final PaperWorldGenRegion genRegion;
+		private final StructuredCustomObject object;
+		private final ArrayList<BlockFunction<?>> extraBlocks;
+		private final Path objectPath;
+		private final String presetFolderName;
+		private final Corner originalCenterPoint;
+		private final boolean leaveIllegalLeaves;
+
+		public EditSession(ObjectType type, PaperWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint, boolean leaveIllegalLeaves)
+		{
+			this.type = type;
+			this.genRegion = genRegion;
+			this.object = object;
+			this.extraBlocks = extraBlocks;
+			this.objectPath = objectPath;
+			this.presetFolderName = presetFolderName;
+			this.originalCenterPoint = originalCenterPoint;
+			this.leaveIllegalLeaves = leaveIllegalLeaves;
+		}
 	}
 
 	protected static ArrayList<BlockFunction<?>> spawnAndFixObject(int x, int y, int z, StructuredCustomObject object, PaperWorldGenRegion worldGenRegion, boolean fixObject, String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
@@ -159,314 +401,152 @@ public class EditCommand extends BaseCommand
 			// They lose persistence on export if they are legal
 			if (block.material.isLeaves())
 			{
-				block.material = PaperMaterialData.ofBlockData(((PaperMaterialData) block.material)
-					.internalBlock().setValue(LeavesBlock.PERSISTENT, true).setValue(LeavesBlock.DISTANCE, 7));
+				block.material = PaperMaterialData.ofBlockData(((PaperMaterialData)block.material).internalBlock()
+					.setValue(LeavesBlock.PERSISTENT, true).setValue(LeavesBlock.DISTANCE, 7));
 			}
-
 			block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z);
 		}
 
 		for (BlockPos pos : gravityBlocksToCheck)
 		{
-			if (worldGenRegion.getMaterial(pos.getX(), pos.getY() - 1, pos.getZ()).isMaterial(LocalMaterials.STRUCTURE_VOID))
+			if (worldGenRegion.getMaterial(pos.getX(), pos.getY()-1, pos.getZ()).isMaterial(LocalMaterials.STRUCTURE_VOID))
 			{
-				worldGenRegion.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), LocalMaterials.STRUCTURE_BLOCK);
+				// prop up any gravity blocks so they don't fall
+				worldGenRegion.setBlock(pos.getX(), pos.getY()-1, pos.getZ(), LocalMaterials.STRUCTURE_BLOCK);
 			}
 		}
 
 		if (fixObject)
 		{
-			for (BlockPos pos : updates)
+			for (BlockPos blockpos : updates)
 			{
-				BlockState blockstate = worldGenRegion.getBlockData(pos);
+				BlockState blockstate = worldGenRegion.getBlockData(blockpos);
 				if (blockstate.is(BlockTags.LEAVES))
 				{
-					worldGenRegion.getInternal().getBlockTicks().scheduleTick(pos, blockstate.getBlock(), 1);
+					// Schedule a tick on this block in 1 unit of time
+					worldGenRegion.getInternal().getBlockTicks().scheduleTick(blockpos, blockstate.getBlock(), 1);
 				} else {
-					BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, worldGenRegion.getInternal(), pos);
-					worldGenRegion.setBlockState(pos, blockstate1, 20);
+					BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, worldGenRegion.getInternal(), blockpos);
+					worldGenRegion.setBlockState(blockpos, blockstate1, 20);
 				}
 			}
 		}
-
 		return unspawnedBlocks;
 	}
 
-	public static void finishSession(Player source)
+	public int help(CommandContext<CommandSourceStack> context)
 	{
-		try
-		{
-			EditCommand.EditSession session = sessionsMap.get(source);
-			Region region = RegionCommand.playerSelectionMap.get(source);
-			if (session == null)
-			{
-				source.sendMessage("No active session, do '/otg edit' to start one");
-				return;
-			}
-
-			if (ObjectUtils.isOutsideBounds(region, session.type))
-			{
-				source.sendMessage("Selection is too big! Maximum size is 16x16 for BO4 and 32x32 for BO3");
-				return;
-			}
-
-			source.sendMessage("Cleaning up...");
-			StructuredCustomObject object = exportFromSession(session, region);
-			if (object != null)
-			{
-				source.sendMessage("Successfully edited " + session.type.getType() + " " + object.getName());
-				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName, object.getName(), object.getConfig().getFile(), object);
-			}
-			else
-			{
-				source.sendMessage("Failed to edit " + session.type.getType() + " " + session.object.getName());
-			}
-
-			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
-			sessionsMap.put(source, null);
-		}
-		catch (Exception var4)
-		{
-			source.sendMessage("Edit command encountered an error, please check logs.");
-			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: ");
-			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, var4);
-		}
-
+		context.getSource().sendSuccess(new TextComponent("To use the edit command:").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+		context.getSource().sendSuccess(new TextComponent("/otg edit <preset> <object> [-nofix, -update]"), false);
+		context.getSource().sendSuccess(new TextComponent(" - Preset is which preset to fetch the object from, and save it back to"), false);
+		context.getSource().sendSuccess(new TextComponent(" - Object is the object you want to edit"), false);
+		context.getSource().sendSuccess(new TextComponent(" - The -nofix flag disables block state fixing"), false);
+		context.getSource().sendSuccess(new TextComponent(" - The -update flag immediately exports and cleans after fixing"), false);
+		context.getSource().sendSuccess(new TextComponent(" - Complex objects cannot have their center moved"), false);
+		context.getSource().sendSuccess(new TextComponent(" - An object is \"complex\" if it contains NBT or RandomBlock"), false);
+		return 0;
 	}
 
-	public static void cancelSession(Player player)
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
 	{
-		EditCommand.EditSession session = sessionsMap.get(player);
-		Region region = RegionCommand.playerSelectionMap.get(player);
-		if (session != null && region != null)
-		{
-			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
-			sessionsMap.put(player, null);
-			player.sendMessage("Edit session cancelled");
-		}
-		else
-		{
-			player.sendMessage("No active edit session to cancel");
-		}
-
+		return SharedSuggestionProvider.suggest(FLAGS, builder);
 	}
 
-	public static StructuredCustomObject exportFromSession(EditCommand.EditSession session, Region region)
-	{
-		return ObjectCreator.createObject(session.type, region.getMin(), region.getMax(), session.extraBlocks.isEmpty() ? region.getCenter() : session.originalCenterPoint, null, session.object.getName(), false, session.leaveIllegalLeaves, session.objectPath, session.genRegion, new PaperNBTHelper(), session.extraBlocks, session.object.getConfig(), session.presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-	}
+	// These maps are used to figure out what blocks to update
 
-	public List<String> onTabComplete(CommandSender sender, String[] args)
-	{
-		Map<String, String> strings = CommandUtil.parseArgs(args, true);
-		if (strings.size() >= 3)
-		{
-			return FLAGS;
-		}
-		else
-		{
-			Set<String> presetFolderNames = OTG.getEngine().getPresetLoader().getAllPresetFolderNames().stream().map(ExportCommand.filterNamesWithSpaces).collect(Collectors.toSet());
-			presetFolderNames.add("global");
-			String presetFolderName = strings.get("1");
-			String objectName = strings.get("2");
-			if (presetFolderName == null)
-			{
-				return new ArrayList<>(presetFolderNames);
-			}
-			else
-			{
-				// This was what the decompiler gave me back, and it works so I'm leaving it -auth
-				return objectName != null && presetFolderNames.contains(presetFolderName)
-					   ? StringUtil.copyPartialMatches(objectName, OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(presetFolderName, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder()), new ArrayList<>())
-					   : StringUtil.copyPartialMatches(presetFolderName, presetFolderNames, new ArrayList<>());
-			}
-		}
-	}
-
-	public boolean execute(CommandSender sender, String[] args)
-	{
-		if (!(sender instanceof Player source))
-		{
-			sender.sendMessage("Only players can execute this command");
-			return true;
-		}
-		if (args.length == 0)
-		{
-			this.help(source);
-			return true;
-		}
-		else if (args.length < 2)
-		{
-			sender.sendMessage("Please supply an object name to export");
-			return true;
-		}
-		String presetFolderName = args[0];
-		String objectName = args[1];
-		String flags = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : "";
-		boolean immediate = flags.contains("-update");
-		boolean doFixing = !flags.contains("-nofix");
-		boolean leaveIllegalLeaves = flags.contains("-wrongleaves");
-		presetFolderName = presetFolderName != null && presetFolderName.equalsIgnoreCase("global") ? null : presetFolderName;
-		boolean isGlobal = presetFolderName == null;
-		StructuredCustomObject inputObject;
-		try
-		{
-			inputObject = getStructuredObject(objectName, presetFolderName);
-		}
-		catch (InvalidConfigException e)
-		{
-			source.sendMessage("Failed to load object " + objectName);
-			return true;
-		}
-		if (inputObject == null)
-		{
-			source.sendMessage("Could not find " + objectName);
-			return true;
-		}
-		ObjectType type = inputObject.getType();
-		Preset preset = ObjectUtils.getPresetOrDefault(presetFolderName);
-		if (preset == null)
-		{
-			source.sendMessage("Could not find preset " + (presetFolderName == null ? "" : presetFolderName));
-			return true;
-		}
-		PaperWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, (CraftWorld) source.getWorld());
-		Region region = ObjectUtils.getRegionFromObject(source.getLocation(), inputObject);
-		Corner center = region.getCenter();
-		ObjectUtils.cleanArea(worldGenRegion, region.getMin(), region.getMax(), true);
-		ArrayList<BlockFunction<?>> extraBlocks = spawnAndFixObject(center.x, center.y, center.z, inputObject, worldGenRegion, doFixing, presetFolderName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-		Path path = ObjectUtils.getObjectFolderPath(isGlobal ? null : preset.getPresetFolder()).resolve(ObjectUtils.getFoldersFromObject(inputObject));
-		if (immediate)
-		{
-			(new Thread(ObjectUtils.getExportRunnable(type, region, center, inputObject, path, extraBlocks, presetFolderName, true, leaveIllegalLeaves, source, worldGenRegion))).start();
-			return true;
-		}
-		sessionsMap.put(source, new EditCommand.EditSession(type, worldGenRegion, inputObject, extraBlocks, path, preset.getFolderName(), center, leaveIllegalLeaves));
-		source.sendMessage("You can now edit the object");
-		source.sendMessage("To change the area of the object, use /otg region");
-		source.sendMessage("When you are done editing, do /otg finishedit");
-		source.sendMessage("To cancel, do /otg canceledit");
-		if (!extraBlocks.isEmpty())
-		{
-			source.sendMessage("This object's center cannot be moved");
-		}
-
-		RegionCommand.playerSelectionMap.put(source, region);
-		return true;
-	}
-
-	public void help(Player source)
-	{
-		source.sendMessage(ChatColor.LIGHT_PURPLE + "To use the edit command:");
-		source.sendMessage("/otg edit <preset> <object> [-nofix, -update]");
-		source.sendMessage(" - Preset is which preset to fetch the object from, and save it back to");
-		source.sendMessage(" - Object is the object you want to edit");
-		source.sendMessage(" - The -nofix flag disables block state fixing");
-		source.sendMessage(" - The -update flag immediately exports and cleans after fixing");
-		source.sendMessage(" - Complex objects cannot have their center moved");
-		source.sendMessage(" - An object is \"complex\" if it contains NBT or RandomBlock");
-	}
-
-	private record EditSession(
-		ObjectType type,
-		PaperWorldGenRegion genRegion,
-		StructuredCustomObject object,
-		ArrayList<BlockFunction<?>> extraBlocks,
-		Path objectPath,
-		String presetFolderName,
-		Corner originalCenterPoint,
-		boolean leaveIllegalLeaves
-	) {}
-
+	private static final HashSet<LocalMaterialData> gravityBlocksSet = Stream.of(
+		LocalMaterials.SAND, LocalMaterials.RED_SAND, LocalMaterials.GRAVEL
+	).collect(Collectors.toCollection(HashSet::new));
 
 	private static final HashSet<ResourceLocation> updateMap = Stream.of(
-		"blocks/oak_fence",
-		"blocks/birch_fence",
-		"blocks/nether_brick_fence",
-		"blocks/spruce_fence",
-		"blocks/jungle_fence",
-		"blocks/acacia_fence",
-		"blocks/dark_oak_fence",
-		"blocks/iron_door",
-		"blocks/oak_door",
-		"blocks/spruce_door",
-		"blocks/birch_door",
-		"blocks/jungle_door",
-		"blocks/acacia_door",
-		"blocks/dark_oak_door",
-		"blocks/glass_pane",
-		"blocks/white_stained_glass_pane",
-		"blocks/orange_stained_glass_pane",
-		"blocks/magenta_stained_glass_pane",
-		"blocks/light_blue_stained_glass_pane",
-		"blocks/yellow_stained_glass_pane",
-		"blocks/lime_stained_glass_pane",
-		"blocks/pink_stained_glass_pane",
-		"blocks/gray_stained_glass_pane",
-		"blocks/light_gray_stained_glass_pane",
-		"blocks/cyan_stained_glass_pane",
-		"blocks/purple_stained_glass_pane",
-		"blocks/blue_stained_glass_pane",
-		"blocks/brown_stained_glass_pane",
-		"blocks/green_stained_glass_pane",
-		"blocks/red_stained_glass_pane",
-		"blocks/black_stained_glass_pane",
-		"blocks/purpur_stairs",
-		"blocks/oak_stairs",
-		"blocks/cobblestone_stairs",
-		"blocks/brick_stairs",
-		"blocks/stone_brick_stairs",
-		"blocks/nether_brick_stairs",
-		"blocks/spruce_stairs",
-		"blocks/sandstone_stairs",
-		"blocks/birch_stairs",
-		"blocks/jungle_stairs",
-		"blocks/quartz_stairs",
-		"blocks/acacia_stairs",
-		"blocks/dark_oak_stairs",
-		"blocks/prismarine_stairs",
-		"blocks/prismarine_brick_stairs",
-		"blocks/dark_prismarine_stairs",
-		"blocks/red_sandstone_stairs",
-		"blocks/polished_granite_stairs",
-		"blocks/smooth_red_sandstone_stairs",
-		"blocks/mossy_stone_brick_stairs",
-		"blocks/polished_diorite_stairs",
-		"blocks/mossy_cobblestone_stairs",
-		"blocks/end_stone_brick_stairs",
-		"blocks/stone_stairs",
-		"blocks/smooth_sandstone_stairs",
-		"blocks/smooth_quartz_stairs",
-		"blocks/granite_stairs",
-		"blocks/andesite_stairs",
-		"blocks/red_nether_brick_stairs",
-		"blocks/polished_andesite_stairs",
-		"blocks/diorite_stairs",
-		"blocks/cobblestone_wall",
-		"blocks/mossy_cobblestone_wall",
-		"blocks/brick_wall",
-		"blocks/prismarine_wall",
-		"blocks/red_sandstone_wall",
-		"blocks/mossy_stone_brick_wall",
-		"blocks/granite_wall",
-		"blocks/stone_brick_wall",
-		"blocks/nether_brick_wall",
-		"blocks/andesite_wall",
-		"blocks/red_nether_brick_wall",
-		"blocks/sandstone_wall",
-		"blocks/end_stone_brick_wall",
-		"blocks/diorite_wall",
-		"blocks/iron_bars",
-		"blocks/trapped_chest",
-		"blocks/chest",
-		"blocks/redstone_wire",
-		"blocks/oak_leaves",
-		"blocks/spruce_leaves",
-		"blocks/birch_leaves",
-		"blocks/jungle_leaves",
-		"blocks/acacia_leaves",
-		"blocks/dark_oak_leaves",
-		"blocks/vine")
+		"oak_fence",
+		"birch_fence",
+		"nether_brick_fence",
+		"spruce_fence",
+		"jungle_fence",
+		"acacia_fence",
+		"dark_oak_fence",
+		"iron_door",
+		"oak_door",
+		"spruce_door",
+		"birch_door",
+		"jungle_door",
+		"acacia_door",
+		"dark_oak_door",
+		"glass_pane",
+		"white_stained_glass_pane",
+		"orange_stained_glass_pane",
+		"magenta_stained_glass_pane",
+		"light_blue_stained_glass_pane",
+		"yellow_stained_glass_pane",
+		"lime_stained_glass_pane",
+		"pink_stained_glass_pane",
+		"gray_stained_glass_pane",
+		"light_gray_stained_glass_pane",
+		"cyan_stained_glass_pane",
+		"purple_stained_glass_pane",
+		"blue_stained_glass_pane",
+		"brown_stained_glass_pane",
+		"green_stained_glass_pane",
+		"red_stained_glass_pane",
+		"black_stained_glass_pane",
+		"purpur_stairs",
+		"oak_stairs",
+		"cobblestone_stairs",
+		"brick_stairs",
+		"stone_brick_stairs",
+		"nether_brick_stairs",
+		"spruce_stairs",
+		"sandstone_stairs",
+		"birch_stairs",
+		"jungle_stairs",
+		"quartz_stairs",
+		"acacia_stairs",
+		"dark_oak_stairs",
+		"prismarine_stairs",
+		"prismarine_brick_stairs",
+		"dark_prismarine_stairs",
+		"red_sandstone_stairs",
+		"polished_granite_stairs",
+		"smooth_red_sandstone_stairs",
+		"mossy_stone_brick_stairs",
+		"polished_diorite_stairs",
+		"mossy_cobblestone_stairs",
+		"end_stone_brick_stairs",
+		"stone_stairs",
+		"smooth_sandstone_stairs",
+		"smooth_quartz_stairs",
+		"granite_stairs",
+		"andesite_stairs",
+		"red_nether_brick_stairs",
+		"polished_andesite_stairs",
+		"diorite_stairs",
+		"cobblestone_wall",
+		"mossy_cobblestone_wall",
+		"brick_wall",
+		"prismarine_wall",
+		"red_sandstone_wall",
+		"mossy_stone_brick_wall",
+		"granite_wall",
+		"stone_brick_wall",
+		"nether_brick_wall",
+		"andesite_wall",
+		"red_nether_brick_wall",
+		"sandstone_wall",
+		"end_stone_brick_wall",
+		"diorite_wall",
+		"iron_bars",
+		"trapped_chest",
+		"chest",
+		"redstone_wire",
+		"oak_leaves",
+		"spruce_leaves",
+		"birch_leaves",
+		"jungle_leaves",
+		"acacia_leaves",
+		"dark_oak_leaves",
+		"vine")
 		.map(ResourceLocation::new)
 		.collect(Collectors.toCollection(HashSet::new));
 }

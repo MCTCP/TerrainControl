@@ -2,25 +2,30 @@ package com.pg85.otg.paper.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 
 public class TpCommand extends BaseCommand
@@ -40,90 +45,70 @@ public class TpCommand extends BaseCommand
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		if (!(sender instanceof Player))
-		{
-			sender.sendMessage("Only players can execute this command");
-			return true;
-		}
-		Player player = (Player) sender;
-		ServerLevel world = ((CraftWorld) player.getWorld()).getHandle();
-
-		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
-		{
-			sender.sendMessage("OTG is not enabled in this world");
-			return true;
-		}
-
-		if (args.length >= 1)
-		{
-			String biome = args[0];
-			Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getPreset();
-
-			ResourceLocation key = new ResourceLocation(new OTGBiomeResourceLocation(preset.getPresetFolder(),
-					preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
-
-			Biome biomeBase = (world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(ResourceKey.create(Registry.BIOME_REGISTRY, key)));
-
-			if (biomeBase == null)
-			{
-				sender.sendMessage("Invalid biome: " + biome + ".");
-				return true;
-			}
-			
-			int range = 10000;
-			
-			if (args.length >= 2) {
-				try {
-					range = Integer.parseInt(args[1]);
-				} catch (NumberFormatException ex) {
-					sender.sendMessage("Invalid search radius: " + (args[1] + "."));
-					return true;
-				}
-			}
-
-			BlockPos playerPos = new BlockPos(player.getLocation().getBlockX(),
-					player.getLocation().getBlockY(), player.getLocation().getBlockZ());
-			BlockPos pos = world.findNearestBiome(biomeBase, playerPos, range, 8);
-
-			if (pos == null)
-			{
-				sender.sendMessage(ERROR_BIOME_NOT_FOUND.create(biome).getLocalizedMessage());
-				return true;
-			} else
-			{
-				int y = world.getChunkSource().getGenerator().getBaseHeight(
-					pos.getX(),
-					pos.getZ(),
-					Types.MOTION_BLOCKING_NO_LEAVES,
-					world);
-				player.teleport(new Location(player.getWorld(), pos.getX(), y, pos.getZ()));
-				player.sendMessage("Teleporting you to the nearest " + biome + ".");
-			}
-
-		}
-		return true;
+		builder.then(
+				Commands.literal("tp").executes(context -> showHelp(context.getSource()))
+						.then(Commands.argument("biome", StringArgumentType.word())
+								.executes(context -> locateBiome(context.getSource(),
+										StringArgumentType.getString(context, "biome"), 10000))
+								.suggests(this::suggestBiomes)
+								.then(Commands.argument("range", IntegerArgumentType.integer(0))
+										.executes(context -> locateBiome(context.getSource(),
+												StringArgumentType.getString(context, "biome"),
+												IntegerArgumentType.getInteger(context, "range"))))));
 	}
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
+	@SuppressWarnings("resource")
+	private int locateBiome(CommandSourceStack source, String biome, int range) throws CommandSyntaxException
 	{
-		List<String> options = new ArrayList<>();
-		if (args.length == 2 && sender instanceof Player)
+		biome = biome.toLowerCase();
+
+		ServerLevel world = source.getLevel();
+		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			ServerLevel serverWorld = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
-			if (serverWorld.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
-			{
-				List<String> biomeNames = new ArrayList<>();
-				for (String name : ((OTGNoiseChunkGenerator) serverWorld.getChunkSource().getGenerator())
-						.getPreset().getAllBiomeNames())
-				{
-					biomeNames.add(name.replace(' ', '_'));
-				}
-				StringUtil.copyPartialMatches(args[1], biomeNames, options);
-			}
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
+			return 0;
 		}
-		return options;
+
+		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset();
+
+		ResourceLocation key = new ResourceLocation(new OTGBiomeResourceLocation(preset.getPresetFolder(),
+				preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
+
+		BlockPos pos = world.findNearestBiome(world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).get(key),
+				new BlockPos(source.getPosition()), range, 8);
+
+		if (pos == null)
+		{
+			throw ERROR_BIOME_NOT_FOUND.create(biome);
+		} else
+		{
+			int y = world.getChunkSource().generator.getBaseHeight(pos.getX(), pos.getZ(),
+					Types.MOTION_BLOCKING_NO_LEAVES, world);
+			source.getPlayerOrException().teleportTo(pos.getX(), y, pos.getZ());
+			source.sendSuccess(new TextComponent("Teleporting you to the nearest " + biome + "."), false);
+			return 0;
+		}
+	}
+
+	private CompletableFuture<Suggestions> suggestBiomes(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
+	{
+		List<String> biomes = new ArrayList<>();
+
+		if (context.getSource().getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		{
+			biomes = ((OTGNoiseChunkGenerator) context.getSource().getLevel().getChunkSource().generator).getPreset()
+					.getAllBiomeNames().stream().map(name -> name.replace(' ', '_')).collect(Collectors.toList());
+		}
+
+		return SharedSuggestionProvider.suggest(biomes, builder);
+	}
+
+	private int showHelp(CommandSourceStack source)
+	{
+		source.sendSuccess(new TextComponent(getUsage()), false);
+		return 0;
 	}
 }

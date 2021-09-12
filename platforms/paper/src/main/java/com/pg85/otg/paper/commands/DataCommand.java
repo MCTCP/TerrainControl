@@ -4,34 +4,34 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
-import net.minecraft.data.BuiltinRegistries;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
-import org.bukkit.util.StringUtil;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
 public class DataCommand extends BaseCommand
 {
-	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
-			"biome",
-			"block",
-			"entity",
-			"sound",
-			"particle",
-			"configured_feature"
-	));
+	private static final String[] DATA_TYPES = new String[]
+			{ "biome", "block", "entity", "sound", "particle", "configured_feature" };
 	
-	public DataCommand() {
+	public DataCommand() 
+	{
 		super("data");
 		this.helpMessage = "Dumps various types of game data to files for preset development.";
 		this.usage = "/otg data <type>";
@@ -42,25 +42,30 @@ public class DataCommand extends BaseCommand
 				" - entity: All registered entities.",
 				" - sound: All registered sounds.",
 				" - particle: All registered particles.",
-				" - dimension: All registered dimensions.",
 				" - configured_feature: All registered configured features (Used to decorate biomes during worldgen)."
 			};
 	}
+	
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	{
+		builder.then(Commands.literal("data")
+			.executes(context -> execute(context.getSource(), ""))
+				.then(Commands.argument("type", StringArgumentType.word())
+					.suggests(this::suggestTypes)
+					.executes((context -> execute(context.getSource(), context.getArgument("type", String.class)))
+				)
+			)
+		);
+	}
 
-	public boolean execute(CommandSender sender, String[] args)
+	public int execute(CommandSourceStack source, String type)
 	{
 		// /otg data music
-		// /otg data sound
-		if (args.length != 1)
-		{
-			sender.sendMessage(getUsage());
-			sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
-			return true;
-		}
 
 		Registry<?> registry;
 
-		switch (args[0].toLowerCase())
+		switch (type.toLowerCase())
 		{
 			case "biome":
 				registry = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
@@ -81,9 +86,10 @@ public class DataCommand extends BaseCommand
 				registry = BuiltinRegistries.CONFIGURED_FEATURE;
 				break;
 			default:
-				sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
-				return true;
+				source.sendSuccess(new TextComponent(getUsage()), false);
+				return 0;
 		}
+
 		Set<ResourceLocation> set = registry.keySet();
 		new Thread(() -> {
 			try
@@ -95,7 +101,7 @@ public class DataCommand extends BaseCommand
 					folder.mkdirs();
 				}
 
-				String fileName = "data-output-" + args[0] + ".txt".toLowerCase();
+				String fileName = "data-output-" + type + ".txt".toLowerCase();
 				File output = new File(folder, fileName);
 				FileWriter writer = new FileWriter(output);
 				for (ResourceLocation key : set)
@@ -103,18 +109,18 @@ public class DataCommand extends BaseCommand
 					writer.write(key.toString() + "\n");
 				}
 				writer.close();
-				sender.sendMessage("File exported as " + output.getPath());
+				source.sendSuccess(new TextComponent("File exported as " + output.getPath()), true);
 			} catch (IOException e)
 			{
 				e.printStackTrace();
 			}
 		}).start();
-		return true;
+		return 0;
 	}
-
-	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
+	
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
 	{
-		return StringUtil.copyPartialMatches(args[1], DATA_TYPES, new ArrayList<>());
+		return SharedSuggestionProvider.suggest(DATA_TYPES, builder);
 	}
 }

@@ -75,7 +75,9 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 
 		OTG.startEngine(new PaperEngine(this));
-		Bukkit.getPluginCommand("OTG").setExecutor(new OTGCommandExecutor());
+		
+		OTGCommandExecutor.registerArguments();
+		OTGCommandExecutor.register(((CraftServer)Bukkit.getServer()).getServer().vanillaCommandDispatcher.getDispatcher());
 		// Does this go here?
 		OTG.getEngine().getPresetLoader().registerBiomes();
 

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -25,7 +24,9 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 
 public class ObjectUtils
 {
@@ -212,7 +213,7 @@ public class ObjectUtils
 	 * @param verbose Whether to print a success/fail message, as well as whether to register the object after creation
 	 */
 	protected static Runnable getExportRunnable(ObjectType type, RegionCommand.Region region, Corner center, StructuredCustomObject inputObject,
-												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, boolean leaveIllegalLeaves, Player source, LocalWorldGenRegion worldGenRegion)
+												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, boolean leaveIllegalLeaves, CommandSourceStack source, LocalWorldGenRegion worldGenRegion)
 	{
 		return () -> {
 			// Wait for tree to finish
@@ -246,10 +247,10 @@ public class ObjectUtils
 
 			if (verbose && fixedObject != null)
 			{
-				source.sendMessage("Successfully updated " + type.getType() + " " + inputObject.getName());
+				source.sendSuccess(new TextComponent("Successfully updated " + type.getType() + " " + inputObject.getName()), false);
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName(), fixedObject.getConfig().getFile(), inputObject);
 			} else if (verbose) {
-				source.sendMessage("Failed to update "+type.getType()+" " + inputObject.getName());
+				source.sendSuccess(new TextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
 			}
 			cleanArea(worldGenRegion, region.getMin(), region.getMax(), false);
 		};

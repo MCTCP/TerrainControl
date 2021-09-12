@@ -1,16 +1,22 @@
 package com.pg85.otg.paper.commands;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.command.CommandSender;
-import org.bukkit.util.StringUtil;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.TextComponent;
 
 public class HelpCommand extends BaseCommand
 {
@@ -24,87 +30,74 @@ public class HelpCommand extends BaseCommand
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		if (args.length >= 1)
+		builder.then(Commands.literal("help").executes(context -> showHelp(context.getSource(), ""))
+				.then(Commands.argument("command", StringArgumentType.word()).suggests(this::suggestHelp).executes(
+						(context -> showHelp(context.getSource(), context.getArgument("command", String.class))))));
+	}
+
+	protected int showHelp(CommandSourceStack source, String cmd)
+	{
+		if (cmd.isEmpty())
 		{
-			String cmd = args[0];
+			showHelp(source, 1);
+		} else
+		{
 
 			if (StringUtils.isNumeric(cmd))
 			{
-				showHelp(sender, Integer.parseInt(cmd));
+				showHelp(source, Integer.parseInt(cmd));
 			} else
 			{
 
-				OTGCommandExecutor.getAllCommands().stream().filter(basecmd -> basecmd.getName().equalsIgnoreCase(cmd))
-						.findFirst().ifPresent(command ->
+				OTGCommandExecutor.getCommands().stream().filter(basecmd -> basecmd.getName().equalsIgnoreCase(cmd)).findFirst()
+						.ifPresent(command ->
 						{
-							TextComponent commandName = new TextComponent("/otg " + command.getName() + ": ");
-							commandName.setColor(ChatColor.GOLD);
-
-							TextComponent helpMsg = new TextComponent(command.getHelpMessage());
-							helpMsg.setColor(ChatColor.GREEN);
-
-							sender.spigot().sendMessage(new ComponentBuilder(commandName).append(helpMsg).create());
-
+							source.sendSuccess(new TextComponent("/otg " + command.getName() + ": ")
+									.withStyle(ChatFormatting.GOLD)
+									.append(new TextComponent(command.getHelpMessage())
+											.withStyle(ChatFormatting.GREEN)),
+									false);
+							source.sendSuccess(new TextComponent("usage: " + command.getUsage())
+									.withStyle(ChatFormatting.GRAY), false);
 							for (String help : command.getDetailedHelp())
 							{
-								helpMsg = new TextComponent(help);
-								helpMsg.setColor(ChatColor.GRAY);
-
-								sender.spigot().sendMessage(helpMsg);
+								source.sendSuccess(new TextComponent(help).withStyle(ChatFormatting.GRAY), false);
 							}
 						});
 			}
-		} else
-		{
-			showHelp(sender, 1);
 		}
-		return true;
+		return 0;
 	}
-	
-	private void showHelp(CommandSender sender, int page)
+
+	private void showHelp(CommandSourceStack source, int page)
 	{
 		int start = (page - 1) * 5;
 
-		List<BaseCommand> commands = new ArrayList<>(OTGCommandExecutor.getAllCommands());
+		List<BaseCommand> commands = OTGCommandExecutor.getCommands();
 
-		TextComponent component;
 		for (int i = start; i < commands.size() && i < start + 5; i++)
 		{
 			BaseCommand command = commands.get(i);
 
-			component = new TextComponent("/otg " + command.getName() + ": ");
-			component.setColor(ChatColor.GOLD);
-
-			TextComponent helpMsg = new TextComponent(command.getHelpMessage());
-			helpMsg.setColor(ChatColor.GREEN);
-
-			sender.spigot().sendMessage(new ComponentBuilder(component).append(helpMsg).create());
-			
-			component = new TextComponent(" - usage: " + command.getUsage());
-			component.setColor(ChatColor.GRAY);
-			
-			sender.spigot().sendMessage(component);
+			source.sendSuccess(
+					new TextComponent("/otg " + command.getName() + ": ").withStyle(ChatFormatting.GOLD).append(
+							new TextComponent(command.getHelpMessage()).withStyle(ChatFormatting.GREEN)),
+					false);
+			source.sendSuccess(
+					new TextComponent(" - usage: " + command.getUsage()).withStyle(ChatFormatting.GRAY), false);
 		}
-		component = new TextComponent("Use /otg help <page> for more commands.");
-		component.setColor(ChatColor.GOLD);
-		
-		sender.spigot().sendMessage(component);
+		source.sendSuccess(
+				new TextComponent("Use /otg help <page> for more commands.").withStyle(ChatFormatting.GOLD),
+				false);
 	}
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
+	private CompletableFuture<Suggestions> suggestHelp(CommandContext<CommandSourceStack> context,
+			SuggestionsBuilder builder)
 	{
-		List<String> commands = new ArrayList<>();
-		if (args.length == 2)
-		{
-			StringUtil.copyPartialMatches(args[1],
-					OTGCommandExecutor.getAllCommands().stream().map(BaseCommand::getName).collect(Collectors.toList()),
-					commands);
-		}
-
-		return commands;
+		return SharedSuggestionProvider.suggest(
+				OTGCommandExecutor.getCommands().stream().map(BaseCommand::getName).collect(Collectors.toList()), builder);
 	}
-
 }
+

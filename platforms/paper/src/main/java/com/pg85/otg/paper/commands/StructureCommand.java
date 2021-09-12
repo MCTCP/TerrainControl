@@ -1,13 +1,8 @@
 package com.pg85.otg.paper.commands;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.entity.Player;
-
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -18,8 +13,13 @@ import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
-import com.pg85.otg.paper.gen.OTGPaperChunkGen;
+import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.ChunkCoordinate;
+
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class StructureCommand extends BaseCommand
 {
@@ -29,49 +29,51 @@ public class StructureCommand extends BaseCommand
 		this.usage = "/otg structure";
 	}
 	
-	public boolean execute(CommandSender sender, String[] args)
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		if (!(sender instanceof Player))
-		{
-			sender.sendMessage("Only players can execute this command");
-			return true;
-		}
-		Player player = (Player) sender;
+		builder.then(Commands.literal("structure")
+			.executes((context -> showStructureInfo(context.getSource())))
+		);
+	}
 	
+	private int showStructureInfo(CommandSourceStack source)
+	{
+		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		{
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
+			return 0;
+		}
+		
 		String structureInfo = "";
-		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)((Player)sender).getLocation().getBlockX(), (int)((Player)sender).getLocation().getBlockZ());
+		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)source.getPosition().x, (int)source.getPosition().z);
+		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 		// if the player is in range
-
-		CustomStructure worldInfoChunk = ((OTGPaperChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache(player.getWorld().getWorldFolder().toPath()).getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
 			ILogger logger = OTG.getEngine().getLogger();
 			CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGPaperChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).getPreset().getFolderName());
+			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getPreset().getFolderName());
 			CustomObjectResourcesManager manager = OTG.getEngine().getCustomObjectResourcesManager();
 			IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 			
 			if(worldInfoChunk instanceof BO4CustomStructure)
 			{				
-				structureInfo += "-- BO4 Info -- \nName: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\nAuthor: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\nDescription: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
+				structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
 				String branchesInChunk = ((BO4CustomStructure)worldInfoChunk).getObjectsToSpawnInfo().get(playerChunk);
 				if(branchesInChunk != null && branchesInChunk.length() > 0)
 				{
-					structureInfo += "\n" + branchesInChunk;
+					structureInfo += "\r\n" + branchesInChunk;
 				}
 			} else {
-				structureInfo += "-- BO3 Info -- \nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
+				structureInfo += "-- BO3 Info -- \r\nName: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getName().replace("Start", "") + "\r\nAuthor: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().author + "\r\nDescription: " + ((BO3)worldInfoChunk.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().description;
 			}
-		}		
-	
-		sender.sendMessage(structureInfo);
-		return true;
-	}
-	
-	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
-	{
-		return Collections.emptyList();
+		}
+		
+		source.sendSuccess(new TextComponent(structureInfo), false);
+		return 0;
 	}
 }
+

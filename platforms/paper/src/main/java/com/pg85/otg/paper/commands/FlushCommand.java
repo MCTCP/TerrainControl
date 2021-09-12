@@ -1,40 +1,43 @@
 package com.pg85.otg.paper.commands;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.OTG;
+import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+
 public class FlushCommand extends BaseCommand
 {	
-	public FlushCommand() {
+	public FlushCommand() 
+	{
 		super("flush");
 		this.helpMessage = "Clears all loaded objects, forcing them to be reloaded from disk.";
 		this.usage = "/otg flush";
 	}
 	
-	public boolean execute(CommandSender sender, String[] args)
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		if (!(sender instanceof Player))
+		builder.then(Commands.literal("flush")
+			.executes(context -> flushCache(context.getSource()))
+		);
+	}
+	
+	protected int flushCache(CommandSourceStack source)
+	{
+		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			sender.sendMessage("Only players can execute this command");
-			return true;
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
+			return 0;
 		}
 
 		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Unloading BO2/BO3/BO4 files");
 		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
-		sender.sendMessage("Objects unloaded.");
-		return true;
-	}
-
-	@Override
-	public List<String> onTabComplete(CommandSender sender, String[] args)
-	{
-		return Collections.emptyList();
+		source.sendSuccess(new TextComponent("Objects unloaded."), false);
+		return 0;
 	}
 }
