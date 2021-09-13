@@ -1,22 +1,6 @@
-// Build script for the Common parts of OpenTerrainGenerator
-
-plugins {
-  id 'java'
-}
-
-// Project properties
-archivesBaseName = "openterraingenerator-common-customobject"
 description = "Core files of OpenTerrainGenerator"
 
-repositories
-{
-	jcenter()
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies
-{
-	implementation project(':common:common-util')
-	implementation project(':common:common-config')
+dependencies {
+    api(project(":common:common-util"))
+    api(project(":common:common-config"))
 }
