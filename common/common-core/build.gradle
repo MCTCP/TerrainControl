@@ -1,57 +1,15 @@
-// Build script for the Common parts of OpenTerrainGenerator
-
-plugins {
-  id 'java'
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
-}
-
-// Project properties
-archivesBaseName = "openterraingenerator-common-core"
 description = "Core files of OpenTerrainGenerator"
 
-repositories
-{
-	jcenter()
-    mavenLocal()
-    mavenCentral()
-}
+dependencies {
+    api(project(":common:common-util"))
+    api(project(":common:common-config"))
+    api(project(":common:common-customobject"))
+    api(project(":common:common-generator"))
 
-dependencies
-{
-	implementation project(':common:common-util')
-	implementation project(':common:common-config')
-	implementation project(':common:common-customobject')
-	implementation project(':common:common-generator')
-    implementation (
-		'com.fasterxml.jackson.core:jackson-annotations:2.9.0',
-		'com.fasterxml.jackson.core:jackson-core:2.9.7',
-		'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7',
-		'com.fasterxml.jackson.core:jackson-databind:2.9.7',
-		'org.yaml:snakeyaml:1.23',
-		'it.unimi.dsi:fastutil:8.2.1',
-		'com.google.guava:guava:23.0'
-    )
+    // Shaded dependencies
+    api("com.fasterxml.jackson.core:jackson-annotations:2.9.7")
+    api("com.fasterxml.jackson.core:jackson-core:2.9.7")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7")
+    api("com.fasterxml.jackson.core:jackson-databind:2.9.7")
+    api("org.yaml:snakeyaml:1.23")
 }
-
-shadowJar {
-	dependencies {
-		include dependency(':common-util')
-		include dependency(':common-config')
-		include dependency(':common-customobject')
-		include dependency(':common-generator')
-		include dependency(':jackson-annotations')
-		include dependency(':jackson-core')
-		include dependency(':jackson-dataformat-yaml')
-		include dependency(':jackson-databind')
-		include dependency(':snakeyaml')
-	}
-	// TODO: ShadowJar doesn't appear to be working correctly, Forge isn't picking
-	// up shaded dependencies. Let's hope Forge know how to resolve duplicate
-	// dependencies by now...
-	//relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
-	//relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
-	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
-	getDestinationDirectory().set(distsDirectory)
-}
-
-build.finalizedBy(shadowJar)
