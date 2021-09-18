@@ -10,4 +10,6 @@ public class MaterialProperties
 	public static final MaterialProperty<Boolean> SNOWY = new MaterialProperty<>("snowy");
 
 	public static final MaterialProperty<OTGDirection> HORIZONTAL_DIRECTION = new MaterialProperty<>("horizontal_direction");
+
+	public static final MaterialProperty<OTGDirection> DIRECTION = new MaterialProperty<>("direction");
 }

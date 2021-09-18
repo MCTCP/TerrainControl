@@ -219,6 +219,14 @@ public class PaperMaterials extends LocalMaterials
 		GLOWSTONE = PaperMaterialData.ofBlockData(Blocks.GLOWSTONE.defaultBlockState());
 		MYCELIUM = PaperMaterialData.ofBlockData(Blocks.MYCELIUM.defaultBlockState());
 		STONE_SLAB = PaperMaterialData.ofBlockData(Blocks.STONE_SLAB.defaultBlockState());
+		AMETHYST_BLOCK = PaperMaterialData.ofBlockData(Blocks.AMETHYST_BLOCK.defaultBlockState());
+		BUDDING_AMETHYST = PaperMaterialData.ofBlockData(Blocks.BUDDING_AMETHYST.defaultBlockState());
+		CALCITE = PaperMaterialData.ofBlockData(Blocks.CALCITE.defaultBlockState());
+		SMOOTH_BASALT = PaperMaterialData.ofBlockData(Blocks.SMOOTH_BASALT.defaultBlockState());
+		SMALL_AMETHYST_BUD = PaperMaterialData.ofBlockData(Blocks.SMALL_AMETHYST_BUD.defaultBlockState());
+		MEDIUM_AMETHYST_BUD = PaperMaterialData.ofBlockData(Blocks.MEDIUM_AMETHYST_BUD.defaultBlockState());
+		LARGE_AMETHYST_BUD = PaperMaterialData.ofBlockData(Blocks.LARGE_AMETHYST_BUD.defaultBlockState());
+		AMETHYST_CLUSTER = PaperMaterialData.ofBlockData(Blocks.AMETHYST_CLUSTER.defaultBlockState());
 
 		// Liquids
 		WATER = PaperMaterialData.ofBlockData(Blocks.WATER.defaultBlockState());

@@ -64,6 +64,14 @@ public class LocalMaterials
 	public static LocalMaterialData GLOWSTONE;
 	public static LocalMaterialData MYCELIUM;
 	public static LocalMaterialData STONE_SLAB;
+	public static LocalMaterialData AMETHYST_BLOCK;
+	public static LocalMaterialData BUDDING_AMETHYST;
+	public static LocalMaterialData CALCITE;
+	public static LocalMaterialData SMOOTH_BASALT;
+	public static LocalMaterialData SMALL_AMETHYST_BUD;
+	public static LocalMaterialData MEDIUM_AMETHYST_BUD;
+	public static LocalMaterialData LARGE_AMETHYST_BUD;
+	public static LocalMaterialData AMETHYST_CLUSTER;
 
 	// Liquids
 	public static LocalMaterialData WATER;

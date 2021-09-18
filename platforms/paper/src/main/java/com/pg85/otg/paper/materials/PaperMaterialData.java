@@ -297,6 +297,11 @@ public class PaperMaterialData extends LocalMaterialData
 			property = BlockStateProperties.HORIZONTAL_FACING;
 			Direction direction = Direction.values()[((OTGDirection)value).ordinal()];
 			return PaperMaterialData.ofBlockData(this.blockData.setValue(property, direction));
+		} else if (materialProperty == MaterialProperties.DIRECTION)
+		{
+			property = BlockStateProperties.FACING;
+			Direction direction = Direction.values()[((OTGDirection)value).ordinal()];
+			return PaperMaterialData.ofBlockData(this.blockData.setValue(property, direction));
 		} else {
 			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}

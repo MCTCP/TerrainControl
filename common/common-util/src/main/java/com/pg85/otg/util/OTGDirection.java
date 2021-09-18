@@ -35,32 +35,24 @@ public enum OTGDirection
 	}
 
 	public OTGDirection getClockWise() {
-		switch (this) {
-			case NORTH:
-				return EAST;
-			case SOUTH:
-				return WEST;
-			case WEST:
-				return NORTH;
-			case EAST:
-				return SOUTH;
-			default:
-				throw new IllegalStateException("Unable to get CW direction of " + this);
-		}
+		return switch (this)
+				{
+					case NORTH -> EAST;
+					case SOUTH -> WEST;
+					case WEST -> NORTH;
+					case EAST -> SOUTH;
+					default -> throw new IllegalStateException("Unable to get CW direction of " + this);
+				};
 	}
 
 	public OTGDirection getCounterClockWise() {
-		switch (this) {
-			case NORTH:
-				return WEST;
-			case SOUTH:
-				return EAST;
-			case WEST:
-				return SOUTH;
-			case EAST:
-				return NORTH;
-			default:
-				throw new IllegalStateException("Unable to get CCW direction of " + this);
-		}
+		return switch (this)
+				{
+					case NORTH -> WEST;
+					case SOUTH -> EAST;
+					case WEST -> SOUTH;
+					case EAST -> NORTH;
+					default -> throw new IllegalStateException("Unable to get CCW direction of " + this);
+				};
 	}
 }
