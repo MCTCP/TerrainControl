@@ -42,7 +42,13 @@ public class PaperLegacyMaterials
 				return Blocks.LIGHT_GRAY_SHULKER_BOX.defaultBlockState();
 			case "minecraft:silver_glazed_terracotta":
 				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
-			*/	
+			*/
+
+			// TODO: This needs to be added to the other platforms when they get to 1.17 -auth
+			case "grass_path":
+				return Blocks.DIRT_PATH.defaultBlockState();
+
+
 			case "stationary_water":
 			case "flowing_water":
 				return Blocks.WATER.defaultBlockState();
@@ -121,7 +127,7 @@ public class PaperLegacyMaterials
 			case "waterlily":
 				return Blocks.LILY_PAD.defaultBlockState();
 			case "quartz_ore":
-				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();				
+				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
 			case "yellow_flower":
 				return Blocks.DANDELION.defaultBlockState();
 			case "web":
@@ -166,7 +172,7 @@ public class PaperLegacyMaterials
 			case "fence":
 				return Blocks.OAK_FENCE.defaultBlockState();
 			case "nether_fence":
-				return Blocks.NETHER_BRICK_FENCE.defaultBlockState();				
+				return Blocks.NETHER_BRICK_FENCE.defaultBlockState();
 			case "wood_step":
 				return Blocks.OAK_SLAB.defaultBlockState();
 			case "thin_glass":
@@ -190,19 +196,19 @@ public class PaperLegacyMaterials
 			case "skull":
 				return Blocks.SKELETON_SKULL.defaultBlockState();
 			case "nether_wart":
-				return Blocks.NETHER_WART.defaultBlockState();				
+				return Blocks.NETHER_WART.defaultBlockState();
 			case "nether_wart_block":
-				return Blocks.NETHER_WART_BLOCK.defaultBlockState();				
+				return Blocks.NETHER_WART_BLOCK.defaultBlockState();
 			case "nether_brick":
 				return Blocks.NETHER_BRICKS.defaultBlockState();
 			case "red_nether_brick":
-				return Blocks.RED_NETHER_BRICKS.defaultBlockState();				
+				return Blocks.RED_NETHER_BRICKS.defaultBlockState();
 			case "end_bricks":
 			case "ender_bricks":
 				return Blocks.END_STONE_BRICKS.defaultBlockState();
 			case "end_stone":
 			case "ender_stone":
-				return Blocks.END_STONE.defaultBlockState();				
+				return Blocks.END_STONE.defaultBlockState();
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.defaultBlockState();
 			case "pg85":
@@ -218,7 +224,7 @@ public class PaperLegacyMaterials
 			case "lordsmellypants":
 				return Blocks.FLOWER_POT.defaultBlockState();
 			case "frank":
-				return Blocks.JUKEBOX.defaultBlockState();				
+				return Blocks.JUKEBOX.defaultBlockState();
 			default:
 				return null;
 		}
