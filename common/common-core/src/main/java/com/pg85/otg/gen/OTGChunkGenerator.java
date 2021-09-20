@@ -12,6 +12,8 @@ import com.pg85.otg.gen.biome.CachedBiomeProvider;
 import com.pg85.otg.gen.carver.Carver;
 import com.pg85.otg.gen.carver.CaveCarver;
 import com.pg85.otg.gen.carver.RavineCarver;
+import com.pg85.otg.gen.gen.OreVeinData;
+import com.pg85.otg.gen.gen.OreVeinGenerator;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
@@ -31,6 +33,7 @@ import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
+import com.pg85.otg.util.materials.LocalMaterialData;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -99,6 +102,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 	private ThreadLocal<Integer> lastX = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
 	private ThreadLocal<Integer> lastZ = ThreadLocal.withInitial(() -> Integer.MAX_VALUE);
 	private ThreadLocal<Double> lastNoise = ThreadLocal.withInitial(() -> 0d);
+	private final OreVeinGenerator oreVeinGenerator;
 
 	public OTGChunkGenerator(Preset preset, long seed, ILayerSource biomeProvider, IBiome[] biomesById, ILogger logger)
 	{
@@ -122,6 +126,8 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 
 		this.caves = new CaveCarver(Constants.WORLD_HEIGHT, preset.getWorldConfig());
 		this.ravines = new RavineCarver(Constants.WORLD_HEIGHT, preset.getWorldConfig());
+
+		this.oreVeinGenerator = preset.getWorldConfig().getLargeOreVeins() ? new OreVeinGenerator(seed) : null;
 	}
 	
 	public ICachedBiomeProvider getCachedBiomeProvider()
@@ -433,6 +439,8 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		ObjectListIterator<JigsawStructureData> junctionsIterator = junctions.iterator();
 
 		long startTime = System.currentTimeMillis();
+
+		OreVeinData data = this.oreVeinGenerator == null ? null : this.oreVeinGenerator.getForChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
 		int[] waterLevel = new int[256];
@@ -452,6 +460,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 
 		// TODO: this double[][][] is probably really bad for performance
 		double[][][] noiseData = new double[2][this.noiseSizeZ + 1][this.noiseSizeY + 1];
+//		double[][][][] oreVeinData
 		// Max smoothing radius is 32, so area covered is 32+5+32=69 (noise/biome coords, so *4)
 	
 		// Initialize noise data on the x0 column.
@@ -595,7 +604,16 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 
 								if (density > 0.0)
 								{
-									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
+									LocalMaterialData material = biomeConfig.getStoneBlockReplaced(realY);
+									if (this.oreVeinGenerator != null) {
+										LocalMaterialData ore = this.oreVeinGenerator.getMaterial(realX, realY, realZ, noiseX, noiseY, noiseZ, xLerp, yLerp, zLerp, data);
+
+										if (ore != null) {
+											material = ore;
+										}
+									}
+
+									buffer.setBlock(localX, realY, localZ, material);
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
 								else if (realY < waterLevel[localX * 16 + localZ] && realY > biomeConfig.getWaterLevelMin())

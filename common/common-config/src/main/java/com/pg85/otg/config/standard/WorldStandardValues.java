@@ -176,7 +176,8 @@ public class WorldStandardValues extends Settings
 		BED_WORKS = booleanSetting("BedWorks", true),
 		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", true),
 		HAS_RAIDS = booleanSetting("HasRaids", true),
-		FIXED_SPAWN_POINT = booleanSetting("FixedSpawnPoint", false),		
+		FIXED_SPAWN_POINT = booleanSetting("FixedSpawnPoint", false),
+		LARGE_ORE_VEINS = booleanSetting("LargeOreVeins", false),
 
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
 		ISOTGPLUS = booleanSetting("IsOTGPlus", false)

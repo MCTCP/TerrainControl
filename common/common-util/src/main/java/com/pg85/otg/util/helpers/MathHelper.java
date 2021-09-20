@@ -102,6 +102,17 @@ public class MathHelper
 		}
 	}
 
+	public static double clampedMap(double lerpValue, double lerpStart, double lerpEnd, double start, double end)
+	{
+		return clampedLerp(start, end, inverseLerp(lerpValue, lerpStart, lerpEnd));
+	}
+
+	public static double inverseLerp(double value, double start, double end)
+	{
+		return (value - start) / (end - start);
+	}
+
+
 	public static int smallestEncompassingPowerOfTwo(int value)
 	{
 		int i = value - 1;

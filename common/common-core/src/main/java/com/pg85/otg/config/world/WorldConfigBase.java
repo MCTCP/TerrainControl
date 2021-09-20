@@ -223,6 +223,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int spawnPointZ;
 	protected float spawnPointAngle;
 
+	protected boolean largeOreVeins;
+
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -1150,5 +1152,11 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public boolean getUniversalAnger()
 	{
 		return this.universalAnger;
-	}	
+	}
+
+
+	public boolean getLargeOreVeins()
+	{
+		return this.largeOreVeins;
+	}
 }

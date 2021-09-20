@@ -227,6 +227,8 @@ public class PaperMaterials extends LocalMaterials
 		MEDIUM_AMETHYST_BUD = PaperMaterialData.ofBlockData(Blocks.MEDIUM_AMETHYST_BUD.defaultBlockState());
 		LARGE_AMETHYST_BUD = PaperMaterialData.ofBlockData(Blocks.LARGE_AMETHYST_BUD.defaultBlockState());
 		AMETHYST_CLUSTER = PaperMaterialData.ofBlockData(Blocks.AMETHYST_CLUSTER.defaultBlockState());
+		GRANITE = PaperMaterialData.ofBlockData(Blocks.GRANITE.defaultBlockState());
+		TUFF = PaperMaterialData.ofBlockData(Blocks.TUFF.defaultBlockState());
 
 		// Liquids
 		WATER = PaperMaterialData.ofBlockData(Blocks.WATER.defaultBlockState());
@@ -327,6 +329,7 @@ public class PaperMaterials extends LocalMaterials
 		EMERALD_ORE = PaperMaterialData.ofBlockData(Blocks.EMERALD_ORE.defaultBlockState());
 		GOLD_ORE = PaperMaterialData.ofBlockData(Blocks.GOLD_ORE.defaultBlockState());
 		IRON_ORE = PaperMaterialData.ofBlockData(Blocks.IRON_ORE.defaultBlockState());
+		COPPER_ORE = PaperMaterialData.ofBlockData(Blocks.COPPER_ORE.defaultBlockState());
 		LAPIS_ORE = PaperMaterialData.ofBlockData(Blocks.LAPIS_ORE.defaultBlockState());
 		QUARTZ_ORE = PaperMaterialData.ofBlockData(Blocks.NETHER_QUARTZ_ORE.defaultBlockState());
 		REDSTONE_ORE = PaperMaterialData.ofBlockData(Blocks.REDSTONE_ORE.defaultBlockState());
@@ -340,5 +343,7 @@ public class PaperMaterials extends LocalMaterials
 		COAL_BLOCK = PaperMaterialData.ofBlockData(Blocks.COAL_BLOCK.defaultBlockState());
 		QUARTZ_BLOCK = PaperMaterialData.ofBlockData(Blocks.QUARTZ_BLOCK.defaultBlockState());
 		EMERALD_BLOCK = PaperMaterialData.ofBlockData(Blocks.EMERALD_BLOCK.defaultBlockState());
+		RAW_IRON_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_IRON_BLOCK.defaultBlockState());
+		RAW_COPPER_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_COPPER_BLOCK.defaultBlockState());
 	}
 }

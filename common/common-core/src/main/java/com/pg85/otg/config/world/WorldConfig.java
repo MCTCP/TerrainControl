@@ -214,6 +214,7 @@ public class WorldConfig extends WorldConfigBase
 		this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY, logger);
 		this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE, logger);
 		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger);
+		this.largeOreVeins = reader.getSetting(WorldStandardValues.LARGE_ORE_VEINS, logger);
 
 		// BiomeGroups requires that values like genDepth are initialized
 		readTemplateBiomes(reader, biomeResourcesManager, logger, materialReader);
@@ -596,6 +597,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
 			"The default Frozen Ocean biome for this world."
+		);
+
+		writer.putSetting(WorldStandardValues.LARGE_ORE_VEINS, this.largeOreVeins,
+				"Add large ore veins to this world."
 		);
 
 		writer.header2("Ice Area Settings");

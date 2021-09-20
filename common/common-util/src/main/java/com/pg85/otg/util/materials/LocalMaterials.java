@@ -72,6 +72,8 @@ public class LocalMaterials
 	public static LocalMaterialData MEDIUM_AMETHYST_BUD;
 	public static LocalMaterialData LARGE_AMETHYST_BUD;
 	public static LocalMaterialData AMETHYST_CLUSTER;
+	public static LocalMaterialData GRANITE;
+	public static LocalMaterialData TUFF;
 
 	// Liquids
 	public static LocalMaterialData WATER;
@@ -177,6 +179,7 @@ public class LocalMaterials
 	public static LocalMaterialData EMERALD_ORE;
 	public static LocalMaterialData GOLD_ORE;
 	public static LocalMaterialData IRON_ORE;
+	public static LocalMaterialData COPPER_ORE;
 	public static LocalMaterialData LAPIS_ORE;
 	public static LocalMaterialData QUARTZ_ORE;
 	public static LocalMaterialData REDSTONE_ORE;
@@ -190,4 +193,6 @@ public class LocalMaterials
 	public static LocalMaterialData COAL_BLOCK;
 	public static LocalMaterialData QUARTZ_BLOCK;
 	public static LocalMaterialData EMERALD_BLOCK;
+	public static LocalMaterialData RAW_IRON_BLOCK;
+	public static LocalMaterialData RAW_COPPER_BLOCK;
 }
