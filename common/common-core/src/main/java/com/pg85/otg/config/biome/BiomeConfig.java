@@ -89,6 +89,7 @@ public class BiomeConfig extends BiomeConfigBase
 		RESOURCE_QUEUE_RESOURCES.put("Iceberg", IcebergResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("BasaltColumn", BasaltColumnResource.class);
 		RESOURCE_QUEUE_RESOURCES.put("Geode", GeodeResource.class);
+		RESOURCE_QUEUE_RESOURCES.put("GlowLichen", GlowLichenResource.class);
 	}
 
 	// Private fields, only used when reading/writing

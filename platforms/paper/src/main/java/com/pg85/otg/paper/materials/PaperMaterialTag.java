@@ -70,7 +70,16 @@ public class PaperMaterialTag extends LocalMaterialTag
 	{
 		return this.blockTag;
 	}
-	
+
+	public Block[] getOtgBlockTag()
+	{
+		if (otgBlockTag != null)
+		{
+			return otgBlockTag.clone();
+		}
+		return null;
+	}
+
 	@Override
 	public String toString()
 	{

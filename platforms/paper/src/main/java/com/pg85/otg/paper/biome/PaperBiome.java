@@ -1,7 +1,10 @@
 package com.pg85.otg.paper.biome;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
@@ -9,15 +12,19 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.gen.resource.GlowLichenResource;
 import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
+import com.pg85.otg.paper.materials.PaperMaterialData;
+import com.pg85.otg.paper.materials.PaperMaterialTag;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
+import com.pg85.otg.util.materials.LocalMaterialBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -28,15 +35,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.feature.MineshaftFeature;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.feature.*;
 import net.minecraft.world.level.levelgen.feature.configurations.*;
 import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
 
@@ -82,7 +90,37 @@ public class PaperBiome implements IBiome
 			{
 				GenerationStep.Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
 				ConfiguredFeature<?, ?> registry = BuiltinRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
-				biomeGenerationSettingsBuilder.addFeature(stage, registry);
+				if (registry == null)
+				{
+					OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Could not find feature "+registryResource.getFeatureKey()+" in the registry, please check spelling");
+				} else {
+					biomeGenerationSettingsBuilder.addFeature(stage, registry);
+				}
+			}
+			if (res instanceof GlowLichenResource glow)
+			{
+				List<BlockState> list = new ArrayList<>();
+				for (LocalMaterialBase base : glow.canBePlacedOn)
+				{
+					if (base instanceof PaperMaterialTag tag)
+					{
+						if (tag.getTag() == null)
+						{
+							list.addAll(Arrays.stream(tag.getOtgBlockTag()).map(Block::defaultBlockState).collect(Collectors.toList()));
+						} else {
+							list.addAll(tag.getTag().getValues().stream().map(Block::defaultBlockState).collect(Collectors.toList()));
+						}
+					}
+					else if (base instanceof PaperMaterialData data)
+					{
+						list.add(data.internalBlock());
+					}
+				}
+				GlowLichenConfiguration config = new GlowLichenConfiguration(glow.nearbyAttempts, glow.canPlaceOnFloor, glow.canPlaceOnCeiling, glow.canPlaceOnWall, glow.chanceOfSpreading, list);
+				biomeGenerationSettingsBuilder
+					.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Feature.GLOW_LICHEN.configured(config).squared()
+					.rangeUniform(VerticalAnchor.aboveBottom(glow.minX), VerticalAnchor.absolute(glow.maxX))
+					.count(UniformInt.of(glow.countMin, glow.countMax)));
 			}
 		}
 
