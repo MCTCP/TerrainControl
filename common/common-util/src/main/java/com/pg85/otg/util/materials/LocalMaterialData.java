@@ -61,7 +61,7 @@ public abstract class LocalMaterialData extends LocalMaterialBase
 	{
 		return this.isDefaultState() || material.isDefaultState() ? material.getRegistryName().equals(this.getRegistryName()) : material.hashCode() == this.hashCode();
 	}
-	
+
 	/**
 	 * Gets whether this material can be used as an anchor point for a smoothing area	
 	 * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves.

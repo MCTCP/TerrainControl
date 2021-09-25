@@ -1333,6 +1333,14 @@ class ForgeLegacyMaterials
 					return getGlazedTerracottaWithData(14, data);
 				case "yellow_glazed_terracotta":
 					return getGlazedTerracottaWithData(15, data);
+				case "snow":
+					switch(data)
+					{
+						case 0:
+							return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, 1);
+						default:
+							return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, data);						
+					}
 				default:
 					return null;
 			}

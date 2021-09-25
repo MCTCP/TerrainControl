@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-
 public class PaperMaterialReader implements IMaterialReader
 {
 	// TODO: Smaller caches should be ok, only most frequently used should be cached?

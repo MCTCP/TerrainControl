@@ -213,7 +213,6 @@ public class ReplaceBlockMatrix
 		
 		for(ReplacedBlocksInstruction instruction : this.instructions)
 		{
-			boolean isBlockTag = instruction.from.isTag();
 			if(instruction.from.matches(biomeCooledLavaBlock))
 			{
 				this.replacesCooledLava = true;
@@ -277,6 +276,18 @@ public class ReplaceBlockMatrix
 		return false;
 	}
   
+	public boolean replacesBlock(LocalMaterialData targetBlock)
+	{				
+		for(ReplacedBlocksInstruction instruction : this.instructions)
+		{
+			if(instruction.from.matches(targetBlock))
+			{
+				return true;
+			}
+		}
+		return false;
+	}	
+	
 	public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
 	{
 		// TODO: simple fix for y being out of bounds, needs a proper fix to figure out why it's happening

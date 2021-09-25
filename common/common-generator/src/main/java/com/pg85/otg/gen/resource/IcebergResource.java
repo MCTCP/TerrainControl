@@ -351,18 +351,18 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 						{
 							LocalMaterialData[] materials =
 							{
-								world.getMaterialDirect(x2 - 1, y2, z2), 
+								world.getMaterialDirect(x2 - 1, y2, z2),
 								world.getMaterialDirect(x2 + 1, y2, z2),
-								world.getMaterialDirect(x2, y2, z2 - 1), 
-								world.getMaterialDirect(x2, y2, z2 + 1) 
+								world.getMaterialDirect(x2, y2, z2 - 1),
+								world.getMaterialDirect(x2, y2, z2 + 1)
 							};
 							IBiomeConfig[] biomeConfigs =
-									{
-											world.getCachedBiomeProvider().getBiomeConfig(x2 - 1, z2, true),
-											world.getCachedBiomeProvider().getBiomeConfig(x2 + 1, z2, true),
-											world.getCachedBiomeProvider().getBiomeConfig(x2, z2 - 1, true),
-											world.getCachedBiomeProvider().getBiomeConfig(x2, z2 + 1, true)
-									};
+							{
+								world.getCachedBiomeProvider().getBiomeConfig(x2 - 1, z2, true),
+								world.getCachedBiomeProvider().getBiomeConfig(x2 + 1, z2, true),
+								world.getCachedBiomeProvider().getBiomeConfig(x2, z2 - 1, true),
+								world.getCachedBiomeProvider().getBiomeConfig(x2, z2 + 1, true)
+							};
 							iheight = 0;
 							int i = 0;
 							for (LocalMaterialData mat : materials)
