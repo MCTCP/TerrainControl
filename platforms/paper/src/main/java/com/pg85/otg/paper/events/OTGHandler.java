@@ -87,7 +87,7 @@ public class OTGHandler implements Listener
 					event.getWorld().getSpawnLocation().getBlockZ() != worldConfig.getSpawnPointZ()
 				)
 				{
-					event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ(), worldConfig.getSpawnPointAngle());
+					event.getWorld().setSpawnLocation(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ());
 				}
 			}
 		}
