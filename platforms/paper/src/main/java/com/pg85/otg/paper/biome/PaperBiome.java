@@ -25,6 +25,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import com.pg85.otg.util.materials.LocalMaterialBase;
+import com.pg85.otg.util.minecraft.EntityCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -193,14 +194,9 @@ public class PaperBiome implements IBiome
 
 		switch (biomeConfig.getGrassColorModifier())
 		{
-			case Swamp:
-				biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.SWAMP);
-				break;
-			case DarkForest:
-				biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.DARK_FOREST);
-				break;
-			default:
-				break;
+			case Swamp -> biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.SWAMP);
+			case DarkForest -> biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.DARK_FOREST);
+			case None -> {}
 		}
 
 		Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
@@ -221,16 +217,7 @@ public class PaperBiome implements IBiome
 			builder.temperatureAdjustment(TemperatureModifier.FROZEN);
 		}
 
-		Biome.BiomeCategory category = Biome.BiomeCategory.byName(biomeConfig.getBiomeCategory());
-		builder.biomeCategory(category != null ? category : isOceanBiome ? Biome.BiomeCategory.OCEAN : Biome.BiomeCategory.NONE);
-
-		if (category == null)
-		{
-			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-			{
-				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category "+biomeConfig.getBiomeCategory());
-			}
-		}
+		builder.biomeCategory(Biome.BiomeCategory.byName(biomeConfig.getBiomeCategory()));
 
 		return builder.build();
 	}
@@ -481,12 +468,13 @@ public class PaperBiome implements IBiome
 	private static MobSpawnSettings.Builder createMobSpawnInfo (IBiomeConfig biomeConfig)
 	{
 		MobSpawnSettings.Builder mobSpawnInfoBuilder = new MobSpawnSettings.Builder();
-		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MONSTER), biomeConfig.getName());
+		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.AMBIENT), biomeConfig.getName());
+		addMobGroup(MobCategory.UNDERGROUND_WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.UNDERGROUND_WATER_CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_AMBIENT), biomeConfig.getName());
+		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MISC), biomeConfig.getName());
 
 		mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;

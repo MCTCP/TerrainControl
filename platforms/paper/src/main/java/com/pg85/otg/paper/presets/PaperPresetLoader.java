@@ -145,7 +145,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 				{
 					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not find biome " + resourceLocation.toString() + " for template biomeconfig " + biomeConfig.getValue().getName());
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not find biome " + resourceLocation + " for template biomeconfig " + biomeConfig.getValue().getName());
 					}
 					continue;
 				}
@@ -216,12 +216,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 			}
 			presetIdMapping[otgBiomeId] = otgBiome;
 
-			List<Integer> idsForBiome = worldBiomes.get(biomeConfig.getValue().getName());
-			if(idsForBiome == null)
-			{
-				idsForBiome = new ArrayList<Integer>();
-				worldBiomes.put(biomeConfig.getValue().getName(), idsForBiome);
-			}
+			List<Integer> idsForBiome = worldBiomes.computeIfAbsent(biomeConfig.getValue().getName(), k -> new ArrayList<>());
 			idsForBiome.add(otgBiomeId);
 			
 			// Make a list of isle and border biomes per generation depth
@@ -268,7 +263,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 			
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 			{
-				OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Registered biome " + resourceLocation.toString() + " | " + biomeConfig.getValue().getName() + " with OTG id " + otgBiomeId);
+				OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Registered biome " + resourceLocation + " | " + biomeConfig.getValue().getName() + " with OTG id " + otgBiomeId);
 			}
 			
 			currentId += isOceanBiome ? 0 : 1;
@@ -407,7 +402,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 	protected void mergeVanillaBiomeMobSpawnSettings (BiomeConfigFinder.BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
 		String[] resourceLocationArr = biomeResourceLocation.split(":");			
-		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
+		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : "minecraft";
 		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];		
 		
 		NamespacedKey location = null;
@@ -434,7 +429,8 @@ public class PaperPresetLoader extends LocalPresetLoader
 				// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 				// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
 				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.MONSTER), EntityCategory.MONSTER);
-				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.AMBIENT), EntityCategory.AMBIENT);
+				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.UNDERGROUND_WATER_CREATURE), EntityCategory.UNDERGROUND_WATER_CREATURE);
 				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.CREATURE), EntityCategory.CREATURE);
 				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
 				biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, MobCategory.WATER_CREATURE), EntityCategory.WATER_CREATURE);

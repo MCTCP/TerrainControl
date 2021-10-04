@@ -14,6 +14,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.util.minecraft.SaplingType;
 
 /**
@@ -187,13 +188,7 @@ public interface IBiomeConfig
 
 	// Mob spawning
 	String getInheritMobsBiomeName();
-	
-	List<WeightedMobSpawnGroup> getMonsters();
-	List<WeightedMobSpawnGroup> getCreatures();
-	List<WeightedMobSpawnGroup> getWaterCreatures();
-	List<WeightedMobSpawnGroup> getAmbientCreatures();	
-	List<WeightedMobSpawnGroup> getWaterAmbientCreatures();
-	List<WeightedMobSpawnGroup> getMiscCreatures();
+	List<WeightedMobSpawnGroup> getSpawnList(EntityCategory category);
 	
 	// Saplings
 	
@@ -202,5 +197,5 @@ public interface IBiomeConfig
 	
 	// Misc
 	
-	public IBiomeConfig createTemplateBiome();
+	IBiomeConfig createTemplateBiome();
 }

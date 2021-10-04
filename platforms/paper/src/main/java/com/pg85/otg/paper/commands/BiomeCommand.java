@@ -78,14 +78,9 @@ public class BiomeCommand extends BaseCommand
 
 		switch (option)
 		{
-		case "info":
-			showBiomeInfo(source, biome, config);
-			break;
-		case "spawns":
-			showBiomeMobs(source, biome, config);
-			break;
-		default:
-			break;
+			case "info" -> showBiomeInfo(source, biome, config);
+			case "spawns" -> showBiomeMobs(source, biome, config);
+			default -> {}
 		}
 		return 0;
 	}
@@ -132,6 +127,8 @@ public class BiomeCommand extends BaseCommand
 		showSpawns(source, biome.getMobSettings().getMobs(MobCategory.CREATURE));
 		source.sendSuccess(new TextComponent("  Water Creatures:").withStyle(ChatFormatting.GOLD), false);
 		showSpawns(source, biome.getMobSettings().getMobs(MobCategory.WATER_CREATURE));
+		source.sendSuccess(new TextComponent("  Underground Water Creatures:").withStyle(ChatFormatting.GOLD), false);
+		showSpawns(source, biome.getMobSettings().getMobs(MobCategory.UNDERGROUND_WATER_CREATURE));
 		source.sendSuccess(new TextComponent("  Ambient Creatures:").withStyle(ChatFormatting.GOLD), false);
 		showSpawns(source, biome.getMobSettings().getMobs(MobCategory.AMBIENT));
 		source.sendSuccess(new TextComponent("  Water Ambient:").withStyle(ChatFormatting.GOLD), false);

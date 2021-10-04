@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 
+import com.pg85.otg.util.gen.DecorationArea;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
@@ -38,7 +39,6 @@ import com.pg85.otg.paper.presets.PaperPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
-import com.pg85.otg.util.gen.DecorationArea;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -93,7 +93,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 					(p_236093_0_) -> p_236093_0_.worldSeed
 				),
 				NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter(
-					(p_236090_0_) -> p_236090_0_.dimensionSettingsSupplier
+					(p_236090_0_) -> p_236090_0_.generatorSettings
 				)
 			).apply(
 				p_236091_0_,
@@ -101,7 +101,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			)
 	);
 
-	private final Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier;
+	private final Supplier<NoiseGeneratorSettings> generatorSettings;
 	private final long worldSeed;
 	private final int noiseHeight;
 	protected final BlockState defaultBlock;
@@ -123,22 +123,22 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Necessary because Spigot calls those methods before we have the chance to inject
 	private ChunkCoordinate fixBiomesForChunk = null;
 
-	public OTGNoiseChunkGenerator (BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator (BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> generatorSettings)
 	{
-		this("default", biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this("default", biomeProvider, biomeProvider, seed, generatorSettings);
 	}
 
-	public OTGNoiseChunkGenerator (String presetName, BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator (String presetName, BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> generatorSettings)
 	{
-		this(presetName, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(presetName, biomeProvider, biomeProvider, seed, generatorSettings);
 	}
 
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
-	private OTGNoiseChunkGenerator (String presetFolderName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator (String presetFolderName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> generatorSettings)
 	{
-		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
-		structSettings = dimensionSettingsSupplier.get().structureSettings();
+		super(biomeProvider1, biomeProvider2, generatorSettings.get().structureSettings(), seed);
+		structSettings = generatorSettings.get().structureSettings();
 		if (!(biomeProvider1 instanceof ILayerSource))
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
@@ -146,8 +146,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.presetFolderName = presetFolderName;
 		this.worldSeed = seed;
-		NoiseGeneratorSettings dimensionsettings = dimensionSettingsSupplier.get();
-		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
+		NoiseGeneratorSettings dimensionsettings = generatorSettings.get();
+		this.generatorSettings = generatorSettings;
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
 		this.noiseHeight = noisesettings.height();
 
@@ -155,7 +155,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.defaultFluid = dimensionsettings.getDefaultFluid();
 
 		this.random = new WorldgenRandom(seed);
-		this.surfaceNoise = (SurfaceNoise)(noisesettings.useSimplexSurfaceNoise() ? new PerlinSimplexNoise(this.random, IntStream.rangeClosed(-3, 0)) : new PerlinNoise(this.random, IntStream.rangeClosed(-3, 0)));
+		this.surfaceNoise = noisesettings.useSimplexSurfaceNoise() ? new PerlinSimplexNoise(this.random, IntStream.rangeClosed(-3, 0)) : new PerlinNoise(this.random, IntStream.rangeClosed(-3, 0));
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();
@@ -518,16 +518,15 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Mob spawning on initial chunk spawn (animals).
 	@Override
-	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
+	public void spawnOriginalMobs(WorldGenRegion region)
 	{
-		//TODO: Make this respect the doMobSpawning game rule
-
-		int chunkX = worldGenRegion.getCenter().x;
-		int chunkZ = worldGenRegion.getCenter().z;
-		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, chunkZ * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);	
+		// We don't respect the mob spawning setting, because we can't access it
+		int chunkX = region.getCenter().x;
+		int chunkZ = region.getCenter().z;
+		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET, chunkZ * Constants.CHUNK_SIZE + DecorationArea.DECORATION_OFFSET);
 		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
-		NaturalSpawner.spawnMobsForChunkGeneration(worldGenRegion, ((PaperBiome)biome).getBiome(), worldGenRegion.getCenter(), (Random)sharedseedrandom);
+		sharedseedrandom.setDecorationSeed(region.getSeed(), chunkX << 4, chunkZ << 4);
+		NaturalSpawner.spawnMobsForChunkGeneration(region, ((PaperBiome)biome).getBiome(), region.getCenter(), sharedseedrandom);
 	}
 
 	// Mob spawning on chunk tick
@@ -684,7 +683,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public ChunkGenerator withSeed(long seed)
 	{
-		return new OTGNoiseChunkGenerator(this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
+		return new OTGNoiseChunkGenerator(this.biomeSource.withSeed(seed), seed, this.generatorSettings);
 	}
 
 	@Override
@@ -703,7 +702,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public int getSeaLevel ()
 	{
 		// TODO: remove supplier
-		return this.dimensionSettingsSupplier.get().seaLevel();
+		return this.generatorSettings.get().seaLevel();
 	}
 
 	public Preset getPreset()

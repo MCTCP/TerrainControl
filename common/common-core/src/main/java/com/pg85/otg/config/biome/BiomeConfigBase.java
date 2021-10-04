@@ -31,6 +31,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.util.minecraft.SaplingType;
 
 /**
@@ -189,13 +190,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		protected int bastionRemnantSize;	
 		
 		// Mob spawning
-		
-		protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-		protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-		protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-		protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-		protected List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-		protected List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();	
+
+		protected Map<EntityCategory, List<WeightedMobSpawnGroup>> spawnGroupsMerged = new HashMap<>();
 		
 		protected String inheritMobsBiomeName;
 		
@@ -421,11 +417,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		List<List<String>> customStructureNamesByGen = new ArrayList<>();
 		for(CustomStructureResource structureGens : this.settings.customStructures)
 		{
-			List<String> customStructureNames = new ArrayList<>();
-			for(String objectName : structureGens.objectNames)
-			{
-				customStructureNames.add(objectName);
-			}
+			List<String> customStructureNames = new ArrayList<>(structureGens.objectNames);
 			customStructureNamesByGen.add(customStructureNames);
 		}
 		return customStructureNamesByGen; 
@@ -814,41 +806,11 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.settings.inheritMobsBiomeName;
 	}
-	
-	@Override
-	public List<WeightedMobSpawnGroup> getAmbientCreatures()
-	{
-		return this.settings.spawnAmbientCreaturesMerged;
-	}
-	
-	@Override
-	public List<WeightedMobSpawnGroup> getCreatures()
-	{
-		return this.settings.spawnCreaturesMerged;
-	}
-	
-	@Override
-	public List<WeightedMobSpawnGroup> getMonsters()
-	{
-		return this.settings.spawnMonstersMerged;
-	}
-	
-	@Override
-	public List<WeightedMobSpawnGroup> getWaterCreatures()
-	{
-		return this.settings.spawnWaterCreaturesMerged;
-	}
-	
-	@Override
-	public List<WeightedMobSpawnGroup> getWaterAmbientCreatures()
-	{
-		return this.settings.spawnWaterAmbientCreaturesMerged;
-	}
 
 	@Override
-	public List<WeightedMobSpawnGroup> getMiscCreatures()
+	public List<WeightedMobSpawnGroup> getSpawnList(EntityCategory category)
 	{
-		return this.settings.spawnMiscCreaturesMerged;
+		return this.settings.spawnGroupsMerged.get(category);
 	}
 	
 	@Override

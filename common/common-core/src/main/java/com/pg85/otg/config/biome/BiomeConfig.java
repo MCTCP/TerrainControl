@@ -111,13 +111,8 @@ public class BiomeConfig extends BiomeConfigBase
 		private double volatilityRaw2;
 		private double volatilityWeightRaw1;
 		private double volatilityWeightRaw2;
-	
-		private List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
-		private List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
-		private List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
-		private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-		private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-		private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
+
+		private Map<EntityCategory, List<WeightedMobSpawnGroup>> spawnGroups = new HashMap<>();
 	}
 
 	public BiomeConfig(String biomeName)
@@ -143,19 +138,11 @@ public class BiomeConfig extends BiomeConfigBase
 
 		if (biomeConfigStub != null)
 		{
-			this.privateSettings.spawnMonsters.addAll(biomeConfigStub.getSpawner(EntityCategory.MONSTER));
-			this.privateSettings.spawnCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.CREATURE));
-			this.privateSettings.spawnWaterCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_CREATURE));
-			this.privateSettings.spawnAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.AMBIENT_CREATURE));
-			this.privateSettings.spawnWaterAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_AMBIENT));
-			this.privateSettings.spawnMiscCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.MISC));
-
-			this.settings.spawnMonstersMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MONSTER));
-			this.settings.spawnCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.CREATURE));
-			this.settings.spawnWaterCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_CREATURE));
-			this.settings.spawnAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.AMBIENT_CREATURE));
-			this.settings.spawnWaterAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_AMBIENT));
-			this.settings.spawnMiscCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MISC));
+			for (EntityCategory category : EntityCategory.values())
+			{
+				this.privateSettings.spawnGroups.put(category, new ArrayList<>(biomeConfigStub.getSpawner(category)));
+				this.settings.spawnGroupsMerged.put(category, new ArrayList<>(biomeConfigStub.getSpawnerMerged(category)));
+			}
 		}
 
 		this.settings.worldConfig = worldConfig;
@@ -410,9 +397,8 @@ public class BiomeConfig extends BiomeConfigBase
 		{
 			if (res != null)
 			{
-				if (res instanceof SaplingResource)
+				if (res instanceof SaplingResource sapling)
 				{
-					SaplingResource sapling = (SaplingResource) res;
 					if (sapling.saplingType == SaplingType.Custom)
 					{
 						try
@@ -959,7 +945,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"To see the mob category a mob belongs to, use /otg entities. The mob's category (if any) is listed after its name.",
 				"Also supports modded mobs, if they are of the correct mob category.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.privateSettings.spawnMonsters,
+			writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.privateSettings.spawnGroups.get(EntityCategory.MONSTER),
 				"The monsters (blazes, cave spiders, creepers, drowned, elder guardians, ender dragons, endermen, endermites, evokers, ghasts, giants,",
 				"guardians, hoglins, husks, illusioners, magma cubes, phantoms, piglins, pillagers, ravagers, shulkers, silverfishes, skeletons, slimes,",
 				"spiders, strays, vexes, vindicators, witches, zoglins, zombies, zombie villagers, zombified piglins) that spawn in this biome.",
@@ -967,7 +953,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.privateSettings.spawnCreatures,
+			writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.CREATURE),
 				"The friendly creatures (bees, cats, chickens, cows, donkeys, foxes, horses, llama, mooshrooms, mules, ocelots, panda's, parrots,",
 				"pigs, polar bears, rabbits, sheep, skeleton horses, striders, trader llama's, turtles, wandering traders, wolves, zombie horses)",
 				"that spawn in this biome.",
@@ -975,29 +961,31 @@ public class BiomeConfig extends BiomeConfigBase
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.privateSettings.spawnWaterCreatures,
+			writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.WATER_CREATURE),
 				"The water creatures (squids and dolphins) that spawn in this biome",
 				"For instance [{\"mob\": \"minecraft:squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.privateSettings.spawnAmbientCreatures,
+			writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.AMBIENT),
 				"The ambient creatures (only bats in vanila) that spawn in this biome",
 				"For instance [{\"mob\": \"minecraft:bat\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, this.privateSettings.spawnWaterAmbientCreatures,
+			writer.putSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.WATER_AMBIENT),
 				"The ambient water creatures (cod, pufferfish, salmon, tropical fish) that spawn in this biome",
 				"For instance [{\"mob\": \"minecraft:cod\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
 	
-			writer.putSetting(BiomeStandardValues.SPAWN_MISC_CREATURES, this.privateSettings.spawnMiscCreatures,
+			writer.putSetting(BiomeStandardValues.SPAWN_MISC_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.MISC),
 				"The miscellaneous creatures (iron golems, snow golems and villagers) that spawn in this biome",
 				"For instance [{\"mob\": \"minecraft:villager\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
 				"Use the \"/otg entities\" console command to get a list of possible mobs and mob categories.",
 				"Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome.");
+
+			writer.putSetting(BiomeStandardValues.SPAWN_UNDERGROUND_WATER_CREATURES, this.privateSettings.spawnGroups.get(EntityCategory.UNDERGROUND_WATER_CREATURE));
 	
 			writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, this.settings.inheritMobsBiomeName,
 				"Inherit the internal mobs list of another biome. Inherited mobs can be overridden using",
@@ -1033,7 +1021,7 @@ public class BiomeConfig extends BiomeConfigBase
 		settings.renameOldSetting("DisableNotchHeightControl", BiomeStandardValues.DISABLE_BIOME_HEIGHT);
 		settings.renameOldSetting("BiomeDictId", BiomeStandardValues.BIOME_DICT_TAGS);
 	}
-	
+
 	@Override
 	public IBiomeConfig createTemplateBiome()
 	{
