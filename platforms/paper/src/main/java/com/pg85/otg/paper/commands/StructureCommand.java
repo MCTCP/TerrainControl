@@ -39,6 +39,10 @@ public class StructureCommand extends BaseCommand
 	
 	private int showStructureInfo(CommandSourceStack source)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
@@ -74,6 +78,11 @@ public class StructureCommand extends BaseCommand
 		
 		source.sendSuccess(new TextComponent(structureInfo), false);
 		return 0;
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.structure";
 	}
 }
 

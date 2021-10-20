@@ -99,6 +99,10 @@ public class EditCommand extends BaseCommand
 
 	public int execute(CommandContext<CommandSourceStack> context)
 	{
+		if (!context.getSource().hasPermission(2, getPermission())) {
+			context.getSource().sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		CommandSourceStack source = context.getSource();
 		try {
 			String presetFolderName = context.getArgument("preset", String.class);
@@ -200,6 +204,11 @@ public class EditCommand extends BaseCommand
 			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
 		return 0;
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.edit";
 	}
 
 	protected static StructuredCustomObject getStructuredObject(String objectName, String presetFolderName) throws InvalidConfigException

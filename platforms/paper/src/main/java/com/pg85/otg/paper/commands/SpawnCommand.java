@@ -99,6 +99,10 @@ public class SpawnCommand extends BaseCommand
 	
 	public static int execute(CommandSourceStack source, String presetName, String objectName, BlockPos blockPos, boolean force)
 	{
+		if (!source.hasPermission(2, "otg.cmd.spawn")) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		try
 		{
 			presetName = presetName != null && presetName.equalsIgnoreCase("global") ? null : presetName;
@@ -276,4 +280,8 @@ public class SpawnCommand extends BaseCommand
 		return 0;
 	}
 
+	@Override
+	public String getPermission() {
+		return "otg.cmd.spawn";
+	}
 }

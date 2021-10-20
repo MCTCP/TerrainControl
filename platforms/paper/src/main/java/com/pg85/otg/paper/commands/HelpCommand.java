@@ -32,7 +32,8 @@ public class HelpCommand extends BaseCommand
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		builder.then(Commands.literal("help").executes(context -> showHelp(context.getSource(), ""))
+		builder.then(Commands.literal("help")
+				.executes(context -> showHelp(context.getSource(), ""))
 				.then(Commands.argument("command", StringArgumentType.word()).suggests(this::suggestHelp).executes(
 						(context -> showHelp(context.getSource(), context.getArgument("command", String.class))))));
 	}
@@ -71,8 +72,17 @@ public class HelpCommand extends BaseCommand
 		return 0;
 	}
 
+	@Override
+	public String getPermission() {
+		return "otg.cmd.help";
+	}
+
 	private void showHelp(CommandSourceStack source, int page)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return;
+		}
 		int start = (page - 1) * 5;
 
 		List<BaseCommand> commands = OTGCommandExecutor.getCommands();
@@ -80,6 +90,8 @@ public class HelpCommand extends BaseCommand
 		for (int i = start; i < commands.size() && i < start + 5; i++)
 		{
 			BaseCommand command = commands.get(i);
+
+			if (!source.hasPermission(2, command.getPermission())) continue;
 
 			source.sendSuccess(
 					new TextComponent("/otg " + command.getName() + ": ").withStyle(ChatFormatting.GOLD).append(

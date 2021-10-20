@@ -11,6 +11,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.SpawnChangeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -26,6 +27,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import net.minecraft.server.level.ServerLevel;
+import org.bukkit.permissions.PermissionAttachment;
 
 public class OTGHandler implements Listener
 {
@@ -36,6 +38,12 @@ public class OTGHandler implements Listener
 		this.saplingHandler = new SaplingHandler();
 		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 		Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(plugin, Constants.MOD_ID_SHORT + ":spigot");
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void onPlayerJoin(PlayerJoinEvent evt) {
+		PermissionAttachment attachment = evt.getPlayer().addAttachment(OTGPlugin.plugin);
+		attachment.setPermission("minecraft.command.otg", true);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)

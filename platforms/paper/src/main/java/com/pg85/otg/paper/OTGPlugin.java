@@ -6,9 +6,12 @@ import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.pg85.otg.paper.util.ObfuscationHelper;
+import io.papermc.paper.brigadier.PaperBrigadier;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
@@ -49,6 +52,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	private OTGHandler handler;
 	private static Field field;
 
+	public static OTGPlugin plugin;
+
 	static
 	{
 		try
@@ -71,6 +76,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	@Override
 	public void onEnable ()
 	{
+		plugin = this;
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 

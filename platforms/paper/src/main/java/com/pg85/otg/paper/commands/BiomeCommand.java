@@ -37,13 +37,23 @@ public class BiomeCommand extends BaseCommand
 	@Override
 	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
-		builder.then(Commands.literal("biome").executes(context -> showBiome(context.getSource(), ""))
+		builder.then(Commands.literal("biome")
+				.executes(context -> showBiome(context.getSource(), ""))
 				.then(Commands.argument("option", StringArgumentType.word()).suggests(this::suggestTypes).executes(
 						context -> showBiome(context.getSource(), StringArgumentType.getString(context, "option")))));
 	}
 
+	@Override
+	public String getPermission() {
+		return "otg.cmd.biome";
+	}
+
 	private int showBiome(CommandSourceStack source, String option)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);

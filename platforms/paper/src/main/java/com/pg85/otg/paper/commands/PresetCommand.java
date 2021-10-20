@@ -27,6 +27,10 @@ public class PresetCommand extends BaseCommand
 	
 	private int showPreset(CommandSourceStack source)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
@@ -40,5 +44,10 @@ public class PresetCommand extends BaseCommand
 			),
 				false);
 		return 0;
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.preset";
 	}
 }

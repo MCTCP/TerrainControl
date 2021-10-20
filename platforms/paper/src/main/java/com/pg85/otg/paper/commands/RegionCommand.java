@@ -34,7 +34,8 @@ public class RegionCommand extends BaseCommand
 	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(
-			Commands.literal("region").then(
+			Commands.literal("region")
+					.then(
 				Commands.literal("mark").executes(
 					context -> mark(context.getSource())
 				).then(Commands.argument("point", StringArgumentType.word()).suggests(this::suggestMarkerTypes).executes(
@@ -70,6 +71,10 @@ public class RegionCommand extends BaseCommand
 
 	public int mark(CommandSourceStack source)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (checkForNonPlayer(source)) return 0;
 		if (playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition()))
 		{
@@ -82,6 +87,10 @@ public class RegionCommand extends BaseCommand
 
 	public int mark(CommandSourceStack source, String input)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (checkForNonPlayer(source)) return 0;
 		Region r = playerSelectionMap.get(source.getEntity());
 		switch(input)
@@ -116,8 +125,17 @@ public class RegionCommand extends BaseCommand
 		}
 	}
 
+	@Override
+	public String getPermission() {
+		return "otg.cmd.region";
+	}
+
 	public int clear(CommandSourceStack source)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (checkForNonPlayer(source)) return 0;
 		playerSelectionMap.get(source.getEntity()).clear();
 		source.sendSuccess(new TextComponent("Position cleared"), false);
@@ -126,6 +144,10 @@ public class RegionCommand extends BaseCommand
 
 	public int expand(CommandSourceStack source, String direction, Integer value)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (checkForNonPlayer(source)) return 0;
 		Region region = playerSelectionMap.get(source.getEntity());
 		if (region.getMax() == null)
@@ -183,6 +205,10 @@ public class RegionCommand extends BaseCommand
 
 	public int shrink(CommandSourceStack source, String direction, Integer value)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (checkForNonPlayer(source)) return 0;
 
 		expand(source, direction, -value);

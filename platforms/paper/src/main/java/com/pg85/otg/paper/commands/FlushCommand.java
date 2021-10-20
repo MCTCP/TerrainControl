@@ -26,9 +26,18 @@ public class FlushCommand extends BaseCommand
 			.executes(context -> flushCache(context.getSource()))
 		);
 	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.flush";
+	}
 	
 	protected int flushCache(CommandSourceStack source)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);

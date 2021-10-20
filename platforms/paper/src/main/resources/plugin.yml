@@ -1,58 +1,67 @@
 name: OpenTerrainGenerator
 version: ${version}
-description: 'Team OTG: PG85 (code), MC_Pitman & LordSmellyPants (graphics, web, community). Authvin, SuperCoder79 and Josh/Coll1234567 (more code). This mod is a fork of TerrainControl by Khorn/Wickth, Olof Cayorion Larsson, RutgerKok and Timethor. - OTG: Generate anything! -'
-authors: ['PeeGee85', 'Authvin', 'SuperCoder79', 'Josh/Coll1234567', 'RutgerKok', 'TimeThor', 'Khorn/Wickth', 'Olof Cayorion Larsson']
+description: 'Team OTG: PG85 (code), MC_Pitman & LordSmellyPants (graphics, web, community). Authvin, SuperCoder79, Josh/Coll1234567, and Frank (more code). This mod is a fork of TerrainControl by Khorn/Wickth, Olof Cayorion Larsson, RutgerKok and Timethor. - OTG: Generate anything! -'
+authors: ['PeeGee85', 'Authvin', 'SuperCoder79', 'Josh/Coll1234567', 'Frank', 'RutgerKok', 'TimeThor', 'Khorn/Wickth', 'Olof Cayorion Larsson']
 main: com.pg85.otg.paper.OTGPlugin
 load: STARTUP
 softdepend: ['WorldEdit']
 api-version: 1.17
 permissions:
+   #This entire section was broken and by the looks of it hadn't been edited since TerrainControl
+   #So I went ahead and cleaned it up a bit - Frank
   otg.*:
     default: false
     children:
       otg.cmd.*: true
-otg.cmd.*:
-  default: false
-  children:
-    otg.cmd.biome: true
-    otg.cmd.check: true
-    otg.cmd.help: true
-    otg.cmd.list: true
-    otg.cmd.mapbiomes: true
-    otg.cmd.mapterrain: true
-    otg.cmd.reload: true
-    otg.cmd.spawn: true
-    otg.cmd.tp: true
-  otg.cmd.biome:
-    default: op
-    description: show chunk biome and block stats
-  otg.cmd.check:
-    default: op
-    description: check/create OTG settings for world
-  otg.cmd.help:
-    default: op
-    description: show help
-  otg.cmd.list:
-    default: op
-    description: list bo2 objects
-  otg.cmd.mapbiomes:
-    default: op
-    description: generate biome map image    
-  otg.cmd.mapterrain:
-    default: op
-    description: generate base terrain map image
-  otg.cmd.reload:
-    default: op
-    description: reload world settings
-  otg.cmd.spawn:
-    default: op
-    description: spawn bo2 where you look
-  otg.cmd.tp:
-    default: op
-    description: Teleport to the given biome (name or id, max range 1000 chunks)
-  otg.cmd.lookup:
-    default: op
-    description: Look up a registered biome by name or id
-  otg.cmd.export:
-    default: op
-    description: Exports the current WorldEdit selection as a new BO3.
+      otg.default: true
+  otg.cmd.*:
+    default: false
+    children:
+      otg.cmd.biome: true
+      otg.cmd.data: true
+      otg.cmd.edit: true
+      otg.cmd.export: true
+      otg.cmd.flush: true
+      otg.cmd.preset: true
+      otg.cmd.region: true
+      otg.cmd.structure: true
+      otg.cmd.help: true
+      otg.cmd.map: true
+      otg.cmd.spawn: true
+      otg.cmd.tp: true
+    otg.cmd.biome:
+      default: op
+      description: show chunk biome and block stats
+    otg.cmd.data:
+      default: op
+      description: modifies otg data
+    otg.cmd.help:
+      default: true
+      description: show help
+    otg.cmd.edit:
+      default: op
+      description: allows you to edit presets
+    otg.cmd.map:
+      default: op
+      description: generate map image, terrain/biome options are available
+    otg.cmd.spawn:
+      default: op
+      description: spawn bo3 where you look
+    otg.cmd.tp:
+      default: op
+      description: Teleport to the given biome (name or id, max range 1000 chunks)
+    otg.cmd.flush:
+      default: op
+      description: Flushes OTG data
+    otg.cmd.export:
+      default: op
+      description: Exports the current WorldEdit selection as a new BO3.
+    otg.cmd.preset:
+      default: true
+      description: Shows current preset
+    otg.cmd.region:
+      default: op
+      description: Configures region for OTG commands
+    otg.cmd.structure:
+      default: op
+      description: Shows information about a structure

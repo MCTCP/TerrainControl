@@ -63,6 +63,11 @@ public class DataCommand extends BaseCommand
 	{
 		// /otg data music
 
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
+
 		Registry<?> registry;
 
 		switch (type.toLowerCase())
@@ -116,6 +121,11 @@ public class DataCommand extends BaseCommand
 			}
 		}).start();
 		return 0;
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.data";
 	}
 	
 	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,

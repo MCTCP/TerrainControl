@@ -86,6 +86,10 @@ public class MapCommand extends BaseCommand
 	
 	private int map(CommandSourceStack source, String type, int width, int height, int threads)
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		switch (type.toLowerCase())
 		{
 			case "biomes":
@@ -96,6 +100,11 @@ public class MapCommand extends BaseCommand
 				source.sendSuccess(new TextComponent(getUsage()), false);
 				return 0;
 		}
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.map";
 	}
 	
 	private static int mapBiomes(CommandSourceStack source, int width, int height, int threads)

@@ -58,7 +58,8 @@ public class ExportCommand extends BaseCommand
 	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(
-			Commands.literal("export").executes(this::execute).then(
+			Commands.literal("export")
+					.executes(this::execute).then(
 				Commands.argument("name", StringArgumentType.string()).executes(this::execute).then(
 					// Skip center block
 					Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
@@ -91,6 +92,10 @@ public class ExportCommand extends BaseCommand
 
 	public int execute(CommandContext<CommandSourceStack> context)
 	{
+		if (!context.getSource().hasPermission(2, getPermission())) {
+			context.getSource().sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		CommandSourceStack source = context.getSource();
 		try
 		{
@@ -273,6 +278,11 @@ public class ExportCommand extends BaseCommand
 		}
 
 		return 0;
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.export";
 	}
 
 	public int helpMessage(CommandSourceStack source)

@@ -48,7 +48,8 @@ public class TpCommand extends BaseCommand
 	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(
-				Commands.literal("tp").executes(context -> showHelp(context.getSource()))
+				Commands.literal("tp")
+						.executes(context -> showHelp(context.getSource()))
 						.then(Commands.argument("biome", StringArgumentType.word())
 								.executes(context -> locateBiome(context.getSource(),
 										StringArgumentType.getString(context, "biome"), 10000))
@@ -62,6 +63,10 @@ public class TpCommand extends BaseCommand
 	@SuppressWarnings("resource")
 	private int locateBiome(CommandSourceStack source, String biome, int range) throws CommandSyntaxException
 	{
+		if (!source.hasPermission(2, getPermission())) {
+			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
+			return 0;
+		}
 		biome = biome.toLowerCase();
 
 		ServerLevel world = source.getLevel();
@@ -104,6 +109,11 @@ public class TpCommand extends BaseCommand
 		}
 
 		return SharedSuggestionProvider.suggest(biomes, builder);
+	}
+
+	@Override
+	public String getPermission() {
+		return "otg.cmd.tp";
 	}
 
 	private int showHelp(CommandSourceStack source)

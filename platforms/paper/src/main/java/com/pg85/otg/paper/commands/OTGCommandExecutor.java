@@ -21,7 +21,7 @@ public class OTGCommandExecutor
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
 	{
 		HelpCommand helpCommand = new HelpCommand();
-		
+
 		commands.clear();
 		commands.add(helpCommand);
 		commands.add(new MapCommand());
@@ -38,12 +38,11 @@ public class OTGCommandExecutor
 		
 		commands.sort(Comparator.comparing(BaseCommand::getName));
 
-		LiteralArgumentBuilder<CommandSourceStack> commandBuilder = Commands.literal("otg").requires(
-				(context) -> context.hasPermission(2)
-			).executes(
+		LiteralArgumentBuilder<CommandSourceStack> commandBuilder = Commands.literal("otg")
+				.executes(
 					context -> helpCommand.showHelp(context.getSource(), "")
 			);
-		
+
 		for (BaseCommand command : commands) {
 			command.build(commandBuilder);
 		}
