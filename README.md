@@ -2,8 +2,6 @@
 
 OpenTerrainGenerator for MC 1.17.x is under development, alpha builds are available in the dev-releases channel of the OTG Discord.
 
-OTG 1.17.x 0.1.0 will be the first public beta release for 1.17.x, available via CurseForge. Once 0.1.0 is released, the 1.16.4 branch will be promoted to default/main. See the milestones for open issues/progress.
-
 ### Team OTG
 * <a href="https://github.com/PG85">PG85</a>
 * MCPitman
