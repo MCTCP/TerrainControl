@@ -13,10 +13,10 @@ dependencies {
 
     implementation(project(":common:common-core"))
 
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.0") {
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.7") {
         exclude("org.yaml")
     }
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.7")
 }
 
 tasks {
@@ -37,10 +37,6 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("deobf-all")
-    }
-
-    reobfJar {
-        inputJar.set(shadowJar.flatMap { it.archiveFile })
     }
 }
 

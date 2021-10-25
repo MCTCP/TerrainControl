@@ -20,7 +20,7 @@ subprojects {
 
 val universalJar = tasks.register<Jar>("universalJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    destinationDirectory.set(buildDir.resolve("distributions"))
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
     archiveFileName.set("OpenTerrainGenerator-Universal-" + project.version + ".jar")
 }
 
@@ -31,12 +31,16 @@ tasks.build {
 listOf(
     // project(":platforms:paper"),
     project(":platforms:forge"),
-    // project(":platforms:fabric"),
+    project(":platforms:fabric"),
 ).forEach { proj ->
     proj.afterEvaluate {
         universalJar {
-            manifest.from(proj.tasks.jar.get().manifest) // include all manifest entries from jar tasks
-            from(zipTree(proj.the<OTGPlatformExtension>().productionJar))
+            val tree = zipTree(proj.the<OTGPlatformExtension>().productionJar)
+            from(tree)
+            val manifestFile = tree.elements.map { files ->
+                files.find { it.asFile.path.endsWith("META-INF/MANIFEST.MF") }
+            }
+            manifest.from(manifestFile)
         }
     }
 }

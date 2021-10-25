@@ -1,6 +1,6 @@
 plugins {
     id("platform-conventions")
-    id("fabric-loom") version "0.9-SNAPSHOT"
+    id("fabric-loom") version "0.10.+"
 }
 
 dependencies {
