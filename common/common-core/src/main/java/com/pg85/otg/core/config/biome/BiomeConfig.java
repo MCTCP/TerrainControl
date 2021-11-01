@@ -494,7 +494,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"Set a category for this biome, used by vanilla for... something",
 				"Accepts one of the following values:",
 				"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether",
-				"TemplateForBiome biomes inherits this from the targeted biomes.");
+				"TemplateForBiome biomes inherit this from the targeted biomes.");
 		}
 
 		writer.header1("Biome placement");

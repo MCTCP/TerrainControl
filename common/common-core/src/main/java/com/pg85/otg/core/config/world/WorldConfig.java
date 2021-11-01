@@ -586,7 +586,7 @@ public class WorldConfig extends WorldConfigBase
 		);
 
 		writer.putSetting(WorldStandardValues.LAND_FUZZY, this.landFuzzy,
-				"Generates more lakes (via small ocean biomes) at the edges of continents. As a side effect, the continent will also get a bit larger. Must be from 0 to GenerationDepth minus LandSize."
+			"Generates more lakes (via small ocean biomes) at the edges of continents. As a side effect, the continent will also get a bit larger. Must be from 0 to GenerationDepth minus LandSize."
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, this.defaultOceanBiome,
@@ -706,7 +706,7 @@ public class WorldConfig extends WorldConfigBase
 		writer.header1("Blocks");
 		
 		writer.putSetting(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone,
-			"Set this to true to replace the biome surface block of all exposed stone."
+			"Set this to true to place the biome surface block on top of all exposed stone."
 		);		
 		
 		writer.header2("Bedrock");
@@ -836,7 +836,7 @@ public class WorldConfig extends WorldConfigBase
 		writer.header2("Caves");
 
 		writer.putSetting(WorldStandardValues.CAVES_ENABLED, this.cavesEnabled,
-				"Enables/disables OTG caves. OTG should automatically disable caves/carvers for biomes when modded carvers are detected."
+			"Enables/disables OTG caves. OTG should automatically disable caves/carvers for biomes when modded carvers are detected."
 		);
 		
 		writer.putSetting(WorldStandardValues.CAVE_RARITY, this.caveRarity,
@@ -895,7 +895,7 @@ public class WorldConfig extends WorldConfigBase
 		writer.header2("Ravines");
 
 		writer.putSetting(WorldStandardValues.RAVINES_ENABLED, this.ravinesEnabled,
-				"Enables/disables OTG ravines. OTG should automatically disable ravines/carvers for biomes when modded carvers are detected."
+			"Enables/disables OTG ravines. OTG should automatically disable ravines/carvers for biomes when modded carvers are detected."
 		);
 
 		writer.putSetting(WorldStandardValues.RAVINE_RARITY, this.ravineRarity);
