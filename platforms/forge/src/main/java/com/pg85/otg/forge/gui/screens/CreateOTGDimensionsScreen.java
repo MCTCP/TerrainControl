@@ -168,8 +168,8 @@ public class CreateOTGDimensionsScreen extends Screen
 			super(CreateOTGDimensionsScreen.this.minecraft, CreateOTGDimensionsScreen.this.width, CreateOTGDimensionsScreen.this.height, 43, CreateOTGDimensionsScreen.this.height - 60, 24);
 
 			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Overworld", CreateOTGDimensionsScreen.this.currentSelection.Overworld.PresetFolderName == null ? CreateOTGDimensionsScreen.this.currentSelection.Overworld.NonOTGWorldType != null ? CreateOTGDimensionsScreen.this.currentSelection.Overworld.NonOTGWorldType : "Non-OTG": CreateOTGDimensionsScreen.this.currentSelection.Overworld.PresetFolderName, 0));
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Nether", CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName, 1));
-			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("End", CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName, 2));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("Nether", CreateOTGDimensionsScreen.this.currentSelection.Nether == null || CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.Nether.PresetFolderName, 1));
+			this.addEntry(new CreateOTGDimensionsScreen.DetailsList.LayerEntry("End", CreateOTGDimensionsScreen.this.currentSelection.End == null || CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName == null ? "Vanilla" : CreateOTGDimensionsScreen.this.currentSelection.End.PresetFolderName, 2));
 			int dimId = 3;
 			for(OTGDimension dim : currentSelection.Dimensions)
 			{
