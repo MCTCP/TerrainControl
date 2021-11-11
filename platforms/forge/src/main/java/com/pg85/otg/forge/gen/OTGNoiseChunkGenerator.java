@@ -312,6 +312,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		double d1;
 		IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(chunkMinX, chunkMinZ));
 		IBiome biome;
+		
 		for(int xInChunk = 0; xInChunk < Constants.CHUNK_SIZE; ++xInChunk)
 		{
 			for(int zInChunk = 0; zInChunk < Constants.CHUNK_SIZE; ++zInChunk)
@@ -339,16 +340,33 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// then check if they have been overridden by mods before using our own carvers.
 		if (stage == GenerationStep.Carving.AIR)
 		{
-			BiomeGenerationSettings biomegenerationsettings = this.biomeSource.getNoiseBiome(chunk.getPos().x << 2, 0, chunk.getPos().z << 2).getGenerationSettings();
-			List<Supplier<ConfiguredWorldCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
-
-			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == Carvers.CAVE);
-			boolean ravinesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == Carvers.CANYON);
+			ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome(chunk.getPos().x << 2, chunk.getPos().z << 2);
+			BiomeGenerationSettings biomegenerationsettings = biome.getBiomeBase().getGenerationSettings();
+			List<Supplier<ConfiguredCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
 			
-			ProtoChunk protoChunk = (ProtoChunk) chunk;
-			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
-			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, cavesEnabled, ravinesEnabled);
+			// TODO: When using template biomes with MC biomes, we don't control which
+			// default carvers were registered to biomes like we do with OTG biomes (always
+			// ConfiguredCarvers.CAVE / ConfiguredCarvers.CANYON), so we only use OTG 
+			// carvers for some MC biomes atm.
+			
+			boolean cavesEnabled = 
+				this.preset.getWorldConfig().getCavesEnabled() &&
+				list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CAVE || a.get() == ConfiguredCarvers.NETHER_CAVE)
+			;
+			
+			// Nether biomes don't have canyons normally, so when NETHER_CAVE is present just add OTG canyons if enabled.
+			boolean ravinesEnabled = 
+				this.preset.getWorldConfig().getRavinesEnabled() && 
+				list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CANYON || a.get() == ConfiguredCarvers.NETHER_CAVE)
+			;
+			
+			if(cavesEnabled || ravinesEnabled)
+			{
+				ChunkPrimer protoChunk = (ChunkPrimer) chunk;
+				ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
+				BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
+				this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, cavesEnabled, ravinesEnabled);
+			}
 		}
 		applyNonOTGCarvers(seed, biomeManager, chunk, stage);
 	}
@@ -362,8 +380,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		Aquifer aquifer = this.createAquifer(chunk);
 		int j = chunkpos.x;
 		int k = chunkpos.z;
-		BiomeGenerationSettings biomegenerationsettings = this.biomeSource.getNoiseBiome(chunkpos.x << 2, 0, chunkpos.z << 2).getGenerationSettings();
-		BitSet bitset = ((ProtoChunk)chunk).getOrCreateCarvingMask(stage);
+		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome(chunk.getPos().x << 2, chunk.getPos().z << 2);
+		BiomeGenerationSettings biomegenerationsettings = biome.getBiomeBase().getGenerationSettings();
+		BitSet bitset = ((ChunkPrimer)chunk).getOrCreateCarvingMask(stage);
 
 		for(int l = j - 8; l <= j + 8; ++l)
 		{
@@ -378,8 +397,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					ConfiguredWorldCarver<?> configuredcarver = listiterator.next().get();
 					// OTG uses its own caves and canyon carvers, ignore the default ones.
 					if(
-						configuredcarver != Carvers.CAVE &&
-						configuredcarver != Carvers.CANYON
+						configuredcarver != ConfiguredCarvers.CAVE &&
+						configuredcarver != ConfiguredCarvers.NETHER_CAVE &&
+						configuredcarver != ConfiguredCarvers.CANYON						
 					)
 					{
 						sharedseedrandom.setLargeFeatureSeed(seed + (long)j1, l, i1);
@@ -390,6 +410,58 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					}
 				}
 			}
+		}
+	}
+	
+	// Structures
+	
+	// Override structure spawning to make sure any structures registered to
+	// non-otg biomes are allowed to spawn according to worldconfig settings. 
+	@Override
+	public void createStructures(DynamicRegistries p_242707_1_, StructureManager p_242707_2_, IChunk p_242707_3_, TemplateManager p_242707_4_, long p_242707_5_)
+	{
+		ChunkPos chunkpos = p_242707_3_.getPos();
+		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
+		if(this.preset.getWorldConfig().getStrongholdsEnabled())
+		{
+			createStructure(StructureFeatures.STRONGHOLD, p_242707_1_, p_242707_2_, p_242707_3_, p_242707_4_, p_242707_5_, chunkpos, biome.getBiomeBase());
+		}
+		for(Supplier<StructureFeature<?, ?>> supplier : biome.getBiomeBase().getGenerationSettings().structures())
+		{
+			if(
+				(!(supplier.get().feature instanceof VillageStructure) || this.preset.getWorldConfig().getVillagesEnabled()) &&				
+				(!(supplier.get().feature instanceof SwampHutStructure) || this.preset.getWorldConfig().getRareBuildingsEnabled()) &&				
+				(!(supplier.get().feature instanceof IglooStructure) || this.preset.getWorldConfig().getRareBuildingsEnabled()) &&
+				(!(supplier.get().feature instanceof JunglePyramidStructure) || this.preset.getWorldConfig().getRareBuildingsEnabled()) &&								
+				(!(supplier.get().feature instanceof DesertPyramidStructure) || this.preset.getWorldConfig().getRareBuildingsEnabled()) &&				
+				(!(supplier.get().feature instanceof MineshaftStructure) || this.preset.getWorldConfig().getMineshaftsEnabled()) &&
+				(!(supplier.get().feature instanceof RuinedPortalStructure) || this.preset.getWorldConfig().getRuinedPortalsEnabled()) &&
+				(!(supplier.get().feature instanceof OceanRuinStructure) || this.preset.getWorldConfig().getOceanRuinsEnabled()) &&
+				(!(supplier.get().feature instanceof ShipwreckStructure) || this.preset.getWorldConfig().getShipWrecksEnabled()) &&
+				(!(supplier.get().feature instanceof OceanMonumentStructure) || this.preset.getWorldConfig().getOceanMonumentsEnabled()) &&				
+				(!(supplier.get().feature instanceof BastionRemantsStructure) || this.preset.getWorldConfig().getBastionRemnantsEnabled()) &&
+				(!(supplier.get().feature instanceof BuriedTreasureStructure) || this.preset.getWorldConfig().getBuriedTreasureEnabled()) &&
+				(!(supplier.get().feature instanceof EndCityStructure) || this.preset.getWorldConfig().getEndCitiesEnabled()) &&
+				(!(supplier.get().feature instanceof FortressStructure) || this.preset.getWorldConfig().getNetherFortressesEnabled()) &&
+				(!(supplier.get().feature instanceof NetherFossilStructure) || this.preset.getWorldConfig().getNetherFossilsEnabled()) &&
+				(!(supplier.get().feature instanceof PillagerOutpostStructure) || this.preset.getWorldConfig().getPillagerOutpostsEnabled()) &&
+				(!(supplier.get().feature instanceof WoodlandMansionStructure) || this.preset.getWorldConfig().getWoodlandMansionsEnabled())
+			)
+			{
+				createStructure(supplier.get(), p_242707_1_, p_242707_2_, p_242707_3_, p_242707_4_, p_242707_5_, chunkpos, biome.getBiomeBase());
+			}
+		}
+	}
+	
+	private void createStructure(StructureFeature<?, ?> p_242705_1_, DynamicRegistries p_242705_2_, StructureManager p_242705_3_, IChunk p_242705_4_, TemplateManager p_242705_5_, long p_242705_6_, ChunkPos p_242705_8_, Biome p_242705_9_)
+	{
+		StructureStart<?> structurestart = p_242705_3_.getStartForFeature(SectionPos.of(p_242705_4_.getPos(), 0), p_242705_1_.feature, p_242705_4_);
+		int i = structurestart != null ? structurestart.getReferences() : 0;
+		StructureSeparationSettings structureseparationsettings = this.getSettings().getConfig(p_242705_1_.feature);
+		if (structureseparationsettings != null)
+		{
+			StructureStart<?> structurestart1 = p_242705_1_.generate(p_242705_2_, this, this.biomeSource, p_242705_5_, p_242705_6_, p_242705_8_, p_242705_9_, i, structureseparationsettings);
+			p_242705_3_.setStartForFeature(SectionPos.of(p_242705_4_.getPos(), 0), p_242705_1_.feature, structurestart1, p_242705_4_);
 		}
 	}
 	
@@ -425,10 +497,79 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 
+		// Get most common biome in chunk and use that for decoration - Frank
+		if (!getPreset().getWorldConfig().improvedBorderDecoration())
+		{
+			List<IBiome> biomes = new ArrayList<IBiome>();
+			biomes.add(biome);
+			biomes.add(biome1);
+			biomes.add(biome2);
+			biomes.add(biome3);
+			biomes.add(biome4);
+			
+			Map<IBiome, Integer> map = new HashMap<>();
+			for (IBiome b : biomes)
+			{
+				Integer val = map.get(b);
+				map.put(b, val == null ? 1 : val + 1);
+			}
+
+			Map.Entry<IBiome, Integer> max = null;
+			for (Map.Entry<IBiome, Integer> ent : map.entrySet())
+			{
+				if (max == null || ent.getValue() > max.getValue())
+				{
+					max = ent;
+				}
+			}
+
+			biome = max.getKey();
+		}
+
 		try
 		{
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
 			((ForgeBiome)biome).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
+			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
+			if (getPreset().getWorldConfig().improvedBorderDecoration())
+			{
+				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+				{
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+					{
+						((ForgeBiome)biome1).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());						
+					}					
+				}
+				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+				{
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+					{
+						((ForgeBiome)biome2).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
+					}					
+				}
+				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+				{
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+					{
+						((ForgeBiome)biome3).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
+					}					
+				}
+				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+				{
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+					{
+						((ForgeBiome)biome4).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					}
+				}
+			}
 			// Template biomes handle their own snow, OTG biomes use OTG snow.
 			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
 			if(
