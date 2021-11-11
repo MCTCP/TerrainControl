@@ -11,6 +11,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.pg85.otg.OTG;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.OTG;
 
@@ -37,6 +40,15 @@ public class DimensionConfig
 	public boolean isModpackConfig()
 	{
 		return this.isModpackConfig;
+	}
+	
+	public static DimensionConfig createDefaultConfig()
+	{
+		DimensionConfig config = new DimensionConfig();
+		config.Overworld = new OTGOverWorld(null, -1, null, null);
+		config.Nether = new OTGDimension(null, -1);
+		config.End = new OTGDimension(null, -1);
+		return config;
 	}
 	
 	public static DimensionConfig fromDisk(String fileName)
@@ -101,6 +113,28 @@ public class DimensionConfig
 		return null;
 	}
 	
+	// Clone method for GUI, to accommodate cancel button / rollbacks.
+	public DimensionConfig clone()
+	{
+		DimensionConfig clone = new DimensionConfig();
+
+		clone.isModpackConfig = this.isModpackConfig;
+		clone.Version = this.Version;
+		clone.ModpackName = this.ModpackName;
+		clone.Overworld = this.Overworld == null ? null : this.Overworld.clone();
+		clone.Nether = this.Nether == null ? null : this.Nether.clone();
+		clone.End = this.End == null ? null : this.End.clone();
+		clone.Dimensions = new ArrayList<>();
+		for(OTGDimension dim : this.Dimensions)
+		{
+			clone.Dimensions.add(dim.clone());
+		}
+		clone.Settings = this.Settings == null ? null : this.Settings.clone();
+		clone.GameRules = this.GameRules == null ? null : this.GameRules.clone();
+		
+		return clone;
+	}
+	
 	public static class OTGOverWorld extends OTGDimension
 	{
 		public String NonOTGWorldType; // Only used for MP atm to create non-otg overworlds.
@@ -117,16 +151,21 @@ public class DimensionConfig
 			this.NonOTGWorldType = nonOTGWorldType;
 			this.NonOTGGeneratorSettings = nonOTGGeneratorSettings;
 		}
+		
+		public OTGOverWorld clone()
+		{
+			return new OTGOverWorld(this.PresetFolderName, this.Seed, this.NonOTGWorldType, this.NonOTGGeneratorSettings);
+		}
 	}
 
 	public static class OTGDimension
 	{
 		public String PresetFolderName;
+		public long Seed;
 		public String PortalBlocks;
 		public String PortalColor;
 		public String PortalMob;
 		public String PortalIgnitionSource;
-		public long Seed;
 
 		public OTGDimension() {}
 		
@@ -134,6 +173,16 @@ public class DimensionConfig
 		{
 			this.PresetFolderName = presetFolderName;
 			this.Seed = seed;
+		}
+		
+		public OTGDimension clone()
+		{
+			OTGDimension otgDimension = new OTGDimension(this.PresetFolderName, this.Seed);
+			otgDimension.PortalBlocks = this.PortalBlocks;
+			otgDimension.PortalColor = this.PortalColor;
+			otgDimension.PortalMob = this.PortalMob;
+			otgDimension.PortalIgnitionSource = this.PortalIgnitionSource;
+			return otgDimension;
 		}
 	}
 
@@ -143,6 +192,14 @@ public class DimensionConfig
 		public boolean BonusChest;
 		
 		public Settings() {}
+		
+		public Settings clone()
+		{
+			Settings settings = new Settings();
+			settings.GenerateStructures = this.GenerateStructures;
+			settings.BonusChest = this.BonusChest;
+			return settings;
+		}
 	}
 	
 	public class GameRules
@@ -180,5 +237,42 @@ public class DimensionConfig
 		public boolean UniversalAnger;
 		
 		public GameRules() {}
+		
+		public GameRules clone()
+		{
+			GameRules gameRules = new GameRules();
+			gameRules.DoFireTick = this.DoFireTick;
+			gameRules.MobGriefing = this.MobGriefing;
+			gameRules.KeepInventory = this.KeepInventory;
+			gameRules.DoMobSpawning = this.DoMobSpawning;
+			gameRules.DoMobLoot = this.DoMobLoot;
+			gameRules.DoTileDrops = this.DoTileDrops;
+			gameRules.DoEntityDrops = this.DoEntityDrops;
+			gameRules.CommandBlockOutput = this.CommandBlockOutput;
+			gameRules.NaturalRegeneration = this.NaturalRegeneration;
+			gameRules.DoDaylightCycle = this.DoDaylightCycle;
+			gameRules.LogAdminCommands = this.LogAdminCommands;
+			gameRules.ShowDeathMessages = this.ShowDeathMessages;
+			gameRules.RandomTickSpeed = this.RandomTickSpeed;
+			gameRules.SendCommandFeedback = this.SendCommandFeedback;
+			gameRules.SpectatorsGenerateChunks = this.SpectatorsGenerateChunks;
+			gameRules.SpawnRadius = this.SpawnRadius;
+			gameRules.DisableElytraMovementCheck = this.DisableElytraMovementCheck;
+			gameRules.MaxEntityCramming = this.MaxEntityCramming;
+			gameRules.DoWeatherCycle = this.DoWeatherCycle;
+			gameRules.DoLimitedCrafting = this.DoLimitedCrafting;
+			gameRules.MaxCommandChainLength = this.MaxCommandChainLength;
+			gameRules.AnnounceAdvancements = this.AnnounceAdvancements;
+			gameRules.DisableRaids = this.DisableRaids;
+			gameRules.DoInsomnia = this.DoInsomnia;
+			gameRules.DrowningDamage = this.DrowningDamage;
+			gameRules.FallDamage = this.FallDamage;
+			gameRules.FireDamage = this.FireDamage;
+			gameRules.DoPatrolSpawning = this.DoPatrolSpawning;
+			gameRules.DoTraderSpawning = this.DoTraderSpawning;
+			gameRules.ForgiveDeadPlayers = this.ForgiveDeadPlayers;
+			gameRules.UniversalAnger = this.UniversalAnger;
+			return gameRules;
+		}				
 	}
 }

@@ -43,14 +43,18 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class OTGGui
 {
+	public static DimensionConfig currentSelection;
+
 	// Define a new world type for the world creation screen
 	public static final WorldPreset OTG_WORLD_TYPE = new WorldPreset(Constants.MOD_ID_SHORT)
 	{
 		protected ChunkGenerator generator(Registry<Biome> biomes, Registry<NoiseGeneratorSettings> dimensionSettings, long seed)
 		{
 			// Called when selecting the OTG world type in the world creation gui.
+			currentSelection = DimensionConfig.createDefaultConfig();
 			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 			{
+				currentSelection.Overworld = new OTGOverWorld(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, null, null);
 				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(NoiseGeneratorSettings.OVERWORLD));
 			} else {
 				// If no presets are installed, return the default chunkgenerator / biomeprovider
@@ -93,6 +97,7 @@ public class OTGGui
 
 								// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
 								DimensionConfig dimConfig = dimGenSettings.dimensionConfig;
+								currentSelection = dimConfig;
 								MappedRegistry<LevelStem> dimensions = dimensionGeneratorSettings.dimensions();
 								if(dimConfig.isModpackConfig())
 								{
