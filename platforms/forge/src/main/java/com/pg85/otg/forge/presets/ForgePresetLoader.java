@@ -789,7 +789,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						{
 							if(biomeConfig.getIsTemplateForBiome())
 							{
-								// For temple biome configs, fetch all associated biomes and add them.
+								// For template biome configs, fetch all associated biomes and add them.
 								for(Entry<IBiomeResourceLocation, IBiomeConfig> entry : biomeConfigsByResourceLocation.entrySet())
 								{
 									if(entry.getValue().getName().equals(biomeConfig.getName()))
@@ -800,7 +800,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 											{
 												OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "BiomeConfig " + biomeConfig.getName() + " found for entry " + tagString + " in group " + group.getName());
 											}
-											groupBiomes.put(entry.getKey().toResourceLocationString(), biomeConfig);
+											groupBiomes.put(entry.getKey().toResourceLocationString(), entry.getValue());
 										}
 									}
 								}
