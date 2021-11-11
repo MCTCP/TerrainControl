@@ -831,7 +831,7 @@ public class WorldConfig extends WorldConfigBase
 			"All air blocks are replaced to CarverLavaBlock from Y0 up to CarverLavaBlockHeight.",
 			"For example, vanilla replaces air in caves with lava up to Y10.",
 			"Defaults to: 10"
-		);		
+		);
 
 		writer.header2("Caves");
 
