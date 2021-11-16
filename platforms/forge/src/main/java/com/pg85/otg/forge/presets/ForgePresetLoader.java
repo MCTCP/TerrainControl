@@ -236,15 +236,29 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 					continue;
 				}
-				// Always re-create OTG biomes, to pick up any config changes.
-				// This does break any kind of datapack support we might implement for OTG biomes.
-				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
-				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
-				if(refresh)
+				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 				{
-					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
-				} else {	 			
-					ForgeRegistries.BIOMES.register(biome);
+					// For developer-mode, always re-create OTG biomes, to pick up any config changes.
+					// This does break any kind of datapack support we might implement for OTG biomes.
+					biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
+					if(refresh)
+					{
+						biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
+					} else {	 			
+						ForgeRegistries.BIOMES.register(biome);
+					}
+				} else {
+					if(refresh)
+					{
+						biome = biomeRegistry.get(resourceLocation);
+						Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+						registryKey = key.isPresent() ? key.get() : null;
+					} else {
+						biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+						registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+						ForgeRegistries.BIOMES.register(biome);
+					}
 				}
 			}
 			if(biome == null || registryKey == null)
