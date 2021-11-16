@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -217,19 +217,16 @@ public class ForgePresetLoader extends LocalPresetLoader
 			Biome biome;
 			if(biomeConfig.getValue().getIsTemplateForBiome())
 			{
-				biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
-				if(biome == null)
+				if(refresh)
 				{
-					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
-					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not find biome " + resourceLocation.toString() + " for template biomeconfig " + biomeConfig.getValue().getName());
-					}
-					continue;
+					biome = biomeRegistry.get(resourceLocation);
+					Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+					registryKey = key.isPresent() ? key.get() : null;
+				} else {
+					biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
+					// TODO: Can we not fetch an existing key?
+					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 				}
-				registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);				
-				presetBiomes.add(registryKey);
-				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
-				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
 			} else {
 				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
 				{
@@ -238,21 +235,29 @@ public class ForgePresetLoader extends LocalPresetLoader
 						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
 					}
 					continue;
-				}
-				
-				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
-				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
- 				registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
-				presetBiomes.add(registryKey);
- 				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());	 			
-
-				if(!refresh)
+				}				
+				if(refresh)
 				{
-					ForgeRegistries.BIOMES.register(biome);
+					biome = biomeRegistry.get(resourceLocation);
+					Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+					registryKey = key.isPresent() ? key.get() : null;
 				} else {
-					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
+	 				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+					ForgeRegistries.BIOMES.register(biome);
+					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 				}
 			}
+			if(biome == null || registryKey == null)
+			{
+				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
+				{
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not find biome " + resourceLocation.toString() + " for biomeconfig " + biomeConfig.getValue().getName());
+				}
+				continue;
+			}
+			presetBiomes.add(registryKey);
+			biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
+			biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
 
 			// Populate our map for syncing
 			OTGClientSyncManager.getSyncedData().put(resourceLocation.toString(), new BiomeSettingSyncWrapper(biomeConfig.getValue()));
