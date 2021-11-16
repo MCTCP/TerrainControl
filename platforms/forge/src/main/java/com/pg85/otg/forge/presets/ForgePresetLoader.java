@@ -235,16 +235,16 @@ public class ForgePresetLoader extends LocalPresetLoader
 						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
 					}
 					continue;
-				}				
+				}
+				// Always re-create OTG biomes, to pick up any config changes.
+				// This does break any kind of datapack support we might implement for OTG biomes.
+				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
 				if(refresh)
 				{
-					biome = biomeRegistry.get(resourceLocation);
-					Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
-					registryKey = key.isPresent() ? key.get() : null;
-				} else {
-	 				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
+				} else {	 			
 					ForgeRegistries.BIOMES.register(biome);
-					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 				}
 			}
 			if(biome == null || registryKey == null)
