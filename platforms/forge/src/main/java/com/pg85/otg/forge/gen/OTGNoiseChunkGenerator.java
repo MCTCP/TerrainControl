@@ -462,7 +462,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 		for(Supplier<StructureFeature<?, ?>> supplier : biome.getBiomeBase().getGenerationSettings().structures())
 		{
-			// TODO: This doesn't catch most modded structures ><
+			// TODO: This doesn't catch most modded structures, modded structures don't appear to have a type?
 			if(
 				(this.preset.getWorldConfig().getStrongholdsEnabled() || !(supplier.get().feature instanceof StrongholdStructure)) &&
 				(this.preset.getWorldConfig().getVillagesEnabled() || !(supplier.get().feature instanceof VillageStructure)) &&				
@@ -505,7 +505,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public BlockPos findNearestMapFeature(ServerWorld world, Structure<?> structure, BlockPos blockPos, int i1, boolean b1) 
 	{
-		// TODO: This doesn't catch most modded structures ><
+		// TODO: This doesn't catch most modded structures, modded structures don't appear to have a type?
 		if(
 			(this.preset.getWorldConfig().getStrongholdsEnabled() || !(structure instanceof StrongholdStructure)) &&
 			(this.preset.getWorldConfig().getVillagesEnabled() || !(structure instanceof VillageStructure)) &&
