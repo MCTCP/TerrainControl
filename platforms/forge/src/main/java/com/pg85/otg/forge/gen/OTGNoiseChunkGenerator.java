@@ -456,13 +456,16 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		ChunkPos chunkpos = p_242707_3_.getPos();
 		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-		if(this.preset.getWorldConfig().getStrongholdsEnabled())
+		// Strongholds are hardcoded apparently, even if they aren't registered to the biome, so check worldconfig and biomeconfig toggles. 
+		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
 		{
 			createStructure(StructureFeatures.STRONGHOLD, p_242707_1_, p_242707_2_, p_242707_3_, p_242707_4_, p_242707_5_, chunkpos, biome.getBiomeBase());
 		}
 		for(Supplier<StructureFeature<?, ?>> supplier : biome.getBiomeBase().getGenerationSettings().structures())
 		{
-			// TODO: This doesn't catch most modded structures, modded structures don't appear to have a type?
+			// This doesn't catch modded structures, modded structures don't appear to have a type so we can't filter except by name.
+			// We don't have to check biomeconfig toggles here, as that would only apply to non-template biomes and for those we
+			// register structures ourselves, so we just don't register them in the first place.			
 			if(
 				(this.preset.getWorldConfig().getStrongholdsEnabled() || !(supplier.get().feature instanceof StrongholdStructure)) &&
 				(this.preset.getWorldConfig().getVillagesEnabled() || !(supplier.get().feature instanceof VillageStructure)) &&				
@@ -505,7 +508,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public BlockPos findNearestMapFeature(ServerWorld world, Structure<?> structure, BlockPos blockPos, int i1, boolean b1) 
 	{
-		// TODO: This doesn't catch most modded structures, modded structures don't appear to have a type?
+		// This doesn't catch modded structures, modded structures don't appear to have a type so we can't filter except by name.
+		// We don't have to check biomeconfig toggles here, as that would only apply to non-template biomes and for those we
+		// register structures ourselves, so we just don't register them in the first place.
 		if(
 			(this.preset.getWorldConfig().getStrongholdsEnabled() || !(structure instanceof StrongholdStructure)) &&
 			(this.preset.getWorldConfig().getVillagesEnabled() || !(structure instanceof VillageStructure)) &&
@@ -531,11 +536,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean hasStronghold(ChunkPos chunkPos)
 	{
-		if(this.preset.getWorldConfig().getStrongholdsEnabled())
+		// super.hasStronghold generates stronghold start points (default settingds appear 
+		// determined per dim type), so check worldconfig and biomeconfig toggles.
+		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkPos.x << 2) + 2, (chunkPos.z << 2) + 2);
+		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
 		{
 			return super.hasStronghold(chunkPos);
 		}
