@@ -666,11 +666,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 						String tagSubString2 = tagSubString.trim().toLowerCase();
 						if(tagSubString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
 						{
-							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
 						}
 						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
 						{
-							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
 							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
 						}
 					}
@@ -1108,11 +1108,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 						String tagSubString2 = tagSubString.trim().toLowerCase();
 						if(tagSubString2.startsWith(Constants.MOD_LABEL_EXCLUDE))
 						{
-							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
+							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL_EXCLUDE, ""));
 						}						
 						else if(tagSubString2.startsWith(Constants.MOD_LABEL))
 						{
-							innerExcludedMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
+							innerMods.add(tagSubString2.replace(Constants.MOD_LABEL, ""));
 							biomesForTags = biomesForTags.stream().filter(key -> !key.location().getNamespace().equals(tagSubString2.replace(Constants.MOD_LABEL, ""))).collect(Collectors.toSet());
 						}
 					}
