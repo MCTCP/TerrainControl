@@ -731,7 +731,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 								{
 									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 									{
-										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biomeForTag.location().toString() + " found for " + templateBiome.toString());
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biomeForTag.location().toString() + " found for " + templateBiome.toString() + " with temperature: " + biome.getBaseTemperature() + " Category: " + biome.getBiomeCategory() + " Tags: " + String.join(",", BiomeDictionary.getTypes(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName())).stream().map(a -> a.getName()).collect(Collectors.toList())));
 									}										
 									biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
 									biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);
