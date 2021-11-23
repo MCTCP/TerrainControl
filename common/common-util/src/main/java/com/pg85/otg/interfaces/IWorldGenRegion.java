@@ -44,7 +44,6 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 	void spawnEntity(IEntityFunction newEntityData);
 	void placeDungeon(Random random, int x, int y, int z);
 	void placeFossil(Random random, int x, int y, int z);
-	void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
 	boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 	DecorationArea getDecorationArea();
 

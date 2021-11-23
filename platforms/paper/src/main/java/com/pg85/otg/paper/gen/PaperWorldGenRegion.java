@@ -722,24 +722,6 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
-	{
-		RegistryAccess registries = this.worldGenRegion.getMinecraftWorld().registryAccess();
-		Registry<ConfiguredFeature<?, ?>> registry = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
-		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
-
-		if (feature.isPresent())
-		{
-			feature.get().place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
-		} else {
-			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
-			{
-				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
-			}
-		}
-	}
-
-	@Override
 	public boolean isInsideWorldBorder (ChunkCoordinate chunkCoordinate)
 	{
 		// TODO: Implement this.

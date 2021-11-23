@@ -141,12 +141,6 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 	{
 		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
 	}
-
-	@Override
-	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
-	{
-		throw new NotImplementedException("This method is not available for non-OTG worlds, you're trying to use an unsupported feature.");
-	}
 	
 	// Shadowgen
 

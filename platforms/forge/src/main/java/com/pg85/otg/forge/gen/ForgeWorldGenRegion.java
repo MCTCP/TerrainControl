@@ -38,23 +38,20 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.nbt.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.data.worldgen.Features;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.Features;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
@@ -779,25 +776,6 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public void placeFossil(Random random, int x, int y, int z)
 	{
 		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
-	}
-
-	@Override
-	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
-	{
-		RegistryAccess registries = this.worldGenRegion.getLevel().registryAccess();
-		Registry<ConfiguredFeature<?, ?>> registry = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
-
-		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
-
-		if (feature.isPresent())
-		{
-			feature.get().place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
-		} else {
-			if(this.logger.getLogCategoryEnabled(LogCategory.DECORATION))
-			{
-				this.logger.log(LogLevel.ERROR, LogCategory.DECORATION, "Unable to find registry object " + id);
-			}
-		}
 	}
 	
 	@Override
