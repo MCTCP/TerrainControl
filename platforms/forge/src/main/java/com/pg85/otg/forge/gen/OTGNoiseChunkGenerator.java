@@ -376,10 +376,23 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			BiomeGenerationSettings biomegenerationsettings = biome.getBiomeBase().getGenerationSettings();
 			List<Supplier<ConfiguredCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
 
-			// Only use OTG carvers when no modded carvers are found
-			boolean moddedCarversFound = list.stream().anyMatch(a -> !ForgeRegistries.WORLD_CARVERS.getKey(a.get().worldCarver).getNamespace().equals("minecraft"));			
-			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && !moddedCarversFound;			
-			boolean ravinesEnabled = this.preset.getWorldConfig().getRavinesEnabled() && !moddedCarversFound;			
+			// Only use OTG carvers when default mc carvers are found
+			List<String> defaultCaves = Arrays.asList("minecraft:cave", "minecraft:underwater_cave", "minecraft:nether_cave");			
+			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(
+				a -> defaultCaves.stream().anyMatch(
+					b -> b.equals(
+						ForgeRegistries.WORLD_CARVERS.getKey(a.get().worldCarver).toString()
+					)
+				)
+			);
+			List<String> defaultRavines = Arrays.asList("minecraft:canyon", "minecraft:underwater_canyon");
+			boolean ravinesEnabled = this.preset.getWorldConfig().getRavinesEnabled() && list.stream().anyMatch(
+				a -> defaultRavines.stream().anyMatch(
+					b -> b.equals(
+						ForgeRegistries.WORLD_CARVERS.getKey(a.get().worldCarver).toString()
+					)
+				)
+			);
 			if(cavesEnabled || ravinesEnabled)
 			{
 				ChunkPrimer protoChunk = (ChunkPrimer) chunk;
@@ -404,6 +417,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		BiomeGenerationSettings biomegenerationsettings = biome.getBiomeBase().getGenerationSettings();
 		BitSet bitset = ((ChunkPrimer)chunk).getOrCreateCarvingMask(stage);
 
+		List<String> defaultCavesAndRavines = Arrays.asList("minecraft:cave", "minecraft:underwater_cave", "minecraft:nether_cave", "minecraft:canyon", "minecraft:underwater_canyon");					
 		for(int l = j - 8; l <= j + 8; ++l)
 		{
 			for(int i1 = k - 8; i1 <= k + 8; ++i1)
@@ -414,9 +428,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				while(listiterator.hasNext())
 				{
 					int j1 = listiterator.nextIndex();
-					ConfiguredWorldCarver<?> configuredcarver = listiterator.next().get();
+					ConfiguredCarver<?> configuredcarver = listiterator.next().get();
+					String carverRegistryName = ForgeRegistries.WORLD_CARVERS.getKey(configuredcarver.worldCarver).toString();
 					// OTG uses its own caves and canyon carvers, ignore the default ones.
-					if(!ForgeRegistries.WORLD_CARVERS.getKey(configuredcarver.worldCarver).getNamespace().equals("minecraft"))
+					if(defaultCavesAndRavines.stream().noneMatch(a -> a.equals(carverRegistryName)))
 					{
 						sharedseedrandom.setLargeFeatureSeed(seed + (long)j1, l, i1);
 						if (configuredcarver.isStartChunk(sharedseedrandom))
