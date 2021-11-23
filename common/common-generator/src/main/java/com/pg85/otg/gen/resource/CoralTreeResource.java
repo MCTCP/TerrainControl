@@ -1,5 +1,6 @@
 package com.pg85.otg.gen.resource;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -38,7 +39,7 @@ public class CoralTreeResource extends FrequencyResourceBase
 		for (int i = 0; i < height; i++)
 		{
 			// Return if we don't have enough space to place the rest of the tree
-			if (!CoralHelper.placeCoralBlock(world, random, x, y + i, z, coral))
+			if (y + i < Constants.WORLD_DEPTH || y + i > Constants.WORLD_HEIGHT -1 || !CoralHelper.placeCoralBlock(world, random, x, y + i, z, coral))
 			{
 				return;
 			}
@@ -68,7 +69,7 @@ public class CoralTreeResource extends FrequencyResourceBase
 			count = random.nextInt(5) + 2;
 			placedIndex = 0;
 
-			for (int i = 0; i < count && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); i++)
+			for (int i = 0; i < count && dy >= Constants.WORLD_DEPTH && dy <= Constants.WORLD_HEIGHT -1 && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); i++)
 			{
 				placedIndex++;
 				dy++;

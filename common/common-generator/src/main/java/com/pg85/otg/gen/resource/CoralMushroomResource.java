@@ -1,5 +1,6 @@
 package com.pg85.otg.gen.resource;
 
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -45,7 +46,11 @@ public class CoralMushroomResource extends FrequencyResourceBase
 						(x1 != 0 && x1 != yRadius || z1 != 0 && z1 != zRadius) &&
 						(x1 == 0 || x1 == yRadius || y1 == 0 || y1 == xRadius || z1 == 0 || z1 == zRadius) &&
 						!(random.nextFloat() < 0.1F) &&
-						!CoralHelper.placeCoralBlock(world, random, x + x1, y + y1 - yOffset, z + z1, coral)
+						(
+							y + y1 - yOffset < Constants.WORLD_DEPTH || 
+							y + y1 - yOffset > Constants.WORLD_HEIGHT -1 || 
+							!CoralHelper.placeCoralBlock(world, random, x + x1, y + y1 - yOffset, z + z1, coral)
+						)
 					)
 					{
 						// Lol

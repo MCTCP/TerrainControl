@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.resource;
 
 import com.google.common.collect.Lists;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.gen.resource.util.CoralHelper;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -48,7 +49,7 @@ public class CoralClawResource extends FrequencyResourceBase
 		LocalMaterialData coral = CoralHelper.getRandomCoralBlock(random);
 
 		// Return if we don't have enough space to place the claw
-		if (!CoralHelper.placeCoralBlock(world, random, x, y, z, coral))
+		if (y < Constants.WORLD_DEPTH || y > Constants.WORLD_HEIGHT -1 || !CoralHelper.placeCoralBlock(world, random, x, y, z, coral))
 		{
 			return;
 		}
@@ -83,7 +84,7 @@ public class CoralClawResource extends FrequencyResourceBase
 				clawLength = random.nextInt(3) + 3;
 			}
 
-			for(int i = 0; i < branchLength && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); ++i)
+			for(int i = 0; i < branchLength && dy >= Constants.WORLD_DEPTH && dy <= Constants.WORLD_HEIGHT -1 && CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral); ++i)
 			{
 				dx += finalDir.getX();
 				dy += finalDir.getY();
@@ -104,7 +105,7 @@ public class CoralClawResource extends FrequencyResourceBase
 				dy += initial.getY();
 				dz += initial.getZ();
 
-				if (!CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral))
+				if (dy < Constants.WORLD_DEPTH || dy > Constants.WORLD_HEIGHT -1 || !CoralHelper.placeCoralBlock(world, random, dx, dy, dz, coral))
 				{
 					break;
 				}
