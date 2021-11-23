@@ -148,8 +148,6 @@ public class CaveCarver extends Carver
 			{
 				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw - 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider);
 				this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw + 1.5707964F, pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider);
-	            //this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw - ((float)Math.PI / 2F), pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
-	            //this.carveTunnels(noiseProvider, chunk, random.nextLong(), mainChunkX, mainChunkZ, x, y, z, random.nextFloat() * 0.5F + 0.5F, yaw + ((float)Math.PI / 2F), pitch / 3.0F, branchIndex, branchCount, 1.0D, carvingMask, cachedBiomeProvider, carversDoSurfaceBlock);
 				return;
 			}
 

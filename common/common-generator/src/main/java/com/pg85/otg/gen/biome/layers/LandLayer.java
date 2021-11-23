@@ -48,6 +48,7 @@ class LandLayer implements ParentedLayer
 			return sample | LAND_BIT;
 		} else {
 			// If we're on the center sample return land to try and make sure that the player doesn't spawn in the ocean.
+			// TODO: This assumes spawn is at 0,0?
 			if (x == 0 && z == 0 && forceLandAtSpawn)
 			{
 				return sample | LAND_BIT;
