@@ -80,7 +80,6 @@ import net.minecraft.world.gen.OctavesNoiseGenerator;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
-import net.minecraft.world.gen.carver.ConfiguredCarvers;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.jigsaw.JigsawJunction;
@@ -376,23 +375,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome(chunk.getPos().x << 2, chunk.getPos().z << 2);
 			BiomeGenerationSettings biomegenerationsettings = biome.getBiomeBase().getGenerationSettings();
 			List<Supplier<ConfiguredCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
-			
-			// TODO: When using template biomes with MC biomes, we don't control which
-			// default carvers were registered to biomes like we do with OTG biomes (always
-			// ConfiguredCarvers.CAVE / ConfiguredCarvers.CANYON), so we only use OTG 
-			// carvers for some MC biomes atm.
-			
-			boolean cavesEnabled = 
-				this.preset.getWorldConfig().getCavesEnabled() &&
-				list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CAVE || a.get() == ConfiguredCarvers.NETHER_CAVE)
-			;
-			
-			// Nether biomes don't have canyons normally, so when NETHER_CAVE is present just add OTG canyons if enabled.
-			boolean ravinesEnabled = 
-				this.preset.getWorldConfig().getRavinesEnabled() && 
-				list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CANYON || a.get() == ConfiguredCarvers.NETHER_CAVE)
-			;
-			
+
+			// Only use OTG carvers when no modded carvers are found
+			boolean moddedCarversFound = list.stream().anyMatch(a -> !ForgeRegistries.WORLD_CARVERS.getKey(a.get().worldCarver).getNamespace().equals("minecraft"));			
+			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && !moddedCarversFound;			
+			boolean ravinesEnabled = this.preset.getWorldConfig().getRavinesEnabled() && !moddedCarversFound;			
 			if(cavesEnabled || ravinesEnabled)
 			{
 				ChunkPrimer protoChunk = (ChunkPrimer) chunk;
@@ -429,11 +416,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					int j1 = listiterator.nextIndex();
 					ConfiguredWorldCarver<?> configuredcarver = listiterator.next().get();
 					// OTG uses its own caves and canyon carvers, ignore the default ones.
-					if(
-						configuredcarver != ConfiguredCarvers.CAVE &&
-						configuredcarver != ConfiguredCarvers.NETHER_CAVE &&
-						configuredcarver != ConfiguredCarvers.CANYON						
-					)
+					if(!ForgeRegistries.WORLD_CARVERS.getKey(configuredcarver.worldCarver).getNamespace().equals("minecraft"))
 					{
 						sharedseedrandom.setLargeFeatureSeed(seed + (long)j1, l, i1);
 						if (configuredcarver.isStartChunk(sharedseedrandom))
