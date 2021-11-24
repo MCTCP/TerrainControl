@@ -19,16 +19,16 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  */
 public class PaperMaterialData extends LocalMaterialData
 {
-	static final LocalMaterialData blank = new PaperMaterialData(null, null, true);
-	private static final HashMap<BlockState, LocalMaterialData> stateToMaterialDataMap = new HashMap<>(); // TODO: Move to SpigotMaterialReader?
+	static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
+	private static final ConcurrentHashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new ConcurrentHashMap<>(); // TODO: Move to SpigotMaterialReader?
 
 	private final BlockState blockData;
 	private String name = null;
@@ -52,14 +52,19 @@ public class PaperMaterialData extends LocalMaterialData
 
 	public static LocalMaterialData ofBlockData(BlockState blockData, String raw)
 	{
-		// Create only one LocalMaterialData object for each BlockState		
-		if (stateToMaterialDataMap.containsKey(blockData))
+		// Create only one LocalMaterialData object for each BlockState
+		LocalMaterialData existingData = stateToMaterialDataMap.get(blockData);
+		if (existingData != null)
 		{
-			return stateToMaterialDataMap.get(blockData);
+			return existingData;
 		}
-		LocalMaterialData data = new PaperMaterialData(blockData, raw);
-		stateToMaterialDataMap.put(blockData, data);
-		return data;
+		LocalMaterialData newData = new SpigotMaterialData(blockData, raw);
+		existingData = stateToMaterialDataMap.putIfAbsent(blockData, newData);
+		if(existingData != null)
+		{
+			return existingData;
+		}
+		return newData;		
 	}
 
 	public static LocalMaterialData ofSpigotMaterial(org.bukkit.Material type)

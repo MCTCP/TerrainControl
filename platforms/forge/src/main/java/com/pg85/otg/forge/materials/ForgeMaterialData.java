@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.Rotation;
 import com.pg85.otg.util.materials.MaterialProperty;
 import com.pg85.otg.util.materials.MaterialProperties;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ForgeMaterialData extends LocalMaterialData
 {
 	static final LocalMaterialData blank = new ForgeMaterialData(null, null, true);
-	private static final HashMap<BlockState, ForgeMaterialData> stateToMaterialDataMap = new HashMap<>(); // TODO: Move to ForgeMaterialReader?
+	private static final ConcurrentHashMap<BlockState, ForgeMaterialData> stateToMaterialDataMap = new ConcurrentHashMap<>(); // TODO: Move to ForgeMaterialReader?
 
 	private final BlockState blockData;
 	private String name = null;
@@ -62,15 +62,20 @@ public class ForgeMaterialData extends LocalMaterialData
 	static ForgeMaterialData ofBlockState(BlockState blockState, String raw)
 	{
 		// Create only one LocalMaterialData object for each BlockState
-		if (stateToMaterialDataMap.containsKey(blockState))
+		ForgeMaterialData existingData = stateToMaterialDataMap.get(blockState);
+		if (existingData != null)
 		{
-			return stateToMaterialDataMap.get(blockState);
+			return existingData;
 		}
-		ForgeMaterialData data = new ForgeMaterialData(blockState, raw);
-		stateToMaterialDataMap.put(blockState, data);
-		return data;
-	}	
-	
+		ForgeMaterialData newData = new ForgeMaterialData(blockState, raw);
+		existingData = stateToMaterialDataMap.putIfAbsent(blockState, newData);
+		if(existingData != null)
+		{
+			return existingData;
+		}
+		return newData;
+	}
+
 	public BlockState internalBlock()
 	{
 		return this.blockData;
