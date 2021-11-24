@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.gen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,8 +62,9 @@ public class ShadowChunkGenerator
 {
 	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
-	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkAccess>(512);
-	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
+	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);
+	private final FifoMap<ChunkCoordinate, Integer> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
+	private final FifoMap<ChunkCoordinate, Integer> hasVanillaNoiseStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
 
 	private final Object workerLock = new Object();
 	private final int maxConcurrent;
@@ -285,7 +287,7 @@ public class ShadowChunkGenerator
 	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
 
-	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider)
+	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, DimensionStructuresSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider, boolean noiseAffectingStructuresOnly)
 	{
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
@@ -293,44 +295,62 @@ public class ShadowChunkGenerator
 		ProtoChunk chunk;
 		ChunkPos chunkpos;
 		IBiome biome;
-		ChunkCoordinate searchChunk;
-		Boolean result;
 		if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
 		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<>();
-			Map<ChunkCoordinate,Boolean> chunksHandled = new HashMap<>();
-			synchronized(this.hasVanillaStructureChunkCache)
+			Map<ChunkCoordinate,Integer> chunksHandled = new HashMap<>();
+			if(noiseAffectingStructuresOnly)
 			{
-				for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+				synchronized(this.hasVanillaNoiseStructureChunkCache)
 				{
-					for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+					if(checkHasVanillaStructureWithoutLoadingCache(this.hasVanillaNoiseStructureChunkCache, chunkCoordinate, radiusInChunks, chunksToHandle))
 					{
-						for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
-						{
-							int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));
-							if (distance == cycle)
-							{
-								searchChunk = ChunkCoordinate.fromChunkCoords(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset);
-								result = this.hasVanillaStructureChunkCache.get(searchChunk);
-								if(result != null)
-								{
-									if(result.booleanValue())
-									{
-										return true;
-									}
-								} else {
-									chunksToHandle.add(searchChunk);
-								}
-							}
-						}
+						return true;
 					}
 				}
-			}			
+			} else {
+				synchronized(this.hasVanillaStructureChunkCache)
+				{
+					if(checkHasVanillaStructureWithoutLoadingCache(this.hasVanillaStructureChunkCache, chunkCoordinate, radiusInChunks, chunksToHandle))
+					{
+						return true;
+					}
+				}
+			}
+			
+			@SuppressWarnings("unchecked")
+			ArrayList<String>[] structuresPerDistance = new ArrayList[radiusInChunks];
+			structuresPerDistance[4] = new ArrayList<String>(Arrays.asList(
+				new String[] {
+					"minecraft:village",
+					"minecraft:endcity",
+					"minecraft:bastion_remnant",
+					"minecraft:monument",
+					"minecraft:mansion"
+				}
+			));
+			structuresPerDistance[3] = new ArrayList<String>(Arrays.asList(new String[]{}));
+			structuresPerDistance[2] = new ArrayList<String>(Arrays.asList(new String[]{}));
+			structuresPerDistance[1] = new ArrayList<String>(Arrays.asList(
+				new String[] {
+					"minecraft:jungle_pyramid",
+					"minecraft:desert_pyramid",
+					"minecraft:ruined_portal",
+					"minecraft:swamp_hut",
+					"minecraft:igloo",
+					"minecraft:shipwreck",
+					"minecraft:pillager_outpost",
+					"minecraft:ocean_ruin"
+				}
+			));
+			structuresPerDistance[0] = new ArrayList<String>(Arrays.asList(new String[]{}));
+		
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
 				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld);
 				chunkpos = chunk.getPos();
-
+				int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkToHandle.getChunkX() - chunkCoordinate.getChunkX(), 2) + Math.pow (chunkToHandle.getChunkZ() - chunkCoordinate.getChunkZ(), 2)));
+				
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 				// based on biome and resource settings (distance etc). Does not plot any structure components.
 
@@ -338,26 +358,116 @@ public class ShadowChunkGenerator
 				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
 				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((ForgeBiome)biome).getBiomeBase().getGenerationSettings().structures())
 				{
-					// *TODO: Do we need to avoid any structures other than villages?
-					if(supplier.get().feature instanceof VillageFeature)
+					StructureFeature<?, ?> structure = supplier.get();
+					if(
+						structure.feature.step() == Decoration.SURFACE_STRUCTURES &&
+						(
+							!noiseAffectingStructuresOnly ||
+							Structure.NOISE_AFFECTING_FEATURES.contains(structure.feature)
+						)
+					)
 					{
-						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
+						ResourceLocation structureRegistryKey = ForgeRegistries.STRUCTURE_FEATURES.getKey(structure.feature);
+						String structureRegistryName = structureRegistryKey.toString();
+						if(!structureRegistryKey.getNamespace().equals("minecraft"))
 						{
-							chunksHandled.put(chunkToHandle, Boolean.TRUE);
-							synchronized(this.hasVanillaStructureChunkCache)
+							// For modded structures, use a default radius
+							int moddedStructuresDefaultRadius = 1;
+							if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
 							{
-								this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+								chunksHandled.put(chunkToHandle, new Integer(moddedStructuresDefaultRadius));
+								if(moddedStructuresDefaultRadius >= distance)
+								{
+									if(noiseAffectingStructuresOnly)
+									{
+										synchronized(this.hasVanillaNoiseStructureChunkCache)
+										{
+											this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+										}
+									} else {
+										synchronized(this.hasVanillaStructureChunkCache)
+										{
+											this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+										}
+									}									
+									return true;
+								}
 							}
-							return true;
+						} else {
+							for(int i = structuresPerDistance.length - 1; i > 0; i--)
+							{
+								ArrayList<String> structuresAtDistance = structuresPerDistance[i];
+								if(structuresAtDistance.contains(structureRegistryName))
+								{
+									if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
+									{
+										chunksHandled.put(chunkToHandle, new Integer(i));
+										if(i >= distance)
+										{
+											if(noiseAffectingStructuresOnly)
+											{
+												synchronized(this.hasVanillaNoiseStructureChunkCache)
+												{													
+													this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+												}
+											} else {
+												synchronized(this.hasVanillaStructureChunkCache)
+												{
+													this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+												}
+											}							
+											return true;
+										}
+									}
+									break;
+								}
+							}
 						}
 					}
 				}
-				chunksHandled.put(chunkToHandle, Boolean.FALSE);
+				chunksHandled.putIfAbsent(chunkToHandle, new Integer(0));
 			}
-			synchronized(this.hasVanillaStructureChunkCache)
+			if(noiseAffectingStructuresOnly)
 			{
-				this.hasVanillaStructureChunkCache.putAll(chunksHandled);
-			}			
+				synchronized(this.hasVanillaNoiseStructureChunkCache)
+				{
+					this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+				}
+			} else {
+				synchronized(this.hasVanillaStructureChunkCache)
+				{
+					this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean checkHasVanillaStructureWithoutLoadingCache(FifoMap<ChunkCoordinate, Integer> cache, ChunkCoordinate chunkCoordinate, int radiusInChunks, List<ChunkCoordinate> chunksToHandle)
+	{
+		for (int cycle = 0; cycle < radiusInChunks; ++cycle)
+		{
+			for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+			{
+				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+				{
+					int distance = (int)Math.floor(Math.sqrt(Math.pow (xOffset, 2) + Math.pow (zOffset, 2)));
+					if (distance == cycle)
+					{
+						ChunkCoordinate searchChunk = ChunkCoordinate.fromChunkCoords(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset);
+						Integer result = cache.get(searchChunk);
+						if(result != null)
+						{
+							if(result.intValue() > 0 && result.intValue() >= distance)
+							{
+								return true;
+							}
+						} else {
+							chunksToHandle.add(searchChunk);
+						}
+					}
+				}
+			}
 		}
 		return false;
 	}
@@ -556,7 +666,7 @@ public class ShadowChunkGenerator
 				}
 				if(coords != null)
 				{
-					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords, this.otgChunkGenerator.getCachedBiomeProvider()))
+					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords, this.otgChunkGenerator.getCachedBiomeProvider(), true))
 					{
 						// Generate a chunk without loading/decorating it.
 						ChunkAccess cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords, this.serverWorld.getLevel()).getChunk();
