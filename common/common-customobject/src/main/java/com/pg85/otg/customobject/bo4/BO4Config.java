@@ -1362,11 +1362,11 @@ public class BO4Config extends CustomObjectConfigFile
 
 	private int bo4DataVersion = 3;
 	void writeToStream(DataOutput stream, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
-	{
-		// TODO: Create new bo4data verison, add doFixedRotation and fixedRotation.
+	{	
 		stream.writeInt(this.bo4DataVersion);
-		// Version 3 added fixedRotation
+		// Version 3 added fixedRotation		
 		StreamHelper.writeStringToStream(stream, this.fixedRotation == null ? null : this.fixedRotation.toString());
+		stream.writeInt(this.bo4DataVersion);
 		stream.writeInt(this.minimumSizeTop);
 		stream.writeInt(this.minimumSizeBottom);
 		stream.writeInt(this.minimumSizeLeft);
@@ -1636,7 +1636,6 @@ public class BO4Config extends CustomObjectConfigFile
 					String rotationString = StreamHelper.readStringFromBuffer(bufferDecompressed);
 					this.fixedRotation = rotationString == null ? null : Rotation.FromString(rotationString);
 				}
-
 				int minimumSizeTop = bufferDecompressed.getInt();
 				int minimumSizeBottom = bufferDecompressed.getInt();
 				int minimumSizeLeft = bufferDecompressed.getInt();
