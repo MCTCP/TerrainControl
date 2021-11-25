@@ -111,6 +111,46 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	// Vanilla structures
 
+	protected int villageSpacing;
+	protected int villageSeparation;
+	protected int desertPyramidSpacing;
+	protected int desertPyramidSeparation;
+	protected int iglooSpacing;
+	protected int iglooSeparation;
+	protected int jungleTempleSpacing;
+	protected int jungleTempleSeparation;
+	protected int swampHutSpacing;
+	protected int swampHutSeparation;
+	protected int pillagerOutpostSpacing;
+	protected int pillagerOutpostSeparation;		
+	protected int strongholdSpacing;
+	protected int strongholdSeparation;
+	protected int strongholdDistance;
+	protected int strongholdSpread;
+	protected int strongholdCount;
+	protected int oceanMonumentSpacing;
+	protected int oceanMonumentSeparation;		
+	protected int endCitySpacing;
+	protected int endCitySeparation;
+	protected int woodlandMansionSpacing;
+	protected int woodlandMansionSeparation;		
+	protected int buriedTreasureSpacing;
+	protected int buriedTreasureSeparation;		
+	protected int mineshaftSpacing;
+	protected int mineshaftSeparation;
+	protected int ruinedPortalSpacing;
+	protected int ruinedPortalSeparation;		
+	protected int shipwreckSpacing;
+	protected int shipwreckSeparation;
+	protected int oceanRuinSpacing;
+	protected int oceanRuinSeparation;
+	protected int bastionRemnantSpacing;
+	protected int bastionRemnantSeparation;
+	protected int netherFortressSpacing;
+	protected int netherFortressSeparation;
+	protected int netherFossilSpacing;
+	protected int netherFossilSeparation;
+	
 	protected boolean woodlandMansionsEnabled;
 	protected boolean netherFortressesEnabled;
 	protected boolean buriedTreasureEnabled;
@@ -118,9 +158,9 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected boolean pillagerOutpostsEnabled;
 	protected boolean bastionRemnantsEnabled;
 	protected boolean netherFossilsEnabled;
-	protected boolean endCitiesEndabled;
-	protected boolean ruinedPortalsEndabled;
-	protected boolean shipWrecksEndabled;
+	protected boolean endCitiesEnabled;
+	protected boolean ruinedPortalsEnabled;
+	protected boolean shipWrecksEnabled;
 	protected boolean strongholdsEnabled;
 	protected boolean villagesEnabled;	
 	protected boolean mineshaftsEnabled;
@@ -555,19 +595,19 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	@Override
 	public boolean getEndCitiesEnabled()
 	{
-		return this.endCitiesEndabled;
+		return this.endCitiesEnabled;
 	}
 
 	@Override
 	public boolean getRuinedPortalsEnabled()
 	{
-		return this.ruinedPortalsEndabled;
+		return this.ruinedPortalsEnabled;
 	}
 
 	@Override
 	public boolean getShipWrecksEnabled()
 	{
-		return this.shipWrecksEndabled;
+		return this.shipWrecksEnabled;
 	}
 
 	@Override
@@ -599,6 +639,242 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.rareBuildingsEnabled;
 	}
+	
+	@Override
+	public int getVillageSpacing()
+	{
+		return this.villageSpacing;
+	}
+	
+	@Override
+	public int getVillageSeparation()
+	{
+		return this.villageSeparation;
+	}
+	
+	@Override
+	public int getDesertPyramidSpacing()
+	{
+		return this.desertPyramidSpacing;
+	}
+	
+	@Override
+	public int getDesertPyramidSeparation()
+	{
+		return this.desertPyramidSeparation;
+	}
+	
+	@Override
+	public int getIglooSpacing()
+	{
+		return this.iglooSpacing;
+	}
+
+	@Override
+	public int getIglooSeparation()
+	{
+		return this.iglooSeparation;
+	}
+	
+	@Override
+	public int getJungleTempleSpacing()
+	{
+		return this.jungleTempleSpacing;
+	}
+	
+	@Override
+	public int getJungleTempleSeparation()
+	{
+		return this.jungleTempleSeparation;
+	}
+	
+	@Override
+	public int getSwampHutSpacing()
+	{
+		return this.swampHutSpacing;
+	}
+	
+	@Override
+	public int getSwampHutSeparation()
+	{
+		return this.swampHutSeparation;
+	}
+	
+	@Override
+	public int getPillagerOutpostSpacing()
+	{
+		return this.pillagerOutpostSpacing;
+	}
+	
+	@Override
+	public int getPillagerOutpostSeparation()
+	{
+		return this.pillagerOutpostSeparation;
+	}
+	
+	@Override
+	public int getStrongholdSpacing()
+	{
+		return this.strongholdSpacing;
+	}
+	
+	@Override
+	public int getStrongholdSeparation()
+	{
+		return this.strongholdSeparation;
+	}
+	
+	@Override
+	public int getStrongHoldDistance()
+	{
+		return this.strongholdDistance;
+	}
+	
+	@Override
+	public int getStrongHoldSpread()
+	{
+		return this.strongholdSpread;
+	}	
+	
+	@Override
+	public int getStrongHoldCount()
+	{
+		return this.strongholdCount;
+	}	
+	
+	@Override
+	public int getOceanMonumentSpacing()
+	{
+		return this.oceanMonumentSpacing;
+	}
+	
+	@Override
+	public int getOceanMonumentSeparation()
+	{
+		return this.oceanMonumentSeparation;
+	}
+	
+	@Override
+	public int getEndCitySpacing()
+	{
+		return this.endCitySpacing;
+	}
+
+	@Override
+	public int getEndCitySeparation()
+	{
+		return this.endCitySeparation;
+	}
+	
+	@Override
+	public int getWoodlandMansionSpacing()
+	{
+		return this.woodlandMansionSpacing;
+	}
+	
+	@Override
+	public int getWoodlandMansionSeparation()
+	{
+		return this.woodlandMansionSeparation;
+	}
+	
+	@Override
+	public int getBuriedTreasureSpacing()
+	{
+		return this.buriedTreasureSpacing;
+	}
+	
+	@Override
+	public int getBuriedTreasureSeparation()
+	{
+		return this.buriedTreasureSeparation;	
+	}
+		
+	@Override
+	public int getMineshaftSpacing()
+	{
+		return this.mineshaftSpacing;
+	}
+	
+	@Override
+	public int getMineshaftSeparation()
+	{
+		return this.mineshaftSeparation;
+	}
+	
+	@Override
+	public int getRuinedPortalSpacing()
+	{
+		return this.ruinedPortalSpacing;
+	}
+	
+	@Override
+	public int getRuinedPortalSeparation()
+	{
+		return this.ruinedPortalSeparation;
+	}
+	
+	@Override
+	public int getShipwreckSpacing()
+	{
+		return this.shipwreckSpacing;
+	}
+	
+	@Override
+	public int getShipwreckSeparation()
+	{
+		return this.shipwreckSeparation;
+	}
+	
+	@Override
+	public int getOceanRuinSpacing()
+	{
+		return this.oceanRuinSpacing;
+	}
+	
+	@Override
+	public int getOceanRuinSeparation()
+	{
+		return this.oceanRuinSeparation;
+	}
+	
+	@Override
+	public int getBastionRemnantSpacing()
+	{
+		return this.bastionRemnantSpacing;
+	}
+	
+	@Override
+	public int getBastionRemnantSeparation()
+	{
+		return this.bastionRemnantSeparation;
+	}
+	
+	@Override
+	public int getNetherFortressSpacing()
+	{
+		return this.netherFortressSpacing;
+	}
+	
+	@Override
+	public int getNetherFortressSeparation()
+	{
+		return this.netherFortressSeparation;
+	}
+	
+	@Override
+	public int getNetherFossilSpacing()
+	{
+		return this.netherFossilSpacing;
+	}
+	
+	@Override
+	public int getNetherFossilSeparation()
+	{
+		return this.netherFossilSeparation;
+	}
+	
+	//
 
 	@Override
 	public boolean getRemoveSurfaceStone()

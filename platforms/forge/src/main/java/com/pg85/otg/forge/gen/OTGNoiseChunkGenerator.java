@@ -1,19 +1,17 @@
 package com.pg85.otg.forge.gen;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.constants.Constants;
@@ -36,6 +34,8 @@ import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.interfaces.IMaterialReader;
+import com.pg85.otg.interfaces.IWorldConfig;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
@@ -109,8 +109,10 @@ import net.minecraft.world.gen.feature.structure.SwampHutStructure;
 import net.minecraft.world.gen.feature.structure.VillageStructure;
 import net.minecraft.world.gen.feature.structure.WoodlandMansionStructure;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.NoiseSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.gen.settings.StructureSpreadSettings;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraft.world.storage.FolderName;
@@ -186,7 +188,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@SuppressWarnings("deprecation")
 	private OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
 	{
-		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
+		super(biomeProvider1, biomeProvider2, overrideStructureSettings(dimensionSettingsSupplier.get().structureSettings(), presetFolderName), seed);
 
 		if (!(biomeProvider1 instanceof ILayerSource))
 		{
@@ -213,6 +215,60 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
 		this.internalGenerator = new OTGChunkGenerator(this.preset, seed, (ILayerSource) biomeProvider1,((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName), OTG.getEngine().getLogger());
 		this.chunkDecorator = new OTGChunkDecorator();
+	}
+	
+	private static DimensionStructuresSettings overrideStructureSettings(DimensionStructuresSettings oldSettings, String presetFolderName)
+	{
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
+		IWorldConfig worldConfig = preset.getWorldConfig();
+
+		DimensionStructuresSettings newSettings = new DimensionStructuresSettings(
+			Optional.of(new StructureSpreadSettings(worldConfig.getStrongHoldDistance(), worldConfig.getStrongHoldSpread(), worldConfig.getStrongHoldCount())), 
+			Maps.newHashMap(
+				ImmutableMap.<Structure<?>, StructureSeparationSettings>builder()
+				.put(Structure.VILLAGE, new StructureSeparationSettings(worldConfig.getVillageSpacing(), worldConfig.getVillageSeparation(), 10387312))
+				.put(Structure.DESERT_PYRAMID, new StructureSeparationSettings(worldConfig.getDesertPyramidSpacing(), worldConfig.getDesertPyramidSeparation(), 14357617))
+				.put(Structure.IGLOO, new StructureSeparationSettings(worldConfig.getIglooSpacing(), worldConfig.getIglooSeparation(), 14357618))
+				.put(Structure.JUNGLE_TEMPLE, new StructureSeparationSettings(worldConfig.getJungleTempleSpacing(), worldConfig.getJungleTempleSeparation(), 14357619))
+				.put(Structure.SWAMP_HUT, new StructureSeparationSettings(worldConfig.getSwampHutSpacing(), worldConfig.getSwampHutSeparation(), 14357620))
+				.put(Structure.PILLAGER_OUTPOST, new StructureSeparationSettings(worldConfig.getPillagerOutpostSpacing(), worldConfig.getPillagerOutpostSeparation(), 165745296))
+				.put(Structure.STRONGHOLD, new StructureSeparationSettings(worldConfig.getStrongholdSpacing(), worldConfig.getStrongholdSeparation(), 0))
+				.put(Structure.OCEAN_MONUMENT, new StructureSeparationSettings(worldConfig.getOceanMonumentSpacing(), worldConfig.getOceanMonumentSeparation(), 10387313))
+				.put(Structure.END_CITY, new StructureSeparationSettings(worldConfig.getEndCitySpacing(), worldConfig.getEndCitySeparation(), 10387313))
+				.put(Structure.WOODLAND_MANSION, new StructureSeparationSettings(worldConfig.getWoodlandMansionSpacing(), worldConfig.getWoodlandMansionSeparation(), 10387319))
+				.put(Structure.BURIED_TREASURE, new StructureSeparationSettings(worldConfig.getBuriedTreasureSpacing(), worldConfig.getBuriedTreasureSeparation(), 0))
+				.put(Structure.MINESHAFT, new StructureSeparationSettings(worldConfig.getMineshaftSpacing(), worldConfig.getMineshaftSeparation(), 0))
+				.put(Structure.RUINED_PORTAL, new StructureSeparationSettings(worldConfig.getRuinedPortalSpacing(), worldConfig.getRuinedPortalSeparation(), 34222645))
+				.put(Structure.SHIPWRECK, new StructureSeparationSettings(worldConfig.getShipwreckSpacing(), worldConfig.getShipwreckSeparation(), 165745295))
+				.put(Structure.OCEAN_RUIN, new StructureSeparationSettings(worldConfig.getOceanRuinSpacing(), worldConfig.getOceanRuinSeparation(), 14357621))
+				.put(Structure.BASTION_REMNANT, new StructureSeparationSettings(worldConfig.getBastionRemnantSpacing(), worldConfig.getBastionRemnantSeparation(), 30084232))
+				.put(Structure.NETHER_BRIDGE, new StructureSeparationSettings(worldConfig.getNetherFortressSpacing(), worldConfig.getNetherFortressSeparation(), 30084232))
+				.put(Structure.NETHER_FOSSIL, new StructureSeparationSettings(worldConfig.getNetherFossilSpacing(), worldConfig.getNetherFossilSeparation(), 14357921))
+				.putAll(
+					oldSettings.structureConfig().entrySet().stream().filter(a -> 
+						a.getKey() != Structure.VILLAGE &&
+						a.getKey() != Structure.DESERT_PYRAMID &&
+						a.getKey() != Structure.IGLOO &&
+						a.getKey() != Structure.JUNGLE_TEMPLE &&
+						a.getKey() != Structure.SWAMP_HUT &&
+						a.getKey() != Structure.PILLAGER_OUTPOST &&
+						a.getKey() != Structure.STRONGHOLD &&
+						a.getKey() != Structure.OCEAN_MONUMENT &&
+						a.getKey() != Structure.END_CITY &&
+						a.getKey() != Structure.WOODLAND_MANSION &&
+						a.getKey() != Structure.BURIED_TREASURE &&
+						a.getKey() != Structure.MINESHAFT &&
+						a.getKey() != Structure.RUINED_PORTAL &&
+						a.getKey() != Structure.SHIPWRECK &&
+						a.getKey() != Structure.OCEAN_RUIN &&
+						a.getKey() != Structure.BASTION_REMNANT &&
+						a.getKey() != Structure.NETHER_BRIDGE &&
+						a.getKey() != Structure.NETHER_FOSSIL
+					).collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+				).build()
+			)
+		);
+		return newSettings;
 	}
 
 	public ICachedBiomeProvider getCachedBiomeProvider()

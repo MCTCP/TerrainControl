@@ -125,6 +125,46 @@ public interface IWorldConfig
 	public boolean getOceanMonumentsEnabled();
 	public boolean getRareBuildingsEnabled();
 
+	public int getVillageSpacing();
+	public int getVillageSeparation();
+	public int getDesertPyramidSpacing();
+	public int getDesertPyramidSeparation();
+	public int getIglooSpacing();
+	public int getIglooSeparation();
+	public int getJungleTempleSpacing();
+	public int getJungleTempleSeparation();
+	public int getSwampHutSpacing();
+	public int getSwampHutSeparation();
+	public int getPillagerOutpostSpacing();
+	public int getPillagerOutpostSeparation();
+	public int getStrongholdSpacing();
+	public int getStrongholdSeparation();
+	public int getStrongHoldDistance();
+	public int getStrongHoldSpread();
+	public int getStrongHoldCount();
+	public int getOceanMonumentSpacing();
+	public int getOceanMonumentSeparation();	
+	public int getWoodlandMansionSpacing();
+	public int getWoodlandMansionSeparation();
+	public int getBuriedTreasureSpacing();
+	public int getBuriedTreasureSeparation();
+	public int getMineshaftSpacing();
+	public int getMineshaftSeparation();
+	public int getRuinedPortalSpacing();
+	public int getRuinedPortalSeparation();
+	public int getShipwreckSpacing();
+	public int getShipwreckSeparation();
+	public int getOceanRuinSpacing();
+	public int getOceanRuinSeparation();	
+	public int getEndCitySpacing();
+	public int getEndCitySeparation();
+	public int getBastionRemnantSpacing();
+	public int getBastionRemnantSeparation();
+	public int getNetherFortressSpacing();
+	public int getNetherFortressSeparation();
+	public int getNetherFossilSpacing();
+	public int getNetherFossilSeparation();
+	
 	// OTG Custom structures
 
 	public String getBO3AtSpawn();
@@ -186,9 +226,7 @@ public interface IWorldConfig
 	public int getSpawnPointX();
 	public int getSpawnPointY();
 	public int getSpawnPointZ();
-	public float getSpawnPointAngle();
-	
-	// Game rules
+	public float getSpawnPointAngle();	
 	
 	// Game rules
 	

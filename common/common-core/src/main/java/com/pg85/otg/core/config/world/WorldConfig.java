@@ -248,6 +248,46 @@ public class WorldConfig extends WorldConfigBase
 
 		// Vanilla structures
 
+		this.villageSpacing = reader.getSetting(WorldStandardValues.VILLAGE_SPACING, logger);
+		this.villageSeparation = reader.getSetting(WorldStandardValues.VILLAGE_SEPARATION, logger);
+		this.desertPyramidSpacing = reader.getSetting(WorldStandardValues.DESERTPYRAMID_SPACING, logger);
+		this.desertPyramidSeparation = reader.getSetting(WorldStandardValues.DESERTPYRAMID_SEPARATION, logger);
+		this.iglooSpacing = reader.getSetting(WorldStandardValues.IGLOO_SPACING, logger);
+		this.iglooSeparation = reader.getSetting(WorldStandardValues.IGLOO_SEPARATION, logger);
+		this.jungleTempleSpacing = reader.getSetting(WorldStandardValues.JUNGLETEMPLE_SPACING, logger);
+		this.jungleTempleSeparation = reader.getSetting(WorldStandardValues.JUNGLETEMPLE_SEPARATION, logger);
+		this.swampHutSpacing = reader.getSetting(WorldStandardValues.SWAMPHUT_SPACING, logger);
+		this.swampHutSeparation = reader.getSetting(WorldStandardValues.SWAMPHUT_SEPARATION, logger);
+		this.pillagerOutpostSpacing = reader.getSetting(WorldStandardValues.PILLAGEROUTPOST_SPACING, logger);
+		this.pillagerOutpostSeparation = reader.getSetting(WorldStandardValues.PILLAGEROUTPOST_SEPARATION, logger);
+		this.strongholdSpacing = reader.getSetting(WorldStandardValues.STRONGHOLD_SPACING, logger);
+		this.strongholdSeparation = reader.getSetting(WorldStandardValues.STRONGHOLD_SEPARATION, logger);
+		this.strongholdDistance = reader.getSetting(WorldStandardValues.STRONGHOLD_DISTANCE, logger);
+		this.strongholdSpread = reader.getSetting(WorldStandardValues.STRONGHOLD_SPREAD, logger);
+		this.strongholdCount = reader.getSetting(WorldStandardValues.STRONGHOLD_COUNT, logger);
+		this.oceanMonumentSpacing = reader.getSetting(WorldStandardValues.OCEANMONUMENT_SPACING, logger);
+		this.oceanMonumentSeparation = reader.getSetting(WorldStandardValues.OCEANMONUMENT_SEPARATION, logger);
+		this.endCitySpacing = reader.getSetting(WorldStandardValues.ENDCITY_SPACING, logger);
+		this.endCitySeparation = reader.getSetting(WorldStandardValues.ENDCITY_SEPARATION, logger);
+		this.woodlandMansionSpacing = reader.getSetting(WorldStandardValues.WOODLANDMANSION_SPACING, logger);
+		this.woodlandMansionSeparation = reader.getSetting(WorldStandardValues.WOODLANDMANSION_SEPARATION, logger);
+		this.buriedTreasureSpacing = reader.getSetting(WorldStandardValues.BURIEDTREASURE_SPACING, logger);
+		this.buriedTreasureSeparation = reader.getSetting(WorldStandardValues.BURIEDTREASURE_SEPARATION, logger);
+		this.mineshaftSpacing = reader.getSetting(WorldStandardValues.MINESHAFT_SPACING, logger);
+		this.mineshaftSeparation = reader.getSetting(WorldStandardValues.MINESHAFT_SEPARATION, logger);
+		this.ruinedPortalSpacing = reader.getSetting(WorldStandardValues.RUINEDPORTAL_SPACING, logger);
+		this.ruinedPortalSeparation = reader.getSetting(WorldStandardValues.RUINEDPORTAL_SEPARATION, logger);
+		this.shipwreckSpacing = reader.getSetting(WorldStandardValues.SHIPWRECK_SPACING, logger);
+		this.shipwreckSeparation = reader.getSetting(WorldStandardValues.SHIPWRECK_SEPARATION, logger);
+		this.oceanRuinSpacing = reader.getSetting(WorldStandardValues.OCEANRUIN_SPACING, logger);
+		this.oceanRuinSeparation = reader.getSetting(WorldStandardValues.OCEANRUIN_SEPARATION, logger);
+		this.bastionRemnantSpacing = reader.getSetting(WorldStandardValues.BASTIONREMNANT_SPACING, logger);
+		this.bastionRemnantSeparation = reader.getSetting(WorldStandardValues.BASTIONREMNANT_SEPARATION, logger);
+		this.netherFortressSpacing = reader.getSetting(WorldStandardValues.NETHERFORTRESS_SPACING, logger);
+		this.netherFortressSeparation = reader.getSetting(WorldStandardValues.NETHERFORTRESS_SEPARATION, logger);
+		this.netherFossilSpacing = reader.getSetting(WorldStandardValues.NETHERFOSSIL_SPACING, logger);
+		this.netherFossilSeparation = reader.getSetting(WorldStandardValues.NETHERFOSSIL_SEPARATION, logger);
+		
 		this.woodlandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger);
 		this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger);
 		this.buriedTreasureEnabled = reader.getSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, logger);
@@ -255,9 +295,9 @@ public class WorldConfig extends WorldConfigBase
 		this.pillagerOutpostsEnabled = reader.getSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, logger);
 		this.bastionRemnantsEnabled = reader.getSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, logger);
 		this.netherFossilsEnabled = reader.getSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, logger);
-		this.endCitiesEndabled = reader.getSetting(WorldStandardValues.END_CITIES_ENABLED, logger);
-		this.ruinedPortalsEndabled = reader.getSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, logger);
-		this.shipWrecksEndabled = reader.getSetting(WorldStandardValues.SHIPWRECKS_ENABLED, logger);
+		this.endCitiesEnabled = reader.getSetting(WorldStandardValues.END_CITIES_ENABLED, logger);
+		this.ruinedPortalsEnabled = reader.getSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, logger);
+		this.shipWrecksEnabled = reader.getSetting(WorldStandardValues.SHIPWRECKS_ENABLED, logger);
 		this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger);
 		this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger);		
 		this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger);
@@ -764,26 +804,66 @@ public class WorldConfig extends WorldConfigBase
 		// Structures
 
 		writer.header1("Structures",
-			"The settings are global on/off toggles for the entire world for each vanilla structure type.",
+			"These are global on/off toggles and spacing/separation settings for the entire world for each",
+			"vanilla structure type. Spacing/separation work the same way as they do for datapacks.",
 			"When set to true, structures configured in biome configs are able to spawn.",
-			"Check the biome configs for customisation options per structure type (size/rarity etc)."
+			"Check the biome configs for customisation options per structure type per biome (size etc)."
 		);
-
+	
 		writer.putSetting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled);
+		writer.putSetting(WorldStandardValues.VILLAGE_SPACING, this.villageSpacing);
+		writer.putSetting(WorldStandardValues.VILLAGE_SEPARATION, this.villageSeparation);		
 		writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
+		writer.putSetting(WorldStandardValues.MINESHAFT_SPACING, this.mineshaftSpacing);
+		writer.putSetting(WorldStandardValues.MINESHAFT_SEPARATION, this.mineshaftSeparation);
 		writer.putSetting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled);
+		writer.putSetting(WorldStandardValues.STRONGHOLD_SPACING, this.strongholdSpacing);
+		writer.putSetting(WorldStandardValues.STRONGHOLD_SEPARATION, this.strongholdSeparation);
+		writer.putSetting(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance);
+		writer.putSetting(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread);
+		writer.putSetting(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount);
 		writer.putSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled);		
+		writer.putSetting(WorldStandardValues.DESERTPYRAMID_SPACING, this.desertPyramidSpacing);
+		writer.putSetting(WorldStandardValues.DESERTPYRAMID_SEPARATION, this.desertPyramidSeparation);
+		writer.putSetting(WorldStandardValues.IGLOO_SPACING, this.iglooSpacing);
+		writer.putSetting(WorldStandardValues.IGLOO_SEPARATION, this.iglooSeparation);
+		writer.putSetting(WorldStandardValues.JUNGLETEMPLE_SPACING, this.jungleTempleSpacing);
+		writer.putSetting(WorldStandardValues.JUNGLETEMPLE_SEPARATION, this.jungleTempleSeparation);
+		writer.putSetting(WorldStandardValues.SWAMPHUT_SPACING, this.swampHutSpacing);
+		writer.putSetting(WorldStandardValues.SWAMPHUT_SEPARATION, this.swampHutSeparation);		
 		writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodlandMansionsEnabled);
-		writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled);		
-		writer.putSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);				
+		writer.putSetting(WorldStandardValues.WOODLANDMANSION_SPACING, this.woodlandMansionSpacing);
+		writer.putSetting(WorldStandardValues.WOODLANDMANSION_SEPARATION, this.woodlandMansionSeparation);		
+		writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled);	
+		writer.putSetting(WorldStandardValues.OCEANMONUMENT_SPACING, this.oceanMonumentSpacing);
+		writer.putSetting(WorldStandardValues.OCEANMONUMENT_SEPARATION, this.oceanMonumentSeparation);		
+		writer.putSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);
+		writer.putSetting(WorldStandardValues.NETHERFORTRESS_SPACING, this.netherFortressSpacing);
+		writer.putSetting(WorldStandardValues.NETHERFORTRESS_SEPARATION, this.netherFortressSeparation);		
 		writer.putSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, this.buriedTreasureEnabled);
+		writer.putSetting(WorldStandardValues.BURIEDTREASURE_SPACING, this.buriedTreasureSpacing);
+		writer.putSetting(WorldStandardValues.BURIEDTREASURE_SEPARATION, this.buriedTreasureSeparation);		
 		writer.putSetting(WorldStandardValues.OCEAN_RUINS_ENABLED, this.oceanRuinsEnabled);
+		writer.putSetting(WorldStandardValues.OCEANRUIN_SPACING, this.oceanRuinSpacing);
+		writer.putSetting(WorldStandardValues.OCEANRUIN_SEPARATION, this.oceanRuinSeparation);		
 		writer.putSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, this.pillagerOutpostsEnabled);
+		writer.putSetting(WorldStandardValues.PILLAGEROUTPOST_SPACING, this.pillagerOutpostSpacing);
+		writer.putSetting(WorldStandardValues.PILLAGEROUTPOST_SEPARATION, this.pillagerOutpostSeparation);		
 		writer.putSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, this.bastionRemnantsEnabled);
+		writer.putSetting(WorldStandardValues.BASTIONREMNANT_SPACING, this.bastionRemnantSpacing);
+		writer.putSetting(WorldStandardValues.BASTIONREMNANT_SEPARATION, this.bastionRemnantSeparation);		
 		writer.putSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, this.netherFossilsEnabled);
-		writer.putSetting(WorldStandardValues.END_CITIES_ENABLED, this.endCitiesEndabled);
-		writer.putSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, this.ruinedPortalsEndabled);
-		writer.putSetting(WorldStandardValues.SHIPWRECKS_ENABLED, this.shipWrecksEndabled);
+		writer.putSetting(WorldStandardValues.NETHERFOSSIL_SPACING, this.netherFossilSpacing);
+		writer.putSetting(WorldStandardValues.NETHERFOSSIL_SEPARATION, this.netherFossilSeparation);				
+		writer.putSetting(WorldStandardValues.END_CITIES_ENABLED, this.endCitiesEnabled);
+		writer.putSetting(WorldStandardValues.ENDCITY_SPACING, this.endCitySpacing);
+		writer.putSetting(WorldStandardValues.ENDCITY_SEPARATION, this.endCitySeparation);		
+		writer.putSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, this.ruinedPortalsEnabled);
+		writer.putSetting(WorldStandardValues.RUINEDPORTAL_SPACING, this.ruinedPortalSpacing);
+		writer.putSetting(WorldStandardValues.RUINEDPORTAL_SEPARATION, this.ruinedPortalSeparation);		
+		writer.putSetting(WorldStandardValues.SHIPWRECKS_ENABLED, this.shipWrecksEnabled);
+		writer.putSetting(WorldStandardValues.SHIPWRECK_SPACING, this.shipwreckSpacing);
+		writer.putSetting(WorldStandardValues.SHIPWRECK_SEPARATION, this.shipwreckSeparation);		
 		
 		writer.header2("OTG Custom structures and objects (BO2/BO3/BO4)");
 		
