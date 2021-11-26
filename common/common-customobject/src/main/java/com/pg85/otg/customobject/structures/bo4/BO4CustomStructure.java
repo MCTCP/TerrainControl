@@ -853,7 +853,7 @@ public class BO4CustomStructure extends CustomStructure
 					Stack<BranchDataItem> collidingBranches = null;
 					if(canSpawn)
 					{
-						if(!minimumSize && worldGenRegion.chunkHasDefaultStructure(this.worldRandom, childBranchDataItem.chunkCoordinate))
+						if(!minimumSize && !this.isStructureAtSpawn && worldGenRegion.chunkHasDefaultStructure(this.worldRandom, childBranchDataItem.chunkCoordinate))
 						{
 							chunkIsIneligible = true;
 							canSpawn = false;
