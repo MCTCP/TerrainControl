@@ -1360,12 +1360,13 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 	}
 
-	private int bo4DataVersion = 2;
+	private int bo4DataVersion = 3;
 	void writeToStream(DataOutput stream, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
 	{
 		// TODO: Create new bo4data verison, add doFixedRotation and fixedRotation.
-		
-		stream.writeInt(this.bo4DataVersion);		
+		stream.writeInt(this.bo4DataVersion);
+		// Version 3 added fixedRotation
+		StreamHelper.writeStringToStream(stream, this.fixedRotation == null ? null : this.fixedRotation.toString());
 		stream.writeInt(this.minimumSizeTop);
 		stream.writeInt(this.minimumSizeBottom);
 		stream.writeInt(this.minimumSizeLeft);
@@ -1577,8 +1578,6 @@ public class BO4Config extends CustomObjectConfigFile
 
 	private BO4Config readFromBO4DataFile(boolean getBlocks, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
 	{
-		// TODO: Create new bo4data verison, add doFixedRotation and fixedRotation.  
-		
 		FileInputStream fis;
 		ByteBuffer bufferCompressed = null;
 		ByteBuffer bufferDecompressed = null;
@@ -1603,7 +1602,8 @@ public class BO4Config extends CustomObjectConfigFile
 				boolean isBO4Data = true;
 				boolean inheritedBO3Loaded = true;
 				int bo4DataVersion = bufferDecompressed.getInt();
-				if(bo4DataVersion != this.bo4DataVersion)
+				// Version 2 made breaking changes
+				if(bo4DataVersion < 2)
 				{
 					// TODO: Should only need to close the reader?
 					if(bufferCompressed != null)
@@ -1630,6 +1630,13 @@ public class BO4Config extends CustomObjectConfigFile
 					}
 					throw new InvalidConfigException("Could not read BO4Data file " + this.reader.getName() + ", it is outdated. Delete and re-export BO4Data files to fix this, or delete and reinstall your OTG preset.");
 				}
+				// Version 3 added fixedRotation
+				if(bo4DataVersion > 2)
+				{
+					String rotationString = StreamHelper.readStringFromBuffer(bufferDecompressed);
+					this.fixedRotation = rotationString == null ? null : Rotation.FromString(rotationString);
+				}
+
 				int minimumSizeTop = bufferDecompressed.getInt();
 				int minimumSizeBottom = bufferDecompressed.getInt();
 				int minimumSizeLeft = bufferDecompressed.getInt();

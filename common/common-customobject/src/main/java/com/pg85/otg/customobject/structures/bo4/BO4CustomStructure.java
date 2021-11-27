@@ -175,9 +175,8 @@ public class BO4CustomStructure extends CustomStructure
 		this.smoothingAreaManager.fillSmoothingLineCaches(smoothingAreasToSpawn);
 		this.minY = minY;
 	}
-	
-	BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
-	{
+
+	public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)	{
 		this.isStructureAtSpawn = false;
 
 		if(start == null)
@@ -455,8 +454,7 @@ public class BO4CustomStructure extends CustomStructure
 	 * If this structure were spawned as small as possible (with branchDepth 0)
 	 * @throws InvalidConfigException
 	 */
-	Object[] getMinimumSize(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
-	{
+	public Object[] getMinimumSize(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException	{
 		BO4 bo4 = ((BO4)this.start.getObject(otgRootFolder, logger, customObjectManager, materialReader, manager, modLoadedChecker));
 		BO4Config bo4Config = bo4.getConfig();
 		if(

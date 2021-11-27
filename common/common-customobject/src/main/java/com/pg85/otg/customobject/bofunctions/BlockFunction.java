@@ -87,10 +87,9 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 
 				if (nbt.getTag("Item") != null) {
 					if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_String) {
-						String val = (String) nbt.getTag("Item").getValue();
-						this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
-					} else if (nbt.getTag("Item").getType() == NamedBinaryTag.Type.TAG_Int) {
-						String val = materialReader.readMaterial(Integer.toString(((int)nbt.getTag("Item").getValue()))).getName();
+						String val1 = (String) nbt.getTag("Item").getValue();
+						String[] vals = val1.split(":");
+						this.material = materialReader.readMaterial("minecraft:potted_" + (vals.length > 1 ? vals[1] : val1));						String val = materialReader.readMaterial(Integer.toString(((int)nbt.getTag("Item").getValue()))).getName();
 						if (val.split(":").length > 1) {
 							this.material = materialReader.readMaterial("minecraft:potted_" + val.split(":")[1]);
 						} else {
