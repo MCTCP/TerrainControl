@@ -670,11 +670,15 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 		} else {
 			// Create entity with nbt data
-			entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) ->
+			try
 			{
-				entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
-				return entity1;
-			});
+				entity = EntityType.loadEntityRecursive(nbtTagCompound, this.worldGenRegion.getLevel(), (entity1) ->
+				{
+					entity1.moveTo(entityData.getX(), entityData.getY(), entityData.getZ(), this.getWorldRandom().nextFloat() * 360.0F, 0.0F);
+					return entity1;
+				});
+			}
+			catch(Exception ex) { }
 			if (entity == null)
 			{
 				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
