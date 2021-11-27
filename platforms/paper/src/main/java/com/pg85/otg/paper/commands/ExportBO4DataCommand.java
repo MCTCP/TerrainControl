@@ -71,9 +71,9 @@ public class ExportBO4DataCommand extends BaseCommand
         		isDone = false;
         		isRunning = true;
 	        	sender.sendMessage("Exporting .BO4Data files for world, this may take a while.");
+	        	sender.sendMessage("Run this command again to see progress or check the logs.");	        	
         		new Thread(() -> {
-		            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Initializing and exporting structure starts");
-		            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Run this command again to see progress or check the logs.");
+		            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Initializing and exporting structure starts");		            
 
 			        // Make sure all structure starts in the world have been initialised
 			        // so that getMinimumSize has been done and its data can be saved with the BO4Data.
