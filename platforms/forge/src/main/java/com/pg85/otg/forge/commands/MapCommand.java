@@ -322,7 +322,7 @@ public class MapCommand extends BaseCommand
 		
 		private void getTerrainPixel(BlockPos2D chunkCoords)
 		{
-			ForgeChunkBuffer chunk = this.generator.getChunkWithoutLoadingOrCaching(this.source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z));
+			ForgeChunkBuffer chunk = this.generator.getChunkWithoutLoadingOrCaching(this.source.getLevel().getRandom(), ChunkCoordinate.fromChunkCoords(chunkCoords.x, chunkCoords.z), this.source.getLevel());
 			HighestBlockInfo highestBlockInfo;
 			for (int internalX = 0; internalX < 16; internalX++)
 			{

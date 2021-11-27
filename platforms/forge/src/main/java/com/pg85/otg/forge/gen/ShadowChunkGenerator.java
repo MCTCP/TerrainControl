@@ -160,9 +160,9 @@ public class ShadowChunkGenerator
 		}
 	}
 
-	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
+	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate, ServerLevel level)
 	{
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
+		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level);
 		ForgeChunkBuffer buffer = new ForgeChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -328,7 +328,7 @@ public class ShadowChunkGenerator
 			}			
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null);
+				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld);
 				chunkpos = chunk.getPos();
 
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
@@ -387,9 +387,9 @@ public class ShadowChunkGenerator
 	// resources used for worldgen or bo4 shadowgen, since the chunks aren't actually supposed to generate in the world.
 	// We won't get any density based smoothing applied to noisegen for vanilla structures, but that's ok for /otg mapterrain.
 
-	public ForgeChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
+	public ForgeChunkBuffer getChunkWithoutLoadingOrCaching(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate, ServerLevel level)
 	{
-		return getUnloadedChunk(otgChunkGenerator, worldHeightCap, random, chunkCoordinate);
+		return getUnloadedChunk(otgChunkGenerator, worldHeightCap, random, chunkCoordinate, level);
 	}
 
 	// BO4's / Smoothing Areas
@@ -399,7 +399,7 @@ public class ShadowChunkGenerator
 	// Async worker threads may also pre-emptively shadowgen and cache unloaded chunks, which speeds up base terrain generation but also BO4's.
 	// Note: BO4's are always processed on the worldgen thread, never on a worker thread, since they are not a part of base terrain generation.
 
-	private LocalMaterialData[] getBlockColumnInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z)
+	private LocalMaterialData[] getBlockColumnInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, ServerLevel level)
 	{
 		BlockPos2D blockPos = new BlockPos2D(x, z);
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
@@ -419,7 +419,7 @@ public class ShadowChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without loading/decorating it
-			chunk = getUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, chunkCoord).getChunk();
+			chunk = getUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, chunkCoord, level).getChunk();
 			synchronized(this.workerLock)
 			{
 				this.unloadedChunksCache.put(chunkCoord, chunk);
@@ -447,17 +447,17 @@ public class ShadowChunkGenerator
 		return blocksInColumn;
 	}
 
-	public LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z)
+	public LocalMaterialData getMaterialInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int y, int z, ServerLevel level)
 	{
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z, level);
 		return blockColumn[y];
 	}
 
-	public int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	public int getHighestBlockYInUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random worldRandom, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ServerLevel level)
 	{
 		int height = -1;
 
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z);
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(otgChunkGenerator, worldHeightCap, worldRandom, x, z, level);
 		ForgeMaterialData material;
 		boolean isLiquid;
 		boolean isSolid;
@@ -559,7 +559,7 @@ public class ShadowChunkGenerator
 					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords, this.otgChunkGenerator.getCachedBiomeProvider()))
 					{
 						// Generate a chunk without loading/decorating it.
-						ChunkAccess cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
+						ChunkAccess cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords, this.serverWorld.getLevel()).getChunk();
 						synchronized(workerLock)
 						{
 							this.unloadedChunksCache.put(coords, cachedChunk);

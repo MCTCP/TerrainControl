@@ -38,7 +38,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 public class OTGTeleporter implements ITeleporter
 {
@@ -288,7 +288,7 @@ public class OTGTeleporter implements ITeleporter
 						axis = Direction.Axis.X;
 						vector3d = new Vec3(0.5D, 0.0D, 0.0D);
 					}					
-					return PortalShape.createPortalInfo(destWorld, result, axis, vector3d, entity.getDimensions(entity.getPose()), entity.getDeltaMovement(), entity.yRot, entity.xRot);
+					return PortalShape.createPortalInfo(destWorld, result, axis, vector3d, entity.getDimensions(entity.getPose()), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
 				}
 			).orElse(null);
 		}
