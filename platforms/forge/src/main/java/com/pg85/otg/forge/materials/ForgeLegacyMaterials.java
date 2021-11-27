@@ -5,87 +5,87 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.BlockNames;
 
-import net.minecraft.block.AnvilBlock;
-import net.minecraft.block.BannerBlock;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.BeetrootBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.BrewingStandBlock;
-import net.minecraft.block.CactusBlock;
-import net.minecraft.block.CakeBlock;
-import net.minecraft.block.CarrotBlock;
-import net.minecraft.block.CarvedPumpkinBlock;
-import net.minecraft.block.CauldronBlock;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.block.ComparatorBlock;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.DaylightDetectorBlock;
-import net.minecraft.block.DetectorRailBlock;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.block.DropperBlock;
-import net.minecraft.block.EndPortalFrameBlock;
-import net.minecraft.block.EndRodBlock;
-import net.minecraft.block.EnderChestBlock;
-import net.minecraft.block.FarmlandBlock;
-import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.FireBlock;
-import net.minecraft.block.FurnaceBlock;
-import net.minecraft.block.GlazedTerracottaBlock;
-import net.minecraft.block.HayBlock;
-import net.minecraft.block.HopperBlock;
-import net.minecraft.block.HugeMushroomBlock;
-import net.minecraft.block.JukeboxBlock;
-import net.minecraft.block.LadderBlock;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.block.NetherWartBlock;
-import net.minecraft.block.ObserverBlock;
-import net.minecraft.block.PistonBlock;
-import net.minecraft.block.PistonHeadBlock;
-import net.minecraft.block.PotatoBlock;
-import net.minecraft.block.PoweredRailBlock;
-import net.minecraft.block.PressurePlateBlock;
-import net.minecraft.block.RailBlock;
-import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.block.RedstoneWallTorchBlock;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.block.RepeaterBlock;
-import net.minecraft.block.RotatedPillarBlock;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.block.SnowBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.block.StandingSignBlock;
-import net.minecraft.block.StemBlock;
-import net.minecraft.block.StoneButtonBlock;
-import net.minecraft.block.StructureBlock;
-import net.minecraft.block.SugarCaneBlock;
-import net.minecraft.block.TrapDoorBlock;
-import net.minecraft.block.TrappedChestBlock;
-import net.minecraft.block.TripWireBlock;
-import net.minecraft.block.TripWireHookBlock;
-import net.minecraft.block.VineBlock;
-import net.minecraft.block.WallBannerBlock;
-import net.minecraft.block.WallSignBlock;
-import net.minecraft.block.WallTorchBlock;
-import net.minecraft.block.WeightedPressurePlateBlock;
-import net.minecraft.block.WoodButtonBlock;
-import net.minecraft.state.properties.AttachFace;
-import net.minecraft.state.properties.BedPart;
-import net.minecraft.state.properties.ComparatorMode;
-import net.minecraft.state.properties.DoorHingeSide;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.state.properties.Half;
-import net.minecraft.state.properties.PistonType;
-import net.minecraft.state.properties.RailShape;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.state.properties.StructureMode;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.AnvilBlock;
+import net.minecraft.world.level.block.BannerBlock;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.BeetrootBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BrewingStandBlock;
+import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.level.block.CakeBlock;
+import net.minecraft.world.level.block.CarrotBlock;
+import net.minecraft.world.level.block.CarvedPumpkinBlock;
+import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.CocoaBlock;
+import net.minecraft.world.level.block.ComparatorBlock;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.DaylightDetectorBlock;
+import net.minecraft.world.level.block.DetectorRailBlock;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DropperBlock;
+import net.minecraft.world.level.block.EndPortalFrameBlock;
+import net.minecraft.world.level.block.EndRodBlock;
+import net.minecraft.world.level.block.EnderChestBlock;
+import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.FurnaceBlock;
+import net.minecraft.world.level.block.GlazedTerracottaBlock;
+import net.minecraft.world.level.block.HayBlock;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.HugeMushroomBlock;
+import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.level.block.NetherWartBlock;
+import net.minecraft.world.level.block.ObserverBlock;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
+import net.minecraft.world.level.block.PotatoBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.PressurePlateBlock;
+import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RepeaterBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.StandingSignBlock;
+import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.StoneButtonBlock;
+import net.minecraft.world.level.block.StructureBlock;
+import net.minecraft.world.level.block.SugarCaneBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.TrappedChestBlock;
+import net.minecraft.world.level.block.TripWireBlock;
+import net.minecraft.world.level.block.TripWireHookBlock;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.WallBannerBlock;
+import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.block.WeightedPressurePlateBlock;
+import net.minecraft.world.level.block.WoodButtonBlock;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.ComparatorMode;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.PistonType;
+import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.block.state.properties.StructureMode;
+import net.minecraft.core.Direction;
 
 // Converts any (1.12.2 or lower) legacy block names/ids + data to the new (1.16) format.
 // TODO: Can probably use some Forge method to convert data to the new format, don't do it all manually?
@@ -144,38 +144,38 @@ class ForgeLegacyMaterials
 
 			case "wood_stairs":
 			case "oak_stairs":
-				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "birch_wood_stairs":
 			case "birch_stairs":
-				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "spruce_wood_stairs":
 			case "spruce_stairs":
-				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "jungle_wood_stairs":				
 			case "jungle_stairs":
-				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "cobblestone_stairs":
 			case "stone_stairs":
-				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "nether_brick_stairs":
-				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "sandstone_stairs":
-				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "quartz_stairs":
-				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "acacia_stairs":
-				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "dark_oak_stairs":
-				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "red_sandstone_stairs":
-				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "purpur_stairs":
-				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			case "brick_stairs":
-				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);				
+				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);				
 			case "stone_brick_stairs":
 			case "smooth_stairs":
-				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST);
 			
 			case "quartz_ore":
 				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
@@ -1086,7 +1086,7 @@ class ForgeLegacyMaterials
 				case "iron_plate":
 					return Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE.defaultBlockState().setValue(WeightedPressurePlateBlock.POWER, data);
 				case "snow_layer":
-					return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, data);
+					return Blocks.SNOW.defaultBlockState().setValue(SnowLayerBlock.LAYERS, data);
 				case "cactus":
 					return Blocks.CACTUS.defaultBlockState().setValue(CactusBlock.AGE, data);
 				case "reeds":
@@ -1095,7 +1095,7 @@ class ForgeLegacyMaterials
 					return Blocks.JUKEBOX.defaultBlockState().setValue(JukeboxBlock.HAS_RECORD, data == 1);
 				case "wheat":
 				case "crops":
-					return Blocks.WHEAT.defaultBlockState().setValue(CropsBlock.AGE, data);
+					return Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, data);
 				case "carrot":
 				case "carrots":
 					return Blocks.CARROTS.defaultBlockState().setValue(CarrotBlock.AGE, data);
@@ -1107,7 +1107,7 @@ class ForgeLegacyMaterials
 					return Blocks.BEETROOTS.defaultBlockState().setValue(BeetrootBlock.AGE, data);
 				case "farmland":
 				case "soil":
-					return Blocks.FARMLAND.defaultBlockState().setValue(FarmlandBlock.MOISTURE, data);
+					return Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, data);
 				case "anvil":
 					return getAnvilWithData(0, data);
 				case "log":
@@ -1296,7 +1296,7 @@ class ForgeLegacyMaterials
 					return getRepeaterWithData(1, data);
 				case "redstone":
 				case "redstone_wire":
-					return Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedstoneWireBlock.POWER, data);
+					return Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.POWER, data);
 				case "redstone_comparator_off":
 				case "comparator":
 					return getComparatorWithData(0, data);
@@ -1633,8 +1633,8 @@ class ForgeLegacyMaterials
 				return null;
 		}
 		return output
-			.setValue(StairsBlock.FACING, getFacingEastWestSouthNorth(facing))
-			.setValue(StairsBlock.HALF, half == 0 ? Half.BOTTOM : Half.TOP);
+			.setValue(StairBlock.FACING, getFacingEastWestSouthNorth(facing))
+			.setValue(StairBlock.HALF, half == 0 ? Half.BOTTOM : Half.TOP);
 	}
 	
 	private static BlockState getLeverOrButtonWithData(int material, int data)
@@ -1942,9 +1942,9 @@ class ForgeLegacyMaterials
 		switch(material)
 		{
 			case 0:
-				return Blocks.PISTON.defaultBlockState().setValue(PistonBlock.EXTENDED, extended == 1).setValue(PistonBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
+				return Blocks.PISTON.defaultBlockState().setValue(PistonBaseBlock.EXTENDED, extended == 1).setValue(PistonBaseBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
 			case 1:				
-				return Blocks.STICKY_PISTON.defaultBlockState().setValue(PistonBlock.EXTENDED, extended == 1).setValue(PistonBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
+				return Blocks.STICKY_PISTON.defaultBlockState().setValue(PistonBaseBlock.EXTENDED, extended == 1).setValue(PistonBaseBlock.FACING, getFacingDownUpNorthSouthWestEast(facing));
 			default:
 				return null;
 		}

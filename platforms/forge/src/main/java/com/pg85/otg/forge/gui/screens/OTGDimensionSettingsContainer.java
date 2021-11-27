@@ -2,14 +2,14 @@ package com.pg85.otg.forge.gui.screens;
 
 import com.pg85.otg.config.dimensions.DimensionConfig;
 
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 
 public class OTGDimensionSettingsContainer
 {
 	public DimensionConfig dimensionConfig;
-	public DimensionGeneratorSettings dimGenSettings;
+	public WorldGenSettings dimGenSettings;
 	
-	public OTGDimensionSettingsContainer(DimensionConfig dimensionConfig, DimensionGeneratorSettings dimGenSettings)
+	public OTGDimensionSettingsContainer(DimensionConfig dimensionConfig, WorldGenSettings dimGenSettings)
 	{
 		this.dimensionConfig = dimensionConfig;
 		this.dimGenSettings = dimGenSettings;

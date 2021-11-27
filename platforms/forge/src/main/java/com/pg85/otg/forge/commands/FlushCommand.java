@@ -6,9 +6,9 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
 
 public class FlushCommand extends BaseCommand
 {	
@@ -20,24 +20,24 @@ public class FlushCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("flush")
 			.executes(context -> flushCache(context.getSource()))
 		);
 	}
 	
-	protected int flushCache(CommandSource source)
+	protected int flushCache(CommandSourceStack source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 
 		OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Unloading BO2/BO3/BO4 files");
 		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
-		source.sendSuccess(new StringTextComponent("Objects unloaded."), false);
+		source.sendSuccess(new TextComponent("Objects unloaded."), false);
 		return 0;
 	}
 }

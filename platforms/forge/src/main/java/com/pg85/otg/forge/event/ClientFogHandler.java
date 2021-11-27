@@ -9,14 +9,14 @@ import com.pg85.otg.forge.network.BiomeSettingSyncWrapper;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.util.helpers.MathHelper;
 
-import net.minecraft.client.GameSettings;
+import net.minecraft.client.Options;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.FogRenderer.FogType;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.FogRenderer.FogMode;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,9 +43,9 @@ public class ClientFogHandler
 	public static void onRenderFog(EntityViewRenderEvent.RenderFogEvent event)
 	{
 		Entity entity = event.getInfo().getEntity();
-		GameSettings settings = Minecraft.getInstance().options;
+		Options settings = Minecraft.getInstance().options;
 
-		if (!(entity instanceof ClientPlayerEntity))
+		if (!(entity instanceof LocalPlayer))
 		{
 			resetFogDistance(Minecraft.getInstance(), event.getType());
 			return;
@@ -86,7 +86,7 @@ public class ClientFogHandler
 		boolean hasMoved = posX != lastX || posZ != lastZ;
 		float biomeFogDistance = 0.0F;
 		float weightBiomeFog = 0.0f;
-		BlockPos.Mutable blockPos = new BlockPos.Mutable(0, 0, 0);
+		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(0, 0, 0);
 		float fogDensity;
 		float densityWeight;
 		double differenceX;
@@ -137,7 +137,7 @@ public class ClientFogHandler
 		float fogDistanceScale = (fogDistanceScaleBiome * weightBiomeFog + 1f * weightDefault) / weightMixed;
 
 		float finalFogDistance = Math.min(fogDistance, event.getFarPlaneDistance());
-		float fogStart = event.getType() == FogType.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
+		float fogStart = event.getType() == FogMode.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
 
 		// set cache values
 		lastX = posX;
@@ -149,7 +149,7 @@ public class ClientFogHandler
 		GL11.glFogf(GL11.GL_FOG_END, finalFogDistance);
 	}
 
-	private static void resetFogDistance(Minecraft minecraft, FogType type)
+	private static void resetFogDistance(Minecraft minecraft, FogMode type)
 	{
 		if (otgDidLastFogRender)
 		{
@@ -159,7 +159,7 @@ public class ClientFogHandler
 			otgDidLastFogRender = false;
 			float farPlaneDistance = (float) (minecraft.options.renderDistance * 16);
 
-			if (type == FogType.FOG_SKY)
+			if (type == FogMode.FOG_SKY)
 			{
 				GL11.glFogf(GL11.GL_FOG_START, 0.0f);
 			} else
@@ -189,7 +189,7 @@ public class ClientFogHandler
 	}
 
 	@SuppressWarnings("resource")
-	private static float getFogDensity(int x, int z, BlockPos.Mutable blockpos, boolean hasMoved)
+	private static float getFogDensity(int x, int z, BlockPos.MutableBlockPos blockpos, boolean hasMoved)
 	{
 		float density = fogDensityCache[x][z];
 

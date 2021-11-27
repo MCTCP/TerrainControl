@@ -2,12 +2,12 @@ package com.pg85.otg.forge.dimensions.portals;
 
 import com.pg85.otg.constants.Constants;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -29,10 +29,10 @@ public class OTGCapabilities
 			new Capability.IStorage<OTGPlayer>()
 	        {
 				@Override
-				public INBT writeNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side) { return new CompoundNBT(); }
+				public Tag writeNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side) { return new CompoundTag(); }
 				
 				@Override
-				public void readNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side, INBT nbt) { }
+				public void readNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side, Tag nbt) { }
 	        }, 
 	        () -> null
 		);
@@ -44,9 +44,9 @@ public class OTGCapabilities
 		@SubscribeEvent
 		public static void attachEntityCapabilities(AttachCapabilitiesEvent<Entity> event)
 		{
-			if (event.getObject() instanceof PlayerEntity)
+			if (event.getObject() instanceof Player)
 			{
-				event.addCapability(new ResourceLocation(Constants.MOD_ID_SHORT, "otg_player"), new OTGPlayerProvider(new OTGPlayer((PlayerEntity) event.getObject())));
+				event.addCapability(new ResourceLocation(Constants.MOD_ID_SHORT, "otg_player"), new OTGPlayerProvider(new OTGPlayer((Player) event.getObject())));
 			}
 		}
 	}

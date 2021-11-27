@@ -14,54 +14,54 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PortalInfo;
-import net.minecraft.block.PortalSize;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.TeleportationRepositioner;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.village.PointOfInterest;
-import net.minecraft.village.PointOfInterestManager;
-import net.minecraft.village.PointOfInterestType;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.level.portal.PortalShape;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.BlockUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.RegistryObject;
 
 public class OTGTeleporter implements ITeleporter
 {
-	protected final ServerWorld world;
+	protected final ServerLevel world;
 	
-	public OTGTeleporter(ServerWorld worldIn)
+	public OTGTeleporter(ServerLevel worldIn)
 	{
 		this.world = worldIn;
 	}
 
-	public Optional<TeleportationRepositioner.Result> getExistingPortal(BlockPos pos, RegistryObject<PointOfInterestType> portalOTG)
+	public Optional<BlockUtil.FoundRectangle> getExistingPortal(BlockPos pos, RegistryObject<PoiType> portalOTG)
 	{
-		PointOfInterestManager poiManager = this.world.getPoiManager();
+		PoiManager poiManager = this.world.getPoiManager();
 		// TODO: Got a nullpointerexception once, could not reproduce, may be when changing portal colors between sessions.
 		if(poiManager == null || portalOTG == null || pos == null)
 		{
 			return Optional.empty();
 		}
 		poiManager.ensureLoadedAndValid(this.world, pos, 128);
-		Optional<PointOfInterest> optional = 
-			poiManager.getInSquare((poiType) -> poiType == portalOTG.get(), pos, 128, PointOfInterestManager.Status.ANY)
+		Optional<PoiRecord> optional = 
+			poiManager.getInSquare((poiType) -> poiType == portalOTG.get(), pos, 128, PoiManager.Occupancy.ANY)
 			.sorted(
-				Comparator.<PointOfInterest>comparingDouble((poi) -> poi.getPos().distSqr(pos)).thenComparingInt((poi) -> poi.getPos().getY())
+				Comparator.<PoiRecord>comparingDouble((poi) -> poi.getPos().distSqr(pos)).thenComparingInt((poi) -> poi.getPos().getY())
 			).filter(
 				(poi) -> this.world.getBlockState(poi.getPos()).hasProperty(BlockStateProperties.HORIZONTAL_AXIS)
 			).findFirst()
@@ -71,11 +71,11 @@ public class OTGTeleporter implements ITeleporter
 			BlockPos blockpos = poi.getPos();
 			this.world.getChunkSource().addRegionTicket(TicketType.PORTAL, new ChunkPos(blockpos), 3, blockpos);
 			BlockState blockstate = this.world.getBlockState(blockpos);
-			return TeleportationRepositioner.getLargestRectangleAround(blockpos, blockstate.getValue(BlockStateProperties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21, (posIn) -> this.world.getBlockState(posIn) == blockstate);
+			return BlockUtil.getLargestRectangleAround(blockpos, blockstate.getValue(BlockStateProperties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21, (posIn) -> this.world.getBlockState(posIn) == blockstate);
 		});
 	}
 
-	public Optional<TeleportationRepositioner.Result> makePortal(BlockPos pos, Direction.Axis axis, RegistryObject<OTGPortalBlock> blockPortalOTG, BlockState portalBlock)
+	public Optional<BlockUtil.FoundRectangle> makePortal(BlockPos pos, Direction.Axis axis, RegistryObject<OTGPortalBlock> blockPortalOTG, BlockState portalBlock)
 	{
 		Direction direction = Direction.get(Direction.AxisDirection.POSITIVE, axis);
 		double d0 = -1.0D;
@@ -84,11 +84,11 @@ public class OTGTeleporter implements ITeleporter
 		BlockPos blockpos1 = null;
 		WorldBorder worldborder = this.world.getWorldBorder();
 		int dimensionLogicalHeight = this.world.getHeight() - 1;
-		BlockPos.Mutable mutablePos = pos.mutable();
+		BlockPos.MutableBlockPos mutablePos = pos.mutable();
 
-		for (BlockPos.Mutable blockpos$mutable1 : BlockPos.spiralAround(pos, 16, Direction.EAST, Direction.SOUTH))
+		for (BlockPos.MutableBlockPos blockpos$mutable1 : BlockPos.spiralAround(pos, 16, Direction.EAST, Direction.SOUTH))
 		{
-			int j = Math.min(dimensionLogicalHeight, this.world.getHeight(Heightmap.Type.MOTION_BLOCKING, blockpos$mutable1.getX(), blockpos$mutable1.getZ()));
+			int j = Math.min(dimensionLogicalHeight, this.world.getHeight(Heightmap.Types.MOTION_BLOCKING, blockpos$mutable1.getX(), blockpos$mutable1.getZ()));
 			if (worldborder.isWithinBounds(blockpos$mutable1) && worldborder.isWithinBounds(blockpos$mutable1.move(direction, 1)))
 			{
 				blockpos$mutable1.move(direction.getOpposite(), 1);
@@ -140,7 +140,7 @@ public class OTGTeleporter implements ITeleporter
 		
 		if (d0 == -1.0D)
 		{
-			blockpos = (new BlockPos(pos.getX(), MathHelper.clamp(pos.getY(), 70, this.world.getHeight() - 10), pos.getZ())).immutable();
+			blockpos = (new BlockPos(pos.getX(), Mth.clamp(pos.getY(), 70, this.world.getHeight() - 10), pos.getZ())).immutable();
 			Direction direction1 = direction.getClockWise();
 			if (!worldborder.isWithinBounds(blockpos))
 			{
@@ -185,10 +185,10 @@ public class OTGTeleporter implements ITeleporter
 			}
 		}
 		
-		return Optional.of(new TeleportationRepositioner.Result(blockpos.immutable(), 2, 3));
+		return Optional.of(new BlockUtil.FoundRectangle(blockpos.immutable(), 2, 3));
 	}
 
-	private boolean checkAreaForPlacement(BlockPos originalPos, BlockPos.Mutable offsetPos, Direction directionIn, int offsetScale)
+	private boolean checkAreaForPlacement(BlockPos originalPos, BlockPos.MutableBlockPos offsetPos, Direction directionIn, int offsetScale)
 	{
 		Direction direction = directionIn.getClockWise();
 		
@@ -214,11 +214,11 @@ public class OTGTeleporter implements ITeleporter
 
 	@Nullable
 	@Override
-	public PortalInfo getPortalInfo(Entity entity, ServerWorld destWorld, Function<ServerWorld, PortalInfo> defaultPortalInfo)
+	public PortalInfo getPortalInfo(Entity entity, ServerLevel destWorld, Function<ServerLevel, PortalInfo> defaultPortalInfo)
 	{
 		if (
-			entity.level.dimension() != World.OVERWORLD &&
-			!(((ServerWorld)entity.level).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			entity.level.dimension() != Level.OVERWORLD &&
+			!(((ServerLevel)entity.level).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 		)
 		{
 			return null;
@@ -229,9 +229,9 @@ public class OTGTeleporter implements ITeleporter
 			double maxX = Math.min(2.9999872E7D, border.getMaxX() - 16.0D);
 			double maxZ = Math.min(2.9999872E7D, border.getMaxZ() - 16.0D);
 			double coordinateDifference = DimensionType.getTeleportationScale(entity.level.dimensionType(), destWorld.dimensionType());
-			BlockPos blockpos = new BlockPos(MathHelper.clamp(entity.getX() * coordinateDifference, minX, maxX), entity.getY(), MathHelper.clamp(entity.getZ() * coordinateDifference, minZ, maxZ));
+			BlockPos blockpos = new BlockPos(Mth.clamp(entity.getX() * coordinateDifference, minX, maxX), entity.getY(), Mth.clamp(entity.getZ() * coordinateDifference, minZ, maxZ));
 
-			RegistryObject<PointOfInterestType> portalOTGPOI = null;
+			RegistryObject<PoiType> portalOTGPOI = null;
 			RegistryObject<OTGPortalBlock> blockPortalOTG = null;
 			BlockState portalBlock = Blocks.QUARTZ_BLOCK.defaultBlockState();
 			// Get portal at position
@@ -239,15 +239,15 @@ public class OTGTeleporter implements ITeleporter
 			if (otgPlayer.isPresent())
 			{
 				String playerPortalColor = otgPlayer.resolve().get().getPortalColor();
-				Collection<ServerWorld> worlds = (Collection<ServerWorld>)entity.getServer().getAllLevels();
+				Collection<ServerLevel> worlds = (Collection<ServerLevel>)entity.getServer().getAllLevels();
 				worlds = worlds.stream().sorted((a,b) -> a.dimension().location().toString().compareTo(b.dimension().location().toString())).collect(Collectors.toList());				
 				ArrayList<String> usedColors = new ArrayList<>();
-				for(ServerWorld world : worlds)
+				for(ServerLevel world : worlds)
 				{
 					if(
-						world.dimension() != World.OVERWORLD &&
-						world.dimension() != World.END &&
-						world.dimension() != World.NETHER &&
+						world.dimension() != Level.OVERWORLD &&
+						world.dimension() != Level.END &&
+						world.dimension() != Level.NETHER &&
 						world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 					)
 					{
@@ -278,37 +278,37 @@ public class OTGTeleporter implements ITeleporter
 				{
 					BlockState blockstate = entity.level.getBlockState(entity.portalEntrancePos);
 					Direction.Axis axis;
-					Vector3d vector3d;
+					Vec3 vector3d;
 					if (blockstate.hasProperty(BlockStateProperties.HORIZONTAL_AXIS))
 					{
 						axis = blockstate.getValue(BlockStateProperties.HORIZONTAL_AXIS);
-						TeleportationRepositioner.Result rectangle = TeleportationRepositioner.getLargestRectangleAround(entity.portalEntrancePos, axis, 21, Direction.Axis.Y, 21, (pos) -> entity.level.getBlockState(pos) == blockstate);
+						BlockUtil.FoundRectangle rectangle = BlockUtil.getLargestRectangleAround(entity.portalEntrancePos, axis, 21, Direction.Axis.Y, 21, (pos) -> entity.level.getBlockState(pos) == blockstate);
 						vector3d = entity.getRelativePortalPosition(axis, rectangle);
 					} else {
 						axis = Direction.Axis.X;
-						vector3d = new Vector3d(0.5D, 0.0D, 0.0D);
+						vector3d = new Vec3(0.5D, 0.0D, 0.0D);
 					}					
-					return PortalSize.createPortalInfo(destWorld, result, axis, vector3d, entity.getDimensions(entity.getPose()), entity.getDeltaMovement(), entity.yRot, entity.xRot);
+					return PortalShape.createPortalInfo(destWorld, result, axis, vector3d, entity.getDimensions(entity.getPose()), entity.getDeltaMovement(), entity.yRot, entity.xRot);
 				}
 			).orElse(null);
 		}
 	}
 
-	protected Optional<TeleportationRepositioner.Result> getOrCreatePortal(Entity entity, BlockPos pos, RegistryObject<PointOfInterestType> portalOTGPOI, RegistryObject<OTGPortalBlock> blockPortalOTG, BlockState portalBlock)
+	protected Optional<BlockUtil.FoundRectangle> getOrCreatePortal(Entity entity, BlockPos pos, RegistryObject<PoiType> portalOTGPOI, RegistryObject<OTGPortalBlock> blockPortalOTG, BlockState portalBlock)
 	{
-		Optional<TeleportationRepositioner.Result> existingPortal = this.getExistingPortal(pos, portalOTGPOI);
+		Optional<BlockUtil.FoundRectangle> existingPortal = this.getExistingPortal(pos, portalOTGPOI);
 		if (existingPortal.isPresent())
 		{
 			return existingPortal;
 		} else {
 			Direction.Axis portalAxis = this.world.getBlockState(entity.portalEntrancePos).getOptionalValue(OTGPortalBlock.AXIS).orElse(Direction.Axis.X);
-			Optional<TeleportationRepositioner.Result> makePortal = this.makePortal(pos, portalAxis, blockPortalOTG, portalBlock);		
+			Optional<BlockUtil.FoundRectangle> makePortal = this.makePortal(pos, portalAxis, blockPortalOTG, portalBlock);		
 			return makePortal;
 		}
 	}
 
 	@Override
-	public boolean playTeleportSound(ServerPlayerEntity player, ServerWorld sourceWorld, ServerWorld destWorld)
+	public boolean playTeleportSound(ServerPlayer player, ServerLevel sourceWorld, ServerLevel destWorld)
 	{
 		return false;
 	}

@@ -5,18 +5,27 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Rotation;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Rotation;
 
 import com.pg85.otg.util.materials.MaterialProperty;
 import com.pg85.otg.util.materials.MaterialProperties;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
+
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CrossCollisionBlock;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -170,7 +179,7 @@ public class ForgeMaterialData extends LocalMaterialData
 			) {
 				// TODO: Vanilla checks faceFull here, we don't since it requires coords.
 				//return Block.isFaceFull(this.blockData.getCollisionShape(blockPos, blockPos.below()), Direction.UP) || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(LAYERS) == 8);
-				return this.blockData.getMaterial().isSolid() || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(SnowBlock.LAYERS) == 8);
+				return this.blockData.getMaterial().isSolid() || (this.blockData.is(Blocks.SNOW) && this.blockData.getValue(SnowLayerBlock.LAYERS) == 8);
 			} else {
 				return true;
 			}
@@ -237,14 +246,14 @@ public class ForgeMaterialData extends LocalMaterialData
 			{
 				state = ((RotatedPillarBlock)state.getBlock()).rotate(this.blockData, Rotation.COUNTERCLOCKWISE_90);
 			}
-			if (state.hasProperty(FourWayBlock.EAST)) // fence or glass pane
+			if (state.hasProperty(CrossCollisionBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
-				boolean hasEast = state.getValue(FourWayBlock.EAST);
-				state = state.setValue(FourWayBlock.EAST, state.getValue(FourWayBlock.SOUTH));
-				state = state.setValue(FourWayBlock.SOUTH, state.getValue(FourWayBlock.WEST));
-				state = state.setValue(FourWayBlock.WEST, state.getValue(FourWayBlock.NORTH));
-				state = state.setValue(FourWayBlock.NORTH, hasEast);
+				boolean hasEast = state.getValue(CrossCollisionBlock.EAST);
+				state = state.setValue(CrossCollisionBlock.EAST, state.getValue(CrossCollisionBlock.SOUTH));
+				state = state.setValue(CrossCollisionBlock.SOUTH, state.getValue(CrossCollisionBlock.WEST));
+				state = state.setValue(CrossCollisionBlock.WEST, state.getValue(CrossCollisionBlock.NORTH));
+				state = state.setValue(CrossCollisionBlock.NORTH, hasEast);
 			}
 			// Block is rotated, store a pointer to it
 			this.rotated = ForgeMaterialData.ofBlockState(state);

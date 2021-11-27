@@ -24,19 +24,19 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.BlockPosArgument;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponentUtils;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class SpawnCommand extends BaseCommand
 {
@@ -54,7 +54,7 @@ public class SpawnCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("spawn")
 			.then(
@@ -97,7 +97,7 @@ public class SpawnCommand extends BaseCommand
 		);
 	}
 	
-	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos, boolean force)
+	public static int execute(CommandSourceStack source, String presetName, String objectName, BlockPos blockPos, boolean force)
 	{
 		try
 		{
@@ -106,7 +106,7 @@ public class SpawnCommand extends BaseCommand
 
 			if (objectToSpawn == null)
 			{
-				source.sendSuccess(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
+				source.sendSuccess(new TextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
 				return 0;
 			}
 
@@ -128,18 +128,18 @@ public class SpawnCommand extends BaseCommand
 				);
 			}
 			
-			Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+			Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 
 			if(objectToSpawn instanceof BO4)
 			{
 				if(!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 				{
-	        		source.sendSuccess(new StringTextComponent("BO4 objects can only be spawned in OTG worlds/dimensions."), false);
+	        		source.sendSuccess(new TextComponent("BO4 objects can only be spawned in OTG worlds/dimensions."), false);
 	        		return 0;					
 				}
 	        	if(preset.getWorldConfig().getCustomStructureType() != CustomStructureType.BO4)
 	        	{
-	        		source.sendSuccess(new StringTextComponent("Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."), false);
+	        		source.sendSuccess(new TextComponent("Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."), false);
 	        		return 0;
 	        	}
 	        	
@@ -187,7 +187,7 @@ public class SpawnCommand extends BaseCommand
 	        	
 	        	// Try spawning the structure in available chunks around the player
 	        	int maxRadius = 1000;
-	        	source.sendSuccess(new StringTextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
+	        	source.sendSuccess(new TextComponent("Trying to plot BO4 structure within " + maxRadius + " chunks of player, with height bounds " + (force ? "disabled" : "enabled") + ". This may take a while."), false);
 
 	            ChunkCoordinate chunkCoord;
 	            for (int cycle = 1; cycle < maxRadius; cycle++)
@@ -230,9 +230,9 @@ public class SpawnCommand extends BaseCommand
 	                            	
 	                            	if(chunkCoordSpawned != null)
 	                            	{
-	                            		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);
-	                            		ITextComponent itextcomponent = TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent("chat.coordinates", chunkCoordSpawned.getBlockX(), "~", chunkCoordSpawned.getBlockZ())).withStyle((p_241055_1_) -> {
-	                            			return p_241055_1_.withColor(TextFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")));
+	                            		source.sendSuccess(new TextComponent(objectToSpawn.getName() + " was spawned at: "), false);
+	                            		Component itextcomponent = ComponentUtils.wrapInSquareBrackets(new TranslatableComponent("chat.coordinates", chunkCoordSpawned.getBlockX(), "~", chunkCoordSpawned.getBlockZ())).withStyle((p_241055_1_) -> {
+	                            			return p_241055_1_.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + chunkCoordSpawned.getBlockX() + " ~ " + chunkCoordSpawned.getBlockZ())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.coordinates.tooltip")));
 	                            		});	                            		
 	                            		source.sendSuccess(itextcomponent, false);
 	                            		return 0;
@@ -242,7 +242,7 @@ public class SpawnCommand extends BaseCommand
 	                    }
 	                }
 	            }
-	            source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information."), false);
+	            source.sendSuccess(new TextComponent(objectToSpawn.getName() + " could not be spawned. This can happen if the world is currently generating chunks, if no biomes with enough space could be found, or if there is an error in the structure's files. Enable SpawnLog:true in OTG.ini and check the logs for more information."), false);
 	        	return 0;
 			} else {
 				if (objectToSpawn.spawnForced(
@@ -256,19 +256,19 @@ public class SpawnCommand extends BaseCommand
 					!(genRegion instanceof MCWorldGenRegion)
 				))
 				{
-            		source.sendSuccess(new StringTextComponent(objectToSpawn.getName() + " was spawned at: "), false);
-            		ITextComponent itextcomponent = TextComponentUtils.wrapInSquareBrackets(new TranslationTextComponent("chat.coordinates", blockPos.getX(), "~", blockPos.getZ())).withStyle((p_241055_1_) -> {
-            			return p_241055_1_.withColor(TextFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + blockPos.getX() + " ~ " + blockPos.getZ())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.coordinates.tooltip")));
+            		source.sendSuccess(new TextComponent(objectToSpawn.getName() + " was spawned at: "), false);
+            		Component itextcomponent = ComponentUtils.wrapInSquareBrackets(new TranslatableComponent("chat.coordinates", blockPos.getX(), "~", blockPos.getZ())).withStyle((p_241055_1_) -> {
+            			return p_241055_1_.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + blockPos.getX() + " ~ " + blockPos.getZ())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.coordinates.tooltip")));
             		});	                            		
             		source.sendSuccess(itextcomponent, false);
 				} else {
-					source.sendSuccess(new StringTextComponent("Failed to spawn object " + objectName), false);
+					source.sendSuccess(new TextComponent("Failed to spawn object " + objectName), false);
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new TextComponent("Something went wrong, please check logs"), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Error during spawn command: ");
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, String.format("Error during spawn command: ", (Object[])e.getStackTrace()));
 			e.printStackTrace();

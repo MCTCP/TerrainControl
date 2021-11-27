@@ -13,29 +13,29 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.RegistryObject;
 
@@ -44,16 +44,16 @@ public class OTGPortalBlock extends NetherPortalBlock
 {
 	private final String portalColor;
 
-	public OTGPortalBlock(AbstractBlock.Properties properties, String portalColor)
+	public OTGPortalBlock(BlockBehaviour.Properties properties, String portalColor)
 	{
 		super(properties);
 		this.portalColor = portalColor;
 	}
 	
-	public static boolean checkForPortal(ServerWorld serverworld, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack, RegistryObject<OTGPortalBlock> otgPortalBlock, List<LocalMaterialData> portalBlocks)
+	public static boolean checkForPortal(ServerLevel serverworld, BlockPos pos, Player player, InteractionHand hand, ItemStack stack, RegistryObject<OTGPortalBlock> otgPortalBlock, List<LocalMaterialData> portalBlocks)
 	{
 		if(
-			serverworld.dimension() == World.OVERWORLD ||
+			serverworld.dimension() == Level.OVERWORLD ||
 			serverworld.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 		)
 		{
@@ -107,7 +107,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 	}	
 
 	@Nullable
-	public OTGPortalBlock.Size isPortal(IWorld world, BlockPos pos, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
+	public OTGPortalBlock.Size isPortal(LevelAccessor world, BlockPos pos, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
 	{
 		OTGPortalBlock.Size otgPortalSizeX = new OTGPortalBlock.Size(world, pos, Axis.X, portalBlock, portalBlocks);
 		if (otgPortalSizeX.isValid() && otgPortalSizeX.portalBlockCount == 0)
@@ -120,7 +120,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 	}
 	
 	@Override
-	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entity)
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entity)
 	{
 		if (!entity.isPassenger() && !entity.isVehicle() && entity.canChangeDimensions())
 		{
@@ -152,7 +152,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 		}
 	}
 
-	public boolean trySpawnPortal(IWorld worldIn, BlockPos pos, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
+	public boolean trySpawnPortal(LevelAccessor worldIn, BlockPos pos, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
 	{
 		OTGPortalBlock.Size otgPortalSize = this.isPortal(worldIn, pos, portalBlock, portalBlocks);
 		if (otgPortalSize != null)
@@ -164,7 +164,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 		}
 	}
 
-	public void randomTick(BlockState block, ServerWorld serverWorld, BlockPos pos, Random rand)
+	public void randomTick(BlockState block, ServerLevel serverWorld, BlockPos pos, Random rand)
 	{
 		if (serverWorld.dimensionType().natural() && serverWorld.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && rand.nextInt(2000) < serverWorld.getDifficulty().getId())
 		{
@@ -174,15 +174,15 @@ public class OTGPortalBlock extends NetherPortalBlock
 			}
 
 			EntityType<?> entityType = null;
-			Collection<ServerWorld> worlds = (Collection<ServerWorld>)serverWorld.getServer().getAllLevels();
+			Collection<ServerLevel> worlds = (Collection<ServerLevel>)serverWorld.getServer().getAllLevels();
 			worlds = worlds.stream().sorted((a,b) -> a.dimension().location().toString().compareTo(b.dimension().location().toString())).collect(Collectors.toList());			
 			ArrayList<String> usedColors = new ArrayList<>();
-			for(ServerWorld world : worlds)
+			for(ServerLevel world : worlds)
 			{
 				if(
-					world.dimension() != World.OVERWORLD &&
-					world.dimension() != World.END &&
-					world.dimension() != World.NETHER &&
+					world.dimension() != Level.OVERWORLD &&
+					world.dimension() != Level.END &&
+					world.dimension() != Level.NETHER &&
 					world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 				)
 				{
@@ -209,7 +209,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 			{
 				if (serverWorld.getBlockState(pos).isValidSpawn(serverWorld, pos, entityType))
 				{
-					Entity entity = entityType.spawn(serverWorld, (CompoundNBT)null, (ITextComponent)null, (PlayerEntity)null, pos.above(), SpawnReason.STRUCTURE, false, false);
+					Entity entity = entityType.spawn(serverWorld, (CompoundTag)null, (Component)null, (Player)null, pos.above(), MobSpawnType.STRUCTURE, false, false);
 					if (entity != null)
 					{
 						entity.setPortalCooldown();
@@ -221,29 +221,29 @@ public class OTGPortalBlock extends NetherPortalBlock
 
 	private void doTeleport(Entity entity)
 	{
-		if (entity.level != null && entity.level instanceof ServerWorld)
+		if (entity.level != null && entity.level instanceof ServerLevel)
 		{
-			ServerWorld serverWorld = (ServerWorld) entity.level;
+			ServerLevel serverWorld = (ServerLevel) entity.level;
 			MinecraftServer minecraftServer = serverWorld.getServer();
-			RegistryKey<World> destinationDim = null;
+			ResourceKey<Level> destinationDim = null;
 			if(
-				serverWorld.dimension() != World.END &&
-				serverWorld.dimension() != World.NETHER &&
+				serverWorld.dimension() != Level.END &&
+				serverWorld.dimension() != Level.NETHER &&
 				(
-					serverWorld.dimension() == World.OVERWORLD ||
+					serverWorld.dimension() == Level.OVERWORLD ||
 					serverWorld.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 				)
 			)
 			{
-				Collection<ServerWorld> worlds = (Collection<ServerWorld>)entity.getServer().getAllLevels();
+				Collection<ServerLevel> worlds = (Collection<ServerLevel>)entity.getServer().getAllLevels();
 				worlds = worlds.stream().sorted((a,b) -> a.dimension().location().toString().compareTo(b.dimension().location().toString())).collect(Collectors.toList());				
 				ArrayList<String> usedColors = new ArrayList<>();
-				for(ServerWorld world : worlds)
+				for(ServerLevel world : worlds)
 				{
 					if(
-						world.dimension() != World.OVERWORLD &&
-						world.dimension() != World.END &&
-						world.dimension() != World.NETHER &&
+						world.dimension() != Level.OVERWORLD &&
+						world.dimension() != Level.END &&
+						world.dimension() != Level.NETHER &&
 						world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 					)
 					{
@@ -258,7 +258,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 						{
 							if(world.dimension() == serverWorld.dimension())
 							{
-								destinationDim = World.OVERWORLD;
+								destinationDim = Level.OVERWORLD;
 							} else {
 								destinationDim = world.dimension();
 							}
@@ -269,7 +269,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 			}
 			if (minecraftServer != null)
 			{
-				ServerWorld destination = minecraftServer.getLevel(destinationDim);
+				ServerLevel destination = minecraftServer.getLevel(destinationDim);
 				if (destination != null && minecraftServer.isNetherEnabled() && !entity.isPassenger())
 				{
 					entity.level.getProfiler().push("otg_portal");
@@ -283,7 +283,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 	
 	public static class Size
 	{
-		protected final IWorld world;
+		protected final LevelAccessor world;
 		public final Direction.Axis axis;
 		public final Direction rightDir;
 		public final Direction leftDir;
@@ -293,7 +293,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 		public int height;
 		public int width;
 		
-		public Size(IWorld worldIn, BlockPos pos, Direction.Axis axisIn, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
+		public Size(LevelAccessor worldIn, BlockPos pos, Direction.Axis axisIn, RegistryObject<OTGPortalBlock> portalBlock, List<LocalMaterialData> portalBlocks)
 		{
 			this.world = worldIn;
 			this.axis = axisIn;
@@ -488,9 +488,9 @@ public class OTGPortalBlock extends NetherPortalBlock
 				
 				for (int j = 0; j < this.height; ++j)
 				{
-					if (this.world instanceof World)
+					if (this.world instanceof Level)
 					{
-						World world = (World) this.world;
+						Level world = (Level) this.world;
 						world.setBlockAndUpdate(blockpos.above(j), portalBlock.get().defaultBlockState().setValue(OTGPortalBlock.AXIS, this.axis));
 					}
 				}

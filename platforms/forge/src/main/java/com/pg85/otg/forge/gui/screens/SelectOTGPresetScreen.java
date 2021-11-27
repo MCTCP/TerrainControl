@@ -5,27 +5,27 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.presets.Preset;
 
-import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.list.ExtendedList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class SelectOTGPresetScreen extends Screen
 {
-	private static final ITextComponent SELECT_PRESET = new TranslationTextComponent("otg.createWorld.customize.preset");
+	private static final Component SELECT_PRESET = new TranslatableComponent("otg.createWorld.customize.preset");
 	private final CreateOTGDimensionsScreen parent;
 	private final ArrayList<Preset> presetList = new ArrayList<>();
 	private SelectOTGPresetScreen.PresetList guiPresetList;
@@ -35,7 +35,7 @@ public class SelectOTGPresetScreen extends Screen
 
 	public SelectOTGPresetScreen(CreateOTGDimensionsScreen parent, DimensionConfig currentSelection, int dimId)
 	{
-		super(new TranslationTextComponent("otg.createWorld.customize.title"));
+		super(new TranslatableComponent("otg.createWorld.customize.title"));
 		this.parent = parent;
 		ArrayList<Preset> presetList = OTG.getEngine().getPresetLoader().getAllPresets();
 		this.presetList.add(0, null);
@@ -89,7 +89,7 @@ public class SelectOTGPresetScreen extends Screen
 	}
 
 	@Override
-	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+	public void render(PoseStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.renderDirtBackground(0);
 		this.guiPresetList.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
@@ -99,7 +99,7 @@ public class SelectOTGPresetScreen extends Screen
 	}
 			
 	@OnlyIn(Dist.CLIENT)
-	class PresetList extends ExtendedList<SelectOTGPresetScreen.PresetList.PresetEntry>
+	class PresetList extends ObjectSelectionList<SelectOTGPresetScreen.PresetList.PresetEntry>
 	{
 		private PresetList()
 		{
@@ -132,21 +132,21 @@ public class SelectOTGPresetScreen extends Screen
 		}
 		
 		@OnlyIn(Dist.CLIENT)
-		class PresetEntry extends ExtendedList.AbstractListEntry<SelectOTGPresetScreen.PresetList.PresetEntry>
+		class PresetEntry extends ObjectSelectionList.Entry<SelectOTGPresetScreen.PresetList.PresetEntry>
 		{
 			private final Preset preset;
-			private final ITextComponent field_243282_c;
+			private final Component field_243282_c;
 		
 			public PresetEntry(Preset p_i232272_2_)
 			{
 				this.preset = p_i232272_2_;
-				this.field_243282_c = new StringTextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Non-OTG (Customize)" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
+				this.field_243282_c = new TextComponent(p_i232272_2_ == null ? SelectOTGPresetScreen.this.dimId == 0 ? "Non-OTG (Customize)" : SelectOTGPresetScreen.this.dimId < 3 ? "Vanilla" : "None" : p_i232272_2_.getFolderName());		
 			}
 
 			@Override
-			public void render(MatrixStack p_230432_1_, int p_230432_2_, int p_230432_3_, int p_230432_4_, int p_230432_5_, int p_230432_6_, int p_230432_7_, int p_230432_8_, boolean p_230432_9_, float p_230432_10_)
+			public void render(PoseStack p_230432_1_, int p_230432_2_, int p_230432_3_, int p_230432_4_, int p_230432_5_, int p_230432_6_, int p_230432_7_, int p_230432_8_, boolean p_230432_9_, float p_230432_10_)
 			{
-				AbstractGui.drawString(p_230432_1_, SelectOTGPresetScreen.this.font, this.field_243282_c, p_230432_4_ + 5, p_230432_3_ + 2, 16777215);
+				GuiComponent.drawString(p_230432_1_, SelectOTGPresetScreen.this.font, this.field_243282_c, p_230432_4_ + 5, p_230432_3_ + 2, 16777215);
 			}
 
 			@Override

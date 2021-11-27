@@ -3,17 +3,17 @@ package com.pg85.otg.forge.gui.screens;
 import java.util.OptionalLong;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.CreateWorldScreen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.datafix.codec.DatapackCodec;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.level.DataPackConfig;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -38,7 +38,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 						false
 					)
 				).orElseGet(
-					() -> DimensionGeneratorSettings.makeDefault(
+					() -> WorldGenSettings.makeDefault(
 						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY),
 						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY),
 						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
@@ -52,7 +52,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 
 	public OTGCustomiseOverworldScreen(@Nullable CreateOTGDimensionsScreen parent, OTGWorldOptionsScreen p_i242063_3_, DimensionConfig dimConfig)
 	{
-		super(parent, DatapackCodec.DEFAULT, p_i242063_3_);
+		super(parent, DataPackConfig.DEFAULT, p_i242063_3_);
 		this.parent = parent;
 		this.dimConfig = dimConfig;
 	}
@@ -70,14 +70,14 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 		int i = this.width / 2 - 155;
 		int j = this.width / 2 + 5;
 		((OTGWorldOptionsScreen)this.worldGenSettingsComponent).init(this, this.minecraft, this.font);
-		this.createButton = this.addButton(new Button(i, this.height - 28, 150, 20, DialogTexts.GUI_DONE, (p_214318_1_) ->
+		this.createButton = this.addButton(new Button(i, this.height - 28, 150, 20, CommonComponents.GUI_DONE, (p_214318_1_) ->
 		{
 			this.dimConfig.Overworld.NonOTGWorldType = ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).preset.get().description().getString().replace("generator.", "");
 			this.parent.dimGenSettings = ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).settings;
 			this.popScreen();
 		}));
 		this.createButton.active = true;
-		this.addButton(new Button(j, this.height - 28, 150, 20, DialogTexts.GUI_CANCEL, (p_214317_1_) ->
+		this.addButton(new Button(j, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_214317_1_) ->
 		{
 			this.popScreen();
 		}));
@@ -125,7 +125,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 	}
 
 	@Override
-	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+	public void render(PoseStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.renderBackground(p_230430_1_);
 		drawCenteredString(p_230430_1_, this.font, this.title, this.width / 2, 20, -1);
@@ -137,13 +137,13 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 	}
 
 	@Override
-	protected <T extends IGuiEventListener> T addWidget(T p_230481_1_)
+	protected <T extends GuiEventListener> T addWidget(T p_230481_1_)
 	{
 		return super.addWidget(p_230481_1_);
 	}
 
 	@Override
-	protected <T extends Widget> T addButton(T p_230480_1_)
+	protected <T extends AbstractWidget> T addButton(T p_230480_1_)
 	{
 		return super.addButton(p_230480_1_);
 	}

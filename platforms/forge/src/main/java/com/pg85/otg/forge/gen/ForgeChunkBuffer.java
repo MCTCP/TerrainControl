@@ -5,18 +5,18 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class ForgeChunkBuffer extends ChunkBuffer
 {
-	private final BlockPos.Mutable mutable = new BlockPos.Mutable();
-	private final ChunkPrimer chunk;
+	private final BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+	private final ProtoChunk chunk;
 
-	ForgeChunkBuffer(ChunkPrimer chunk)
+	ForgeChunkBuffer(ProtoChunk chunk)
 	{
 		this.chunk = chunk;
 	}
@@ -41,7 +41,7 @@ public class ForgeChunkBuffer extends ChunkBuffer
 		return blockState == null ? null : ForgeMaterialData.ofBlockState(blockState);
 	}
 	
-	public IChunk getChunk()
+	public ChunkAccess getChunk()
 	{
 		return this.chunk;
 	}

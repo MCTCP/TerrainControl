@@ -16,10 +16,10 @@ import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class StructureCommand extends BaseCommand
 {
@@ -30,24 +30,24 @@ public class StructureCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("structure")
 			.executes((context -> showStructureInfo(context.getSource())))
 		);
 	}
 	
-	private int showStructureInfo(CommandSource source)
+	private int showStructureInfo(CommandSourceStack source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 		
 		String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)source.getPosition().x, (int)source.getPosition().z);
-		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 		// if the player is in range
 		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
@@ -72,7 +72,7 @@ public class StructureCommand extends BaseCommand
 			}
 		}
 		
-		source.sendSuccess(new StringTextComponent(structureInfo), false);
+		source.sendSuccess(new TextComponent(structureInfo), false);
 		return 0;
 	}
 }

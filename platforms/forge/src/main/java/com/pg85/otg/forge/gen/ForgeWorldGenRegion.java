@@ -27,38 +27,38 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.monster.GuardianEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.nbt.*;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
-	protected final ISeedReader worldGenRegion;
+	protected final WorldGenLevel worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 
 	// BO4 plotting may call hasDefaultStructures on chunks outside the area being decorated, in order to plot large structures.
@@ -74,7 +74,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used for OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -82,7 +82,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	/** Creates a LocalWorldGenRegion to be used for non-OTG worlds outside of decoration, only used for /otg spawn/edit/export. */
-	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
+	public ForgeWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion)
 	{
 		super(presetFolderName, OTG.getEngine().getPluginConfig(), worldConfig, OTG.getEngine().getLogger());
 		this.worldGenRegion = worldGenRegion;
@@ -114,7 +114,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 	}
 	
-	public ISeedReader getInternal()
+	public WorldGenLevel getInternal()
 	{
 		return worldGenRegion;
 	}
@@ -167,7 +167,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
-		IChunk chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -230,7 +230,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunk chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -248,12 +248,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;	
-		int heightMapy = chunk.getHeight(Type.WORLD_SURFACE, internalX, internalZ);
+		int heightMapy = chunk.getHeight(Types.WORLD_SURFACE, internalX, internalZ);
 		
 		return getHighestBlockYAt(chunk, internalX, heightMapy, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}	
 
-	protected int getHighestBlockYAt(IChunk chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	protected int getHighestBlockYAt(ChunkAccess chunk, int internalX, int heightMapY, int internalZ, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
 	{
 		LocalMaterialData material;
 		boolean isSolid;
@@ -325,7 +325,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHeightMapHeight(int x, int z)
 	{
-		return this.worldGenRegion.getHeight(Type.WORLD_SURFACE_WG, x, z); 
+		return this.worldGenRegion.getHeight(Types.WORLD_SURFACE_WG, x, z); 
 	}
 
 	@Override
@@ -340,7 +340,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Check if this causes problems with BO3 LightChecks.
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		IChunk chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		if(chunk != null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
@@ -429,12 +429,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockState state)
 	{
-		CompoundNBT nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
-		nms.put("x", IntNBT.valueOf(x));
-		nms.put("y", IntNBT.valueOf(y));
-		nms.put("z", IntNBT.valueOf(z));
+		CompoundTag nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
+		nms.put("x", IntTag.valueOf(x));
+		nms.put("y", IntTag.valueOf(y));
+		nms.put("z", IntTag.valueOf(z));
 
-		TileEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
+		BlockEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)
 		{
 			try {
@@ -469,7 +469,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 	
-	public TileEntity getTileEntity(BlockPos blockPos)
+	public BlockEntity getTileEntity(BlockPos blockPos)
 	{
 		return worldGenRegion.getBlockEntity(blockPos);
 	}
@@ -489,90 +489,90 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			switch (type)
 			{
 				case Tree:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> oak = Features.OAK;
+					ConfiguredFeature<TreeConfiguration, ?> oak = Features.OAK;
 					oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config);
 					return true;
 				case BigTree:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> fancy_oak = Features.FANCY_OAK;
+					ConfiguredFeature<TreeConfiguration, ?> fancy_oak = Features.FANCY_OAK;
 					fancy_oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config);
 					return true;
 				case Forest:
 				case Birch:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> birch = Features.BIRCH;
+					ConfiguredFeature<TreeConfiguration, ?> birch = Features.BIRCH;
 					birch.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
 					return true;
 				case TallBirch:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> tall_birch = Features.SUPER_BIRCH_BEES_0002;
+					ConfiguredFeature<TreeConfiguration, ?> tall_birch = Features.SUPER_BIRCH_BEES_0002;
 					tall_birch.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tall_birch.config);
 					return true;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
-						ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+						ConfiguredFeature<FeatureConfiguration, ?> huge_brown_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
 						huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					} else {
-						ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+						ConfiguredFeature<FeatureConfiguration, ?> huge_red_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
 						huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					}
 					return true;
 				case HugeRedMushroom:
-					ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+					ConfiguredFeature<FeatureConfiguration, ?> huge_red_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
 					huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					return true;
 				case HugeBrownMushroom:
-					ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+					ConfiguredFeature<FeatureConfiguration, ?> huge_brown_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
 					huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					return true;
 				case SwampTree:
-					ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
+					ConfiguredFeature<FeatureConfiguration, ?> swamp_tree = (ConfiguredFeature<FeatureConfiguration, ?>) Features.SWAMP_TREE;
 					swamp_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
 					return true;
 				case Taiga1:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> pine = Features.PINE;
+					ConfiguredFeature<TreeConfiguration, ?> pine = Features.PINE;
 					pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
 					return true;
 				case Taiga2:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
+					ConfiguredFeature<TreeConfiguration, ?> spruce = Features.SPRUCE;
 					spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
 					return true;
 				case JungleTree:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_jungle_tree = Features.MEGA_JUNGLE_TREE;
+					ConfiguredFeature<TreeConfiguration, ?> mega_jungle_tree = Features.MEGA_JUNGLE_TREE;
 					mega_jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_jungle_tree.config);
 					return true;
 				case CocoaTree:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> jungle_tree = Features.JUNGLE_TREE;
+					ConfiguredFeature<TreeConfiguration, ?> jungle_tree = Features.JUNGLE_TREE;
 					jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
 					return true;
 				case GroundBush:
-					ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
+					ConfiguredFeature<FeatureConfiguration, ?> jungle_bush = (ConfiguredFeature<FeatureConfiguration, ?>) Features.JUNGLE_BUSH;
 					jungle_bush.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
 					return true;
 				case Acacia:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> acacia = Features.ACACIA;
+					ConfiguredFeature<TreeConfiguration, ?> acacia = Features.ACACIA;
 					acacia.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config);
 					return true;
 				case DarkOak:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> dark_oak = Features.DARK_OAK;
+					ConfiguredFeature<TreeConfiguration, ?> dark_oak = Features.DARK_OAK;
 					dark_oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
 					return true;
 				case HugeTaiga1:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_pine = Features.MEGA_PINE;
+					ConfiguredFeature<TreeConfiguration, ?> mega_pine = Features.MEGA_PINE;
 					mega_pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
 					return true;
 				case HugeTaiga2:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
+					ConfiguredFeature<TreeConfiguration, ?> mega_spruce = Features.MEGA_SPRUCE;
 					mega_spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
 					return true;
 				case CrimsonFungi:
-					ConfiguredFeature<IFeatureConfig, ?> crimson_fungi = (ConfiguredFeature<IFeatureConfig, ?>) Features.CRIMSON_FUNGI;
+					ConfiguredFeature<FeatureConfiguration, ?> crimson_fungi = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CRIMSON_FUNGI;
 					crimson_fungi.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, crimson_fungi.config);
 					return true;
 				case WarpedFungi:
-					ConfiguredFeature<IFeatureConfig, ?> warped_fungi = (ConfiguredFeature<IFeatureConfig, ?>) Features.WARPED_FUNGI;
+					ConfiguredFeature<FeatureConfiguration, ?> warped_fungi = (ConfiguredFeature<FeatureConfiguration, ?>) Features.WARPED_FUNGI;
 					warped_fungi.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, warped_fungi.config);
 					return true;
 				case ChorusPlant:
-					ConfiguredFeature<IFeatureConfig, ?> chorus_plant = (ConfiguredFeature<IFeatureConfig, ?>) Features.CHORUS_PLANT;
+					ConfiguredFeature<FeatureConfiguration, ?> chorus_plant = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CHORUS_PLANT;
 					chorus_plant.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, chorus_plant.config);
 					return true;					
 				default:
@@ -618,7 +618,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		
 		// Check for any .txt or .nbt file containing nbt data for the entity
-		CompoundNBT nbtTagCompound = null;
+		CompoundTag nbtTagCompound = null;
 		if(
 			entityData.getNameTagOrNBTFileName() != null &&
 			(
@@ -627,11 +627,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 		)
 		{
-			nbtTagCompound = new CompoundNBT();
+			nbtTagCompound = new CompoundTag();
 			if (entityData.getNameTagOrNBTFileName().toLowerCase().trim().endsWith(".txt"))
 			{
 				try {
-					nbtTagCompound = JsonToNBT.parseTag(entityData.getMetaData());
+					nbtTagCompound = TagParser.parseTag(entityData.getMetaData());
 				} catch (CommandSyntaxException e) {
 					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
@@ -719,7 +719,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 			
 			// TODO: Non-mob entities, aren't those handled via Block(nbt), chests, armor stands etc?
-			if (entity instanceof MobEntity)
+			if (entity instanceof Mob)
 			{
 				// If the block is a solid block or entity is a fish out of water, cancel
 				LocalMaterialData block = ForgeMaterialData.ofBlockState(this.worldGenRegion.getBlockState(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())));
@@ -727,8 +727,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					block.isSolid() ||
 					(
 						(
-							entity.getClassification(false) == EntityClassification.WATER_CREATURE
-							|| entity instanceof GuardianEntity
+							entity.getClassification(false) == MobCategory.WATER_CREATURE
+							|| entity instanceof Guardian
 						)
 						&& !block.isLiquid()
 					)
@@ -742,8 +742,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				}
 				
 				// Appease Forge
-				MobEntity mobentity = (MobEntity)entity;
-				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, this.worldGenRegion, entityData.getX(), entityData.getY(), entityData.getZ(), null, SpawnReason.CHUNK_GENERATION) == -1)
+				Mob mobentity = (Mob)entity;
+				if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, this.worldGenRegion, entityData.getX(), entityData.getY(), entityData.getZ(), null, MobSpawnType.CHUNK_GENERATION) == -1)
 				{
 					if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 					{
@@ -756,13 +756,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				String nameTag = entityData.getNameTagOrNBTFileName();
 				if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
 				{
-					entity.setCustomName(new StringTextComponent(nameTag));
+					entity.setCustomName(new TextComponent(nameTag));
 				}
 				// Make sure Entity() mobs don't de-spawn, regardless of nbt data
 				mobentity.setPersistenceRequired();
 				
-				ILivingEntityData ilivingentitydata = null;
-				ilivingentitydata = mobentity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), SpawnReason.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
+				SpawnGroupData ilivingentitydata = null;
+				ilivingentitydata = mobentity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), MobSpawnType.CHUNK_GENERATION, ilivingentitydata, nbtTagCompound);
 				this.worldGenRegion.addFreshEntityWithPassengers(mobentity);
 			}
 		}
@@ -771,19 +771,19 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeDungeon(Random random, int x, int y, int z)
 	{
-		Feature.MONSTER_ROOM.configured(IFeatureConfig.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.MONSTER_ROOM.configured(FeatureConfiguration.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		Feature.FOSSIL.configured(IFeatureConfig.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Feature.FOSSIL.configured(FeatureConfiguration.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
 	{
-		DynamicRegistries registries = this.worldGenRegion.getLevel().registryAccess();
+		RegistryAccess registries = this.worldGenRegion.getLevel().registryAccess();
 		Registry<ConfiguredFeature<?, ?>> registry = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 
 		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
@@ -833,7 +833,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunk chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -861,7 +861,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunk chunk = null;
+		ChunkAccess chunk = null;
 		// TOOD: Don't use this.decorationArea == null for worldgenregions
 		// doing things outside of population, split up worldgenregion
 		// into separate classes, one for decoration, one for non-decoration.		
@@ -880,7 +880,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		int heightMapy = chunk.getHeight(Type.WORLD_SURFACE_WG, internalX, internalZ);	
+		int heightMapy = chunk.getHeight(Types.WORLD_SURFACE_WG, internalX, internalZ);	
 		return getHighestBlockYAt(chunk, internalX, heightMapy, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}	
 	

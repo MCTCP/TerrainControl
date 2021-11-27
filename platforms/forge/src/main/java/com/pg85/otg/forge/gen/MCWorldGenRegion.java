@@ -20,14 +20,14 @@ import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.*;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
 
 public class MCWorldGenRegion extends ForgeWorldGenRegion
 {
@@ -35,7 +35,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 	 * Creates a LocalWorldGenRegion to be used for non-OTG worlds, used for /otg spawn/edit/export.
 	 * Cannot use any functionality requiring OTGNoiseChhunkGenerator or OTGBiomeProvider 
 	 * */
-	public MCWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, ISeedReader worldGenRegion)
+	public MCWorldGenRegion(String presetFolderName, IWorldConfig worldConfig, WorldGenLevel worldGenRegion)
 	{
 		super(presetFolderName, worldConfig, worldGenRegion);
 	}
@@ -68,7 +68,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 
-		IChunk chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		
 		// Tried to query an unloaded chunk outside the area being decorated
 		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
@@ -88,7 +88,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		
 		// If the chunk exists or is inside the area being decorated, fetch it normally.
-		IChunk chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		ChunkAccess chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		
 		// Tried to query an unloaded chunk outside the area being decorated
 		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
@@ -99,7 +99,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;	
-		int heightMapy = chunk.getHeight(Type.WORLD_SURFACE, internalX, internalZ);
+		int heightMapy = chunk.getHeight(Types.WORLD_SURFACE, internalX, internalZ);
 		
 		return getHighestBlockYAt(chunk, internalX, heightMapy, internalZ, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 	}
@@ -135,12 +135,12 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 
 	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockState state)
 	{
-		CompoundNBT nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
-		nms.put("x", IntNBT.valueOf(x));
-		nms.put("y", IntNBT.valueOf(y));
-		nms.put("z", IntNBT.valueOf(z));
+		CompoundTag nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
+		nms.put("x", IntTag.valueOf(x));
+		nms.put("y", IntTag.valueOf(y));
+		nms.put("z", IntTag.valueOf(z));
 
-		TileEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
+		BlockEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)
 		{
 			try {
