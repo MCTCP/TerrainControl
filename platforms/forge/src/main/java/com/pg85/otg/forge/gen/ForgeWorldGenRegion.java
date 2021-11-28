@@ -108,8 +108,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public ChunkCoordinate getSpawnChunk()
 	{
-		BlockPos spawnPos = this.worldGenRegion.getLevel().getSharedSpawnPos();
-		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+		if(this.getWorldConfig().getSpawnPointSet())
+		{
+			return ChunkCoordinate.fromBlockCoords(this.getWorldConfig().getSpawnPointX(), this.getWorldConfig().getSpawnPointZ());
+		} else {
+			BlockPos spawnPos = this.worldGenRegion.getLevel().getSharedSpawnPos();
+			return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+		}
 	}
 	
 	public WorldGenLevel getInternal()

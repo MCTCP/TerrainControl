@@ -113,8 +113,13 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public ChunkCoordinate getSpawnChunk()
 	{
-		BlockPos spawnPos = this.worldGenRegion.getMinecraftWorld().getSharedSpawnPos();
-		return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+		if(this.getWorldConfig().getSpawnPointSet())
+		{
+			return ChunkCoordinate.fromBlockCoords(this.getWorldConfig().getSpawnPointX(), this.getWorldConfig().getSpawnPointZ());
+		} else {
+			BlockPosition spawnPos = this.worldGenRegion.getMinecraftWorld().getSpawn();
+			return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+		}
 	}
 
 	public LevelAccessor getInternal()
