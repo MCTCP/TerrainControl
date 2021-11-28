@@ -84,7 +84,7 @@ public class OTGPlugin
 	// OTG World Type MP: Register the OTG world type. 
 	// For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
-	@OnlyIn(Dist.DEDICATED_SERVER)
+	//@OnlyIn(Dist.DEDICATED_SERVER)
 	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)
 	{
 		ForgeRegistries.WORLD_TYPES.register(new OTGWorldType());
