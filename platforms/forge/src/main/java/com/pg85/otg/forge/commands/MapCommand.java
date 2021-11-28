@@ -68,7 +68,7 @@ public class MapCommand extends BaseCommand
 				context -> map(context.getSource(), "", 2048, 2048, 0)
 				).then(
 					Commands.argument("type", StringArgumentType.word()).executes(
-							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 0))
+							context -> map(context.getSource(), StringArgumentType.getString(context, "type"), 2048, 2048, 1))
 							.suggests(this::suggestTypes
 					).then(
 						Commands.argument("width", IntegerArgumentType.integer(0)).executes(
