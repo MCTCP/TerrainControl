@@ -94,7 +94,7 @@ public class BiomeLayers
 				// If we're at the land size, initialize the land layer with the provided rarity.
 				if (depth == data.landSize && data.landRarity > 0)
 				{
-					factory = new LandLayer(data.landRarity, data.forceLandAtSpawn).create(contextProvider.apply(1L), factory);
+					factory = new LandLayer(data.landRarity, data.forceLandAtSpawn, data.oldLandRarity).create(contextProvider.apply(1L), factory);
 					factory = new FuzzyScaleLayer().create(contextProvider.apply(2000L), factory);
 				}
 

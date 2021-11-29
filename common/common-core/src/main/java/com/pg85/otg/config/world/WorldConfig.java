@@ -195,6 +195,7 @@ public class WorldConfig extends WorldConfigBase
 		this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger);
 		this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger);
 		this.oldGroupRarity = reader.getSetting(WorldStandardValues.OLD_GROUP_RARITY, logger);
+		this.oldLandRarity = reader.getSetting(WorldStandardValues.OLD_LAND_RARITY, logger);
 		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);
 		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
 		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
@@ -482,6 +483,10 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.OLD_GROUP_RARITY, this.oldGroupRarity,
 			"Whether or not OTG should use the old group rarity"
+		);
+
+		writer.putSetting(WorldStandardValues.OLD_LAND_RARITY, this.oldLandRarity,
+				"Whether or not OTG should use the old land rarity. Disabling this will make LandRarity work as a percentage"
 		);
 
 		writer.putSetting(WorldStandardValues.IMPROVED_BORDER_DECORATION, this.improvedBorderDecoration,
