@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+", changing: true
-        classpath "org.spongepowered:mixingradle:0.7.+"
+        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
 
@@ -33,7 +33,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: "official", version: "1.17.1"
+    mappings channel: "official", version: "1.16.5"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // Default run configurations.
@@ -89,18 +89,18 @@ minecraft {
 }
 
 dependencies {
-    minecraft('net.minecraftforge:forge:1.17.1-37.0.126')
+    minecraft("net.minecraftforge:forge:1.16.5-36.1.6")
 
-    annotationProcessor("org.spongepowered:mixin:0.8.4:processor")
+    annotationProcessor("org.spongepowered:mixin:0.8:processor")
 
     implementation(project(":common:common-core"))
 
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.7") {
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.0") {
         exclude group: "org.yaml"
     }
 
     // We may not need this, remove if so
-    compileOnly(fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.2.7"))
+    compileOnly(fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.16.3:7.2.0"))
 }
 
 tasks {

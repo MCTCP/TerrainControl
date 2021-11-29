@@ -6,12 +6,13 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
-import com.pg85.otg.forge.dimensions.OTGDimensionTypeHelper;
+import com.pg85.otg.forge.dimensions.OTGDimensionType;
 import com.pg85.otg.forge.dimensions.OTGWorldType;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalBlocks;
 import com.pg85.otg.forge.dimensions.portals.OTGCapabilities;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalPois;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.presets.Preset;
 
@@ -71,14 +72,12 @@ public class OTGPlugin
 		OTGCapabilities.register();
 	}
 
-
-
 	// OTG World Type SP: We use our own world type registration logic so we can add a "customise"
 	// button to the world creation gui that shows OTG preset selection and customisation screens.
 	private void clientSetup(final FMLClientSetupEvent event)
 	{
 		// Register the OTG world type and any OTG GUI's for the world creation screen.
-		//OTGGui.init(); // Removed for 1.17 update, needs reimplementing
+		OTGGui.init();
 	}
 
 	// OTG World Type MP: Register the OTG world type. 
@@ -124,8 +123,8 @@ public class OTGPlugin
 			{
 				Path datapackDir = ((ServerLevel)event.getWorld()).getLevel().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
 				Preset preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getLevel().getChunkSource().generator).getPreset();
-				String dimName = ((ServerLevel)event.getWorld()).dimension().location().getPath();
-				OTGDimensionTypeHelper.saveDataPackFile(datapackDir, dimName, preset.getWorldConfig(), preset.getFolderName());
+				String dimName = ((ServerLevel)event.getWorld()).getWorldServer().dimension().location().getPath();
+				OTGDimensionType.saveDataPackFile(datapackDir, dimName, preset.getWorldConfig(), preset.getFolderName());
 			}
 		}
 		((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());

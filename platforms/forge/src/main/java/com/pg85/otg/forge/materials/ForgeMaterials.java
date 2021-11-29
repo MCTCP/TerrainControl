@@ -3,6 +3,7 @@ package com.pg85.otg.forge.materials;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import net.minecraft.block.*;
 import net.minecraft.world.level.block.state.properties.BambooLeaves;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.BlockTags;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.block.BambooBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
-import net.minecraft.world.level.block.TallSeagrassBlock;
+import net.minecraft.world.level.block.TallSeagrass;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -304,8 +305,8 @@ public class ForgeMaterials extends LocalMaterials
 		BAMBOO_LARGE_GROWING = ForgeMaterialData.ofBlockState(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.LARGE).setValue(BambooBlock.STAGE, 1));
 		PODZOL = ForgeMaterialData.ofBlockState(Blocks.PODZOL.defaultBlockState());
 		SEAGRASS = ForgeMaterialData.ofBlockState(Blocks.SEAGRASS.defaultBlockState());
-		TALL_SEAGRASS_LOWER = ForgeMaterialData.ofBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrassBlock.HALF, DoubleBlockHalf.LOWER));
-		TALL_SEAGRASS_UPPER = ForgeMaterialData.ofBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrassBlock.HALF, DoubleBlockHalf.UPPER));
+		TALL_SEAGRASS_LOWER = ForgeMaterialData.ofBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrass.HALF, DoubleBlockHalf.LOWER));
+		TALL_SEAGRASS_UPPER = ForgeMaterialData.ofBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeagrass.HALF, DoubleBlockHalf.UPPER));
 		KELP = ForgeMaterialData.ofBlockState(Blocks.KELP.defaultBlockState());
 		KELP_PLANT = ForgeMaterialData.ofBlockState(Blocks.KELP_PLANT.defaultBlockState());
 		VINE_SOUTH = ForgeMaterialData.ofBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.SOUTH, true));

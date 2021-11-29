@@ -17,19 +17,17 @@ public class ForgeMaterialTag extends LocalMaterialTag
 	public static LocalMaterialTag ofString(String name)
 	{ 
 		// If otg: or no domain was supplied, try OTG tags.
-
-		// TODO: This might not be updated correctly, needs another look --auth
-		Tag<Block> optTag;
+		Optional<? extends Named<Block>> optTag;
 		if(!name.contains(":") || name.startsWith(Constants.MOD_ID_SHORT + ":"))
 		{
 			final ResourceLocation otgResourceLocation;
 			try
 			{
 				otgResourceLocation = new ResourceLocation(Constants.MOD_ID_SHORT + ":" + name.trim().toLowerCase().replace(Constants.MOD_ID_SHORT + ":", ""));
-				optTag = BlockTags.getAllTags().getTag(otgResourceLocation);
-				if(optTag != null)
+				optTag = BlockTags.getWrappers().stream().filter(a -> a.getName().equals(otgResourceLocation)).findFirst();
+				if(optTag.isPresent())
 				{
-					return new ForgeMaterialTag(optTag, otgResourceLocation.toString());
+					return new ForgeMaterialTag(optTag.get(), otgResourceLocation.toString());
 				}
 			} catch(ResourceLocationException ex) { }
 		}
@@ -38,10 +36,10 @@ public class ForgeMaterialTag extends LocalMaterialTag
 		try
 		{
 			resourceLocation = new ResourceLocation(name.trim().toLowerCase());
-			optTag = BlockTags.getAllTags().getTag(resourceLocation);
-			if(optTag != null)
+			optTag = BlockTags.getWrappers().stream().filter(a -> a.getName().equals(resourceLocation)).findFirst();
+			if(optTag.isPresent())
 			{
-				return new ForgeMaterialTag(optTag, resourceLocation.toString());
+				return new ForgeMaterialTag(optTag.get(), resourceLocation.toString());
 			}
 		} catch(ResourceLocationException ex) { }
 		

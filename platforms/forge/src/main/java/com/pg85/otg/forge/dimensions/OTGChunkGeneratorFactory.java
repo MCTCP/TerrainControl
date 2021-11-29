@@ -20,6 +20,6 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 	// Used for MP when starting the server, with settings from server.properties.
 	public WorldGenSettings createSettings(RegistryAccess dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
 	{	
-		return OTGDimensionTypeHelper.createOTGSettings(dynamicRegistries, seed, generateStructures, bonusChest, generatorSettings);
+		return OTGDimensionType.createOTGSettings(dynamicRegistries, seed, generateStructures, bonusChest, generatorSettings);
 	}
 }

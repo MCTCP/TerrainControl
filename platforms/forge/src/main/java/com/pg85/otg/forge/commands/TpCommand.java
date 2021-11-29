@@ -85,7 +85,7 @@ public class TpCommand extends BaseCommand
 		} else
 		{
 			int y = world.getChunkSource().generator.getBaseHeight(pos.getX(), pos.getZ(),
-					Types.MOTION_BLOCKING_NO_LEAVES, world);
+					Types.MOTION_BLOCKING_NO_LEAVES);
 			source.getPlayerOrException().teleportTo(pos.getX(), y, pos.getZ());
 			source.sendSuccess(new TextComponent("Teleporting you to the nearest " + biome + "."), false);
 			return 0;

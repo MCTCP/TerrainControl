@@ -45,7 +45,6 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
 
-import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -1254,9 +1253,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
 			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.MONSTER), EntityCategory.MONSTER);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.AMBIENT), EntityCategory.AMBIENT);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.AMBIENT), EntityCategory.AMBIENT_CREATURE);
 			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.CREATURE), EntityCategory.CREATURE);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.UNDERGROUND_WATER_CREATURE), EntityCategory.UNDERGROUND_WATER_CREATURE);
 			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
 			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.WATER_CREATURE), EntityCategory.WATER_CREATURE);
 			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.MISC), EntityCategory.MISC);
@@ -1270,11 +1268,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 
 	private List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, MobCategory type)
 	{
-		WeightedRandomList<SpawnerData> mobList = biome.getMobSettings().getMobs(type);
+		List<SpawnerData> mobList = biome.getMobSettings().getMobs(type);		
 		List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
-		for (SpawnerData spawner : mobList.unwrap())
+		for (SpawnerData spawner : mobList)
 		{
-			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount);
+			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.weight, spawner.minCount, spawner.maxCount);
 			if(wMSG != null)
 			{
 				result.add(wMSG);

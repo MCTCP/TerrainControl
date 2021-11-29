@@ -53,17 +53,17 @@ import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class OTGDimensionTypeHelper
+public class OTGDimensionType extends DimensionType
 {
-	public static DimensionType make(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int minY, int height, int logicalHeight, BiomeZoomer biomeZoomer, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
+	public OTGDimensionType(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int logicalHeight, BiomeZoomer biomeZoomer, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
 	{
-		return DimensionType.create(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, createDragonFight, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, minY, height, logicalHeight, biomeZoomer, infiniburn, effectsLocation, ambientLight);
+		super(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, createDragonFight, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, logicalHeight, biomeZoomer, infiniburn, effectsLocation, ambientLight);
 	}
 	
 	// Used for MP when starting the server, with settings from server.properties.
 	public static WorldGenSettings createOTGSettings(RegistryAccess dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
 	{
-		WritableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+		WritableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 		Registry<NoiseGeneratorSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 		
@@ -129,7 +129,7 @@ public class OTGDimensionTypeHelper
 			}
 		}
 
-		return OTGDimensionTypeHelper.createOTGDimensionGeneratorSettings(
+		return OTGDimensionType.createOTGDimensionGeneratorSettings(
 			dimConfigName,				
 			dimConfig,
 			dimensionTypesRegistry,
@@ -221,7 +221,7 @@ public class OTGDimensionTypeHelper
 		IWorldConfig worldConfig = preset.getWorldConfig();
 		
 		// Register OTG DimensionType with settings from WorldConfig
-		DimensionType otgOverWorld = DimensionType.create(
+		DimensionType otgOverWorld = new DimensionType(
 			worldConfig.getFixedTime(),
 			worldConfig.getHasSkyLight(),
 			worldConfig.getHasCeiling(),
@@ -233,8 +233,6 @@ public class OTGDimensionTypeHelper
 			worldConfig.getBedWorks(),
 			worldConfig.getRespawnAnchorWorks(),
 			worldConfig.getHasRaids(),
-			Constants.WORLD_DEPTH,
-			Constants.WORLD_HEIGHT,
 			worldConfig.getLogicalHeight(),
 			FuzzyOffsetConstantColumnBiomeZoomer.INSTANCE,
 			new ResourceLocation(worldConfig.getInfiniburn()),

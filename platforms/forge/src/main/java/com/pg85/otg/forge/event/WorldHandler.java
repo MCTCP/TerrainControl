@@ -30,13 +30,13 @@ public class WorldHandler
 		{
 			// If a fixed spawn point is configured in the WorldConfig, apply it.
 			IWorldConfig worldConfig = null;
-			if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			if(((ServerLevel)event.getWorld()).getWorldServer().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 			{
-				worldConfig = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset().getWorldConfig();
+				worldConfig = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getWorldServer().getChunkSource().generator).getPreset().getWorldConfig(); 
 				if(worldConfig.getSpawnPointSet())
 				{
 					event.setCanceled(true);
-					((ServerLevel)event.getWorld()).setDefaultSpawnPos(new BlockPos(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ()), worldConfig.getSpawnPointAngle());
+					((ServerLevel)event.getWorld()).getWorldServer().setDefaultSpawnPos(new BlockPos(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ()), worldConfig.getSpawnPointAngle());
 				}
 			}
 		

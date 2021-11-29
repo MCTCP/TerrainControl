@@ -16,7 +16,6 @@ import com.pg85.otg.interfaces.IBiomeConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
@@ -152,11 +151,11 @@ public class BiomeCommand extends BaseCommand
 
 	}
 
-	public void showSpawns(CommandSourceStack source, WeightedRandomList<SpawnerData> spawns)
+	public void showSpawns(CommandSourceStack source, List<SpawnerData> spawns)
 	{
-		spawns.unwrap().forEach(spawn -> source
+		spawns.forEach(spawn -> source
 				.sendSuccess(createComponent("   - Entity: ", spawn.type.getRegistryName().toString(), ChatFormatting.GOLD, ChatFormatting.GREEN)
-						.append(createComponent(", Weight: ", Integer.toString(spawn.getWeight().asInt()), ChatFormatting.GOLD,
+						.append(createComponent(", Weight: ", Integer.toString(spawn.weight), ChatFormatting.GOLD,
 								ChatFormatting.GREEN))
 						.append(createComponent(", Min: ", Integer.toString(spawn.minCount), ChatFormatting.GOLD,
 								ChatFormatting.GREEN))
