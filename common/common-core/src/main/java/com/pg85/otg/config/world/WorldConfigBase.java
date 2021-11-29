@@ -86,6 +86,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int riverSize;
 	protected boolean riversEnabled;
 	protected boolean biomeConfigsHaveReplacement = false;
+	protected boolean improvedBorderDecoration = false;
 
 	// Terrain settings
 	
@@ -256,6 +257,11 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public double getFractureHorizontal()
 	{
 		return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
+	}
+
+	@Override
+	public boolean improvedBorderDecoration() {
+		return improvedBorderDecoration;
 	}
 
 	@Override

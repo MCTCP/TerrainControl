@@ -40,6 +40,7 @@ public interface IWorldConfig
 
 	public boolean isDisableOreGen();
 	public boolean getBedrockDisabled();
+	public boolean improvedBorderDecoration();
 
 	// Blocks
 
