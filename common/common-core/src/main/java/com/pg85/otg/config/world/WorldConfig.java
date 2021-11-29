@@ -940,10 +940,10 @@ public class WorldConfig extends WorldConfigBase
 		
 		writer.header1("Dimension settings (Forge)");
 
-		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? -1 : this.fixedTime.getAsLong(),
-			"The time this dimension is fixed at, from 0 to 24000.",
-			"-1 by default, meaning disabled, so time passes normally."
-		);		
+		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? WorldStandardValues.FIXED_TIME.getDefaultValue() : this.fixedTime.getAsLong(),
+				"The time this dimension is fixed at, from 0 to 24000.",
+				"-1 by default, meaning disabled, so time passes normally."
+		);
 		writer.putSetting(WorldStandardValues.HAS_SKYLIGHT, this.hasSkyLight, 
 			"Whether this dimension uses a skylight, defaults to true.",
 			"Vanilla nether and end use false, nether combines this with AmbientLight:0.1."

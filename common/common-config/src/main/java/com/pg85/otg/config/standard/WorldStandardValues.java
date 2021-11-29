@@ -101,7 +101,7 @@ public class WorldStandardValues extends Settings
 	;
 	
 	public static final Setting<Long>
-		FIXED_TIME = longSetting("FixedTime", -1l, 0, 24000)
+		FIXED_TIME = longSetting("FixedTime", -1l, -1l, 24000)
 	;
 	
 	public static final Setting<Boolean>
