@@ -36,15 +36,15 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.BlockStateArgument;
-import net.minecraft.command.arguments.BlockStateInput;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.commands.arguments.blocks.BlockInput;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class ExportCommand extends BaseCommand
 {
@@ -59,7 +59,7 @@ public class ExportCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(
 			Commands.literal("export").executes(this::execute).then(
@@ -93,17 +93,17 @@ public class ExportCommand extends BaseCommand
 		);
 	}
 
-	public int execute(CommandContext<CommandSource> context)
+	public int execute(CommandContext<CommandSourceStack> context)
 	{
-		CommandSource source = context.getSource();
+		CommandSourceStack source = context.getSource();
 		try
 		{
-			if (!(source.getEntity() instanceof ServerPlayerEntity))
+			if (!(source.getEntity() instanceof ServerPlayer))
 			{
-				source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
+				source.sendSuccess(new TextComponent("Only players can execute this command"), false);
 				return 0;
 			}
-			ServerPlayerEntity playerEntity = (ServerPlayerEntity) source.getEntity();
+			ServerPlayer playerEntity = (ServerPlayer) source.getEntity();
 
 			// Extract here; this is kinda complex, would be messy in OTGCommand
 			String objectName = "";
@@ -115,7 +115,7 @@ public class ExportCommand extends BaseCommand
 
 			try
 			{
-				centerBlockState = context.getArgument("center", BlockStateInput.class).getState();
+				centerBlockState = context.getArgument("center", BlockInput.class).getState();
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -148,14 +148,14 @@ public class ExportCommand extends BaseCommand
 
 			if (objectName.equalsIgnoreCase(""))
 			{
-				source.sendSuccess(new StringTextComponent("Usage: /otg export <object name> (center block) [preset] [type] [template] [-a -b -o]").withStyle(TextFormatting.LIGHT_PURPLE), false);
-				source.sendSuccess(new StringTextComponent("Do /otg export help for more info"), false);
+				source.sendSuccess(new TextComponent("Usage: /otg export <object name> (center block) [preset] [type] [template] [-a -b -o]").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+				source.sendSuccess(new TextComponent("Do /otg export help for more info"), false);
 				return 0;
 			}
 
 			if (type == ObjectType.BO2)
 			{
-				source.sendSuccess(new StringTextComponent("Cannot export BO2 objects"), false);
+				source.sendSuccess(new TextComponent("Cannot export BO2 objects"), false);
 				return 0;
 			}
 
@@ -172,7 +172,7 @@ public class ExportCommand extends BaseCommand
 
 			if (region == null || region.getMin() == null || region.getMax() == null)
 			{
-				source.sendSuccess(new StringTextComponent("Please define a region with /otg region mark, or worldedit"), false);
+				source.sendSuccess(new TextComponent("Please define a region with /otg region mark, or worldedit"), false);
 				return 0;
 			}
 
@@ -184,7 +184,7 @@ public class ExportCommand extends BaseCommand
 			Preset preset = ObjectUtils.getPresetOrDefault(presetName);
 			if (preset == null)
 			{
-				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false);
+				source.sendSuccess(new TextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false);
 				return 0;
 			}
 
@@ -194,7 +194,7 @@ public class ExportCommand extends BaseCommand
 			{
 				if (new File(objectPath.toFile(), objectName + "." + type.getType()).exists())
 				{
-					source.sendSuccess(new StringTextComponent("File already exists, run command with flag '-o' to overwrite"), false);
+					source.sendSuccess(new TextComponent("File already exists, run command with flag '-o' to overwrite"), false);
 					return 0;
 				}
 			}
@@ -225,7 +225,7 @@ public class ExportCommand extends BaseCommand
 				OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
 				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker()))
 			{
-				source.sendSuccess(new StringTextComponent("Failed to load template \"" + templateName + "\""), false);
+				source.sendSuccess(new TextComponent("Failed to load template \"" + templateName + "\""), false);
 				return 0;
 			}
 
@@ -259,7 +259,7 @@ public class ExportCommand extends BaseCommand
 			// Send feedback, and register the BO3 for immediate use
 			if (object != null)
 			{
-				source.sendSuccess(new StringTextComponent("Successfully created " + type.getType() + " " + objectName), false);
+				source.sendSuccess(new TextComponent("Successfully created " + type.getType() + " " + objectName), false);
 				if (isGlobal)
 				{
 					OTG.getEngine().getCustomObjectManager().registerGlobalObject(object, object.getConfig().getFile());
@@ -268,10 +268,10 @@ public class ExportCommand extends BaseCommand
 						.addObjectToPreset(preset.getFolderName(), object.getName().toLowerCase(Locale.ROOT), object.getConfig().getFile(), object);
 				}
 			} else {
-				source.sendSuccess(new StringTextComponent("Failed to create " + type.getType() + " " + objectName), false);
+				source.sendSuccess(new TextComponent("Failed to create " + type.getType() + " " + objectName), false);
 			}
 		} catch (Exception e) {
-			source.sendSuccess(new StringTextComponent("Something went wrong, please check the logs"), false);
+			source.sendSuccess(new TextComponent("Something went wrong, please check the logs"), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Error during export command: "+e.getClass().getName());
 			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
@@ -279,21 +279,21 @@ public class ExportCommand extends BaseCommand
 		return 0;
 	}
 
-	public int helpMessage(CommandSource source)
+	public int helpMessage(CommandSourceStack source)
 	{
-		source.sendSuccess(new StringTextComponent("Usage: /otg export <object name> (center block) [preset] [type] [template] [-a -b -o]").withStyle(TextFormatting.LIGHT_PURPLE), false);
-		source.sendSuccess(new StringTextComponent(" - Object name is the only required argument"), false);
-		source.sendSuccess(new StringTextComponent(" - Center block is optional; if set, the center will be set to the first found instance of the given block."), false);
-		source.sendSuccess(new StringTextComponent(" - Preset determines where the object is saved, and where templates are searched for"), false);
-		source.sendSuccess(new StringTextComponent(" - Type is either BO3 or BO4"), false);
-		source.sendSuccess(new StringTextComponent(" - Template is a BO3 file whose settings are used for the exported object"), false);
-		source.sendSuccess(new StringTextComponent("    - Templates have file ending .BO3Template or .BO4Template"), false);
-		source.sendSuccess(new StringTextComponent("    - Templates are not loaded as objects"), false);
-		source.sendSuccess(new StringTextComponent(" - There are three flags; -a for Air blocks, -b for Branches, -o for Override"), false);
+		source.sendSuccess(new TextComponent("Usage: /otg export <object name> (center block) [preset] [type] [template] [-a -b -o]").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+		source.sendSuccess(new TextComponent(" - Object name is the only required argument"), false);
+		source.sendSuccess(new TextComponent(" - Center block is optional; if set, the center will be set to the first found instance of the given block."), false);
+		source.sendSuccess(new TextComponent(" - Preset determines where the object is saved, and where templates are searched for"), false);
+		source.sendSuccess(new TextComponent(" - Type is either BO3 or BO4"), false);
+		source.sendSuccess(new TextComponent(" - Template is a BO3 file whose settings are used for the exported object"), false);
+		source.sendSuccess(new TextComponent("    - Templates have file ending .BO3Template or .BO4Template"), false);
+		source.sendSuccess(new TextComponent("    - Templates are not loaded as objects"), false);
+		source.sendSuccess(new TextComponent(" - There are three flags; -a for Air blocks, -b for Branches, -o for Override"), false);
 		return 0;
 	}
 	
-	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder, boolean includeBO2)
 	{
 		Set<String> set = Stream.of(ObjectType.values())
@@ -303,13 +303,13 @@ public class ExportCommand extends BaseCommand
 			{
 				set.remove("BO2");
 			}
-			return ISuggestionProvider.suggest(set, builder);
+			return SharedSuggestionProvider.suggest(set, builder);
 	}
 	
-	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder)
 	{
-		return ISuggestionProvider.suggest(FLAGS, builder);
+		return SharedSuggestionProvider.suggest(FLAGS, builder);
 	}
 	
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
@@ -341,7 +341,7 @@ public class ExportCommand extends BaseCommand
 			if (list == null) list = new ArrayList<>();
 			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
 			list.add("default");
-			return ISuggestionProvider.suggest(list.stream(), builder);
+			return SharedSuggestionProvider.suggest(list.stream(), builder);
 		}
 	}
 }

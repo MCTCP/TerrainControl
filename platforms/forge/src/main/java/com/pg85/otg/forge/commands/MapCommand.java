@@ -28,13 +28,13 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 
 public class MapCommand extends BaseCommand
 {
@@ -61,7 +61,7 @@ public class MapCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("map")
 			.executes(
@@ -83,7 +83,7 @@ public class MapCommand extends BaseCommand
 		);
 	}
 	
-	private int map(CommandSource source, String type, int width, int height, int threads)
+	private int map(CommandSourceStack source, String type, int width, int height, int threads)
 	{
 		switch (type.toLowerCase())
 		{
@@ -92,19 +92,19 @@ public class MapCommand extends BaseCommand
 			case "terrain":
 				return mapTerrain(source, width, height, threads);
 			default:
-				source.sendSuccess(new StringTextComponent(getUsage()), false);
+				source.sendSuccess(new TextComponent(getUsage()), false);
 				return 0;
 		}
 	}
 	
-	private static int mapBiomes(CommandSource source, int width, int height, int threads)
+	private static int mapBiomes(CommandSourceStack source, int width, int height, int threads)
 	{
 		if (
 			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
 			!(source.getLevel().getChunkSource().generator.getBiomeSource() instanceof OTGBiomeProvider)
 		)
 		{
-			source.sendSuccess(new StringTextComponent("Please run this command in an OTG world."), false);
+			source.sendSuccess(new TextComponent("Please run this command in an OTG world."), false);
 			return 1;
 		}
 		
@@ -129,19 +129,19 @@ public class MapCommand extends BaseCommand
 		String hours = "" + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours());
 		String minutes = "" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60));
 		String seconds = "" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60));
-		source.sendSuccess(new StringTextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
+		source.sendSuccess(new TextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
 		
 		return 0;
 	}
 	
-	private static int mapTerrain(CommandSource source, int width, int height, int threads)
+	private static int mapTerrain(CommandSourceStack source, int width, int height, int threads)
 	{
 		if (
 			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
 			!(source.getLevel().getChunkSource().generator.getBiomeSource() instanceof OTGBiomeProvider)
 		)
 		{
-			source.sendSuccess(new StringTextComponent("Please run this command in an OTG world."), false);
+			source.sendSuccess(new TextComponent("Please run this command in an OTG world."), false);
 			return 1;
 		}
 		
@@ -166,12 +166,12 @@ public class MapCommand extends BaseCommand
 		String hours = "" + (duration.toHours() > 9 ? duration.toHours() : "0" + duration.toHours());
 		String minutes = "" + (duration.toMinutes() % 60 > 9 ? (duration.toMinutes() % 60) : "0" + (duration.toMinutes() % 60));
 		String seconds = "" + (duration.get(ChronoUnit.SECONDS) % 60 > 9 ? (duration.get(ChronoUnit.SECONDS) % 60) : "0" + (duration.get(ChronoUnit.SECONDS) % 60));
-		source.sendSuccess(new StringTextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
+		source.sendSuccess(new TextComponent("Finished mapping in " + hours + ":" + minutes + ":" + seconds + "! The resulting image is located at " + fileName + "."), true);
 		
 		return 0;
 	}
 	
-	private static void handleArea(int width, int height, BufferedImage img, CommandSource source, OTGNoiseChunkGenerator generator, boolean mapBiomes, int threads)
+	private static void handleArea(int width, int height, BufferedImage img, CommandSourceStack source, OTGNoiseChunkGenerator generator, boolean mapBiomes, int threads)
 	{
 		// TODO: Optimise this, List<BlockPos2D> is lazy and handy for having workers pop a task 
 		// off a stack until it's empty, ofc it's not efficient or pretty and doesn't scale.
@@ -233,14 +233,14 @@ public class MapCommand extends BaseCommand
 		private final List<BlockPos2D> coordsToHandle;
 		private final CountDownLatch latch;
 		private final OTGNoiseChunkGenerator generator;
-		private final CommandSource source;
+		private final CommandSourceStack source;
 		private final BufferedImage img;
 		private final int progressUpdate;
 		private final boolean mapBiomes;
 		private final int width;
 		private final int height;
 
-		public Worker(CountDownLatch latch, CommandSource source, OTGNoiseChunkGenerator generator, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
+		public Worker(CountDownLatch latch, CommandSourceStack source, OTGNoiseChunkGenerator generator, BufferedImage img, List<BlockPos2D> coordsToHandle, int totalSize, boolean mapBiomes, int width, int height)
 		{
 			this.latch = latch;
 			this.generator = generator;
@@ -279,7 +279,7 @@ public class MapCommand extends BaseCommand
 				// Send a progress update to let people know the server isn't dying
 				if (sizeLeft % this.progressUpdate == 0)
 				{
-					this.source.sendSuccess(new StringTextComponent((int)Math.floor(100 - (((double)sizeLeft / this.totalSize) * 100)) + "% Done mapping"), true);
+					this.source.sendSuccess(new TextComponent((int)Math.floor(100 - (((double)sizeLeft / this.totalSize) * 100)) + "% Done mapping"), true);
 				}
 				
 				if(coords != null)
@@ -372,10 +372,10 @@ public class MapCommand extends BaseCommand
 		}
 	}
 	
-	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder)
 	{
-		return ISuggestionProvider.suggest(MAP_TYPES, builder);
+		return SharedSuggestionProvider.suggest(MAP_TYPES, builder);
 	}
 		
 	public class HighestBlockInfo

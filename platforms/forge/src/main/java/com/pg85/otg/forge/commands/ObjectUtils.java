@@ -17,10 +17,10 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -213,7 +213,7 @@ public class ObjectUtils
 	 * @param verbose Whether to print a success/fail message, as well as whether to register the object after creation
 	 */
 	protected static Runnable getExportRunnable(ObjectType type, RegionCommand.Region region, Corner center, StructuredCustomObject inputObject,
-												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, boolean leaveIllegalLeaves, CommandSource source, LocalWorldGenRegion worldGenRegion)
+												Path exportPath, List<BlockFunction<?>> extraBlocks, String presetFolderName, boolean verbose, boolean leaveIllegalLeaves, CommandSourceStack source, LocalWorldGenRegion worldGenRegion)
 	{
 		return () -> {
 			// Wait for tree to finish
@@ -247,16 +247,16 @@ public class ObjectUtils
 
 			if (verbose && fixedObject != null)
 			{
-				source.sendSuccess(new StringTextComponent("Successfully updated " + type.getType() + " " + inputObject.getName()), false);
+				source.sendSuccess(new TextComponent("Successfully updated " + type.getType() + " " + inputObject.getName()), false);
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetFolderName, fixedObject.getName(), fixedObject.getConfig().getFile(), inputObject);
 			} else if (verbose) {
-				source.sendSuccess(new StringTextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
+				source.sendSuccess(new TextComponent("Failed to update "+type.getType()+" " + inputObject.getName()), false);
 			}
 			cleanArea(worldGenRegion, region.getMin(), region.getMax(), false);
 		};
 	}
 
-	protected static ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerWorld level)
+	protected static ForgeWorldGenRegion getWorldGenRegion(Preset preset, ServerLevel level)
 	{
 		if(level.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{

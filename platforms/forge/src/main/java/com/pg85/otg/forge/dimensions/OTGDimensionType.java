@@ -30,46 +30,46 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.SimpleRegistry;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
-import net.minecraft.world.biome.IBiomeMagnifier;
-import net.minecraft.world.biome.provider.OverworldBiomeProvider;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.DebugChunkGenerator;
-import net.minecraft.world.gen.DimensionSettings;
-import net.minecraft.world.gen.FlatChunkGenerator;
-import net.minecraft.world.gen.FlatGenerationSettings;
-import net.minecraft.world.gen.NoiseChunkGenerator;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.FuzzyOffsetConstantColumnBiomeZoomer;
+import net.minecraft.world.level.biome.BiomeZoomer;
+import net.minecraft.world.level.biome.OverworldBiomeSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.DebugLevelSource;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class OTGDimensionType extends DimensionType
 {
-	public OTGDimensionType(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int logicalHeight, IBiomeMagnifier biomeZoomer, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
+	public OTGDimensionType(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int logicalHeight, BiomeZoomer biomeZoomer, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
 	{
 		super(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, createDragonFight, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, logicalHeight, biomeZoomer, infiniburn, effectsLocation, ambientLight);
 	}
 	
 	// Used for MP when starting the server, with settings from server.properties.
-	public static DimensionGeneratorSettings createOTGSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
+	public static WorldGenSettings createOTGSettings(RegistryAccess dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
 	{
-		MutableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+		WritableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
-		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+		Registry<NoiseGeneratorSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 		
 		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
 		DimensionConfig dimConfig = DimensionConfig.fromDisk(generatorSettings);
-		SimpleRegistry<Dimension> dimensions = null;
+		MappedRegistry<LevelStem> dimensions = null;
 		Preset preset = null;
 		String dimConfigName = null;
 		if(dimConfig == null)
@@ -91,38 +91,38 @@ public class OTGDimensionType extends DimensionType
 			ForgeWorldType def = dimConfig.Overworld.NonOTGWorldType == null || dimConfig.Overworld.NonOTGWorldType.trim().length() == 0 ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
 			if(def != null)
 			{
-				DimensionGeneratorSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateStructures, bonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);
+				WorldGenSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateStructures, bonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);
 				dimensions = existingDimSetting.dimensions();
 			} else {
 				Registry<DimensionType> registry2 = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 				Registry<Biome> registry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
-				Registry<DimensionSettings> registry1 = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-				SimpleRegistry<Dimension> simpleregistry = DimensionType.defaultDimensions(registry2, registry, registry1, seed);		      
-				DimensionGeneratorSettings existingDimSetting = null;
+				Registry<NoiseGeneratorSettings> registry1 = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+				MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(registry2, registry, registry1, seed);		      
+				WorldGenSettings existingDimSetting = null;
 				switch(dimConfig.Overworld.NonOTGWorldType == null ? "" : dimConfig.Overworld.NonOTGWorldType)
 				{
 					case "flat":
-						JsonObject jsonobject = dimConfig.Overworld.NonOTGGeneratorSettings != null && !dimConfig.Overworld.NonOTGGeneratorSettings.isEmpty() ? JSONUtils.parse(dimConfig.Overworld.NonOTGGeneratorSettings) : new JsonObject();
+						JsonObject jsonobject = dimConfig.Overworld.NonOTGGeneratorSettings != null && !dimConfig.Overworld.NonOTGGeneratorSettings.isEmpty() ? GsonHelper.parse(dimConfig.Overworld.NonOTGGeneratorSettings) : new JsonObject();
 						Dynamic<JsonElement> dynamic = new Dynamic<>(JsonOps.INSTANCE, jsonobject);
-						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new FlatChunkGenerator(FlatGenerationSettings.CODEC.parse(dynamic).resultOrPartial(LogManager.getLogger()::error).orElseGet(() -> {
-						return FlatGenerationSettings.getDefault(registry);
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, new FlatLevelSource(FlatLevelGeneratorSettings.CODEC.parse(dynamic).resultOrPartial(LogManager.getLogger()::error).orElseGet(() -> {
+						return FlatLevelGeneratorSettings.getDefault(registry);
 						}))));
 						break;
 					case "debug_all_block_states":
-						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new DebugChunkGenerator(registry)));
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, new DebugLevelSource(registry)));
 						break;
 					case "amplified":
-						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, registry), seed, () -> {
-							return registry1.getOrThrow(DimensionSettings.AMPLIFIED);
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, new NoiseBasedChunkGenerator(new OverworldBiomeSource(seed, false, false, registry), seed, () -> {
+							return registry1.getOrThrow(NoiseGeneratorSettings.AMPLIFIED);
 						})));
 						break;
 					case "largebiomes":
-						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, true, registry), seed, () -> {
-							return registry1.getOrThrow(DimensionSettings.OVERWORLD);
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, new NoiseBasedChunkGenerator(new OverworldBiomeSource(seed, false, true, registry), seed, () -> {
+							return registry1.getOrThrow(NoiseGeneratorSettings.OVERWORLD);
 						})));
 						break;
 					default:
-						existingDimSetting = new DimensionGeneratorSettings(seed, generateStructures, bonusChest, DimensionGeneratorSettings.withOverworld(registry2, simpleregistry, DimensionGeneratorSettings.makeDefaultOverworld(registry, registry1, seed)));
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, WorldGenSettings.makeDefaultOverworld(registry, registry1, seed)));
 						break;
 				}
 				dimensions = existingDimSetting.dimensions();
@@ -143,37 +143,37 @@ public class OTGDimensionType extends DimensionType
 	}
 	
 	// Used for SP and MP
-	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(String dimConfigName, DimensionConfig dimConfig, MutableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, SimpleRegistry<Dimension> defaultDimensions)
+	public static WorldGenSettings createOTGDimensionGeneratorSettings(String dimConfigName, DimensionConfig dimConfig, WritableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<NoiseGeneratorSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, MappedRegistry<LevelStem> defaultDimensions)
 	{
 		// Create a new registry object and register dimensions to it.
-		SimpleRegistry<Dimension> dimensions = new SimpleRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
+		MappedRegistry<LevelStem> dimensions = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
 		boolean nonOTGOverWorld = dimConfig.Overworld.PresetFolderName == null;
 
 		if(dimConfig.Overworld != null && dimConfig.Overworld.PresetFolderName != null && !nonOTGOverWorld)
 		{
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 				dimConfig.Overworld.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Overworld.PresetFolderName, seed, false, false, biomesRegistry), seed,
-				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
+				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 			);
-			addDimension(dimConfig.Overworld.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.OVERWORLD, chunkGenerator, DimensionType.OVERWORLD_LOCATION);
+			addDimension(dimConfig.Overworld.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.OVERWORLD, chunkGenerator, DimensionType.OVERWORLD_LOCATION);
 		}
 		if(dimConfig.Nether != null && dimConfig.Nether.PresetFolderName != null)
 		{
 			long dimSeed = dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 					dimConfig.Nether.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
-				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.NETHER) // TODO: Add OTG DimensionSettings?
+				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER) // TODO: Add OTG DimensionSettings?
 			);
-			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.NETHER, chunkGenerator, DimensionType.NETHER_LOCATION);
+			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.NETHER, chunkGenerator, DimensionType.NETHER_LOCATION);
 		}
 		if(dimConfig.End != null && dimConfig.End.PresetFolderName != null)
 		{
 			long dimSeed = dimConfig.End.Seed != -1l ? dimConfig.End.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 					dimConfig.End.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
-				() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.END) // TODO: Add OTG DimensionSettings?
+				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END) // TODO: Add OTG DimensionSettings?
 			);
-			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, Dimension.END, chunkGenerator, DimensionType.END_LOCATION);
+			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.END, chunkGenerator, DimensionType.END_LOCATION);
 		}
 		if(dimConfig.Dimensions != null)
 		{
@@ -184,30 +184,30 @@ public class OTGDimensionType extends DimensionType
 					long dimSeed = otgDim.Seed != -1l ? otgDim.Seed : new Random().nextLong();
 					ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 						otgDim.PresetFolderName, dimConfigName, new OTGBiomeProvider(otgDim.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
-						() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
+						() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 					);
-					RegistryKey<Dimension> dimRegistryKey = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
-					RegistryKey<DimensionType> dimTypeRegistryKey = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+					ResourceKey<LevelStem> dimRegistryKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
+					ResourceKey<DimensionType> dimTypeRegistryKey = ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));
 					addDimension(otgDim.PresetFolderName, dimensions, dimensionTypesRegistry, dimRegistryKey, chunkGenerator, dimTypeRegistryKey);
 				}
 			}
 		}
 
 		// Register default dimensions (if we're not overriding them with otg dimensions)
-		for(Entry<RegistryKey<Dimension>, Dimension> entry : defaultDimensions.entrySet())
+		for(Entry<ResourceKey<LevelStem>, LevelStem> entry : defaultDimensions.entrySet())
 		{
-			RegistryKey<Dimension> registrykey = entry.getKey();
+			ResourceKey<LevelStem> registrykey = entry.getKey();
 			if (
-				(dimConfig.Overworld == null || dimConfig.Overworld.PresetFolderName == null || registrykey != Dimension.OVERWORLD) &&
-				(dimConfig.Nether == null || dimConfig.Nether.PresetFolderName == null || registrykey != Dimension.NETHER) && 
-				(dimConfig.End == null || dimConfig.End.PresetFolderName == null || registrykey != Dimension.END)
+				(dimConfig.Overworld == null || dimConfig.Overworld.PresetFolderName == null || registrykey != LevelStem.OVERWORLD) &&
+				(dimConfig.Nether == null || dimConfig.Nether.PresetFolderName == null || registrykey != LevelStem.NETHER) && 
+				(dimConfig.End == null || dimConfig.End.PresetFolderName == null || registrykey != LevelStem.END)
 			)
 			{
 				dimensions.register(registrykey, entry.getValue(), defaultDimensions.lifecycle(entry.getValue()));
 			}
 		}
 
-		return new DimensionGeneratorSettings(
+		return new WorldGenSettings(
 			seed,
 			generateFeatures,
 			generateBonusChest,
@@ -215,7 +215,7 @@ public class OTGDimensionType extends DimensionType
 		);
 	}
 
-	private static void addDimension(String presetFolderName, SimpleRegistry<Dimension> dimensions, MutableRegistry<DimensionType> dimensionTypeRegistry, RegistryKey<Dimension> dimRegistryKey, ChunkGenerator chunkGenerator, RegistryKey<DimensionType> dimTypeRegistryKey)
+	private static void addDimension(String presetFolderName, MappedRegistry<LevelStem> dimensions, WritableRegistry<DimensionType> dimensionTypeRegistry, ResourceKey<LevelStem> dimRegistryKey, ChunkGenerator chunkGenerator, ResourceKey<DimensionType> dimTypeRegistryKey)
 	{
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		IWorldConfig worldConfig = preset.getWorldConfig();
@@ -234,18 +234,18 @@ public class OTGDimensionType extends DimensionType
 			worldConfig.getRespawnAnchorWorks(),
 			worldConfig.getHasRaids(),
 			worldConfig.getLogicalHeight(),
-			ColumnFuzzedBiomeMagnifier.INSTANCE,
+			FuzzyOffsetConstantColumnBiomeZoomer.INSTANCE,
 			new ResourceLocation(worldConfig.getInfiniburn()),
 			new ResourceLocation(worldConfig.getEffectsLocation()),
 			worldConfig.getAmbientLight()
 		);
 		dimensionTypeRegistry.registerOrOverride(OptionalInt.empty(), dimTypeRegistryKey, otgOverWorld, Lifecycle.stable());
 		
-		Dimension dimension = dimensions.get(dimRegistryKey);
+		LevelStem dimension = dimensions.get(dimRegistryKey);
 		Supplier<DimensionType> supplier = () -> {
 			return dimension == null ? dimensionTypeRegistry.getOrThrow(dimTypeRegistryKey) : dimension.type();
 		};
-		dimensions.register(dimRegistryKey, new Dimension(supplier, chunkGenerator), Lifecycle.stable());		
+		dimensions.register(dimRegistryKey, new LevelStem(supplier, chunkGenerator), Lifecycle.stable());		
 	}
 	
 	// Writes OTG DimensionTypes to world save folder as datapack json files so they're picked up on world load.

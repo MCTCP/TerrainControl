@@ -23,8 +23,8 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.SaplingType;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -39,7 +39,7 @@ public class SaplingHandler
 	@SubscribeEvent
 	public void onSaplingGrowTree(SaplingGrowTreeEvent event)
 	{
-    	if(!(event.getWorld() instanceof ServerWorld))
+    	if(!(event.getWorld() instanceof ServerLevel))
     	{
     		return;
     	}
@@ -47,14 +47,14 @@ public class SaplingHandler
         BlockPos blockPos = event.getPos();
 		ForgeWorldGenRegion worldGenRegion;	
 		Preset preset;
-		if(((ServerWorld)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 		{
-			preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator).getPreset();
+			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset();
 			worldGenRegion = new ForgeWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
-				(ServerWorld)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator)
+				(ServerLevel)event.getWorld(), 
+				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator)
 			);
 		} else { 
 			return;
@@ -162,7 +162,7 @@ public class SaplingHandler
     @SubscribeEvent
     public void onBonemealUse(BonemealEvent event)
     {
-    	if(!(event.getWorld() instanceof ServerWorld))
+    	if(!(event.getWorld() instanceof ServerLevel))
     	{
     		return;
     	}
@@ -170,14 +170,14 @@ public class SaplingHandler
         BlockPos blockPos = event.getPos();        
 		IWorldGenRegion worldGenRegion;	
 		Preset preset;
-		if(((ServerWorld)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 		{
-			preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator).getPreset();
+			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset();
 			worldGenRegion = new ForgeWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
-				(ServerWorld)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getChunkSource().generator)
+				(ServerLevel)event.getWorld(), 
+				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator)
 			);
 		} else {
 			return;

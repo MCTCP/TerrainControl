@@ -10,15 +10,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryLookupCodec;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.BiomeSource;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
@@ -33,7 +33,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
+public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 {
  	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
@@ -50,12 +50,12 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
 	private final ThreadLocal<CachingLayerSampler> layer;
-	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
+	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
 	
 	public OTGBiomeProvider(String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
-		super(getAllBiomesByPreset(presetFolderName, (MutableRegistry<Biome>)registry));
+		super(getAllBiomesByPreset(presetFolderName, (WritableRegistry<Biome>)registry));
 		this.presetFolderName = presetFolderName;
 		this.seed = seed;
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
@@ -74,19 +74,19 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 		}
 				
 		IBiome biome;
-		RegistryKey<Biome> key;
+		ResourceKey<Biome> key;
 		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
 		{
 			biome = biomeLookup[biomeId];
 			if(biome != null)
 			{
-				key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
+				key = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
 				this.keyLookup.put(biomeId, key);
 			}
 		}
 	}
 	
-	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetFolderName, MutableRegistry<Biome> registry)
+	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetFolderName, WritableRegistry<Biome> registry)
 	{
 		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 		{
@@ -100,7 +100,7 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).reRegisterBiomes(presetFolderName, registry);
 		}
 
-		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
+		List<ResourceKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
 		if(biomesForPreset == null)
 		{
 			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
@@ -114,13 +114,13 @@ public class OTGBiomeProvider extends BiomeProvider implements ILayerSource
 		);
 	}
 
-	protected Codec<? extends BiomeProvider> codec()
+	protected Codec<? extends BiomeSource> codec()
 	{
 		return CODEC;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public BiomeProvider withSeed(long seed)
+	public BiomeSource withSeed(long seed)
 	{
 		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}

@@ -7,10 +7,10 @@ import com.pg85.otg.forge.materials.ForgeMaterials;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeModLoadedChecker;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerChunkProvider;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import java.io.File;
@@ -35,34 +35,34 @@ public class ForgeEngine extends OTGEngine
 		super.onStart();
 	}
 
-	public void reloadPreset(String presetFolderName, MutableRegistry<Biome> biomeRegistry)
+	public void reloadPreset(String presetFolderName, WritableRegistry<Biome> biomeRegistry)
 	{
 		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetFolderName, this.biomeResourcesManager, this.logger, biomeRegistry);
 	}
 	
-	public void onSave(IWorld world)
+	public void onSave(LevelAccessor world)
 	{
 		// For server worlds, save the structure cache.
 		if(
 			!world.isClientSide() && 
-			world.getChunkSource() instanceof ServerChunkProvider && 
-			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+			world.getChunkSource() instanceof ServerChunkCache && 
+			((ServerChunkCache)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
 		)
 		{
-			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).saveStructureCache();
+			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).generator).saveStructureCache();
 		}
 	}
 
-	public void onUnload(IWorld world)
+	public void onUnload(LevelAccessor world)
 	{
 		// For server worlds, stop any worker threads.
 		if(
 			!world.isClientSide() && 
-			world.getChunkSource() instanceof ServerChunkProvider && 
-			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+			world.getChunkSource() instanceof ServerChunkCache && 
+			((ServerChunkCache)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
 		)
 		{
-			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).stopWorkerThreads();
+			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).generator).stopWorkerThreads();
 		}
 	}
 	

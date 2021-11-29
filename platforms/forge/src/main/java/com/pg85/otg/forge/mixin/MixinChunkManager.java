@@ -1,18 +1,18 @@
 package com.pg85.otg.forge.mixin;
 
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.ChunkPrimerWrapper;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.server.ChunkHolder;
-import net.minecraft.world.server.ChunkManager;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.ImposterProtoChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ChunkMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import java.util.function.Predicate;
 
-@Mixin(ChunkManager.class)
+@Mixin(ChunkMap.class)
 public class MixinChunkManager
 {
 	@ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 0))
@@ -22,8 +22,8 @@ public class MixinChunkManager
 	}
 	
 	@ModifyArg(method = "saveAllChunks(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;", ordinal = 1))
-	private Predicate<IChunk> allowChunkPrimerFlush(Predicate<IChunk> chunk)
+	private Predicate<ChunkAccess> allowChunkPrimerFlush(Predicate<ChunkAccess> chunk)
 	{
-		return c -> c instanceof ChunkPrimer || c instanceof ChunkPrimerWrapper || c instanceof Chunk;
+		return c -> c instanceof ProtoChunk || c instanceof ImposterProtoChunk || c instanceof LevelChunk;
 	}	
 }

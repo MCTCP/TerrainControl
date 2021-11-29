@@ -5,13 +5,13 @@ import java.util.Optional;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IBiomeConfig;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 
 public class OTGForgeAPI
 {
 	@SuppressWarnings("resource")
-	public static IBiomeConfig getOTGBiome(ServerWorld world, BlockPos pos)
+	public static IBiomeConfig getOTGBiome(ServerLevel world, BlockPos pos)
 	{
 		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
@@ -22,7 +22,7 @@ public class OTGForgeAPI
 				.getBiomeConfig(pos.getX(), pos.getZ());
 	}
 
-	public static Optional<IBiomeConfig> getOTGBiomeOptional(ServerWorld world, BlockPos pos)
+	public static Optional<IBiomeConfig> getOTGBiomeOptional(ServerLevel world, BlockPos pos)
 	{
 		return Optional.ofNullable(getOTGBiome(world, pos));
 	}

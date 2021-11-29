@@ -11,14 +11,14 @@ import com.pg85.otg.forge.dimensions.portals.OTGPortalColors;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
@@ -34,27 +34,27 @@ public class BlockHandler
 	{
 		if(
 			event.getWorld().getServer() != null &&
-			event.getWorld() instanceof ServerWorld &&
-			event.getWorld().dimension() != World.END &&
-			event.getWorld().dimension() != World.NETHER && 
+			event.getWorld() instanceof ServerLevel &&
+			event.getWorld().dimension() != Level.END &&
+			event.getWorld().dimension() != Level.NETHER && 
 			(
-				event.getWorld().dimension() == World.OVERWORLD ||
-				((ServerWorld)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator
+				event.getWorld().dimension() == Level.OVERWORLD ||
+				((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator
 			)
 		)
 		{
 			// TODO: Optimise this, may cause lag doing this for every right-click?
-			BlockRayTraceResult hitVec = event.getHitVec();
+			BlockHitResult hitVec = event.getHitVec();
 			BlockPos pos = hitVec.getBlockPos().relative(hitVec.getDirection());
-			Collection<ServerWorld> worlds = (Collection<ServerWorld>) event.getWorld().getServer().getAllLevels();
+			Collection<ServerLevel> worlds = (Collection<ServerLevel>) event.getWorld().getServer().getAllLevels();
 			worlds = worlds.stream().sorted((a,b) -> a.dimension().location().toString().compareTo(b.dimension().location().toString())).collect(Collectors.toList());
 			ArrayList<String> usedColors = new ArrayList<>();
-			for(ServerWorld world : worlds)
+			for(ServerLevel world : worlds)
 			{
 				if(
-					world.dimension() != World.END && 
-					world.dimension() != World.NETHER && 
-					world.dimension() != World.OVERWORLD &&
+					world.dimension() != Level.END && 
+					world.dimension() != Level.NETHER && 
+					world.dimension() != Level.OVERWORLD &&
 					world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
 				)
 				{
@@ -81,7 +81,7 @@ public class BlockHandler
 					{
 						RegistryObject<OTGPortalBlock> otgPortalBlock = OTGPortalColors.getPortalBlockByColor(portalColor);				
 						List<LocalMaterialData> portalBlocks = generator.getPortalBlocks();
-						if (OTGPortalBlock.checkForPortal((ServerWorld)event.getWorld(), pos, event.getPlayer(), event.getHand(), event.getItemStack(), otgPortalBlock, portalBlocks)) 
+						if (OTGPortalBlock.checkForPortal((ServerLevel)event.getWorld(), pos, event.getPlayer(), event.getHand(), event.getItemStack(), otgPortalBlock, portalBlocks)) 
 						{
 							event.setCanceled(true);
 							return;

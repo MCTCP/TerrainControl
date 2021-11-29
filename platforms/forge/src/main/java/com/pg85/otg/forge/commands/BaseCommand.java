@@ -2,10 +2,10 @@ package com.pg85.otg.forge.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public abstract class BaseCommand
 {
@@ -39,9 +39,9 @@ public abstract class BaseCommand
 		return this.detailedHelp;
 	}
 	
-	public IFormattableTextComponent createComponent(String text, String text2, TextFormatting color1, TextFormatting color2) {
-		return new StringTextComponent(text).withStyle(color1).append(new StringTextComponent(text2).withStyle(color2));
+	public MutableComponent createComponent(String text, String text2, ChatFormatting color1, ChatFormatting color2) {
+		return new TextComponent(text).withStyle(color1).append(new TextComponent(text2).withStyle(color2));
 	}
 
-	public abstract void build(LiteralArgumentBuilder<CommandSource> builder);
+	public abstract void build(LiteralArgumentBuilder<CommandSourceStack> builder);
 }

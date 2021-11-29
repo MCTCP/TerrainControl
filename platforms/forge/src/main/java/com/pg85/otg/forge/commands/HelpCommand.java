@@ -12,11 +12,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class HelpCommand extends BaseCommand
 {
@@ -30,14 +30,14 @@ public class HelpCommand extends BaseCommand
 	}
 
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("help").executes(context -> showHelp(context.getSource(), ""))
 				.then(Commands.argument("command", StringArgumentType.word()).suggests(this::suggestHelp).executes(
 						(context -> showHelp(context.getSource(), context.getArgument("command", String.class))))));
 	}
 
-	protected int showHelp(CommandSource source, String cmd)
+	protected int showHelp(CommandSourceStack source, String cmd)
 	{
 		if (cmd.isEmpty())
 		{
@@ -54,16 +54,16 @@ public class HelpCommand extends BaseCommand
 				OTGCommand.getCommands().stream().filter(basecmd -> basecmd.getName().equalsIgnoreCase(cmd)).findFirst()
 						.ifPresent(command ->
 						{
-							source.sendSuccess(new StringTextComponent("/otg " + command.getName() + ": ")
-									.withStyle(TextFormatting.GOLD)
-									.append(new StringTextComponent(command.getHelpMessage())
-											.withStyle(TextFormatting.GREEN)),
+							source.sendSuccess(new TextComponent("/otg " + command.getName() + ": ")
+									.withStyle(ChatFormatting.GOLD)
+									.append(new TextComponent(command.getHelpMessage())
+											.withStyle(ChatFormatting.GREEN)),
 									false);
-							source.sendSuccess(new StringTextComponent("usage: " + command.getUsage())
-									.withStyle(TextFormatting.GRAY), false);
+							source.sendSuccess(new TextComponent("usage: " + command.getUsage())
+									.withStyle(ChatFormatting.GRAY), false);
 							for (String help : command.getDetailedHelp())
 							{
-								source.sendSuccess(new StringTextComponent(help).withStyle(TextFormatting.GRAY), false);
+								source.sendSuccess(new TextComponent(help).withStyle(ChatFormatting.GRAY), false);
 							}
 						});
 			}
@@ -71,7 +71,7 @@ public class HelpCommand extends BaseCommand
 		return 0;
 	}
 
-	private void showHelp(CommandSource source, int page)
+	private void showHelp(CommandSourceStack source, int page)
 	{
 		int start = (page - 1) * 5;
 
@@ -82,21 +82,21 @@ public class HelpCommand extends BaseCommand
 			BaseCommand command = commands.get(i);
 
 			source.sendSuccess(
-					new StringTextComponent("/otg " + command.getName() + ": ").withStyle(TextFormatting.GOLD).append(
-							new StringTextComponent(command.getHelpMessage()).withStyle(TextFormatting.GREEN)),
+					new TextComponent("/otg " + command.getName() + ": ").withStyle(ChatFormatting.GOLD).append(
+							new TextComponent(command.getHelpMessage()).withStyle(ChatFormatting.GREEN)),
 					false);
 			source.sendSuccess(
-					new StringTextComponent(" - usage: " + command.getUsage()).withStyle(TextFormatting.GRAY), false);
+					new TextComponent(" - usage: " + command.getUsage()).withStyle(ChatFormatting.GRAY), false);
 		}
 		source.sendSuccess(
-				new StringTextComponent("Use /otg help <page> for more commands.").withStyle(TextFormatting.GOLD),
+				new TextComponent("Use /otg help <page> for more commands.").withStyle(ChatFormatting.GOLD),
 				false);
 	}
 
-	private CompletableFuture<Suggestions> suggestHelp(CommandContext<CommandSource> context,
+	private CompletableFuture<Suggestions> suggestHelp(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder)
 	{
-		return ISuggestionProvider.suggest(
+		return SharedSuggestionProvider.suggest(
 				OTGCommand.getCommands().stream().map(BaseCommand::getName).collect(Collectors.toList()), builder);
 	}
 }

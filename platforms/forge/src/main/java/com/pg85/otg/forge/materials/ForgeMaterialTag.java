@@ -5,19 +5,19 @@ import java.util.Optional;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ITag.INamedTag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.Tag.Named;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ResourceLocationException;
 
 public class ForgeMaterialTag extends LocalMaterialTag
 {
 	public static LocalMaterialTag ofString(String name)
 	{ 
 		// If otg: or no domain was supplied, try OTG tags.
-		Optional<? extends INamedTag<Block>> optTag;
+		Optional<? extends Named<Block>> optTag;
 		if(!name.contains(":") || name.startsWith(Constants.MOD_ID_SHORT + ":"))
 		{
 			final ResourceLocation otgResourceLocation;
@@ -47,15 +47,15 @@ public class ForgeMaterialTag extends LocalMaterialTag
 	}
 
 	private final String name;
-	private final ITag<Block> blockTag;
+	private final Tag<Block> blockTag;
 
-	private ForgeMaterialTag(ITag<Block> blockTag, String name)
+	private ForgeMaterialTag(Tag<Block> blockTag, String name)
 	{
 		this.blockTag = blockTag;
 		this.name = name;
 	}
 
-	public ITag<Block> getTag()
+	public Tag<Block> getTag()
 	{
 		return this.blockTag;
 	}

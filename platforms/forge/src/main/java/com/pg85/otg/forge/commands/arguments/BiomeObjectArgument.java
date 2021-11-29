@@ -11,14 +11,14 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 public class BiomeObjectArgument
 {
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
 
-	public static CompletableFuture<Suggestions> suggest(CommandContext<CommandSource> context,
+	public static CompletableFuture<Suggestions> suggest(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder)
 	{
 		String presetFolderName = context.getArgument("preset", String.class);
@@ -37,6 +37,6 @@ public class BiomeObjectArgument
 			list = new ArrayList<>();
 		}
 		list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
-		return ISuggestionProvider.suggest(list, builder);
+		return SharedSuggestionProvider.suggest(list, builder);
 	}
 }
