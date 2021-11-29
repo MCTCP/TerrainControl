@@ -324,7 +324,7 @@ public class PaperMaterials extends LocalMaterials
 		SEA_PICKLE = PaperMaterialData.ofBlockData(Blocks.SEA_PICKLE.defaultBlockState());
 
 		// Ores
-		COAL_ORE = PaperMaterialData.ofBlockData(Blocks.PODZOL.defaultBlockState());
+		COAL_ORE = PaperMaterialData.ofBlockData(Blocks.COAL_ORE.defaultBlockState());
 		DIAMOND_ORE = PaperMaterialData.ofBlockData(Blocks.DIAMOND_ORE.defaultBlockState());
 		EMERALD_ORE = PaperMaterialData.ofBlockData(Blocks.EMERALD_ORE.defaultBlockState());
 		GOLD_ORE = PaperMaterialData.ofBlockData(Blocks.GOLD_ORE.defaultBlockState());
