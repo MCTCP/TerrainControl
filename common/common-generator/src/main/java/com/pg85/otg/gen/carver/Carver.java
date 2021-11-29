@@ -119,7 +119,7 @@ public abstract class Carver
 			{
 				foundSurface.setValue(true);
 			}				
-			if (material.isSolid() && !blockAbove.isMaterial(LocalMaterials.WATER))
+			if (material.isSolid() && !blockAbove.isLiquid())
 			{
 				if (y <= this.worldConfig.getCarverLavaBlockHeight())
 				{
@@ -152,7 +152,7 @@ public abstract class Carver
 			{
 				for (int k = minY - 1; k <= maxY + 1; ++k)
 				{
-					if (chunk.getBlock(i + mainChunkX * Constants.CHUNK_SIZE, k, j + mainChunkZ * Constants.CHUNK_SIZE).isMaterial(LocalMaterials.WATER))
+					if (chunk.getBlock(i + mainChunkX * Constants.CHUNK_SIZE, k, j + mainChunkZ * Constants.CHUNK_SIZE).isLiquid())
 					{
 						return true;
 					}
