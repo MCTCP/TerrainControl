@@ -937,12 +937,18 @@ public class WorldConfig extends WorldConfigBase
 			"The ignition source for this portal, minecraft:flint_and_steel by default.",
 			"Only applies for dimensions, not overworld/nether/end."
 		);
-		
-		writer.header1("Dimension settings (Forge)");
+
+		writer.header1("Dimension settings (Forge)",
+				"Note: At world creation, these settings are written to the world save's datapack folder (\\saves\\WorldName\\datapacks\\otg\\)",
+				"as dimension_type json file. The json file is used by MC on world load to fetch the settings. If you want to change dimension",
+				"settings for already created worlds make sure to edit the dimension_type json file, since changes to the WorldConfig dimension",
+				"settings won't be picked up on world load, only on world creation."
+		);
 
 		writer.putSetting(WorldStandardValues.FIXED_TIME, !this.fixedTime.isPresent() ? WorldStandardValues.FIXED_TIME.getDefaultValue() : this.fixedTime.getAsLong(),
 				"The time this dimension is fixed at, from 0 to 24000.",
-				"-1 by default, meaning disabled, so time passes normally."
+				"-1 by default, meaning disabled, so time passes normally.",
+				"Vanilla Nether uses 18000, End uses 6000."
 		);
 		writer.putSetting(WorldStandardValues.HAS_SKYLIGHT, this.hasSkyLight, 
 			"Whether this dimension uses a skylight, defaults to true.",
