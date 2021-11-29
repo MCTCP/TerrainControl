@@ -10,8 +10,8 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.ISuggestionProvider;
 
 public class PresetArgument
 {
@@ -19,7 +19,7 @@ public class PresetArgument
 			? "\"" + name + "\""
 			: name);
 
-	public static CompletableFuture<Suggestions> suggest(CommandContext<CommandSourceStack> context,
+	public static CompletableFuture<Suggestions> suggest(CommandContext<CommandSource> context,
 			SuggestionsBuilder builder, boolean global)
 	{
 		// TODO: Should this include shortnames?
@@ -27,6 +27,6 @@ public class PresetArgument
 				.map(filterNamesWithSpaces).collect(Collectors.toSet());
 		if (global)
 			set.add("global");
-		return SharedSuggestionProvider.suggest(set, builder);
+		return ISuggestionProvider.suggest(set, builder);
 	}
 }

@@ -45,20 +45,20 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.EntityCategory;
 
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.core.WritableRegistry;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
+import net.minecraft.util.registry.MutableRegistry;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private Map<String, List<ResourceKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();
+	private Map<String, List<RegistryKey<Biome>>> biomesByPresetFolderName = new LinkedHashMap<>();
 	private HashMap<String, IBiome[]> globalIdMapping = new HashMap<>();
 	private Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return new ForgeMaterialReader();
 	}
 
-	public List<ResourceKey<Biome>> getBiomeRegistryKeys(String presetFolderName)
+	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetFolderName)
 	{
 		return this.biomesByPresetFolderName.get(presetFolderName);
 	}
@@ -97,7 +97,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, WritableRegistry<Biome> biomeRegistry)
+	public void reloadPresetFromDisk(String presetFolderName, IConfigFunctionProvider biomeResourcesManager, ILogger logger, MutableRegistry<Biome> biomeRegistry)
 	{
 		clearCaches();
 		
@@ -131,7 +131,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		this.materialReaderByPresetFolderName = new HashMap<>();
 	}
 
-	public void reRegisterBiomes(String presetFolderName, WritableRegistry<Biome> biomeRegistry)
+	public void reRegisterBiomes(String presetFolderName, MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping.remove(presetFolderName);
 		this.presetGenerationData.remove(presetFolderName);
@@ -146,7 +146,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		registerBiomes(false, null);
 	}
 
-	private void registerBiomes(boolean refresh, WritableRegistry<Biome> biomeRegistry)
+	private void registerBiomes(boolean refresh, MutableRegistry<Biome> biomeRegistry)
 	{
 		for(Preset preset : this.presets.values())
 		{
@@ -154,7 +154,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		}
 	}
 	
-	private void registerBiomesForPreset(boolean refresh, Preset preset, WritableRegistry<Biome> biomeRegistry)
+	private void registerBiomesForPreset(boolean refresh, Preset preset, MutableRegistry<Biome> biomeRegistry)
 	{
 		// Index BiomeColors for FromImageMode and /otg map
 		HashMap<Integer, Integer> biomeColorMap = new HashMap<Integer, Integer>();
@@ -162,7 +162,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		// Start at 1, 0 is the fallback for the biome generator (the world's ocean biome).
 		int currentId = 1;
 		
-		List<ResourceKey<Biome>> presetBiomes = new ArrayList<>();
+		List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
 		this.biomesByPresetFolderName.put(preset.getFolderName(), presetBiomes);
 
 		IWorldConfig worldConfig = preset.getWorldConfig();
@@ -212,7 +212,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			// When using TemplateForBiome, we'll fetch the non-OTG biome from the registry, including any settings registered to it.
 			// For normal biomes we create our own new OTG biome and apply settings from the biome config.
 			ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getKey().toResourceLocationString());
-			ResourceKey<Biome> registryKey;
+			RegistryKey<Biome> registryKey;
 			Biome biome;
 			if(biomeConfig.getValue().getTemplateForBiome())
 			{
@@ -225,7 +225,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 					continue;
 				}
-				registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);				
+				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);				
 				presetBiomes.add(registryKey);
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
@@ -241,7 +241,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				
 				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
 				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
- 				registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+ 				registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 				presetBiomes.add(registryKey);
  				biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());	 			
 
@@ -392,7 +392,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 			List<String> allowedMods = new ArrayList<>();
 			List<Biome> excludedBiomes = new ArrayList<>();
-			List<Biome.BiomeCategory> excludedCategories = new ArrayList<>();
+			List<Biome.Category> excludedCategories = new ArrayList<>();
 			List<BiomeDictionary.Type> excludedTags = new ArrayList<>();
 			List<String> excludedMods = new ArrayList<>();
 			List<String> tagStrings = new ArrayList<>();
@@ -477,7 +477,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						)
 						{
 							// Exclude biome category
-							Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							Biome.Category category = Biome.Category.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 							if(category != null)
 							{
 								excludedCategories.add(category);
@@ -535,8 +535,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
 				) {
-					Set<ResourceKey<Biome>> biomesForTags = new HashSet<>();
-					List<Biome.BiomeCategory> innerExcludedCategories = new ArrayList<>();
+					Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
+					List<Biome.Category> innerExcludedCategories = new ArrayList<>();
 					List<BiomeDictionary.Type> innerExcludedTags = new ArrayList<>();
 					List<String> innerExcludedMods = new ArrayList<>();
 					// Handle biome category
@@ -549,7 +549,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
 						)
 						{
-							Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 							if(category != null)
 							{								
 								innerExcludedCategories.add(category);
@@ -566,7 +566,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
 						)
 						{
-							Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
 							if(category != null)
 							{
 								biomesForTags.addAll(
@@ -576,7 +576,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 											!excludedBiomes.contains(biome) &&
 											!excludedCategories.contains(biome.getBiomeCategory()) &&
 											!innerExcludedCategories.contains(biome.getBiomeCategory()) &&
-											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
+											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
 											!blackListedBiomes.contains(biome.getRegistryName().toString()) &&
 											!biome.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 											(
@@ -587,7 +587,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 												!excludedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
 											)
 										).map(
-											b -> ResourceKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
+											b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
 										).collect(Collectors.toList())
 								);
 							} else {
@@ -665,8 +665,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
 								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
 								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
-								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
-								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
 								!blackListedBiomes.contains(key.location().toString()) &&
 								!key.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 								(
@@ -693,7 +693,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 					if(biomesForTags.size() > 0)
 					{
-						for(ResourceKey<Biome> biomeForTag : biomesForTags)
+						for(RegistryKey<Biome> biomeForTag : biomesForTags)
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
 							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
@@ -753,7 +753,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			List<String> templateBiomeTagStrings = group.getBiomes();
 			List<String> allowedMods = new ArrayList<>();
 			List<Biome> excludedBiomes = new ArrayList<>();
-			List<Biome.BiomeCategory> excludedCategories = new ArrayList<>();
+			List<Biome.Category> excludedCategories = new ArrayList<>();
 			List<BiomeDictionary.Type> excludedTags = new ArrayList<>();
 			List<String> excludedMods = new ArrayList<>();
 			List<String> tagStrings = new ArrayList<>();
@@ -906,7 +906,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					)
 					{
 						// Exclude biome category
-						Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+						Biome.Category category = Biome.Category.byName(tagString2.toLowerCase().replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 						if(category != null)
 						{
 							excludedCategories.add(category);
@@ -977,8 +977,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					tagString2.startsWith(Constants.MOD_BIOME_DICT_TAG_LABEL_EXCLUDE) ||
 					tagString2.startsWith(Constants.MC_BIOME_DICT_TAG_LABEL_EXCLUDE)					
 				) {
-					Set<ResourceKey<Biome>> biomesForTags = new HashSet<>();
-					List<Biome.BiomeCategory> innerExcludedCategories = new ArrayList<>();
+					Set<RegistryKey<Biome>> biomesForTags = new HashSet<>();
+					List<Biome.Category> innerExcludedCategories = new ArrayList<>();
 					List<BiomeDictionary.Type> innerExcludedTags = new ArrayList<>();
 					List<String> innerExcludedMods = new ArrayList<>();
 					// Handle biome category
@@ -991,7 +991,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE)
 						)
 						{
-							Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.MC_BIOME_CATEGORY_LABEL_EXCLUDE, "").replace(Constants.BIOME_CATEGORY_LABEL_EXCLUDE, ""));
 							if(category != null)
 							{
 								innerExcludedCategories.add(category);
@@ -1008,7 +1008,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 							tagSubString2.startsWith(Constants.MC_BIOME_CATEGORY_LABEL)
 						)
 						{
-							Biome.BiomeCategory category = Biome.BiomeCategory.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
+							Biome.Category category = Biome.Category.byName(tagSubString2.replace(Constants.MOD_BIOME_CATEGORY_LABEL, "").replace(Constants.MC_BIOME_CATEGORY_LABEL, "").replace(Constants.BIOME_CATEGORY_LABEL, ""));
 							if(category != null)
 							{
 								biomesForTags.addAll(
@@ -1018,7 +1018,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 											!excludedBiomes.contains(biome) &&
 											!excludedCategories.contains(biome.getBiomeCategory()) &&
 											!innerExcludedCategories.contains(biome.getBiomeCategory()) &&
-											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
+											excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName()), type)) &&
 											!blackListedBiomes.contains(biome.getRegistryName().toString()) &&
 											!biome.getRegistryName().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 											(
@@ -1029,7 +1029,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 												!excludedMods.stream().anyMatch(mod -> biome.getRegistryName().getNamespace().equals(mod))
 											)
 										).map(
-											b -> ResourceKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
+											b -> RegistryKey.create(Registry.BIOME_REGISTRY, b.getRegistryName())
 										).collect(Collectors.toList())
 								);
 							} else {
@@ -1107,8 +1107,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 								!excludedBiomes.contains(ForgeRegistries.BIOMES.getValue(key.location())) &&
 								!excludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
 								!innerExcludedCategories.contains(ForgeRegistries.BIOMES.getValue(key.location()).getBiomeCategory()) &&
-								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
-								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(ResourceKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								excludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
+								innerExcludedTags.stream().allMatch(type -> !BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, key.location()), type)) &&
 								!blackListedBiomes.contains(key.location().toString()) &&
 								!key.location().getNamespace().equals(Constants.MOD_ID_SHORT) &&
 								(
@@ -1135,7 +1135,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					}
 					if(biomesForTags.size() > 0)
 					{
-						for(ResourceKey<Biome> biomeForTag : biomesForTags)
+						for(RegistryKey<Biome> biomeForTag : biomesForTags)
 						{
 							Biome biome = ForgeRegistries.BIOMES.getValue(biomeForTag.location());
 							// Check for temperature range and add biome, if it hasn't already been added by a previous entry.
@@ -1252,12 +1252,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
 			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.MONSTER), EntityCategory.MONSTER);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.AMBIENT), EntityCategory.AMBIENT_CREATURE);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.CREATURE), EntityCategory.CREATURE);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.WATER_CREATURE), EntityCategory.WATER_CREATURE);
-			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, MobCategory.MISC), EntityCategory.MISC);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+			biomeConfigStub.mergeMobs(getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
 		} else {
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 			{
@@ -1266,11 +1266,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 		}
 	}
 
-	private List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, MobCategory type)
+	private List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, EntityClassification type)
 	{
-		List<SpawnerData> mobList = biome.getMobSettings().getMobs(type);		
+		List<Spawners> mobList = biome.getMobSettings().getMobs(type);		
 		List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
-		for (SpawnerData spawner : mobList)
+		for (Spawners spawner : mobList)
 		{
 			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.weight, spawner.minCount, spawner.maxCount);
 			if(wMSG != null)

@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import com.pg85.otg.constants.Constants;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PacketSyncBiomeSettings implements OTGLoginMessage
@@ -25,7 +25,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		this.syncMap = syncMap;
 	}
 
-	public static void encode(PacketSyncBiomeSettings packet, FriendlyByteBuf buffer)
+	public static void encode(PacketSyncBiomeSettings packet, PacketBuffer buffer)
 	{
 		buffer.writeInt(packet.syncMap.size());
 		for (Entry<String, BiomeSettingSyncWrapper> entry : packet.syncMap.entrySet())
@@ -35,7 +35,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		}
 	}
 
-	public static PacketSyncBiomeSettings decode(FriendlyByteBuf buffer)
+	public static PacketSyncBiomeSettings decode(PacketBuffer buffer)
 	{
 		PacketSyncBiomeSettings packet = new PacketSyncBiomeSettings();
 		int size = buffer.readInt();
@@ -48,7 +48,7 @@ public class PacketSyncBiomeSettings implements OTGLoginMessage
 		return packet;
 	}
 	
-	public static PacketSyncBiomeSettings decodeSpigot(FriendlyByteBuf buffer)
+	public static PacketSyncBiomeSettings decodeSpigot(PacketBuffer buffer)
 	{
 		PacketSyncBiomeSettings packet = new PacketSyncBiomeSettings();
 		int size = buffer.readInt();

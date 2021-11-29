@@ -8,7 +8,7 @@ import com.pg85.otg.util.biome.ColorSet;
 import com.pg85.otg.util.biome.ColorThreshold;
 import com.pg85.otg.util.biome.SimpleColorSet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketBuffer;
 
 public class BiomeSettingSyncWrapper
 {
@@ -25,7 +25,7 @@ public class BiomeSettingSyncWrapper
 		this.waterColorControl = config.getWaterColorControl();
 	}
 
-	public BiomeSettingSyncWrapper(FriendlyByteBuf buffer)
+	public BiomeSettingSyncWrapper(PacketBuffer buffer)
 	{
 		this.fogDensity = buffer.readFloat();
 		byte size;
@@ -75,7 +75,7 @@ public class BiomeSettingSyncWrapper
 		return waterColorControl;
 	}
 
-	public void encode(FriendlyByteBuf buffer)
+	public void encode(PacketBuffer buffer)
 	{
 		buffer.writeFloat(this.fogDensity);
 

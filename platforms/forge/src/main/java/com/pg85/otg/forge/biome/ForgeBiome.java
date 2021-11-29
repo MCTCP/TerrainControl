@@ -21,55 +21,46 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.sounds.Music;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.client.audio.BackgroundMusicSelector;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.*;
-import net.minecraft.world.level.biome.Biome.TemperatureModifier;
-import net.minecraft.world.level.biome.BiomeGenerationSettings.Builder;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.data.worldgen.BastionPieces;
-import net.minecraft.data.worldgen.DesertVillagePools;
-import net.minecraft.world.level.levelgen.feature.configurations.MineshaftConfiguration;
-import net.minecraft.world.level.levelgen.feature.MineshaftFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OceanRuinConfiguration;
-import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
-import net.minecraft.data.worldgen.PillagerOutpostPools;
-import net.minecraft.data.worldgen.PlainVillagePools;
-import net.minecraft.data.worldgen.SavannaVillagePools;
-import net.minecraft.data.worldgen.SnowyVillagePools;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.data.worldgen.StructureFeatures;
-import net.minecraft.data.worldgen.TaigaVillagePools;
-import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
-import net.minecraft.data.worldgen.SurfaceBuilders;
+import net.minecraft.world.biome.Biome.TemperatureModifier;
+import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.GenerationStage.Decoration;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.ProbabilityConfig;
+import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.BastionRemnantsPieces;
+import net.minecraft.world.gen.feature.structure.DesertVillagePools;
+import net.minecraft.world.gen.feature.structure.MineshaftConfig;
+import net.minecraft.world.gen.feature.structure.MineshaftStructure;
+import net.minecraft.world.gen.feature.structure.OceanRuinConfig;
+import net.minecraft.world.gen.feature.structure.OceanRuinStructure;
+import net.minecraft.world.gen.feature.structure.PillagerOutpostPools;
+import net.minecraft.world.gen.feature.structure.PlainsVillagePools;
+import net.minecraft.world.gen.feature.structure.SavannaVillagePools;
+import net.minecraft.world.gen.feature.structure.SnowyVillagePools;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureFeatures;
+import net.minecraft.world.gen.feature.structure.TaigaVillagePools;
+import net.minecraft.world.gen.feature.structure.VillageConfig;
+import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.common.world.MobSpawnInfoBuilder;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import net.minecraft.data.worldgen.BiomeDefaultFeatures;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 
 public class ForgeBiome implements IBiome
 {
@@ -104,16 +95,16 @@ public class ForgeBiome implements IBiome
 		BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder = new BiomeGenerationSettings.Builder();
 
 		// Mob spawning
-		MobSpawnSettings.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
+		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
 		// TODO: What if there's no grass around spawn?
-		biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
+		biomeGenerationSettingsBuilder.surfaceBuilder(ConfiguredSurfaceBuilders.GRASS);
 
 		// Register default carvers, we won't actually use these since we have
 		// our own carvers, but if they're replaced we'll know there are modded carvers.
-		BiomeDefaultFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
+		DefaultBiomeFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
 
 		// Register any Registry() resources to the biome, to be handled by MC.
 		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
@@ -121,8 +112,8 @@ public class ForgeBiome implements IBiome
 			if (res instanceof RegistryResource)
 			{
 				RegistryResource registryResource = (RegistryResource)res;
-				Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
-				ConfiguredFeature<?, ?> registry = BuiltinRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
+				Decoration stage = GenerationStage.Decoration.valueOf(registryResource.getDecorationStage());
+				ConfiguredFeature<?, ?> registry = WorldGenRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
 				biomeGenerationSettingsBuilder.addFeature(stage, registry);
 			}
 		}
@@ -137,8 +128,8 @@ public class ForgeBiome implements IBiome
 			safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
 		}
 
-		BiomeSpecialEffects.Builder biomeAmbienceBuilder =
-			new BiomeSpecialEffects.Builder()			
+		BiomeAmbience.Builder biomeAmbienceBuilder =
+			new BiomeAmbience.Builder()			
 				.fogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue() ? biomeConfig.getFogColor() : worldConfig.getFogColor())
 				.waterFogColor(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
 				.waterColor(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
@@ -147,15 +138,15 @@ public class ForgeBiome implements IBiome
 
 		@SuppressWarnings("deprecation")
 		Optional<ParticleType<?>> particleType = Registry.PARTICLE_TYPE.getOptional(new ResourceLocation(biomeConfig.getParticleType()));
-		if(particleType.isPresent() && particleType.get() instanceof ParticleOptions)
+		if(particleType.isPresent() && particleType.get() instanceof IParticleData)
 		{
-			biomeAmbienceBuilder.ambientParticle(new AmbientParticleSettings((ParticleOptions)particleType.get(), biomeConfig.getParticleProbability()));	
+			biomeAmbienceBuilder.ambientParticle(new ParticleEffectAmbience((IParticleData)particleType.get(), biomeConfig.getParticleProbability()));	
 		}
 
 		SoundEvent event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getMusic()));
 		if (event != null)
 		{
-			biomeAmbienceBuilder.backgroundMusic(new Music(event,
+			biomeAmbienceBuilder.backgroundMusic(new BackgroundMusicSelector(event,
 				biomeConfig.getMusicMinDelay(),
 				biomeConfig.getMusicMaxDelay(),
 				biomeConfig.isReplaceCurrentMusic()));
@@ -170,7 +161,7 @@ public class ForgeBiome implements IBiome
 		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getMoodSound()));
 		if (event != null)
 		{
-			biomeAmbienceBuilder.ambientMoodSound(new AmbientMoodSettings(event,
+			biomeAmbienceBuilder.ambientMoodSound(new MoodSoundAmbience(event,
 				biomeConfig.getMoodSoundDelay(),
 				biomeConfig.getMoodSearchRange(),
 				biomeConfig.getMoodOffset()));
@@ -179,7 +170,7 @@ public class ForgeBiome implements IBiome
 		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAdditionsSound()));
 		if (event != null)
 		{
-			biomeAmbienceBuilder.ambientAdditionsSound(new AmbientAdditionsSettings(event, biomeConfig.getAdditionsTickChance()));
+			biomeAmbienceBuilder.ambientAdditionsSound(new SoundAdditionsAmbience(event, biomeConfig.getAdditionsTickChance()));
 		}
 
 		if(biomeConfig.getFoliageColor() != 0xffffff)
@@ -195,43 +186,43 @@ public class ForgeBiome implements IBiome
 		switch(biomeConfig.getGrassColorModifier())
 		{
 			case Swamp:
-				biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.SWAMP);
+				biomeAmbienceBuilder.grassColorModifier(BiomeAmbience.GrassColorModifier.SWAMP);
 				break;
 			case DarkForest:
-				biomeAmbienceBuilder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.DARK_FOREST);
+				biomeAmbienceBuilder.grassColorModifier(BiomeAmbience.GrassColorModifier.DARK_FOREST);
 				break;
 			default:
 				break;
 		}
 		
 		ResourceLocation registryName = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
-		Biome.BiomeCategory category = Biome.BiomeCategory.byName(biomeConfig.getBiomeCategory());
+		Biome.Category category = Biome.Category.byName(biomeConfig.getBiomeCategory());
 		if (category == null)
 		{
 			if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
 			{
 				OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not parse biome category " + biomeConfig.getBiomeCategory());
 			}
-			category = isOceanBiome ? Biome.BiomeCategory.OCEAN : Biome.BiomeCategory.NONE;
+			category = isOceanBiome ? Biome.Category.OCEAN : Biome.Category.NONE;
 		}
-        Biome.Precipitation rainType = 
-    		biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE : 
-			biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN : 
-			Biome.Precipitation.SNOW
+        Biome.RainType rainType = 
+    		biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.RainType.NONE : 
+			biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.RainType.RAIN : 
+			Biome.RainType.SNOW
 		;
 
 		// Fire Forge BiomeLoadingEvent to allow other mods to enrich otg biomes with decoration features, structure features and mob spawns.
         BiomeGenerationSettingsBuilder genBuilder = new BiomeGenerationSettingsBuilder(biomeGenerationSettingsBuilder.build());
         MobSpawnInfoBuilder spawnBuilder = new MobSpawnInfoBuilder(mobSpawnInfoBuilder.build());
-        BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.ClimateSettings(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeConfig.getBiomeHeight(), biomeConfig.getBiomeVolatility(), biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
+        BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.Climate(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeConfig.getBiomeHeight(), biomeConfig.getBiomeVolatility(), biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
         MinecraftForge.EVENT_BUS.post(event1);
-        BiomeSpecialEffects biomeAmbienceBuilder2 = event1.getEffects();
+        BiomeAmbience biomeAmbienceBuilder2 = event1.getEffects();
         BiomeGenerationSettingsBuilder biomeGenerationSettingsBuilder2 = event1.getGeneration();
         MobSpawnInfoBuilder mobSpawnInfoBuilder2 = event1.getSpawns();
         //
 
-		Biome.BiomeBuilder biomeBuilder = 
-			new Biome.BiomeBuilder()
+		Biome.Builder biomeBuilder = 
+			new Biome.Builder()
 			.precipitation(rainType)
 			.depth(biomeConfig.getBiomeHeight())
 			.scale(biomeConfig.getBiomeVolatility())
@@ -247,32 +238,32 @@ public class ForgeBiome implements IBiome
 			biomeBuilder.temperatureAdjustment(Biome.TemperatureModifier.FROZEN);
 		}
 
-		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.BiomeCategory.OCEAN : Biome.BiomeCategory.PLAINS);
+		biomeBuilder.biomeCategory(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
 		
 		return biomeBuilder.build().setRegistryName(registryName);
 	}
 
-	private static MobSpawnSettings.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
+	private static MobSpawnInfo.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
 	{
-		MobSpawnSettings.Builder mobSpawnInfoBuilder = new MobSpawnSettings.Builder();
-		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		MobSpawnInfo.Builder mobSpawnInfoBuilder = new MobSpawnInfo.Builder();
+		addMobGroup(EntityClassification.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
+		addMobGroup(EntityClassification.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
+		addMobGroup(EntityClassification.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
 		mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}
 
-	private static void addMobGroup(MobCategory entitiClassification, MobSpawnSettings.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
+	private static void addMobGroup(EntityClassification entitiClassification, MobSpawnInfo.Builder mobSpawnInfoBuilder, List<WeightedMobSpawnGroup> mobSpawnGroupList, String biomeName)
 	{
 		for(WeightedMobSpawnGroup mobSpawnGroup : mobSpawnGroupList)
 		{
 			Optional<EntityType<?>> entityType = EntityType.byString(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.addSpawn(entitiClassification, new MobSpawnSettings.SpawnerData(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.addSpawn(entitiClassification, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MOBS))
 				{
@@ -295,10 +286,10 @@ public class ForgeBiome implements IBiome
 		{
 			int villageSize = biomeConfig.getVillageSize();
 			VillageType villageType = biomeConfig.getVillageType();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customVillage = register(
+			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customVillage = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
-				StructureFeature.VILLAGE.configured(
-					new JigsawConfiguration(
+				Structure.VILLAGE.configured(
+					new VillageConfig(
 						() -> {
 							switch(villageType)
 							{
@@ -309,13 +300,13 @@ public class ForgeBiome implements IBiome
 								case taiga:
 									return TaigaVillagePools.START;
 								case wood:
-									return PlainVillagePools.START;
+									return PlainsVillagePools.START;
 								case snowy:
 									return SnowyVillagePools.START;
 								case disabled: // Should never happen
 									break;
 							}
-							return PlainVillagePools.START;
+							return PlainsVillagePools.START;
 						},
 						villageSize
 					)
@@ -376,12 +367,12 @@ public class ForgeBiome implements IBiome
 		{
 			float mineShaftProbability = biomeConfig.getMineShaftProbability();
 			MineshaftType mineShaftType = biomeConfig.getMineShaftType();
-			ConfiguredStructureFeature<MineshaftConfiguration, ? extends StructureFeature<MineshaftConfiguration>> customMineShaft = register(
+			StructureFeature<MineshaftConfig, ? extends Structure<MineshaftConfig>> customMineShaft = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("mineshaft").toResourceLocationString(),
-				StructureFeature.MINESHAFT.configured(
-					new MineshaftConfiguration(
+				Structure.MINESHAFT.configured(
+					new MineshaftConfig(
 						mineShaftProbability,
-						mineShaftType == MineshaftType.mesa ? MineshaftFeature.Type.MESA : MineshaftFeature.Type.NORMAL
+						mineShaftType == MineshaftType.mesa ? MineshaftStructure.Type.MESA : MineshaftStructure.Type.NORMAL
 					)
 				)
 			);
@@ -392,9 +383,9 @@ public class ForgeBiome implements IBiome
 		if(worldConfig.getBuriedTreasureEnabled() && biomeConfig.getBuriedTreasureEnabled())
 		{
 			float buriedTreasureProbability = biomeConfig.getBuriedTreasureProbability();
-			ConfiguredStructureFeature<ProbabilityFeatureConfiguration, ? extends StructureFeature<ProbabilityFeatureConfiguration>> customBuriedTreasure = register(
+			StructureFeature<ProbabilityConfig, ? extends Structure<ProbabilityConfig>> customBuriedTreasure = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("buried_treasure").toResourceLocationString(),
-				StructureFeature.BURIED_TREASURE.configured(new ProbabilityFeatureConfiguration(buriedTreasureProbability))
+				Structure.BURIED_TREASURE.configured(new ProbabilityConfig(buriedTreasureProbability))
 			);
 			biomeGenerationSettingsBuilder.addStructureStart(customBuriedTreasure);
 		}
@@ -405,11 +396,11 @@ public class ForgeBiome implements IBiome
 			float oceanRuinsLargeProbability = biomeConfig.getOceanRuinsLargeProbability();
 			float oceanRuinsClusterProbability = biomeConfig.getOceanRuinsClusterProbability();
 			OceanRuinsType oceanRuinsType = biomeConfig.getOceanRuinsType();
-			ConfiguredStructureFeature<OceanRuinConfiguration, ? extends StructureFeature<OceanRuinConfiguration>> customOceanRuins = register(
+			StructureFeature<OceanRuinConfig, ? extends Structure<OceanRuinConfig>> customOceanRuins = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("ocean_ruin").toResourceLocationString(),
-				StructureFeature.OCEAN_RUIN.configured(
-					new OceanRuinConfiguration(
-						oceanRuinsType == OceanRuinsType.cold ? OceanRuinFeature.Type.COLD : OceanRuinFeature.Type.WARM,
+				Structure.OCEAN_RUIN.configured(
+					new OceanRuinConfig(
+						oceanRuinsType == OceanRuinsType.cold ? OceanRuinStructure.Type.COLD : OceanRuinStructure.Type.WARM,
 						oceanRuinsLargeProbability,
 						oceanRuinsClusterProbability
 					)
@@ -436,10 +427,10 @@ public class ForgeBiome implements IBiome
 		if(worldConfig.getPillagerOutpostsEnabled() && biomeConfig.getPillagerOutpostEnabled())
 		{
 			int outpostSize = biomeConfig.getPillagerOutPostSize();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customOutpost = register(
+			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customOutpost = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("pillager_outpost").toResourceLocationString(), 
-				StructureFeature.PILLAGER_OUTPOST.configured(
-					new JigsawConfiguration(
+				Structure.PILLAGER_OUTPOST.configured(
+					new VillageConfig(
 						() -> {
 							return PillagerOutpostPools.START;
 						},
@@ -454,12 +445,12 @@ public class ForgeBiome implements IBiome
 		if(worldConfig.getBastionRemnantsEnabled() && biomeConfig.getBastionRemnantEnabled())
 		{
 			int bastionRemnantSize = biomeConfig.getBastionRemnantSize();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customBastionRemnant = register(
+			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customBastionRemnant = register(
 				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("bastion_remnant").toResourceLocationString(), 
-				StructureFeature.BASTION_REMNANT.configured(
-					new JigsawConfiguration(
+				Structure.BASTION_REMNANT.configured(
+					new VillageConfig(
 						() -> {
-							return BastionPieces.START;
+							return BastionRemnantsPieces.START;
 						},
 						bastionRemnantSize
 					)
@@ -513,15 +504,15 @@ public class ForgeBiome implements IBiome
 	}
 
 	// StructureFeatures.register()
-	private static <FC extends FeatureConfiguration, F extends StructureFeature<FC>> ConfiguredStructureFeature<FC, F> register(String name, ConfiguredStructureFeature<FC, F> structure)
+	private static <FC extends IFeatureConfig, F extends Structure<FC>> StructureFeature<FC, F> register(String name, StructureFeature<FC, F> structure)
 	{
-		return BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, name, structure);
+		return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, name, structure);
 	}
 	
 	private static int getSkyColorForTemp(float p_244206_0_)
 	{
 		float lvt_1_1_ = p_244206_0_ / 3.0F;
-		lvt_1_1_ = Mth.clamp(lvt_1_1_, -1.0F, 1.0F);
-		return Mth.hsvToRgb(0.62222224F - lvt_1_1_ * 0.05F, 0.5F + lvt_1_1_ * 0.1F, 1.0F);
+		lvt_1_1_ = MathHelper.clamp(lvt_1_1_, -1.0F, 1.0F);
+		return MathHelper.hsvToRgb(0.62222224F - lvt_1_1_ * 0.05F, 0.5F + lvt_1_1_ * 0.1F, 1.0F);
 	}
 }

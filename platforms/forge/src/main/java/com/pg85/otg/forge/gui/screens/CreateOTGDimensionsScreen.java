@@ -5,23 +5,23 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
 import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.constants.Constants;
 
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.BaseComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.client.gui.DialogTexts;
+import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.list.ExtendedList;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -29,10 +29,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class CreateOTGDimensionsScreen extends Screen
 {	
 	public final CreateWorldScreen parent;
-	public WorldGenSettings dimGenSettings;
+	public DimensionGeneratorSettings dimGenSettings;
 	private final Consumer<OTGDimensionSettingsContainer> dimensionConfigConsumer;
-	private Component columnType;
-	private Component columnHeight;
+	private ITextComponent columnType;
+	private ITextComponent columnHeight;
 	private CreateOTGDimensionsScreen.DetailsList list;
 	private final DimensionConfig currentSelection;
 	private Button addDimButton;
@@ -60,35 +60,35 @@ public class CreateOTGDimensionsScreen extends Screen
 		}
 	}
 
-	private static BaseComponent setTitle()
+	private static TextComponent setTitle()
 	{
 		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
 		modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 
 		if(modpackConfig == null || modpackConfig.ModpackName == null)
 		{
-			return new TranslatableComponent("otg.createDimensions.customize.title");
+			return new TranslationTextComponent("otg.createDimensions.customize.title");
 		} else {
-			return new TextComponent(modpackConfig.ModpackName);
+			return new StringTextComponent(modpackConfig.ModpackName);
 		}
 	}
 	
 	protected void init()
 	{
-		this.columnType = new TranslatableComponent("otg.createDimensions.customize.dimension");
-		this.columnHeight = new TranslatableComponent("otg.createDimensions.customize.preset");
+		this.columnType = new TranslationTextComponent("otg.createDimensions.customize.dimension");
+		this.columnHeight = new TranslationTextComponent("otg.createDimensions.customize.preset");
 		this.list = new CreateOTGDimensionsScreen.DetailsList();
 		this.children.add(this.list);
 
 		if(!this.uiLocked)
 		{
-			this.addDimButton = this.addButton(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
+			this.addDimButton = this.addButton(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
 				this.currentSelection.Dimensions.add(new OTGDimension(null, -1l));
 				this.list.resetRows();
 				this.updateButtonValidity();
 			}));
 	
-			this.removeDimButton = this.addButton(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
+			this.removeDimButton = this.addButton(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
 				if (this.hasValidSelection() && this.currentSelection.Dimensions.size() > this.list.getSelected().dimId - 3)
 				{
 					this.currentSelection.Dimensions.remove(this.list.getSelected().dimId - 3);
@@ -97,7 +97,7 @@ public class CreateOTGDimensionsScreen extends Screen
 				}
 			}));
 			
-			this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
+			this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslationTextComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
 				if (this.hasValidSelection())
 				{
 					this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
@@ -106,7 +106,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		}
 
 		// Done
-		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, CommonComponents.GUI_DONE, 
+		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, DialogTexts.GUI_DONE, 
 			(p_213010_1_) -> {
 				if(!(this.parent instanceof ModpackCreateWorldScreen))
 				{
@@ -117,7 +117,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		));
 
 		// Cancel
-		this.addButton(new Button(this.width / 2 + 5, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_213009_1_) -> {
+		this.addButton(new Button(this.width / 2 + 5, this.height - 28, 150, 20, DialogTexts.GUI_CANCEL, (p_213009_1_) -> {
 			this.minecraft.setScreen(this.parent);
 		}));
 
@@ -149,7 +149,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		this.minecraft.setScreen(this.parent);
 	}
 	
-	public void render(PoseStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.renderBackground(p_230430_1_);
 		this.list.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
@@ -161,7 +161,7 @@ public class CreateOTGDimensionsScreen extends Screen
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	class DetailsList extends ObjectSelectionList<CreateOTGDimensionsScreen.DetailsList.LayerEntry>
+	class DetailsList extends ExtendedList<CreateOTGDimensionsScreen.DetailsList.LayerEntry>
 	{
 		public DetailsList()
 		{
@@ -217,7 +217,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		}
 	
 		@OnlyIn(Dist.CLIENT)
-		class LayerEntry extends ObjectSelectionList.Entry<CreateOTGDimensionsScreen.DetailsList.LayerEntry>
+		class LayerEntry extends ExtendedList.AbstractListEntry<CreateOTGDimensionsScreen.DetailsList.LayerEntry>
 		{
 			private final String dimensionName;
 			private String presetFolderName;
@@ -230,7 +230,7 @@ public class CreateOTGDimensionsScreen extends Screen
 				this.dimId = dimId;
 			}
 
-			public void render(PoseStack p_230432_1_, int p_230432_2_, int p_230432_3_, int p_230432_4_, int p_230432_5_, int p_230432_6_, int p_230432_7_, int p_230432_8_, boolean p_230432_9_, float p_230432_10_)
+			public void render(MatrixStack p_230432_1_, int p_230432_2_, int p_230432_3_, int p_230432_4_, int p_230432_5_, int p_230432_6_, int p_230432_7_, int p_230432_8_, boolean p_230432_9_, float p_230432_10_)
 			{
 				String s = I18n.get(this.dimensionName, 32);
 				CreateOTGDimensionsScreen.this.font.draw(p_230432_1_, s, (float)(p_230432_4_), (float)(p_230432_3_ + 3), 16777215);

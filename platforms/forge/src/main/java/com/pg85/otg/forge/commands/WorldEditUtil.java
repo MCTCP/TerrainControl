@@ -4,12 +4,12 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.forge.ForgeAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.BlockPos;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 
 public class WorldEditUtil
 {
-	public static RegionCommand.Region getRegionFromPlayer(ServerPlayer playerEntity)
+	public static RegionCommand.Region getRegionFromPlayer(ServerPlayerEntity playerEntity)
 	{
 		if (!WorldEdit.getInstance().getSessionManager().contains(ForgeAdapter.adaptPlayer(playerEntity)))
 		{

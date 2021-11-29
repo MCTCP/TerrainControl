@@ -43,48 +43,48 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.CrashReport;
-import net.minecraft.ReportedException;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.synth.SurfaceNoise;
-import net.minecraft.world.level.levelgen.synth.PerlinNoise;
-import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
-import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.data.worldgen.Carvers;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
-import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
-import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.levelgen.structure.StructurePiece;
-import net.minecraft.world.level.levelgen.NoiseSettings;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.NaturalSpawner;
-import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.util.SharedSeedRandom;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.SectionPos;
+import net.minecraft.world.Blockreader;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenerationSettings;
+import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.INoiseGenerator;
+import net.minecraft.world.gen.OctavesNoiseGenerator;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
+import net.minecraft.world.gen.carver.ConfiguredCarvers;
+import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.jigsaw.JigsawJunction;
+import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
+import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureManager;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.settings.NoiseSettings;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.spawner.WorldEntitySpawner;
+import net.minecraft.world.storage.FolderName;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
@@ -104,13 +104,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 							return p_236090_0_.dimConfigName;
 						}
 					),
-					BiomeSource.CODEC.fieldOf("biome_source").forGetter(
+					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
 						(p_236096_0_) -> { return p_236096_0_.biomeSource; }
 					),
 					Codec.LONG.fieldOf("seed").stable().forGetter(
 						(p_236093_0_) -> { return p_236093_0_.worldSeed; }
 					),
-					NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter(
+					DimensionSettings.CODEC.fieldOf("settings").forGetter(
 						(p_236090_0_) -> { return p_236090_0_.dimensionSettingsSupplier; }
 					)
 				).apply(
@@ -121,13 +121,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	);
 
-	private final Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier;
+	private final Supplier<DimensionSettings> dimensionSettingsSupplier;
 	private final long worldSeed;
 	private final int noiseHeight;
 	protected final BlockState defaultBlock;
 	protected final BlockState defaultFluid;
-	private final SurfaceNoise surfaceNoise;
-	protected final WorldgenRandom random;
+	private final INoiseGenerator surfaceNoise;
+	protected final SharedSeedRandom random;
 
 	private final ShadowChunkGenerator shadowChunkGenerator;
 	private final OTGChunkGenerator internalGenerator;
@@ -144,12 +144,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private String portalMob;
 	private String portalIgnitionSource;
 
-	public OTGNoiseChunkGenerator(BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		this(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), null, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
-	public OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeSource biomeProvider, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	public OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		this(presetFolderName, dimConfigName, biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
@@ -157,7 +157,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	@SuppressWarnings("deprecation")
-	private OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator(String presetFolderName, String dimConfigName, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
 
@@ -177,12 +177,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.dimConfig = null;
 		}
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;		
-		NoiseGeneratorSettings dimensionsettings = dimensionSettingsSupplier.get();	
+		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();	
 		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
 		this.defaultBlock = dimensionsettings.getDefaultBlock();
 		this.defaultFluid = dimensionsettings.getDefaultFluid();
-		this.random = new WorldgenRandom(seed);
-		this.surfaceNoise = (SurfaceNoise)(noisesettings.useSimplexSurfaceNoise() ? new PerlinSimplexNoise(this.random, IntStream.rangeClosed(-3, 0)) : new PerlinNoise(this.random, IntStream.rangeClosed(-3, 0)));
+		this.random = new SharedSeedRandom(seed);
+		this.surfaceNoise = (INoiseGenerator)(noisesettings.useSimplexSurfaceNoise() ? new PerlinNoiseGenerator(this.random, IntStream.rangeClosed(-3, 0)) : new OctavesNoiseGenerator(this.random, IntStream.rangeClosed(-3, 0)));
 		this.noiseHeight = noisesettings.height();
 
 		this.shadowChunkGenerator = new ShadowChunkGenerator(OTG.getEngine().getPluginConfig().getMaxWorkerThreads());
@@ -219,7 +219,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Generates the base terrain for a chunk.	
 	@Override
-	public void fillFromNoise(LevelAccessor world, StructureFeatureManager manager, ChunkAccess chunk)
+	public void fillFromNoise(IWorld world, StructureManager manager, IChunk chunk)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 
@@ -229,8 +229,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		
 		// If we've already (shadow-)generated and cached this	
 		// chunk while it was unloaded, use cached data.
-		ChunkBuffer buffer = new ForgeChunkBuffer((ProtoChunk) chunk);
-		ChunkAccess cachedChunk = this.shadowChunkGenerator.getChunkWithWait(chunkCoord);
+		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
+		IChunk cachedChunk = this.shadowChunkGenerator.getChunkWithWait(chunkCoord);
 		if (cachedChunk != null)
 		{
 			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunk, cachedChunk);
@@ -245,7 +245,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startZ = chunkZ << 4;
 
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for(StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES)
+			for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES)
 			{
 				// Get all structure starts in this chunk
 				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) ->
@@ -256,12 +256,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 						// Check if it intersects with this chunk
 						if (piece.isCloseToChunk(pos, 12))
 						{
-							BoundingBox box = piece.getBoundingBox();
-							if (piece instanceof PoolElementStructurePiece)
+							MutableBoundingBox box = piece.getBoundingBox();
+							if (piece instanceof AbstractVillagePiece)
 							{
-								PoolElementStructurePiece villagePiece = (PoolElementStructurePiece) piece;
+								AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
 								// Add to the list if it's a rigid piece
-								if (villagePiece.getElement().getProjection() == StructureTemplatePool.Projection.RIGID)
+								if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID)
 								{
 									structures.add(new JigsawStructureData(box.x0, box.y0, box.z0, box.x1, villagePiece.getGroundLevelDelta(), box.z1, true, 0, 0, 0));
 								}
@@ -292,7 +292,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Replaces surface and ground blocks in base terrain and places bedrock.
 	@Override
-	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, ChunkAccess chunk)
+	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, IChunk chunk)
 	{
 		// OTG handles surface/ground blocks during base terrain gen. For non-OTG biomes used
 		// with TemplateForBiome, we want to use registered surfacebuilders though.
@@ -301,7 +301,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkPos chunkpos = chunk.getPos();
 		int i = chunkpos.x;
 		int j = chunkpos.z;
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		sharedseedrandom.setBaseChunkSeed(i, j);
 		ChunkPos chunkpos1 = chunk.getPos();
 		int chunkMinX = chunkpos1.getMinBlockX();
@@ -321,7 +321,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
 				if(biome.getBiomeConfig().getTemplateForBiome())
 				{
-					i2 = chunk.getHeight(Heightmap.Types.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
+					i2 = chunk.getHeight(Heightmap.Type.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
 					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
 					((ForgeBiome)biome).getBiomeBase().buildSurfaceAt(sharedseedrandom, chunk, worldX, worldZ, i2, d1, this.defaultBlock, this.defaultFluid, this.getSeaLevel(), worldGenRegion.getSeed());
 				}
@@ -333,19 +333,19 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Carvers: Caves and ravines
 
 	@Override
-	public void applyCarvers(long seed, BiomeManager biomeManager, ChunkAccess chunk, GenerationStep.Carving stage)
+	public void applyCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{
 		// OTG has its own caves and canyons carvers. We register default carvers to OTG biomes,
 		// then check if they have been overridden by mods before using our own carvers.
-		if (stage == GenerationStep.Carving.AIR)
+		if (stage == GenerationStage.Carving.AIR)
 		{
 			BiomeGenerationSettings biomegenerationsettings = this.biomeSource.getNoiseBiome(chunk.getPos().x << 2, 0, chunk.getPos().z << 2).getGenerationSettings();
-			List<Supplier<ConfiguredWorldCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
+			List<Supplier<ConfiguredCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
 
-			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == Carvers.CAVE);
-			boolean ravinesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == Carvers.CANYON);
+			boolean cavesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CAVE);
+			boolean ravinesEnabled = this.preset.getWorldConfig().getCavesEnabled() && list.stream().anyMatch(a -> a.get() == ConfiguredCarvers.CANYON);
 			
-			ProtoChunk protoChunk = (ProtoChunk) chunk;
+			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, cavesEnabled, ravinesEnabled);
@@ -353,30 +353,30 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		applyNonOTGCarvers(seed, biomeManager, chunk, stage);
 	}
 
-	public void applyNonOTGCarvers(long seed, BiomeManager biomeManager, ChunkAccess chunk, GenerationStep.Carving stage)
+	public void applyNonOTGCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{
 		BiomeManager biomemanager = biomeManager.withDifferentSource(this.biomeSource);
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		ChunkPos chunkpos = chunk.getPos();
 		int j = chunkpos.x;
 		int k = chunkpos.z;
 		BiomeGenerationSettings biomegenerationsettings = this.biomeSource.getNoiseBiome(chunkpos.x << 2, 0, chunkpos.z << 2).getGenerationSettings();
-		BitSet bitset = ((ProtoChunk)chunk).getOrCreateCarvingMask(stage);
+		BitSet bitset = ((ChunkPrimer)chunk).getOrCreateCarvingMask(stage);
 
 		for(int l = j - 8; l <= j + 8; ++l)
 		{
 			for(int i1 = k - 8; i1 <= k + 8; ++i1)
 			{
-				List<Supplier<ConfiguredWorldCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
-				ListIterator<Supplier<ConfiguredWorldCarver<?>>> listiterator = list.listIterator();
+				List<Supplier<ConfiguredCarver<?>>> list = biomegenerationsettings.getCarvers(stage);
+				ListIterator<Supplier<ConfiguredCarver<?>>> listiterator = list.listIterator();
 				while(listiterator.hasNext())
 				{
 					int j1 = listiterator.nextIndex();
-					ConfiguredWorldCarver<?> configuredcarver = listiterator.next().get();
+					ConfiguredCarver<?> configuredcarver = listiterator.next().get();
 					// OTG uses its own caves and canyon carvers, ignore the default ones.
 					if(
-						configuredcarver != Carvers.CAVE &&
-						configuredcarver != Carvers.CANYON
+						configuredcarver != ConfiguredCarvers.CAVE &&
+						configuredcarver != ConfiguredCarvers.CANYON
 					)
 					{
 						sharedseedrandom.setLargeFeatureSeed(seed + (long)j1, l, i1);
@@ -395,7 +395,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Does decoration for a given pos/chunk
 	@Override
 	@SuppressWarnings("deprecation")	
-	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureFeatureManager structureManager)
+	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
 		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
 		{
@@ -408,7 +408,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int worldX = worldGenRegion.getCenterX() * Constants.CHUNK_SIZE;
 		int worldZ = worldGenRegion.getCenterZ() * Constants.CHUNK_SIZE;
 		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	
 		//
 
@@ -420,7 +420,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 4, (worldGenRegion.getCenterZ() << 2));
 		IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenterX() << 2) + 4, (worldGenRegion.getCenterZ() << 2) + 4);
 		// World save folder name may not be identical to level name, fetch it.
-		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
+		Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
 
 		try
 		{
@@ -455,18 +455,18 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			int chunkX = worldGenRegion.getCenterX();
 			int chunkZ = worldGenRegion.getCenterZ();
 			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE, chunkZ * Constants.CHUNK_SIZE);
-			WorldgenRandom sharedseedrandom = new WorldgenRandom();
+			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
-			NaturalSpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);			
+			WorldEntitySpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), chunkX, chunkZ, sharedseedrandom);			
 		}
 	}
 	
 	// Mob spawning on chunk tick
 	@Override
-	public List<MobSpawnSettings.SpawnerData> getMobsAt(Biome biome, StructureFeatureManager structureManager, MobCategory entityClassification, BlockPos blockPos)
+	public List<MobSpawnInfo.Spawners> getMobsAt(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)
 	{
 		// Forge code injected into NoiseChunkGenerator
-		List<MobSpawnSettings.SpawnerData> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structureManager, entityClassification, blockPos);
+		List<MobSpawnInfo.Spawners> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structureManager, entityClassification, blockPos);
 		if (spawns != null)
 		{
 			return spawns;
@@ -477,18 +477,18 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Noise
 
 	@Override
-	public int getBaseHeight(int x, int z, Types heightmapType)
+	public int getBaseHeight(int x, int z, Type heightmapType)
 	{
 		return this.sampleHeightmap(x, z, null, heightmapType.isOpaque());
 	}
 
 	// Provides a sample of the full column for structure generation.
 	@Override
-	public BlockGetter getBaseColumn(int x, int z)
+	public IBlockReader getBaseColumn(int x, int z)
 	{
 		BlockState[] ablockstate = new BlockState[256];
 		this.sampleHeightmap(x, x, ablockstate, null);
-		return new NoiseColumn(ablockstate);
+		return new Blockreader(ablockstate);
 	}
 
 	// Samples the noise at a column and provides a view of the blockstates, or fills a heightmap.
@@ -538,7 +538,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				double yLerp = (double) pieceY / 8.0;
 				// Density at this position given the current y interpolation
-				double density = Mth.lerp3(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
+				double density = MathHelper.lerp3(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
 
 				// Get the real y position (translate noise chunk and noise piece)
 				int y = (noiseY * 8) + pieceY;
@@ -615,7 +615,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.shadowChunkGenerator.stopWorkerThreads();
 	}
 
-	public Boolean checkHasVanillaStructureWithoutLoading(ServerLevel world, ChunkCoordinate chunkCoord)
+	public Boolean checkHasVanillaStructureWithoutLoading(ServerWorld world, ChunkCoordinate chunkCoord)
 	{
 		return this.shadowChunkGenerator.checkHasVanillaStructureWithoutLoading(world, this, (OTGBiomeProvider)this.biomeSource, this.getSettings(), chunkCoord, this.internalGenerator.getCachedBiomeProvider());
 	}

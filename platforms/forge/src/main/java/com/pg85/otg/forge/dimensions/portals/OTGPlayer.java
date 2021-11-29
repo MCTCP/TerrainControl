@@ -1,10 +1,10 @@
 package com.pg85.otg.forge.dimensions.portals;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
@@ -12,23 +12,23 @@ import net.minecraftforge.common.util.LazyOptional;
 // Used only for tracking players in OTG portals.
 public class OTGPlayer
 {
-	private final Player player;
+	private final PlayerEntity player;
 	private boolean isInOtgPortal = false;
 	private String portalColor;
 	private int otgPortalTime = 0;
 	private float portalAnimTime = 0.0F;
 	
-	public OTGPlayer(Player player)
+	public OTGPlayer(PlayerEntity player)
 	{
 		this.player = player;
 	}	
 	
-	public static LazyOptional<OTGPlayer> get(Player player)
+	public static LazyOptional<OTGPlayer> get(PlayerEntity player)
 	{
 		return player.getCapability(OTGCapabilities.OTG_PLAYER_CAPABILITY);
 	}	
 	
-	public Player getPlayer()
+	public PlayerEntity getPlayer()
 	{
 		return this.player;
 	}
@@ -50,7 +50,7 @@ public class OTGPlayer
 			{
 				if (mc.screen != null && !mc.screen.isPauseScreen())
 				{
-					if (mc.screen instanceof AbstractContainerScreen)
+					if (mc.screen instanceof ContainerScreen)
 					{
 						player.closeContainer();
 					}
@@ -100,7 +100,7 @@ public class OTGPlayer
 	@OnlyIn(Dist.CLIENT)
 	private void playPortalSound(Minecraft mc)
 	{
-		mc.getSoundManager().play(SimpleSoundInstance.forLocalAmbience(SoundEvents.PORTAL_TRIGGER, this.getPlayer().getRandom().nextFloat() * 0.4F + 0.8F, 0.25F));
+		mc.getSoundManager().play(SimpleSound.forLocalAmbience(SoundEvents.PORTAL_TRIGGER, this.getPlayer().getRandom().nextFloat() * 0.4F + 0.8F, 0.25F));
 	}
 
 	public void setPortal(boolean inPortal, String portalColor)

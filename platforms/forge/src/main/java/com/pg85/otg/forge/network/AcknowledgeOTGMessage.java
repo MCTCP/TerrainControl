@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.network;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -12,9 +12,9 @@ public class AcknowledgeOTGMessage implements OTGLoginMessage
 
 	public AcknowledgeOTGMessage() { }
 
-	public static void serialize(AcknowledgeOTGMessage msg, FriendlyByteBuf buf) { }
+	public static void serialize(AcknowledgeOTGMessage msg, PacketBuffer buf) { }
 
-	public static AcknowledgeOTGMessage deserialize(FriendlyByteBuf buf)
+	public static AcknowledgeOTGMessage deserialize(PacketBuffer buf)
 	{
 		return new AcknowledgeOTGMessage();
 	}

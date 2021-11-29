@@ -9,13 +9,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.customobject.util.Corner;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +32,7 @@ public class RegionCommand extends BaseCommand
 	}
 
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(
 			Commands.literal("region").then(
@@ -69,19 +69,19 @@ public class RegionCommand extends BaseCommand
 		);
 	}
 
-	public int mark(CommandSourceStack source)
+	public int mark(CommandSource source)
 	{
 		if (checkForNonPlayer(source)) return 0;
 		if (playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition()))
 		{
-			source.sendSuccess(new TextComponent("Point 1 marked"), false);
+			source.sendSuccess(new StringTextComponent("Point 1 marked"), false);
 		} else {
-			source.sendSuccess(new TextComponent("Point 2 marked"), false);
+			source.sendSuccess(new StringTextComponent("Point 2 marked"), false);
 		}
 		return 0;
 	}
 
-	public int mark(CommandSourceStack source, String input)
+	public int mark(CommandSource source, String input)
 	{
 		if (checkForNonPlayer(source)) return 0;
 		Region r = playerSelectionMap.get(source.getEntity());
@@ -92,7 +92,7 @@ public class RegionCommand extends BaseCommand
 			case "1":
 			{
 				r.setPos1(source.getEntity().blockPosition());
-				source.sendSuccess(new TextComponent("Point 1 marked"), false);
+				source.sendSuccess(new StringTextComponent("Point 1 marked"), false);
 				return 0;
 			}
 			case "max":
@@ -100,38 +100,38 @@ public class RegionCommand extends BaseCommand
 			case "2":
 			{
 				r.setPos2(source.getEntity().blockPosition());
-				source.sendSuccess(new TextComponent("Point 2 marked"), false);
+				source.sendSuccess(new StringTextComponent("Point 2 marked"), false);
 				return 0;
 			}
 			case "center":
 			{
 				r.setCenter(Region.cornerFromBlockPos(source.getEntity().blockPosition()));
-				source.sendSuccess(new TextComponent("Center marked"), false);
+				source.sendSuccess(new StringTextComponent("Center marked"), false);
 				return 0;
 			}
 			default:
 			{
-				source.sendSuccess(new TextComponent(input + " is not recognized"), false);
+				source.sendSuccess(new StringTextComponent(input + " is not recognized"), false);
 				return 0;
 			}
 		}
 	}
 
-	public int clear(CommandSourceStack source)
+	public int clear(CommandSource source)
 	{
 		if (checkForNonPlayer(source)) return 0;
 		playerSelectionMap.get(source.getEntity()).clear();
-		source.sendSuccess(new TextComponent("Position cleared"), false);
+		source.sendSuccess(new StringTextComponent("Position cleared"), false);
 		return 0;
 	}
 
-	public int expand(CommandSourceStack source, String direction, Integer value)
+	public int expand(CommandSource source, String direction, Integer value)
 	{
 		if (checkForNonPlayer(source)) return 0;
 		Region region = playerSelectionMap.get(source.getEntity());
 		if (region.getMax() == null)
 		{
-			source.sendSuccess(new TextComponent("Please mark two positions before modifying or exporting the region"), false);
+			source.sendSuccess(new StringTextComponent("Please mark two positions before modifying or exporting the region"), false);
 			return 0;
 		}
 
@@ -174,15 +174,15 @@ public class RegionCommand extends BaseCommand
 					region.setPos1(region.pos1.below(value));
 				break;
 			default:
-				source.sendSuccess(new TextComponent("Unrecognized direction " + direction), false);
+				source.sendSuccess(new StringTextComponent("Unrecognized direction " + direction), false);
 				return 0;
 		}
 
-		source.sendSuccess(new TextComponent("Region modified"), false);
+		source.sendSuccess(new StringTextComponent("Region modified"), false);
 		return 0;
 	}
 
-	public int shrink(CommandSourceStack source, String direction, Integer value)
+	public int shrink(CommandSource source, String direction, Integer value)
 	{
 		if (checkForNonPlayer(source)) return 0;
 
@@ -191,11 +191,11 @@ public class RegionCommand extends BaseCommand
 		return 0;
 	}
 
-	private static boolean checkForNonPlayer(CommandSourceStack source)
+	private static boolean checkForNonPlayer(CommandSource source)
 	{
-		if (!(source.getEntity() instanceof ServerPlayer))
+		if (!(source.getEntity() instanceof ServerPlayerEntity))
 		{
-			source.sendSuccess(new TextComponent("Only players can execute this command"), false);
+			source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
 			return true;
 		}
 		if (!playerSelectionMap.containsKey(source.getEntity()))
@@ -301,7 +301,7 @@ public class RegionCommand extends BaseCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			return SharedSuggestionProvider.suggest(options, builder);
+			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 
@@ -318,7 +318,7 @@ public class RegionCommand extends BaseCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			return SharedSuggestionProvider.suggest(options, builder);
+			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 }

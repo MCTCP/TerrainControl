@@ -23,25 +23,25 @@ import com.pg85.otg.util.materials.LocalMaterials;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.levelgen.feature.VillageFeature;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-import net.minecraft.world.level.levelgen.StructureSettings;
-import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.SharedSeedRandom;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.StructureManager;
+import net.minecraft.world.gen.feature.structure.VillageStructure;
+import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
+import net.minecraft.world.server.ServerWorld;
 
 /**
  * Shadow chunk generation means generating base terrain for chunks
@@ -61,7 +61,7 @@ public class ShadowChunkGenerator
 {
 	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
-	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkAccess>(512);
+	private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);
 	private final FifoMap<ChunkCoordinate, Boolean> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Boolean>(2048);
 
 	private final Object workerLock = new Object();
@@ -105,7 +105,7 @@ public class ShadowChunkGenerator
 	// These chunks are highly likely to be requested next, so we can filter out any that need noisegen/base terrain gen and
 	// pre-emptively generate and cache them asynchronously. When MC requests those chunks a moment later as part of worldgen,
 	// we return the async generated chunk data.
-	public void queueChunksForWorkerThreads(WorldGenRegion worldGenRegion, StructureFeatureManager manager, ChunkAccess chunk, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, StructureSettings dimensionStructuresSettings, int worldHeightCap)
+	public void queueChunksForWorkerThreads(WorldGenRegion worldGenRegion, StructureManager manager, IChunk chunk, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
 	{
 		if(this.maxConcurrent > 0)
 		{
@@ -125,7 +125,7 @@ public class ShadowChunkGenerator
 				if(this.chunksToLoad.size() == 0)
 				{
 					//OTG.log(LogMarker.INFO, "Fetching chunks for async chunkgen");
-					for(ChunkAccess wgrChunk : worldGenRegion.cache)
+					for(IChunk wgrChunk : worldGenRegion.cache)
 					{
 						ChunkCoordinate wgrChunkCoord = ChunkCoordinate.fromChunkCoords(wgrChunk.getPos().x, wgrChunk.getPos().z);
 						if(wgrChunk != chunk && !wgrChunk.getStatus().isOrAfter(ChunkStatus.NOISE))
@@ -162,7 +162,7 @@ public class ShadowChunkGenerator
 
 	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate)
 	{
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
+		ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ForgeChunkBuffer buffer = new ForgeChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -178,14 +178,14 @@ public class ShadowChunkGenerator
 		return buffer;
 	}
 
-	public ChunkAccess getChunkWithWait(ChunkCoordinate chunkCoord)
+	public IChunk getChunkWithWait(ChunkCoordinate chunkCoord)
 	{
 		// Fetch the chunk if it is cached, otherwise check if no other thread
 		// is generating the chunk. If not, claim the chunk and generate it.
 		// If so, wait for the other thread to finish.
 		synchronized(this.workerLock)
 		{
-			ChunkAccess cachedChunk = this.unloadedChunksCache.get(chunkCoord);
+			IChunk cachedChunk = this.unloadedChunksCache.get(chunkCoord);
 			if(cachedChunk != null)
 			{
 				return cachedChunk;
@@ -233,7 +233,7 @@ public class ShadowChunkGenerator
 			}
 			synchronized(this.workerLock)
 			{
-				ChunkAccess cachedChunk = this.unloadedChunksCache.get(chunkCoord);
+				IChunk cachedChunk = this.unloadedChunksCache.get(chunkCoord);
 				if(cachedChunk != null)
 				{
 					return cachedChunk;
@@ -253,13 +253,13 @@ public class ShadowChunkGenerator
 		}
 	}
 
-	public void fillWorldGenChunkFromShadowChunk(ChunkAccess chunk, ChunkAccess cachedChunk)
+	public void fillWorldGenChunkFromShadowChunk(IChunk chunk, IChunk cachedChunk)
 	{
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 		// Re-use base terrain generated via shadowgen for worldgen.
-		((ProtoChunk)chunk).sections = ((ProtoChunk)cachedChunk).sections;
-		((ProtoChunk)chunk).heightmaps = ((ProtoChunk)cachedChunk).heightmaps;
-		((ProtoChunk)chunk).lights = ((ProtoChunk)cachedChunk).lights;
+		((ChunkPrimer)chunk).sections = ((ChunkPrimer)cachedChunk).sections;
+		((ChunkPrimer)chunk).heightmaps = ((ChunkPrimer)cachedChunk).heightmaps;
+		((ChunkPrimer)chunk).lights = ((ChunkPrimer)cachedChunk).lights;
 		this.cacheHits++;
 		//OTG.log(LogMarker.INFO, "Cache hit " + this.cacheHits);
 		synchronized(this.workerLock)
@@ -285,12 +285,12 @@ public class ShadowChunkGenerator
 	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
 
-	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider)
+	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, DimensionStructuresSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider)
 	{
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 5;
-		ProtoChunk chunk;
+		ChunkPrimer chunk;
 		ChunkPos chunkpos;
 		IBiome biome;
 		ChunkCoordinate searchChunk;
@@ -328,7 +328,7 @@ public class ShadowChunkGenerator
 			}			
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null);
+				chunk = new ChunkPrimer(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null);
 				chunkpos = chunk.getPos();
 
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
@@ -336,10 +336,10 @@ public class ShadowChunkGenerator
 
 				// TODO: Optimise this for biome lookups, fetch a whole region of noise biome info at once?
 				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((ForgeBiome)biome).getBiomeBase().getGenerationSettings().structures())
+				for(Supplier<StructureFeature<?, ?>> supplier : ((ForgeBiome)biome).getBiomeBase().getGenerationSettings().structures())
 				{
 					// *TODO: Do we need to avoid any structures other than villages?
-					if(supplier.get().feature instanceof VillageFeature)
+					if(supplier.get().feature instanceof VillageStructure)
 					{
 						if(hasStructureStart(supplier.get(), dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
 						{
@@ -363,12 +363,12 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	private boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, RegistryAccess dynamicRegistries, StructureFeatureManager structureManager, ChunkAccess chunk, StructureManager templateManager, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
+	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DimensionStructuresSettings dimensionStructuresSettings, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, ChunkGenerator chunkGenerator, BiomeProvider biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
 	{
-		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
+		StructureSeparationSettings structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
 		{
-			WorldgenRandom sharedSeedRandom = new WorldgenRandom();
+			SharedSeedRandom sharedSeedRandom = new SharedSeedRandom();
 			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
 			if (
 				chunkPos.x == chunkPosPotential.x &&
@@ -415,7 +415,7 @@ public class ShadowChunkGenerator
 			return cachedColumn;
 		}
 
-		ChunkAccess chunk = this.getChunkWithWait(chunkCoord);
+		IChunk chunk = this.getChunkWithWait(chunkCoord);
 		if (chunk == null)
 		{
 			// Generate a chunk without loading/decorating it
@@ -494,17 +494,17 @@ public class ShadowChunkGenerator
 		private Random worldRandom;
 
 		private final int index;
-		private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache;
+		private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache;
 		private final List<ChunkCoordinate> chunksToLoad;
 		private final ChunkCoordinate[] chunksBeingLoaded;
-		private final ServerLevel serverWorld;
+		private final ServerWorld serverWorld;
 		private final ChunkGenerator chunkGenerator;
 		private final OTGBiomeProvider biomeProvider;
 		private final OTGChunkGenerator otgChunkGenerator;
-		private final StructureSettings dimensionStructuresSettings;
+		private final DimensionStructuresSettings dimensionStructuresSettings;
 		private final int worldHeightCap;
 
-		Worker(int index, FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerLevel serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, StructureSettings dimensionStructuresSettings, int worldHeightCap)
+		Worker(int index, FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache, List<ChunkCoordinate> chunksToLoad, ChunkCoordinate[] chunksBeingLoaded, ServerWorld serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, OTGChunkGenerator otgChunkGenerator, DimensionStructuresSettings dimensionStructuresSettings, int worldHeightCap)
 		{
 			this.index = index;
 			this.unloadedChunksCache = unloadedChunksCache;
@@ -559,7 +559,7 @@ public class ShadowChunkGenerator
 					if(!checkHasVanillaStructureWithoutLoading(this.serverWorld, this.chunkGenerator, this.biomeProvider, this.dimensionStructuresSettings, coords, this.otgChunkGenerator.getCachedBiomeProvider()))
 					{
 						// Generate a chunk without loading/decorating it.
-						ChunkAccess cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
+						IChunk cachedChunk = getUnloadedChunk(this.otgChunkGenerator, this.worldHeightCap, this.worldRandom, coords).getChunk();
 						synchronized(workerLock)
 						{
 							this.unloadedChunksCache.put(coords, cachedChunk);

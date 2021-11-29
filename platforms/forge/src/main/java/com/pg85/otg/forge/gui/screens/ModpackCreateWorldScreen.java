@@ -14,51 +14,51 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.worldselection.WorldPreset;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.WorldGenSettingsComponent;
-import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.FileUtil;
-import net.minecraft.Util;
-import net.minecraft.world.level.DataPackConfig;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.client.gui.DialogTexts;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
+import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.gui.screen.DirtMessageScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldOptionsScreen;
+import net.minecraft.client.gui.toasts.SystemToast;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.resources.ResourcePackList;
+import net.minecraft.util.FileUtil;
+import net.minecraft.util.Util;
+import net.minecraft.util.datafix.codec.DatapackCodec;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraft.world.level.storage.LevelResource;
-import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.GameType;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
+import net.minecraft.world.storage.FolderName;
+import net.minecraft.world.storage.SaveFormat;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ModpackCreateWorldScreen extends CreateWorldScreen
 {
 	private static final Logger LOGGER = LogManager.getLogger();
-	private static final Component GAME_MODEL_LABEL = new TranslatableComponent("selectWorld.gameMode");
-	private static final Component NAME_LABEL = new TranslatableComponent("selectWorld.enterName");
-	private static final Component OUTPUT_DIR_INFO = new TranslatableComponent("selectWorld.resultFolder");
-	private static final Component COMMANDS_INFO = new TranslatableComponent("selectWorld.allowCommands.info");
-	private EditBox seedEdit;
+	private static final ITextComponent GAME_MODEL_LABEL = new TranslationTextComponent("selectWorld.gameMode");
+	private static final ITextComponent NAME_LABEL = new TranslationTextComponent("selectWorld.enterName");
+	private static final ITextComponent OUTPUT_DIR_INFO = new TranslationTextComponent("selectWorld.resultFolder");
+	private static final ITextComponent COMMANDS_INFO = new TranslationTextComponent("selectWorld.allowCommands.info");
+	private TextFieldWidget seedEdit;
 	private ModpackCreateWorldScreen.GameMode gameMode = ModpackCreateWorldScreen.GameMode.SURVIVAL;
 	@Nullable
 	private ModpackCreateWorldScreen.GameMode oldGameMode;
@@ -67,20 +67,20 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	@Nullable
 	private Path tempDataPackDir;
 	@Nullable
-	private PackRepository tempDataPackRepository;
+	private ResourcePackList tempDataPackRepository;
 	private Button createButton;
 	private Button difficultyButton;
 	private Button commandsButton;
-	private Component gameModeHelp1;
-	private Component gameModeHelp2;
+	private ITextComponent gameModeHelp1;
+	private ITextComponent gameModeHelp2;
 	private String initName;
 	private String initSeed = "";
-	private Component title2;
+	private ITextComponent title2;
 
 	public static ModpackCreateWorldScreen create(@Nullable Screen screen)
 	{
-		RegistryAccess.RegistryHolder dynamicregistry = RegistryAccess.builtin();
-		WorldGenSettings dimGenSettings = net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
+		DynamicRegistries.Impl dynamicregistry = DynamicRegistries.builtin();
+		DimensionGeneratorSettings dimGenSettings = net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
 			type -> type.create(
 					dynamicregistry, 
 					new java.util.Random().nextLong(), 
@@ -88,7 +88,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 					false
 				)
 			).orElseGet(() -> 
-				WorldGenSettings.makeDefault(
+				DimensionGeneratorSettings.makeDefault(
 					dynamicregistry.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), 
 					dynamicregistry.registryOrThrow(Registry.BIOME_REGISTRY), 
 					dynamicregistry.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
@@ -97,8 +97,8 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		
 		return new ModpackCreateWorldScreen(
 			screen,
-			DataPackConfig.DEFAULT, 
-			new WorldGenSettingsComponent(
+			DatapackCodec.DEFAULT, 
+			new WorldOptionsScreen(
 				dynamicregistry, 
 				dimGenSettings, 
 				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType(), 
@@ -108,14 +108,14 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		);
 	}
 
-	public ModpackCreateWorldScreen(@Nullable Screen screen, DataPackConfig datapackCodec, WorldGenSettingsComponent worldGenSettingsComponent, WorldGenSettings dimGenSettings)
+	public ModpackCreateWorldScreen(@Nullable Screen screen, DatapackCodec datapackCodec, WorldOptionsScreen worldGenSettingsComponent, DimensionGeneratorSettings dimGenSettings)
 	{
 		super(screen, datapackCodec, worldGenSettingsComponent);
 		this.initName = I18n.get("selectWorld.newWorld");
 
 		// Does the same as opening the customisation/dimensions menu and applying, registering the dimensions from the modpack config.
-		Optional<WorldPreset> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
-		WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(preset);
+		Optional<BiomeGeneratorTypeScreens> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
+		BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(preset);
 		biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
 		if (biomegeneratortypescreens$ifactory != null)
 		{
@@ -138,18 +138,18 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		int j = this.width / 2 + 5;
 
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
-		this.nameEdit = new EditBox(this.font, i, 60, 150, 20, new TranslatableComponent("selectWorld.enterName"))
+		this.nameEdit = new TextFieldWidget(this.font, i, 60, 150, 20, new TranslationTextComponent("selectWorld.enterName"))
 		{
-			protected MutableComponent createNarrationMessage()
+			protected IFormattableTextComponent createNarrationMessage()
 			{
-				return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
+				return super.createNarrationMessage().append(". ").append(new TranslationTextComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
 			}
 		};
-		this.seedEdit = new EditBox(this.font, j, 60, 150, 20, new TranslatableComponent("selectWorld.enterName"))
+		this.seedEdit = new TextFieldWidget(this.font, j, 60, 150, 20, new TranslationTextComponent("selectWorld.enterName"))
 		{
-			protected MutableComponent createNarrationMessage()
+			protected IFormattableTextComponent createNarrationMessage()
 			{
-				return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
+				return super.createNarrationMessage().append(". ").append(new TranslationTextComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
 			}
 		};		
 		this.nameEdit.setValue(this.initName);
@@ -167,7 +167,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		});
 		this.children.add(this.seedEdit);
 		this.addButton(
-			new Button(i, 110, 150, 20, TextComponent.EMPTY, 
+			new Button(i, 110, 150, 20, StringTextComponent.EMPTY, 
 				(p_214316_1_) ->
 				{
 					switch(this.gameMode)
@@ -185,74 +185,74 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 					p_214316_1_.queueNarration(250);
 				}
 			) {
-				public Component getMessage()
+				public ITextComponent getMessage()
 				{
-					return new TranslatableComponent("options.generic_value", ModpackCreateWorldScreen.GAME_MODEL_LABEL, new TranslatableComponent("selectWorld.gameMode." + ModpackCreateWorldScreen.this.gameMode.name));
+					return new TranslationTextComponent("options.generic_value", ModpackCreateWorldScreen.GAME_MODEL_LABEL, new TranslationTextComponent("selectWorld.gameMode." + ModpackCreateWorldScreen.this.gameMode.name));
 				}
 			
-				protected MutableComponent createNarrationMessage()
+				protected IFormattableTextComponent createNarrationMessage()
 				{
 					return super.createNarrationMessage().append(". ").append(ModpackCreateWorldScreen.this.gameModeHelp1).append(" ").append(ModpackCreateWorldScreen.this.gameModeHelp2);
 				}
 			}
 		);
 		this.difficultyButton = this.addButton(
-			new Button(j, 110, 150, 20, new TranslatableComponent("options.difficulty"),
+			new Button(j, 110, 150, 20, new TranslationTextComponent("options.difficulty"),
 			(p_238956_1_) -> {
 				this.selectedDifficulty = this.selectedDifficulty.nextById();
 				this.effectiveDifficulty = this.selectedDifficulty;
 				p_238956_1_.queueNarration(250);
 			}) {
-				public Component getMessage()
+				public ITextComponent getMessage()
 				{
-					return (new TranslatableComponent("options.difficulty")).append(": ").append(ModpackCreateWorldScreen.this.effectiveDifficulty.getDisplayName());
+					return (new TranslationTextComponent("options.difficulty")).append(": ").append(ModpackCreateWorldScreen.this.effectiveDifficulty.getDisplayName());
 				}
 			}
 		);
-		this.commandsButton = this.addButton(new Button(i, 161, 150, 20, new TranslatableComponent("selectWorld.allowCommands"), 
+		this.commandsButton = this.addButton(new Button(i, 161, 150, 20, new TranslationTextComponent("selectWorld.allowCommands"), 
 			(p_214322_1_) -> {
 				this.commandsChanged = true;
 				this.commands = !this.commands;
 				p_214322_1_.queueNarration(250);
 			}) {
-				public Component getMessage()
+				public ITextComponent getMessage()
 				{
-					return CommonComponents.optionStatus(super.getMessage(), ModpackCreateWorldScreen.this.commands && !ModpackCreateWorldScreen.this.hardCore);
+					return DialogTexts.optionStatus(super.getMessage(), ModpackCreateWorldScreen.this.commands && !ModpackCreateWorldScreen.this.hardCore);
 				}
 		
-				protected MutableComponent createNarrationMessage()
+				protected IFormattableTextComponent createNarrationMessage()
 				{
-					return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.allowCommands.info"));
+					return super.createNarrationMessage().append(". ").append(new TranslationTextComponent("selectWorld.allowCommands.info"));
 				}
 			}
 		);
-		this.addButton(new Button(j, 161, 150, 20, new TextComponent("Dimensions"), // TODO: Use translationtext
+		this.addButton(new Button(j, 161, 150, 20, new StringTextComponent("Dimensions"), // TODO: Use translationtext
 			(p_214322_1_) -> {
-				Optional<WorldPreset> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
-				WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(preset);
+				Optional<BiomeGeneratorTypeScreens> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
+				BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(preset);
 				biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
 				if (biomegeneratortypescreens$ifactory != null)
 				{
 					this.minecraft.setScreen(biomegeneratortypescreens$ifactory.createEditScreen(this, this.worldGenSettingsComponent.makeSettings(this.hardCore)));
 				}
 			}) {
-				public Component getMessage()
+				public ITextComponent getMessage()
 				{
 					// TODO: Add translations/narration
 					//return DialogTexts.optionStatus(super.getMessage(), ModpackCreateWorldScreen.this.commands && !ModpackCreateWorldScreen.this.hardCore);
-					return new TextComponent("Dimensions");
+					return new StringTextComponent("Dimensions");
 				}
 
-				protected MutableComponent createNarrationMessage()
+				protected IFormattableTextComponent createNarrationMessage()
 				{
 					// TODO: Add translations/narration
 					//return super.createNarrationMessage().append(". ").append(new TranslationTextComponent("selectWorld.allowCommands.info"));
-					return super.createNarrationMessage().append(". ").append(new TextComponent("Dimensions"));
+					return super.createNarrationMessage().append(". ").append(new StringTextComponent("Dimensions"));
 				}
 			}
 		);
 		this.createButton = this.addButton(
-			new Button(i, this.height - 28, 150, 20, new TranslatableComponent("selectWorld.create"),
+			new Button(i, this.height - 28, 150, 20, new TranslationTextComponent("selectWorld.create"),
 				(p_214318_1_) -> {
 					this.onCreate();
 				}
@@ -260,7 +260,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		);
 		this.createButton.active = !this.initName.isEmpty();
 		this.addButton(
-			new Button(j, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, 
+			new Button(j, this.height - 28, 150, 20, DialogTexts.GUI_CANCEL, 
 				(p_214317_1_) -> {
 					this.popScreen();
 				}
@@ -277,16 +277,16 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		DimensionConfig modPackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 		if(modPackConfig == null || modPackConfig.ModpackName == null)
 		{
-			this.title2 = new TranslatableComponent("otg.createDimensions.customize.title");
+			this.title2 = new TranslationTextComponent("otg.createDimensions.customize.title");
 		} else {
-			this.title2 = new TextComponent(modPackConfig.ModpackName);
+			this.title2 = new StringTextComponent(modPackConfig.ModpackName);
 		}
 	}
 
 	private void updateGameModeHelp()
 	{
-		this.gameModeHelp1 = new TranslatableComponent("selectWorld.gameMode." + this.gameMode.name + ".line1");
-		this.gameModeHelp2 = new TranslatableComponent("selectWorld.gameMode." + this.gameMode.name + ".line2");
+		this.gameModeHelp1 = new TranslationTextComponent("selectWorld.gameMode." + this.gameMode.name + ".line1");
+		this.gameModeHelp2 = new TranslationTextComponent("selectWorld.gameMode." + this.gameMode.name + ".line2");
 	}
 
 	private void updateResultFolder()
@@ -317,11 +317,11 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 
 	private void onCreate()
 	{
-		this.minecraft.forceSetScreen(new GenericDirtMessageScreen(new TranslatableComponent("createWorld.preparing")));
+		this.minecraft.forceSetScreen(new DirtMessageScreen(new TranslationTextComponent("createWorld.preparing")));
 		if (this.copyTempDataPackDirToNewWorld())
 		{
 			this.cleanupTempResources();
-			LevelSettings worldsettings = new LevelSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, this.effectiveDifficulty, this.commands && !this.hardCore, this.gameRules, this.dataPacks);
+			WorldSettings worldsettings = new WorldSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, this.effectiveDifficulty, this.commands && !this.hardCore, this.gameRules, this.dataPacks);
 			this.minecraft.createLevel(this.resultFolder, worldsettings, this.worldGenSettingsComponent.registryHolder(), this.worldGenSettingsComponent.makeSettings(worldsettings.hardcore()).withSeed(worldsettings.hardcore(), parseSeed()));
 		}
 	}
@@ -421,12 +421,12 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	}
 
 	@Override
-	public void render(PoseStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.renderBackground(p_230430_1_);
 		drawCenteredString(p_230430_1_, this.font, this.title2, this.width / 2, 20, -1);
 		drawString(p_230430_1_, this.font, NAME_LABEL, this.width / 2 - 150, 47, -6250336);
-		drawString(p_230430_1_, this.font, (new TextComponent("")).append(OUTPUT_DIR_INFO).append(" ").append(this.resultFolder), this.width / 2 - 150, 85, -6250336);
+		drawString(p_230430_1_, this.font, (new StringTextComponent("")).append(OUTPUT_DIR_INFO).append(" ").append(this.resultFolder), this.width / 2 - 150, 85, -6250336);
 		drawString(p_230430_1_, this.font, "Seed", this.width / 2 + 10, 47, -6250336);
 		this.nameEdit.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
 		this.seedEdit.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
@@ -444,13 +444,13 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	}
 
 	@Override
-	protected <T extends GuiEventListener> T addWidget(T p_230481_1_)
+	protected <T extends IGuiEventListener> T addWidget(T p_230481_1_)
 	{
 		return super.addWidget(p_230481_1_);
 	}
 
 	@Override
-	protected <T extends AbstractWidget> T addButton(T p_230480_1_)
+	protected <T extends Widget> T addButton(T p_230480_1_)
 	{
 		return super.addButton(p_230480_1_);
 	}
@@ -510,10 +510,10 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		if (this.tempDataPackDir != null)
 		{
 			try (
-					LevelStorageSource.LevelStorageAccess saveformat$levelsave = this.minecraft.getLevelSource().createAccess(this.resultFolder);
+					SaveFormat.LevelSave saveformat$levelsave = this.minecraft.getLevelSource().createAccess(this.resultFolder);
 					Stream<Path> stream = Files.walk(this.tempDataPackDir);
 			) {
-				Path path = saveformat$levelsave.getLevelPath(LevelResource.DATAPACK_DIR);
+				Path path = saveformat$levelsave.getLevelPath(FolderName.DATAPACK_DIR);
 				Files.createDirectories(path);
 				stream.filter(
 					(p_238942_1_) -> {

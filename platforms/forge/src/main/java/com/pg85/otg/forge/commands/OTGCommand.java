@@ -7,16 +7,16 @@ import java.util.List;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.pg85.otg.forge.commands.arguments.FlagsArgument;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
-import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
 
 public class OTGCommand
 {
 	private static final List<BaseCommand> commands = new ArrayList<>();
 	
-	public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
+	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
 		HelpCommand helpCommand = new HelpCommand();
 		
@@ -37,7 +37,7 @@ public class OTGCommand
 		
 		commands.sort(Comparator.comparing(BaseCommand::getName));
 
-		LiteralArgumentBuilder<CommandSourceStack> commandBuilder = Commands.literal("otg").requires(
+		LiteralArgumentBuilder<CommandSource> commandBuilder = Commands.literal("otg").requires(
 				(context) -> context.hasPermission(2)
 			).executes(
 					context -> helpCommand.showHelp(context.getSource(), "")
@@ -51,7 +51,7 @@ public class OTGCommand
 	}
 	
 	public static void registerArguments() {
-		ArgumentTypes.register("flags", FlagsArgument.class, new EmptyArgumentSerializer<>(FlagsArgument::create));
+		ArgumentTypes.register("flags", FlagsArgument.class, new ArgumentSerializer<>(FlagsArgument::create));
 	}
 	
 	public static List<BaseCommand> getCommands() {

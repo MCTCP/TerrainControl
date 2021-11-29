@@ -8,9 +8,9 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.util.text.StringTextComponent;
 
 public class PresetCommand extends BaseCommand
 {
@@ -22,22 +22,22 @@ public class PresetCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("preset")
 			.executes(context -> showPreset(context.getSource()))
 		);
 	}
 	
-	private int showPreset(CommandSourceStack source)
+	private int showPreset(CommandSource source)
 	{
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
+			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 		Preset preset = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator).getPreset();
-		source.sendSuccess(new TextComponent
+		source.sendSuccess(new StringTextComponent
 			("Preset: " + preset.getFolderName()
 			 + "\nDescription: " + preset.getDescription()
 			 + "\nMajor version: " + preset.getMajorVersion()
@@ -48,7 +48,7 @@ public class PresetCommand extends BaseCommand
 
 			if (!portalBlocks.isEmpty())
 			{
-				source.sendSuccess(new TextComponent("Portal Blocks: " + String.join(", ", portalBlocks)), false);
+				source.sendSuccess(new StringTextComponent("Portal Blocks: " + String.join(", ", portalBlocks)), false);
 			}
 		return 0;
 	}

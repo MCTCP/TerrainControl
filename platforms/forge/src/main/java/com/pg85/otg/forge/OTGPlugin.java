@@ -16,12 +16,12 @@ import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
 import com.pg85.otg.presets.Preset;
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -57,7 +57,7 @@ public class OTGPlugin
 		// If they're not added, we get errors and MC does not save properly.
 		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
-		ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
+		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
 
 		// Deferred registers
 		OTGPortalPois.poi.register(modEventBus);
@@ -119,11 +119,11 @@ public class OTGPlugin
 		// Unfortunately there doesn't appear to be a way to persist them via code(?)
 		if(!event.getWorld().isClientSide())
 		{
-			if(((ServerLevel)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			if(((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 			{
-				Path datapackDir = ((ServerLevel)event.getWorld()).getLevel().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
-				Preset preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getLevel().getChunkSource().generator).getPreset();
-				String dimName = ((ServerLevel)event.getWorld()).getWorldServer().dimension().location().getPath();
+				Path datapackDir = ((ServerWorld)event.getWorld()).getLevel().getServer().getWorldPath(FolderName.DATAPACK_DIR);
+				Preset preset = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getLevel().getChunkSource().generator).getPreset();
+				String dimName = ((ServerWorld)event.getWorld()).getWorldServer().dimension().location().getPath();
 				OTGDimensionType.saveDataPackFile(datapackDir, dimName, preset.getWorldConfig(), preset.getFolderName());
 			}
 		}

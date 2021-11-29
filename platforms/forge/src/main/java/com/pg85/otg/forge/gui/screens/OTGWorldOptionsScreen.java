@@ -4,40 +4,40 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import org.apache.commons.lang3.StringUtils;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.MultiLineLabel;
-import net.minecraft.client.gui.screens.worldselection.WorldPreset;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.WorldGenSettingsComponent;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.IBidiRenderer;
+import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
+import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldOptionsScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 
-public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
+public class OTGWorldOptionsScreen extends WorldOptionsScreen
 {
-	private static final Component CUSTOM_WORLD_DESCRIPTION = new TranslatableComponent("generator.custom");
-	private static final Component AMPLIFIED_HELP_TEXT = new TranslatableComponent("generator.amplified.info");
-	private MultiLineLabel amplifiedWorldInfo = MultiLineLabel.EMPTY;
-	private Font font;
+	private static final ITextComponent CUSTOM_WORLD_DESCRIPTION = new TranslationTextComponent("generator.custom");
+	private static final ITextComponent AMPLIFIED_HELP_TEXT = new TranslationTextComponent("generator.amplified.info");
+	private IBidiRenderer amplifiedWorldInfo = IBidiRenderer.EMPTY;
+	private FontRenderer font;
 	private int width;
-	private EditBox seedEdit;
+	private TextFieldWidget seedEdit;
 	private Button typeButton;
 	private Button customizeTypeButton;
-	private RegistryAccess.RegistryHolder registryHolder;
-	public WorldGenSettings settings;
-	protected Optional<WorldPreset> preset;
+	private DynamicRegistries.Impl registryHolder;
+	public DimensionGeneratorSettings settings;
+	protected Optional<BiomeGeneratorTypeScreens> preset;
 	private OptionalLong seed;
 
-	public OTGWorldOptionsScreen(RegistryAccess.RegistryHolder p_i242065_1_, WorldGenSettings p_i242065_2_, Optional<WorldPreset> p_i242065_3_, OptionalLong p_i242065_4_)
+	public OTGWorldOptionsScreen(DynamicRegistries.Impl p_i242065_1_, DimensionGeneratorSettings p_i242065_2_, Optional<BiomeGeneratorTypeScreens> p_i242065_3_, OptionalLong p_i242065_4_)
 	{
 		super(p_i242065_1_, p_i242065_2_, p_i242065_3_, p_i242065_4_);
 		this.registryHolder = p_i242065_1_;
@@ -47,11 +47,11 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 	}
 
 	@Override
-	public void init(final CreateWorldScreen p_239048_1_, Minecraft p_239048_2_, Font p_239048_3_)
+	public void init(final CreateWorldScreen p_239048_1_, Minecraft p_239048_2_, FontRenderer p_239048_3_)
 	{
 		this.font = p_239048_3_;
 		this.width = p_239048_1_.width;
-		this.seedEdit = new EditBox(this.font, this.width / 2 - 100, 60, 200, 20, new TranslatableComponent("selectWorld.enterSeed"));
+		this.seedEdit = new TextFieldWidget(this.font, this.width / 2 - 100, 60, 200, 20, new TranslationTextComponent("selectWorld.enterSeed"));
 		this.seedEdit.setValue(toString(this.seed));
 		this.seedEdit.setResponder((p_239058_1_) ->
 		{
@@ -59,27 +59,27 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 		});
 		((OTGCustomiseOverworldScreen)p_239048_1_).addWidget(this.seedEdit);
 		int j = this.width / 2 + 5;
-		this.typeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 100, 150, 20, new TranslatableComponent("selectWorld.mapType"), (p_239050_2_) ->
+		this.typeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 100, 150, 20, new TranslationTextComponent("selectWorld.mapType"), (p_239050_2_) ->
 		{
 			while(true)
 			{
 				if (this.preset.isPresent())
 				{
-					int k = WorldPreset.PRESETS.indexOf(this.preset.get()) + 1;
-					if (k >= WorldPreset.PRESETS.size())
+					int k = BiomeGeneratorTypeScreens.PRESETS.indexOf(this.preset.get()) + 1;
+					if (k >= BiomeGeneratorTypeScreens.PRESETS.size())
 					{
 						k = 0;
 					}
 	
-					WorldPreset biomegeneratortypescreens = WorldPreset.PRESETS.get(k);
+					BiomeGeneratorTypeScreens biomegeneratortypescreens = BiomeGeneratorTypeScreens.PRESETS.get(k);
 					if(biomegeneratortypescreens == OTGGui.OTG_WORLD_TYPE)
 					{
 						k++;
-						if (k >= WorldPreset.PRESETS.size())
+						if (k >= BiomeGeneratorTypeScreens.PRESETS.size())
 						{
 							k = 0;
 						}
-						biomegeneratortypescreens = WorldPreset.PRESETS.get(k);
+						biomegeneratortypescreens = BiomeGeneratorTypeScreens.PRESETS.get(k);
 					}
 					this.preset = Optional.of(biomegeneratortypescreens);
 					this.settings = biomegeneratortypescreens.create(this.registryHolder, this.settings.seed(), this.settings.generateFeatures(), this.settings.generateBonusChest());
@@ -95,22 +95,22 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 			}
 		}) {
 			@Override
-			public Component getMessage()
+			public ITextComponent getMessage()
 			{
-				return super.getMessage().copy().append(" ").append(OTGWorldOptionsScreen.this.preset.map(WorldPreset::description).orElse(OTGWorldOptionsScreen.CUSTOM_WORLD_DESCRIPTION));
+				return super.getMessage().copy().append(" ").append(OTGWorldOptionsScreen.this.preset.map(BiomeGeneratorTypeScreens::description).orElse(OTGWorldOptionsScreen.CUSTOM_WORLD_DESCRIPTION));
 			}
 	
 			@Override
-			protected MutableComponent createNarrationMessage()
+			protected IFormattableTextComponent createNarrationMessage()
 			{
-				return Objects.equals(OTGWorldOptionsScreen.this.preset, Optional.of(WorldPreset.AMPLIFIED)) ? super.createNarrationMessage().append(". ").append(OTGWorldOptionsScreen.AMPLIFIED_HELP_TEXT) : super.createNarrationMessage();
+				return Objects.equals(OTGWorldOptionsScreen.this.preset, Optional.of(BiomeGeneratorTypeScreens.AMPLIFIED)) ? super.createNarrationMessage().append(". ").append(OTGWorldOptionsScreen.AMPLIFIED_HELP_TEXT) : super.createNarrationMessage();
 			}
 		});
 		this.typeButton.visible = false;
 		this.typeButton.active = this.preset.isPresent();
-		this.customizeTypeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 120, 150, 20, new TranslatableComponent("selectWorld.customizeType"), (p_239044_3_) ->
+		this.customizeTypeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addButton(new Button(j, 120, 150, 20, new TranslationTextComponent("selectWorld.customizeType"), (p_239044_3_) ->
 		{
-			WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(this.preset);
+			BiomeGeneratorTypeScreens.IFactory biomegeneratortypescreens$ifactory = BiomeGeneratorTypeScreens.EDITORS.get(this.preset);
 			biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(this.preset, biomegeneratortypescreens$ifactory);
 			if (biomegeneratortypescreens$ifactory != null)
 			{
@@ -118,7 +118,7 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 			}
 		}));
 		this.customizeTypeButton.visible = false;
-		this.amplifiedWorldInfo = MultiLineLabel.create(p_239048_3_, AMPLIFIED_HELP_TEXT, this.typeButton.getWidth());
+		this.amplifiedWorldInfo = IBidiRenderer.create(p_239048_3_, AMPLIFIED_HELP_TEXT, this.typeButton.getWidth());
 	}
 
 	@Override
@@ -128,17 +128,17 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 	}
 
 	@Override
-	public void render(PoseStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+	public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
 	{
 		this.seedEdit.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
-		if (this.preset.equals(Optional.of(WorldPreset.AMPLIFIED)))
+		if (this.preset.equals(Optional.of(BiomeGeneratorTypeScreens.AMPLIFIED)))
 		{
 			this.amplifiedWorldInfo.renderLeftAligned(p_230430_1_, this.typeButton.x + 2, this.typeButton.y + 22, 9, 10526880);
 		}
 	}
 
 	@Override
-	public void updateSettings(WorldGenSettings p_239043_1_)
+	public void updateSettings(DimensionGeneratorSettings p_239043_1_)
 	{
 		this.settings = p_239043_1_;
 	}
@@ -158,7 +158,7 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 	}
 
 	@Override
-	public WorldGenSettings makeSettings(boolean p_239054_1_)
+	public DimensionGeneratorSettings makeSettings(boolean p_239054_1_)
 	{
 		OptionalLong optionallong = this.parseSeed();
 		return this.settings.withSeed(p_239054_1_, optionallong);
@@ -197,14 +197,14 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 		{
 			this.customizeTypeButton.visible = false;
 		} else {
-			this.customizeTypeButton.visible = p_239059_1_ && (WorldPreset.EDITORS.containsKey(this.preset) || net.minecraftforge.client.ForgeHooksClient.hasBiomeGeneratorSettingsOptionsScreen(this.preset));
+			this.customizeTypeButton.visible = p_239059_1_ && (BiomeGeneratorTypeScreens.EDITORS.containsKey(this.preset) || net.minecraftforge.client.ForgeHooksClient.hasBiomeGeneratorSettingsOptionsScreen(this.preset));
 		}
 		
 		this.seedEdit.setVisible(p_239059_1_);
 	}
 
 	@Override
-	public RegistryAccess.RegistryHolder registryHolder()
+	public DynamicRegistries.Impl registryHolder()
 	{
 		return this.registryHolder;
 	}	

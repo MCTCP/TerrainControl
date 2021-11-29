@@ -14,12 +14,12 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.OTG;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -45,7 +45,7 @@ public class DataCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("data")
 			.executes(context -> execute(context.getSource(), ""))
@@ -57,7 +57,7 @@ public class DataCommand extends BaseCommand
 		);
 	}
 
-	public int execute(CommandSourceStack source, String type)
+	public int execute(CommandSource source, String type)
 	{
 		// /otg data music
 
@@ -86,7 +86,7 @@ public class DataCommand extends BaseCommand
 				worldGenRegistry = source.getServer().registryAccess().registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 				break;
 			default:
-				source.sendSuccess(new TextComponent(getUsage()), false);
+				source.sendSuccess(new StringTextComponent(getUsage()), false);
 				return 0;
 		}
 
@@ -115,7 +115,7 @@ public class DataCommand extends BaseCommand
 					writer.write(key.toString() + "\n");
 				}
 				writer.close();
-				source.sendSuccess(new TextComponent("File exported as " + output.getPath()), true);
+				source.sendSuccess(new StringTextComponent("File exported as " + output.getPath()), true);
 			} catch (IOException e)
 			{
 				e.printStackTrace();
@@ -124,9 +124,9 @@ public class DataCommand extends BaseCommand
 		return 0;
 	}
 	
-	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
+	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSource> context,
 			SuggestionsBuilder builder)
 	{
-		return SharedSuggestionProvider.suggest(DATA_TYPES, builder);
+		return ISuggestionProvider.suggest(DATA_TYPES, builder);
 	}
 }

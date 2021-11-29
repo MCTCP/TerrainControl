@@ -6,11 +6,11 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IWorldConfig;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Dimension;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.SleepFinishedTimeEvent;
 import net.minecraftforge.event.world.WorldEvent.CreateSpawnPosition;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,17 +26,17 @@ public class WorldHandler
 	@SubscribeEvent
 	public static void onSetSpawn(CreateSpawnPosition event)
 	{		
-		if(event.getWorld() instanceof ServerLevel)
+		if(event.getWorld() instanceof ServerWorld)
 		{
 			// If a fixed spawn point is configured in the WorldConfig, apply it.
 			IWorldConfig worldConfig = null;
-			if(((ServerLevel)event.getWorld()).getWorldServer().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			if(((ServerWorld)event.getWorld()).getWorldServer().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
 			{
-				worldConfig = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getWorldServer().getChunkSource().generator).getPreset().getWorldConfig(); 
+				worldConfig = ((OTGNoiseChunkGenerator)((ServerWorld)event.getWorld()).getWorldServer().getChunkSource().generator).getPreset().getWorldConfig(); 
 				if(worldConfig.getSpawnPointSet())
 				{
 					event.setCanceled(true);
-					((ServerLevel)event.getWorld()).getWorldServer().setDefaultSpawnPos(new BlockPos(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ()), worldConfig.getSpawnPointAngle());
+					((ServerWorld)event.getWorld()).getWorldServer().setDefaultSpawnPos(new BlockPos(worldConfig.getSpawnPointX(), worldConfig.getSpawnPointY(), worldConfig.getSpawnPointZ()), worldConfig.getSpawnPointAngle());
 				}
 			}
 		
@@ -45,7 +45,7 @@ public class WorldHandler
 			DimensionConfig modpackConfig = DimensionConfig.fromDisk(Constants.MODPACK_CONFIG_NAME);
 			if(modpackConfig != null && modpackConfig.GameRules != null)
 			{
-				GameRules gameRules = ((ServerLevel)event.getWorld()).getGameRules();
+				GameRules gameRules = ((ServerWorld)event.getWorld()).getGameRules();
 				// TODO: doImmediateRespawn
 				gameRules.getRule(GameRules.RULE_DOFIRETICK).set(modpackConfig.GameRules.DoFireTick, (MinecraftServer)null);
 				gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(modpackConfig.GameRules.MobGriefing, (MinecraftServer)null);
@@ -81,7 +81,7 @@ public class WorldHandler
 			}
 			else if(worldConfig != null && worldConfig.getOverrideGameRules())
 			{
-				GameRules gameRules = ((ServerLevel)event.getWorld()).getGameRules();
+				GameRules gameRules = ((ServerWorld)event.getWorld()).getGameRules();
 				// TODO: doImmediateRespawn
 				gameRules.getRule(GameRules.RULE_DOFIRETICK).set(worldConfig.getDoFireTick(), (MinecraftServer)null);
 				gameRules.getRule(GameRules.RULE_MOBGRIEFING).set(worldConfig.getMobGriefing(), (MinecraftServer)null);
@@ -126,14 +126,14 @@ public class WorldHandler
 	@SubscribeEvent
 	public static void onSleepFinished(SleepFinishedTimeEvent event)
 	{
-		if(event.getWorld() instanceof ServerLevel)
+		if(event.getWorld() instanceof ServerWorld)
 		{
-			if(!((ServerLevel)event.getWorld()).dimension().location().equals(LevelStem.OVERWORLD.location()))
+			if(!((ServerWorld)event.getWorld()).dimension().location().equals(Dimension.OVERWORLD.location()))
 			{
-				ChunkGenerator chunkGenerator = ((ServerLevel)event.getWorld()).getChunkSource().generator;
+				ChunkGenerator chunkGenerator = ((ServerWorld)event.getWorld()).getChunkSource().generator;
 				if(chunkGenerator instanceof OTGNoiseChunkGenerator)
 				{
-					((ServerLevel)event.getWorld()).getServer().overworld().setDayTime(event.getNewTime());
+					((ServerWorld)event.getWorld()).getServer().overworld().setDayTime(event.getNewTime());
 				}
 			}
 		}

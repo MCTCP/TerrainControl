@@ -12,12 +12,12 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.minecraft.BlockNames;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.commands.arguments.blocks.BlockStateParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.command.arguments.BlockStateParser;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeMaterialReader implements IMaterialReader
@@ -190,7 +190,7 @@ public class ForgeMaterialReader implements IMaterialReader
 				}				
 				return ForgeMaterialData.ofBlock(block, input);
 			}
-		} catch(net.minecraft.ResourceLocationException ignored) { }
+		} catch(net.minecraft.util.ResourceLocationException ignored) { }
 
 		// Try legacy name again, without data.
 		blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));

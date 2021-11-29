@@ -9,8 +9,8 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import net.minecraft.nbt.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 
 import java.text.MessageFormat;
 import java.util.Set;
@@ -20,12 +20,12 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	@Override
 	public NamedBinaryTag getNBTFromLocation(LocalWorldGenRegion world, int x, int y, int z)
 	{
-		BlockEntity tileEntity = ((ForgeWorldGenRegion) world).getTileEntity(new BlockPos(x, y, z));
+		TileEntity tileEntity = ((ForgeWorldGenRegion) world).getTileEntity(new BlockPos(x, y, z));
 		if (tileEntity == null)
 		{
 			return null;
 		}
-		CompoundTag nbt = new CompoundTag();
+		CompoundNBT nbt = new CompoundNBT();
 		tileEntity.save(nbt);
 		// Double up, just to be safe. It should be x, y, z.
 		//nmsTag.remove("pos");
@@ -43,7 +43,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param compoundNBT The Minecraft tag.
 	 * @return The converted tag.
 	 */
-	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, CompoundTag compoundNBT)
+	public static NamedBinaryTag getNBTFromNMSTagCompound(String name, CompoundNBT compoundNBT)
 	{
 		NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name,
 			new NamedBinaryTag[]{new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
@@ -53,7 +53,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 		// Add all child tags to the compound tag
 		for (String key : keys)
 		{
-			Tag nmsChildTag = compoundNBT.get(key);
+			INBT nmsChildTag = compoundNBT.get(key);
 
 			if (nmsChildTag == null)
 			{
@@ -79,14 +79,14 @@ public class ForgeNBTHelper extends LocalNBTHelper
 					compoundTag.addTag(new NamedBinaryTag(type, key, getValueFromNms(nmsChildTag)));
 					break;
 				case TAG_List:
-					NamedBinaryTag listChildTag = getNBTFromNMSTagList(key, (ListTag) nmsChildTag);
+					NamedBinaryTag listChildTag = getNBTFromNMSTagList(key, (ListNBT) nmsChildTag);
 					if (listChildTag != null)
 					{
 						compoundTag.addTag(listChildTag);
 					}
 					break;
 				case TAG_Compound:
-					compoundTag.addTag(getNBTFromNMSTagCompound(key, (CompoundTag) nmsChildTag));
+					compoundTag.addTag(getNBTFromNMSTagCompound(key, (CompoundNBT) nmsChildTag));
 					break;
 				case TAG_End:
 				default:
@@ -105,7 +105,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param listNBT The Minecraft tag.
 	 * @return The converted tag.
 	 */
-	private static NamedBinaryTag getNBTFromNMSTagList(String name, ListTag listNBT)
+	private static NamedBinaryTag getNBTFromNMSTagList(String name, ListNBT listNBT)
 	{
 		if (listNBT.size() == 0)
 		{
@@ -119,7 +119,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 		// Add all child tags
 		for (int i = 0; i < listNBT.size(); i++)
 		{
-			Tag nmsChildTag = listNBT.get(i);
+			INBT nmsChildTag = listNBT.get(i);
 			switch (listType)
 			{
 				case TAG_End:
@@ -136,14 +136,14 @@ public class ForgeNBTHelper extends LocalNBTHelper
 					listTag.addTag(new NamedBinaryTag(listType, null, getValueFromNms(nmsChildTag)));
 					break;
 				case TAG_List:
-					NamedBinaryTag listChildTag = getNBTFromNMSTagList(null, (ListTag) nmsChildTag);
+					NamedBinaryTag listChildTag = getNBTFromNMSTagList(null, (ListNBT) nmsChildTag);
 					if (listChildTag != null)
 					{
 						listTag.addTag(listChildTag);
 					}
 					break;
 				case TAG_Compound:
-					listTag.addTag(getNBTFromNMSTagCompound(null, (CompoundTag) nmsChildTag));
+					listTag.addTag(getNBTFromNMSTagCompound(null, (CompoundNBT) nmsChildTag));
 					break;
 				default:
 					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
@@ -172,29 +172,29 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param inbt The Minecraft tag.
 	 * @return The value in the tag.
 	 */
-	private static Object getValueFromNms(Tag inbt)
+	private static Object getValueFromNms(INBT inbt)
 	{
 		NamedBinaryTag.Type type = NamedBinaryTag.Type.values()[inbt.getId()];
 		switch (type)
 		{
 			case TAG_Byte:
-				return ((ByteTag) inbt).getAsByte();
+				return ((ByteNBT) inbt).getAsByte();
 			case TAG_Short:
-				return ((ShortTag) inbt).getAsShort();
+				return ((ShortNBT) inbt).getAsShort();
 			case TAG_Int:
-				return ((IntTag) inbt).getAsInt();
+				return ((IntNBT) inbt).getAsInt();
 			case TAG_Long:
-				return ((LongTag) inbt).getAsLong();
+				return ((LongNBT) inbt).getAsLong();
 			case TAG_Float:
-				return ((FloatTag) inbt).getAsFloat();
+				return ((FloatNBT) inbt).getAsFloat();
 			case TAG_Double:
-				return ((DoubleTag) inbt).getAsDouble();
+				return ((DoubleNBT) inbt).getAsDouble();
 			case TAG_Byte_Array:
-				return ((ByteArrayTag) inbt).getAsByteArray();
+				return ((ByteArrayNBT) inbt).getAsByteArray();
 			case TAG_String:
 				return inbt.getAsString();
 			case TAG_Int_Array:
-				return ((IntArrayTag) inbt).getAsIntArray();
+				return ((IntArrayNBT) inbt).getAsIntArray();
 			default:
 				// Cannot read this from a tag
 				throw new IllegalArgumentException(type + "doesn't have a simple value!");
@@ -208,9 +208,9 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param compoundTag Our tag.
 	 * @return The Minecraft tag.
 	 */
-	public static CompoundTag getNMSFromNBTTagCompound(NamedBinaryTag compoundTag)
+	public static CompoundNBT getNMSFromNBTTagCompound(NamedBinaryTag compoundTag)
 	{
-		CompoundTag nmsTag = new CompoundTag();
+		CompoundNBT nmsTag = new CompoundNBT();
 		NamedBinaryTag[] childTags = (NamedBinaryTag[]) compoundTag.getValue();
 		if (childTags == null)
 		{
@@ -253,9 +253,9 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param listTag The OpenTerrainGenerator list tag.
 	 * @return The Minecraft list tag.
 	 */
-	private static ListTag getNMSFromNBTTagList(NamedBinaryTag listTag)
+	private static ListNBT getNMSFromNBTTagList(NamedBinaryTag listTag)
 	{
-		ListTag nmsTag = new ListTag();
+		ListNBT nmsTag = new ListNBT();
 		NamedBinaryTag[] childTags = (NamedBinaryTag[]) listTag.getValue();
 		for (NamedBinaryTag tag : childTags)
 		{
@@ -294,28 +294,28 @@ public class ForgeNBTHelper extends LocalNBTHelper
 	 * @param value Value of the tag.
 	 * @return The Minecraft NBTBast tag.
 	 */
-	private static Tag createTagNms(NamedBinaryTag.Type type, Object value)
+	private static INBT createTagNms(NamedBinaryTag.Type type, Object value)
 	{
 		switch (type)
 		{
 			case TAG_Byte:
-				return ByteTag.valueOf((Byte) value);
+				return ByteNBT.valueOf((Byte) value);
 			case TAG_Short:
-				return ShortTag.valueOf((Short) value);
+				return ShortNBT.valueOf((Short) value);
 			case TAG_Int:
-				return IntTag.valueOf((Integer) value);
+				return IntNBT.valueOf((Integer) value);
 			case TAG_Long:
-				return LongTag.valueOf((Long) value);
+				return LongNBT.valueOf((Long) value);
 			case TAG_Float:
-				return FloatTag.valueOf((Float) value);
+				return FloatNBT.valueOf((Float) value);
 			case TAG_Double:
-				return DoubleTag.valueOf((Double) value);
+				return DoubleNBT.valueOf((Double) value);
 			case TAG_Byte_Array:
-				return new ByteArrayTag((byte[]) value);
+				return new ByteArrayNBT((byte[]) value);
 			case TAG_String:
-				return StringTag.valueOf((String) value);
+				return StringNBT.valueOf((String) value);
 			case TAG_Int_Array:
-				return new IntArrayTag((int[]) value);
+				return new IntArrayNBT((int[]) value);
 			default:
 				// Cannot make this into a tag
 				throw new IllegalArgumentException(type + "doesn't have a simple value!");

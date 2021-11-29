@@ -36,18 +36,18 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.entity.Entity;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -71,7 +71,7 @@ public class EditCommand extends BaseCommand
 	}
 
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
+	public void build(LiteralArgumentBuilder<CommandSource> builder)
 	{
 		builder.then(Commands.literal("edit")
 			.executes(this::help).then(
@@ -91,9 +91,9 @@ public class EditCommand extends BaseCommand
 			.executes(this::finish));
 	}
 
-	public int execute(CommandContext<CommandSourceStack> context)
+	public int execute(CommandContext<CommandSource> context)
 	{
-		CommandSourceStack source = context.getSource();
+		CommandSource source = context.getSource();
 		try {
 			String presetFolderName = context.getArgument("preset", String.class);
 			String objectName = "";
@@ -113,13 +113,13 @@ public class EditCommand extends BaseCommand
 				
 			if (objectName.equals(""))
 			{
-				source.sendSuccess(new TextComponent("Please supply an object name"), false);
+				source.sendSuccess(new StringTextComponent("Please supply an object name"), false);
 				return 0;
 			}
 
 			if (source.getEntity() == null)
 			{
-				source.sendSuccess(new TextComponent("Only players can run this command"), false);
+				source.sendSuccess(new StringTextComponent("Only players can run this command"), false);
 				return 0;
 			}
 
@@ -129,12 +129,12 @@ public class EditCommand extends BaseCommand
 			}
 			catch (InvalidConfigException e)
 			{
-				source.sendSuccess(new TextComponent("Error loading object " + objectName), false);
+				source.sendSuccess(new StringTextComponent("Error loading object " + objectName), false);
 				return 0;
 			}
 			if (inputObject == null)
 			{
-				source.sendSuccess(new TextComponent("Could not find " + objectName), false);
+				source.sendSuccess(new StringTextComponent("Could not find " + objectName), false);
 				return 0;
 			}
 
@@ -143,7 +143,7 @@ public class EditCommand extends BaseCommand
 			Preset preset = ObjectUtils.getPresetOrDefault(presetFolderName);
 			if (preset == null)
 			{
-				source.sendSuccess(new TextComponent("Could not find preset " + (presetFolderName == null ? "" : presetFolderName)), false);
+				source.sendSuccess(new StringTextComponent("Could not find preset " + (presetFolderName == null ? "" : presetFolderName)), false);
 				return 0;
 			}
 
@@ -176,19 +176,19 @@ public class EditCommand extends BaseCommand
 			// Store the info, wait for /otg finishedit
 			sessionsMap.put(source.getEntity(), new EditSession(type, worldGenRegion, inputObject, extraBlocks,
 				path, preset.getFolderName(), center, leaveIllegalLeaves));
-			source.sendSuccess(new TextComponent("You can now edit the object"), false);
-			source.sendSuccess(new TextComponent("To change the area of the object, use /otg region"), false);
-			source.sendSuccess(new TextComponent("When you are done editing, do /otg finishedit"), false);
-			source.sendSuccess(new TextComponent("To cancel, do /otg canceledit"), false);
+			source.sendSuccess(new StringTextComponent("You can now edit the object"), false);
+			source.sendSuccess(new StringTextComponent("To change the area of the object, use /otg region"), false);
+			source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
+			source.sendSuccess(new StringTextComponent("To cancel, do /otg canceledit"), false);
 
 			if (!extraBlocks.isEmpty())
-				source.sendSuccess(new TextComponent("This object's center cannot be moved"), false);
+				source.sendSuccess(new StringTextComponent("This object's center cannot be moved"), false);
 
 			RegionCommand.playerSelectionMap.put(source.getEntity(), region);
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new TextComponent("Edit command encountered an error, please check the logs."), false);
+			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check the logs."), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: "+e.getClass().getName() + " - " +e.getMessage());
 			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
@@ -247,9 +247,9 @@ public class EditCommand extends BaseCommand
 		return null;
 	}
 
-	public int finish(CommandContext<CommandSourceStack> context)
+	public int finish(CommandContext<CommandSource> context)
 	{
-		CommandSourceStack source = context.getSource();
+		CommandSource source = context.getSource();
 		try
 		{
 			EditSession session = sessionsMap.get(source.getEntity());
@@ -257,32 +257,32 @@ public class EditCommand extends BaseCommand
 
 			if (session == null)
 			{
-				source.sendSuccess(new TextComponent("No active session, do '/otg edit' to start one"), false);
+				source.sendSuccess(new StringTextComponent("No active session, do '/otg edit' to start one"), false);
 				return 0;
 			}
 			else if (ObjectUtils.isOutsideBounds(region, session.type))
 			{
-				source.sendSuccess(new TextComponent("Selection is too big! Maximum size is 16x16 for BO4 and 32x32 for BO3"), false);
+				source.sendSuccess(new StringTextComponent("Selection is too big! Maximum size is 16x16 for BO4 and 32x32 for BO3"), false);
 				return 0;
 			} else {
-				source.sendSuccess(new TextComponent("Cleaning up..."), false);
+				source.sendSuccess(new StringTextComponent("Cleaning up..."), false);
 			}
 
 			StructuredCustomObject object = exportFromSession(session, region);
 
 			if (object != null)
 			{
-				source.sendSuccess(new TextComponent("Successfully edited "+session.type.getType()+" " + object.getName()), false);
+				source.sendSuccess(new StringTextComponent("Successfully edited "+session.type.getType()+" " + object.getName()), false);
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetFolderName,  object.getName(), object.getConfig().getFile(), object);
 			} else {
-				source.sendSuccess(new TextComponent("Failed to edit "+session.type.getType()+" " + session.object.getName()), false);
+				source.sendSuccess(new StringTextComponent("Failed to edit "+session.type.getType()+" " + session.object.getName()), false);
 			}
 			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
 			sessionsMap.put(source.getEntity(), null);
 		}
 		catch (Exception e)
 		{
-			source.sendSuccess(new TextComponent("Edit command encountered an error, please check logs."), false);
+			source.sendSuccess(new StringTextComponent("Edit command encountered an error, please check logs."), false);
 			OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "Edit command encountered an error: ");
 			OTG.getEngine().getLogger().printStackTrace(LogLevel.ERROR, LogCategory.MAIN, e);
 		}
@@ -316,9 +316,9 @@ public class EditCommand extends BaseCommand
 		);
 	}
 
-	public int cancelSession(CommandContext<CommandSourceStack> context)
+	public int cancelSession(CommandContext<CommandSource> context)
 	{
-		CommandSourceStack source = context.getSource();
+		CommandSource source = context.getSource();
 		EditSession session = sessionsMap.get(source.getEntity());
 		RegionCommand.Region region = RegionCommand.playerSelectionMap.get(source.getEntity());
 
@@ -326,9 +326,9 @@ public class EditCommand extends BaseCommand
 		{
 			ObjectUtils.cleanArea(session.genRegion, region.getMin(), region.getMax(), false);
 			sessionsMap.put(source.getEntity(), null);
-			source.sendSuccess(new TextComponent("Edit session cancelled"), false);
+			source.sendSuccess(new StringTextComponent("Edit session cancelled"), false);
 		} else {
-			source.sendSuccess(new TextComponent("No active edit session to cancel"), false);
+			source.sendSuccess(new StringTextComponent("No active edit session to cancel"), false);
 		}
 		return 0;
 	}
@@ -427,23 +427,23 @@ public class EditCommand extends BaseCommand
 		return unspawnedBlocks;
 	}
 
-	public int help(CommandContext<CommandSourceStack> context)
+	public int help(CommandContext<CommandSource> context)
 	{
-		context.getSource().sendSuccess(new TextComponent("To use the edit command:").withStyle(ChatFormatting.LIGHT_PURPLE), false);
-		context.getSource().sendSuccess(new TextComponent("/otg edit <preset> <object> [-nofix, -update]"), false);
-		context.getSource().sendSuccess(new TextComponent(" - Preset is which preset to fetch the object from, and save it back to"), false);
-		context.getSource().sendSuccess(new TextComponent(" - Object is the object you want to edit"), false);
-		context.getSource().sendSuccess(new TextComponent(" - The -nofix flag disables block state fixing"), false);
-		context.getSource().sendSuccess(new TextComponent(" - The -update flag immediately exports and cleans after fixing"), false);
-		context.getSource().sendSuccess(new TextComponent(" - Complex objects cannot have their center moved"), false);
-		context.getSource().sendSuccess(new TextComponent(" - An object is \"complex\" if it contains NBT or RandomBlock"), false);
+		context.getSource().sendSuccess(new StringTextComponent("To use the edit command:").withStyle(TextFormatting.LIGHT_PURPLE), false);
+		context.getSource().sendSuccess(new StringTextComponent("/otg edit <preset> <object> [-nofix, -update]"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - Preset is which preset to fetch the object from, and save it back to"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - Object is the object you want to edit"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - The -nofix flag disables block state fixing"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - The -update flag immediately exports and cleans after fixing"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - Complex objects cannot have their center moved"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" - An object is \"complex\" if it contains NBT or RandomBlock"), false);
 		return 0;
 	}
 
-	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSourceStack> context,
+	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSource> context,
 			SuggestionsBuilder builder)
 	{
-		return SharedSuggestionProvider.suggest(FLAGS, builder);
+		return ISuggestionProvider.suggest(FLAGS, builder);
 	}
 
 	// These maps are used to figure out what blocks to update
