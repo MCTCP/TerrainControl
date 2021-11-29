@@ -21,6 +21,7 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
+import com.pg85.otg.util.minecraft.EntityCategory;
 import net.minecraft.sounds.Music;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
@@ -32,7 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.world.biome.*;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
 import net.minecraft.world.level.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -255,12 +256,13 @@ public class ForgeBiome implements IBiome
 	private static MobSpawnSettings.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
 	{
 		MobSpawnSettings.Builder mobSpawnInfoBuilder = new MobSpawnSettings.Builder();
-		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getMonsters(), biomeConfig.getName());
-		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getWaterCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getWaterAmbientCreatures(), biomeConfig.getName());
-		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getMiscCreatures(), biomeConfig.getName());
+		addMobGroup(MobCategory.MONSTER, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MONSTER), biomeConfig.getName());
+		addMobGroup(MobCategory.CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.AMBIENT), biomeConfig.getName());
+		addMobGroup(MobCategory.UNDERGROUND_WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.UNDERGROUND_WATER_CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_CREATURE), biomeConfig.getName());
+		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_AMBIENT), biomeConfig.getName());
+		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MISC), biomeConfig.getName());
 		mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}

@@ -129,11 +129,11 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 
 		if (nbt != null)
 		{
-			this.attachNBT(x, y, z, nbt, worldGenRegion.getBlockState(pos));
+			this.attachNBT(x, y, z, nbt);
 		}
 	}
 
-	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockState state)
+	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt)
 	{
 		CompoundTag nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
 		nms.put("x", IntTag.valueOf(x));
@@ -144,7 +144,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 		if (tileEntity != null)
 		{
 			try {
-				tileEntity.deserializeNBT(state, nms);
+				tileEntity.deserializeNBT(nms);
 			} catch (JsonSyntaxException e) {
 				if(this.logger.getLogCategoryEnabled(LogCategory.CUSTOM_OBJECTS))
 				{

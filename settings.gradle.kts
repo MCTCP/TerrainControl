@@ -18,7 +18,7 @@ include(
     "common:common-customobject",
     "common:common-generator",
     "common:common-core",
-    // "platforms:forge",
-    "platforms:fabric",
+    "platforms:forge",
+    // "platforms:fabric",
     "platforms:paper"
 )

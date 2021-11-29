@@ -639,7 +639,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world)
 	{
 		BlockState[] ablockstate = new BlockState[256];
-		this.sampleHeightmap(x, x, ablockstate, null);
+		this.sampleHeightmap(x, z, ablockstate, null);
 		return new NoiseColumn(0, ablockstate);
 	}
 

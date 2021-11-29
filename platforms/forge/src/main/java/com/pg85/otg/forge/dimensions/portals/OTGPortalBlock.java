@@ -37,7 +37,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 // TODO: Customisable portal particles, requires preset lookup on client.
 public class OTGPortalBlock extends NetherPortalBlock
@@ -472,7 +472,8 @@ public class OTGPortalBlock extends NetherPortalBlock
 		protected boolean isEmptyBlock(BlockState pos)
 		{
 			Block block = pos.getBlock();
-			return pos.isAir() || block == Blocks.WATER || block.getBlock() instanceof OTGPortalBlock;
+			// TODO: In updating, changed block.getBlock to just block here. Might have broken something --auth
+			return pos.isAir() || block == Blocks.WATER || block instanceof OTGPortalBlock;
 		}
 
 		public boolean isValid()

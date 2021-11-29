@@ -24,17 +24,7 @@ public class OTGCapabilities
 	public static void register()
 	{
 		CapabilityManager.INSTANCE.register(
-			OTGPlayer.class, 
-			// Dummy storage, since we're not actually persisting anything.
-			new Capability.IStorage<OTGPlayer>()
-	        {
-				@Override
-				public Tag writeNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side) { return new CompoundTag(); }
-				
-				@Override
-				public void readNBT(Capability<OTGPlayer> capability, OTGPlayer instance, Direction side, Tag nbt) { }
-	        }, 
-	        () -> null
+			OTGPlayer.class
 		);
 	}
 
