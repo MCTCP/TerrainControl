@@ -284,6 +284,8 @@ public class PaperMaterialData extends LocalMaterialData
 		if (materialProperty == MaterialProperties.AGE_0_25)
 		{
 			property = BlockStateProperties.AGE_25;
+		} else if (materialProperty == MaterialProperties.AGE_0_3) {
+			property = BlockStateProperties.AGE_3;
 		}
 		else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{

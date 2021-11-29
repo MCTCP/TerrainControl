@@ -169,6 +169,10 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		int x2;
 		int y2;
 		int z2;
+		IBiomeConfig biomeConfig;
+		LocalMaterialData replacedMaterial;
+		LocalMaterialData replacedMaterial2;
+		LocalMaterialData current;
 		for (int x1 = -irandom3; x1 < irandom3; x1++)
 		{
 			for (int z1 = -irandom3; z1 < irandom3; z1++)
@@ -179,8 +183,17 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					x2 = x + x1;
 					y2 = y + irandom;
 					z2 = z + z1;
-					LocalMaterialData current = world.getMaterialDirect(x2, y2, z2);
-					if (isIcebergBlock(current, material, material2) || current.isMaterial(LocalMaterials.SNOW_BLOCK))
+					current = world.getMaterialDirect(x2, y2, z2);
+					// TODO: Request all up front instead of using cacheChunk true?
+					biomeConfig = world.getCachedBiomeProvider().getBiomeConfig(x2, z2, true);
+					replacedMaterial = material;
+					replacedMaterial2 = material2;
+					if(biomeConfig.getReplaceBlocks() != null)
+					{
+						replacedMaterial = biomeConfig.getReplaceBlocks().replaceBlock(y2, material);
+						replacedMaterial2 = biomeConfig.getReplaceBlocks().replaceBlock(y2, material2);
+					}
+					if (isIcebergBlock(current, replacedMaterial, replacedMaterial2) || current.isMaterial(LocalMaterials.SNOW_BLOCK))
 					{
 						if (flag)
 						{
@@ -303,6 +316,11 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 		int x2;
 		int y2;
 		int z2;
+		IBiomeConfig biomeConfig;
+		LocalMaterialData replacedMaterial;
+		LocalMaterialData replacedMaterial2;
+		LocalMaterialData current;
+		int iheight;
 		for (int x1 = -iradius; x1 <= iradius; x1++)
 		{
 			for (int z1 = -iradius; z1 <= iradius; z1++)
@@ -312,15 +330,24 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 					x2 = x + x1;
 					y2 = y + y1;
 					z2 = z + z1;
-					LocalMaterialData current = world.getMaterialDirect(x2, y2, z2);
-					if (isIcebergBlock(current, material, material2) || material.isMaterial(LocalMaterials.SNOW))
+					// TODO: Request all up front instead of using cacheChunk true?
+					biomeConfig = world.getCachedBiomeProvider().getBiomeConfig(x2, z2, true);
+					replacedMaterial = material;
+					replacedMaterial2 = material2;
+					if(biomeConfig.getReplaceBlocks() != null)
+					{
+						replacedMaterial = biomeConfig.getReplaceBlocks().replaceBlock(y2, material);
+						replacedMaterial2 = biomeConfig.getReplaceBlocks().replaceBlock(y2, material2);
+					}
+					current = world.getMaterialDirect(x2, y2, z2);
+					if (isIcebergBlock(current, replacedMaterial, replacedMaterial2) || current.isMaterial(LocalMaterials.SNOW))
 					{
 						if (belowIsAir(world, x2, y2, z2))
 						{
 							world.setBlockDirect(x2, y2, z2, LocalMaterials.AIR);
 							world.setBlockDirect(x2, y2 + 1, z2, LocalMaterials.AIR);	
 						}
-						else if (isIcebergBlock(current, material, material2))
+						else if (isIcebergBlock(current, replacedMaterial, replacedMaterial2))
 						{
 							LocalMaterialData[] materials =
 							{
@@ -329,13 +356,27 @@ public class IcebergResource extends BiomeResourceBase implements IBasicResource
 								world.getMaterialDirect(x2, y2, z2 - 1), 
 								world.getMaterialDirect(x2, y2, z2 + 1) 
 							};
-							int iheight = 0;
+							IBiomeConfig[] biomeConfigs =
+									{
+											world.getCachedBiomeProvider().getBiomeConfig(x2 - 1, z2, true),
+											world.getCachedBiomeProvider().getBiomeConfig(x2 + 1, z2, true),
+											world.getCachedBiomeProvider().getBiomeConfig(x2, z2 - 1, true),
+											world.getCachedBiomeProvider().getBiomeConfig(x2, z2 + 1, true)
+									};
+							iheight = 0;
+							int i = 0;
 							for (LocalMaterialData mat : materials)
 							{
-								if (!isIcebergBlock(mat, material, material2))
+								if(biomeConfigs[i].getReplaceBlocks() != null)
+								{
+									replacedMaterial = biomeConfigs[i].getReplaceBlocks().replaceBlock(y2, material);
+									replacedMaterial2 = biomeConfigs[i].getReplaceBlocks().replaceBlock(y2, material2);
+								}
+								if (!isIcebergBlock(mat, replacedMaterial, replacedMaterial2))
 								{
 									iheight++;
 								}
+								i++;
 							}
 							if (iheight >= 3)
 							{

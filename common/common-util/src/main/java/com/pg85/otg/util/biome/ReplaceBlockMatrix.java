@@ -214,91 +214,67 @@ public class ReplaceBlockMatrix
 		for(ReplacedBlocksInstruction instruction : this.instructions)
 		{
 			boolean isBlockTag = instruction.from.isTag();
-			if(
-				isBlockTag ? biomeCooledLavaBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeCooledLavaBlock.hashCode() 
-			)
+			if(instruction.from.matches(biomeCooledLavaBlock))
 			{
 				this.replacesCooledLava = true;
 			}
-			if(
-				isBlockTag ? biomeIceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeIceBlock.hashCode() 
-			)
+			if(instruction.from.matches(biomeIceBlock))
 			{
 				this.replacesIce = true;
 			}
-			if(
-				isBlockTag ? biomePackedIceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomePackedIceBlock.hashCode() 
-			)
+			if(instruction.from.matches(biomePackedIceBlock))
 			{
 				this.replacesPackedIce = true;
 			}
-			if(
-				isBlockTag ? biomeSnowBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeSnowBlock.hashCode() 
-			)
+			if(instruction.from.matches(biomeSnowBlock))
 			{
 				this.replacesSnow = true;
-			}			
-			if(
-				isBlockTag ? biomeWaterBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeWaterBlock.hashCode() 
-			)				
+			}
+			if(instruction.from.matches(biomeWaterBlock))
 			{
 				this.replacesWater = true;
 			}
-			if(
-				isBlockTag ? biomeStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeStoneBlock.hashCode()
-			)
+			if(instruction.from.matches(biomeStoneBlock))
 			{
 				this.replacesStone = true;
 			}
-			if(
-				isBlockTag ? biomeGroundBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeGroundBlock.hashCode()
-			)
+			if(instruction.from.matches(biomeGroundBlock))
 			{
 				this.replacesGround = true;
 			}
-			if(
-				isBlockTag ? biomeSurfaceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeSurfaceBlock.hashCode()
-			)			
+			if(instruction.from.matches(biomeSurfaceBlock))
 			{
 				this.replacesSurface = true;
 			}
-			if(
-				isBlockTag ? biomeUnderWaterSurfaceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeUnderWaterSurfaceBlock.hashCode()
-			)			
+			if(instruction.from.matches(biomeUnderWaterSurfaceBlock))
 			{
 				this.replacesUnderWaterSurface = true;
 			}
-			if(
-				isBlockTag ? biomeBedrockBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeBedrockBlock.hashCode()
-			)			
+			if(instruction.from.matches(biomeBedrockBlock))
 			{
 				this.replacesBedrock = true;
 			}
-			if(
-				isBlockTag ? biomeSandStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeSandStoneBlock.hashCode()
-			)			
+			if(instruction.from.matches(biomeSandStoneBlock))
 			{
 				this.replacesSandStone = true;
 			}
-			if(
-				isBlockTag ? biomeRedSandStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
-				instruction.from.hashCode() == biomeRedSandStoneBlock.hashCode()
-			)			
+			if(instruction.from.matches(biomeRedSandStoneBlock))
 			{
 				this.replacesRedSandStone = true;
 			}
 		}
+	}
+
+	public boolean replacesBlock(LocalMaterialData targetBlock)
+	{
+		for(ReplacedBlocksInstruction instruction : this.instructions)
+		{
+			if(instruction.from.matches(targetBlock))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
   
 	public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
@@ -393,21 +369,5 @@ public class ReplaceBlockMatrix
 		} catch (InvalidConfigException e) {
 			throw new AssertionError(e); // Should never happen
 		}
-	}
-
-	public boolean replacesBlock(LocalMaterialData targetBlock)
-	{				
-		for(ReplacedBlocksInstruction instruction : this.instructions)
-		{
-			if(
-				instruction.getFrom().isTag() ? 
-				targetBlock.isBlockTag((LocalMaterialTag)instruction.getFrom()) : 
-				targetBlock.hashCode() == instruction.getFrom().hashCode()
-			)
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 }

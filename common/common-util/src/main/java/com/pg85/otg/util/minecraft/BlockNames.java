@@ -351,7 +351,7 @@ public class BlockNames
 			case 171:
 				return "white_carpet";
 			case 172:
-				return "white_terracotta";
+				return "terracotta";
 			case 173:
 				return "coal_block";
 			case 174:

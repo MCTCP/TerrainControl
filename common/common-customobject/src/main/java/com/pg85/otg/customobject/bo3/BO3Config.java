@@ -371,9 +371,7 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("For example, you can set 100 spawn attempts using Frequency, but stop spawning after 5 successfull spawns via MaxSpawn.");
 		writer.comment("0 by default, which means ignore this setting.");
 		writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-		writer.setting(BO3Settings.MAX_SPAWN, this.maxSpawn);		
-		
-		this.maxSpawn = readSettings(BO3Settings.MAX_SPAWN, logger, null, null);
+		writer.setting(BO3Settings.MAX_SPAWN, this.maxSpawn);
 		
 		writer.comment("If you set this to true, the BO3 will be placed with a random rotation.");
 		writer.setting(BO3Settings.ROTATE_RANDOMLY, this.rotateRandomly);

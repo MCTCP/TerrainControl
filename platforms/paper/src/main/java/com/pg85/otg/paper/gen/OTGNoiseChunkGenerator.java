@@ -1,8 +1,7 @@
 package com.pg85.otg.paper.gen;
 
 import java.nio.file.Path;
-import java.util.BitSet;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
@@ -412,41 +411,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, ChunkAccess chunk)
 	{
 		// OTG handles surface/ground blocks during base terrain gen. For non-OTG biomes used
-		// with TemplateForBiome, we want to use registered surfacebuilders though.
-		// TODO: Disable any surface/ground block related features for Template BiomeConfigs. 
-
-		ChunkPos chunkpos = chunk.getPos();
-		int i = chunkpos.x;
-		int j = chunkpos.z;
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		sharedseedrandom.setBaseChunkSeed(i, j);
-		ChunkPos chunkpos1 = chunk.getPos();
-		int chunkMinX = chunkpos1.getMinBlockX();
-		int chunkMinZ = chunkpos1.getMinBlockZ();
-		int worldX;
-		int worldZ;
-		int i2;
-		double d1;
-		IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(chunkMinX, chunkMinZ));
-		IBiome biome;
-		for(int xInChunk = 0; xInChunk < Constants.CHUNK_SIZE; ++xInChunk)
-		{
-			for(int zInChunk = 0; zInChunk < Constants.CHUNK_SIZE; ++zInChunk)
-			{
-				worldX = chunkMinX + xInChunk;
-				worldZ = chunkMinZ + zInChunk;
-				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
-				if(biome.getBiomeConfig().getTemplateForBiome())
-				{
-					i2 = chunk.getHeight(Types.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
-					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
-					
-					// TODO this method needs an additional long now
-					((PaperBiome)biome).getBiome().buildSurfaceAt(sharedseedrandom, chunk, worldX, worldZ, i2, d1, defaultBlock, defaultFluid, this.getSeaLevel(), 50, worldSeed);
-				}
-			}
-		}
-		// Skip bedrock, OTG always handles that.
 	}
 
 	// Carvers: Caves and ravines
@@ -485,21 +449,77 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		
 		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
 		PaperWorldGenRegion spigotWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
-		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);		
+		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
+		IBiome biome1 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2));
+		IBiome biome2 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2) + 4);
+		IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2));
+		IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2) + 4);		
 		IBiomeConfig biomeConfig = biome.getBiomeConfig();
 		// World save folder name may not be identical to level name, fetch it.
 		Path worldSaveFolder = worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath();
+
+		// Get most common biome in chunk and use that for decoration - Frank
+		if (!getPreset().getWorldConfig().improvedBorderDecoration()) {
+			List<IBiome> biomes = new ArrayList<IBiome>();
+			biomes.add(biome);
+			biomes.add(biome1);
+			biomes.add(biome2);
+			biomes.add(biome3);
+			biomes.add(biome4);
+			Map<IBiome, Integer> map = new HashMap<>();
+			for (IBiome b : biomes) {
+				Integer val = map.get(b);
+				map.put(b, val == null ? 1 : val + 1);
+			}
+
+			Map.Entry<IBiome, Integer> max = null;
+
+			for (Map.Entry<IBiome, Integer> ent : map.entrySet()) {
+				if (max == null || ent.getValue() > max.getValue()) max = ent;
+			}
+
+			biome = max.getKey();
+		}
 		
 		try
 		{
+			/*
+			* Here's how the code works that was added for the ImprovedBorderDecoration code.
+			* - List of biome ids is initialized, will be used to ensure biomes are not populated twice.
+			* - Placement is done for the main biome
+			* - If ImprovedBorderDecoration is true, will attempt to perform decoration from any biomes that have not
+			* already been decorated. Thus preventing decoration from happening twice.
+			*
+			* - Frank
+			*/
+			List<Integer> alreadyDecorated = new ArrayList<>();
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
-			((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-			// Template biomes handle their own snow, OTG biomes use OTG snow.
-			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
-			if(!biome.getBiomeConfig().getTemplateForBiome())
-			{
-				this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
+			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
+			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
+			if (getPreset().getWorldConfig().improvedBorderDecoration()) {
+				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId())) {
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId())) {
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId())) {
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId())) {
+					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
+					((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+				}
+			} else {
+				((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			}
+			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 		}
 		catch (Exception exception)
 		{
@@ -608,7 +628,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator.getNoiseColumn(noiseData[2], xStart + 1, zStart);
 		this.internalGenerator.getNoiseColumn(noiseData[3], xStart + 1, zStart + 1);
 
-		IBiomeConfig biomeConfig = this.internalGenerator.getCachedBiomeProvider().getBiomeConfig(x, z);
+		//IBiomeConfig biomeConfig = this.internalGenerator.getCachedBiomeProvider().getBiomeConfig(x, z);
 		
 		BlockState state;
 		double x0z0y0;
@@ -647,7 +667,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 				// Get the real y position (translate noise chunk and noise piece)
 				y = (noiseY * 8) + pieceY;
 
-				state = this.getBlockState(density, y, biomeConfig);
+				//state = this.getBlockState(density, y, biomeConfig);
+				state = this.getBlockState(density, y);
 				if (blockStates != null)
 				{
 					blockStates[y] = state;
@@ -664,15 +685,27 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return 0;
 	}
 
-	protected BlockState getBlockState (double density, int y, IBiomeConfig config)
+	// MC's NoiseChunkGenerator returns defaultBlock and defaultFluid here, so callers
+	// apparently don't rely on any blocks (re)placed after base terrain gen, only on
+	// the default block/liquid set for the dimension (stone/water for overworld,
+	// netherrack/lava for nether), that MC uses for base terrain gen.
+	// We can do the same, no need to pass biome config and fetch replaced blocks etc.
+	// OTG does place blocks other than defaultBlock/defaultLiquid during base terrain gen
+	// (for replaceblocks/sagc), but that shouldn't matter for the callers of this method.
+	// Actually, it's probably better if they don't see OTG's replaced blocks, and just see
+	// the default blocks instead, as vanilla MC would do.
+	//protected IBlockData getBlockState(double density, int y, IBiomeConfig config)
+	private BlockState getBlockState(double density, int y)
 	{
 		if (density > 0.0D)
 		{
-			return ((PaperMaterialData) config.getStoneBlockReplaced(y)).internalBlock();
+			return this.defaultBlock;
+			//return ((PaperMaterialData) config.getStoneBlockReplaced(y)).internalBlock();
 		}
 		else if (y < this.getSeaLevel())
 		{
-			return ((PaperMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
+			return this.defaultFluid;
+			//return ((PaperMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
 		} else {
 			return Blocks.AIR.defaultBlockState();
 		}

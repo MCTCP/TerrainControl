@@ -46,6 +46,8 @@ public class LocalMaterials
 	public static LocalMaterialData RED_TERRACOTTA;
 	public static LocalMaterialData SILVER_TERRACOTTA;
 	public static LocalMaterialData STONE;
+	public static LocalMaterialData NETHERRACK;
+	public static LocalMaterialData END_STONE;
 	public static LocalMaterialData SAND;
 	public static LocalMaterialData RED_SAND;
 	public static LocalMaterialData SANDSTONE;
@@ -193,6 +195,7 @@ public class LocalMaterials
 	public static LocalMaterialData COAL_BLOCK;
 	public static LocalMaterialData QUARTZ_BLOCK;
 	public static LocalMaterialData EMERALD_BLOCK;
+	public static LocalMaterialData BERRY_BUSH;
 	public static LocalMaterialData RAW_IRON_BLOCK;
 	public static LocalMaterialData RAW_COPPER_BLOCK;
 }

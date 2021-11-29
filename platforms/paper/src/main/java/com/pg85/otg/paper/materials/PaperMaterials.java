@@ -201,6 +201,8 @@ public class PaperMaterials extends LocalMaterials
 		RED_TERRACOTTA = PaperMaterialData.ofBlockData(Blocks.RED_TERRACOTTA.defaultBlockState());
 		SILVER_TERRACOTTA = PaperMaterialData.ofBlockData(Blocks.LIGHT_GRAY_TERRACOTTA.defaultBlockState());
 		STONE = PaperMaterialData.ofBlockData(Blocks.STONE.defaultBlockState());
+		NETHERRACK = PaperMaterialData.ofBlockData(Blocks.NETHERRACK.defaultBlockState());
+		END_STONE = PaperMaterialData.ofBlockData(Blocks.END_STONE.defaultBlockState());
 		SAND = PaperMaterialData.ofBlockData(Blocks.SAND.defaultBlockState());
 		RED_SAND = PaperMaterialData.ofBlockData(Blocks.RED_SAND.defaultBlockState());
 		SANDSTONE = PaperMaterialData.ofBlockData(Blocks.SANDSTONE.defaultBlockState());
@@ -324,7 +326,7 @@ public class PaperMaterials extends LocalMaterials
 		SEA_PICKLE = PaperMaterialData.ofBlockData(Blocks.SEA_PICKLE.defaultBlockState());
 
 		// Ores
-		COAL_ORE = PaperMaterialData.ofBlockData(Blocks.PODZOL.defaultBlockState());
+		COAL_ORE = PaperMaterialData.ofBlockData(Blocks.COAL_ORE.defaultBlockState());
 		DIAMOND_ORE = PaperMaterialData.ofBlockData(Blocks.DIAMOND_ORE.defaultBlockState());
 		EMERALD_ORE = PaperMaterialData.ofBlockData(Blocks.EMERALD_ORE.defaultBlockState());
 		GOLD_ORE = PaperMaterialData.ofBlockData(Blocks.GOLD_ORE.defaultBlockState());
@@ -343,6 +345,7 @@ public class PaperMaterials extends LocalMaterials
 		COAL_BLOCK = PaperMaterialData.ofBlockData(Blocks.COAL_BLOCK.defaultBlockState());
 		QUARTZ_BLOCK = PaperMaterialData.ofBlockData(Blocks.QUARTZ_BLOCK.defaultBlockState());
 		EMERALD_BLOCK = PaperMaterialData.ofBlockData(Blocks.EMERALD_BLOCK.defaultBlockState());
+		BERRY_BUSH = PaperMaterialData.ofBlockData(Blocks.SWEET_BERRY_BUSH.defaultBlockState());
 		RAW_IRON_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_IRON_BLOCK.defaultBlockState());
 		RAW_COPPER_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_COPPER_BLOCK.defaultBlockState());
 	}

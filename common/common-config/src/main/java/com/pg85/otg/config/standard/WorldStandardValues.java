@@ -101,7 +101,7 @@ public class WorldStandardValues extends Settings
 	;
 	
 	public static final Setting<Long>
-		FIXED_TIME = longSetting("FixedTime", -1l, 0, 24000)
+		FIXED_TIME = longSetting("FixedTime", -1l, -1l, 24000)
 	;
 	
 	public static final Setting<Boolean>
@@ -120,6 +120,7 @@ public class WorldStandardValues extends Settings
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 
 		OLD_GROUP_RARITY = booleanSetting("OldGroupRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin
+		OLD_LAND_RARITY = booleanSetting("OldLandRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin
 		CAVES_ENABLED = booleanSetting("CavesEnabled", true),
 		RAVINES_ENABLED = booleanSetting("RavinesEnabled", true),
 		MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
@@ -177,6 +178,7 @@ public class WorldStandardValues extends Settings
 		RESPAWN_ANCHOR_WORKS = booleanSetting("RespawnAnchorWorks", true),
 		HAS_RAIDS = booleanSetting("HasRaids", true),
 		FIXED_SPAWN_POINT = booleanSetting("FixedSpawnPoint", false),
+		IMPROVED_BORDER_DECORATION = booleanSetting("ImprovedBorderDecoration", false),
 		LARGE_ORE_VEINS = booleanSetting("LargeOreVeins", false),
 
 		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.

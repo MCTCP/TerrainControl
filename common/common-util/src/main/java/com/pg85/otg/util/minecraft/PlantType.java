@@ -43,6 +43,7 @@ public class PlantType
 	public static final PlantType Sunflower = register(new PlantType("Sunflower", new String[] { "minecraft:double_plant", "double_plant", "minecraft:double_plant:0", "double_plant:0" }, LocalMaterials.SUNFLOWER_LOWER, LocalMaterials.SUNFLOWER_UPPER));
 	public static final PlantType Tallgrass = register(new PlantType("Tallgrass", LocalMaterials.LONG_GRASS));
 	public static final PlantType WhiteTulip = register(new PlantType("WhiteTulip", LocalMaterials.WHITE_TULIP));
+	public static final PlantType BerryBush = register(new PlantType("BerryBush", LocalMaterials.BERRY_BUSH));
 	
 	/**
 	 * Gets the plant with the given name. The name can be one of the premade

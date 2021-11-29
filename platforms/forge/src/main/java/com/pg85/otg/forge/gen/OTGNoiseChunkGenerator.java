@@ -322,7 +322,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				worldX = chunkMinX + xInChunk;
 				worldZ = chunkMinZ + zInChunk;
 				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
-				if(biome.getBiomeConfig().getTemplateForBiome())
+				if(biome.getBiomeConfig().getIsTemplateForBiome())
 				{
 					i2 = chunk.getHeight(Heightmap.Types.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
 					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
@@ -435,11 +435,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			// Template biomes handle their own snow, OTG biomes use OTG snow.
 			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
 			if(
-				!biome.getBiomeConfig().getTemplateForBiome() ||
-				!biome1.getBiomeConfig().getTemplateForBiome() ||
-				!biome2.getBiomeConfig().getTemplateForBiome() ||
-				!biome3.getBiomeConfig().getTemplateForBiome() ||				
-				!biome4.getBiomeConfig().getTemplateForBiome()
+				!biome.getBiomeConfig().getIsTemplateForBiome() ||
+				!biome1.getBiomeConfig().getIsTemplateForBiome() ||
+				!biome2.getBiomeConfig().getIsTemplateForBiome() ||
+				!biome3.getBiomeConfig().getIsTemplateForBiome() ||				
+				!biome4.getBiomeConfig().getIsTemplateForBiome()
 			)
 			{
 				this.chunkDecorator.doSnowAndIce(forgeWorldGenRegion, chunkBeingDecorated);

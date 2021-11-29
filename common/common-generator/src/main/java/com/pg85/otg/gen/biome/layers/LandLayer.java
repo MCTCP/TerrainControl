@@ -14,13 +14,19 @@ class LandLayer implements ParentedLayer
 	private final int rarity;
 	private final boolean forceLandAtSpawn;
 	private final boolean spawnLand;
+	private final boolean oldLandRarity;
 
-	LandLayer(int landRarity, boolean forceLandAtSpawn)
+	LandLayer(int landRarity, boolean forceLandAtSpawn, boolean oldLandRarity)
 	{
 		// Scale rarity from the world config
-		this.rarity = 101 - landRarity;
+		if (oldLandRarity) {
+			this.rarity = 101 - landRarity;
+		} else {
+			this.rarity = landRarity;
+		}
 		this.forceLandAtSpawn = forceLandAtSpawn;
 		this.spawnLand = landRarity != 0;
+		this.oldLandRarity = oldLandRarity;
 	}
 
 	@Override
@@ -28,8 +34,16 @@ class LandLayer implements ParentedLayer
 	{
 		int sample = parent.sample(x, z);
 
-		// Set land based on the rarity
-		if (context.nextInt(this.rarity) == 0 && spawnLand)
+		boolean result;
+		if (oldLandRarity) {
+			// Old land rarity - 100 is all land, 99 is 50% land, etc.
+			result = context.nextInt(rarity) == 0;
+		} else {
+			// New land rarity, where n = % chance for land
+			result = context.nextInt(101) <= this.rarity;
+		}
+
+		if (result && spawnLand)
 		{
 			return sample | LAND_BIT;
 		} else {

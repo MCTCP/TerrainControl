@@ -40,6 +40,7 @@ public interface IWorldConfig
 
 	public boolean isDisableOreGen();
 	public boolean getBedrockDisabled();
+	public boolean improvedBorderDecoration();
 
 	// Blocks
 
@@ -63,6 +64,7 @@ public interface IWorldConfig
 	public List<String> getBlackListedBiomes();
 	public int getBiomeRarityScale();
 	boolean getOldGroupRarity();
+	boolean getOldLandRarity();
 	public int getGenerationDepth();
 	public int getLandFuzzy();
 	public int getLandRarity();

@@ -104,7 +104,7 @@ public abstract class Carver
 			carvingMask.set(i);
 
 			LocalMaterialData material = chunkBuffer.getBlock(worldX, y, worldZ);
-			if(material.isNonCaveAir() || material.isLiquid())
+			if(material.isNonCaveAir() || material.isMaterial(LocalMaterials.WATER))
 			{
 				return false;
 			}

@@ -72,7 +72,7 @@ public final class GeneratingChunk
 			{
 				return true;
 			}
-			if (ceilingBedrock && y >= this.heightCap - 2)
+			if (ceilingBedrock && y >= this.heightCap - 1)
 			{
 				return true;
 			}
@@ -86,7 +86,7 @@ public final class GeneratingChunk
 		}
 		if (ceilingBedrock)
 		{
-			int amountBelowHeightCap = this.heightCap - y - 2;
+			int amountBelowHeightCap = this.heightCap - y - 1;
 			if (amountBelowHeightCap < 0 || amountBelowHeightCap > BEDROCK_LAYER_HEIGHT)
 			{
 				return false;
