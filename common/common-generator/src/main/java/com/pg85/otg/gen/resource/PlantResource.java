@@ -46,7 +46,7 @@ public class PlantResource extends FrequencyResourceBase
 	public void spawn(IWorldGenRegion worldGenregion, Random rand, int x, int z)
 	{
 		if (sparseOption != null && plant == PlantType.BerryBush){
-			BerryBush.spawnBerryBushes(worldGenregion, rand, x, z, frequency, minAltitude, maxAltitude, sourceBlocks, sparseOption);
+			BerryBush.spawnBerryBushes(worldGenregion, rand, x, z, plant, frequency, minAltitude, maxAltitude, sourceBlocks, sparseOption);
 			return;
 		}
 		int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
@@ -79,6 +79,7 @@ public class PlantResource extends FrequencyResourceBase
 	@Override
 	public String toString()
 	{
-		String sparse = (sparseOption == null ||  plant != PlantType.BerryBush) ? "" : sparseOption + ",";
-		return "Plant(" + this.plant.getName() + "," + sparse + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";	}
+		String sparse = (sparseOption == null) ? "" : sparseOption + ",";
+		return "Plant(" + this.plant.getName() + "," + sparse + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
+	}
 }

@@ -6,6 +6,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.PlantType;
 
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class BerryBush {
         Decorated
     }
 
-    public static void spawnBerryBushes(IWorldGenRegion worldGenregion, Random random, int centerX, int centerZ, int frequency, int minAltitude, int maxAltitude, MaterialSet sourceBlocks, SparseOption sparseOption) {
+    public static void spawnBerryBushes(IWorldGenRegion worldGenregion, Random random, int centerX, int centerZ, PlantType plant, int frequency, int minAltitude, int maxAltitude, MaterialSet sourceBlocks, SparseOption sparseOption) {
         int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ);
 
         if (centerY < Constants.WORLD_DEPTH) {
@@ -73,8 +74,12 @@ public class BerryBush {
                             )
             ) {
                 //set block directly so we can set the age of the berry bush
-                worldGenregion.setBlock(x, y, z, LocalMaterials.BERRY_BUSH.withProperty(MaterialProperties.AGE_0_3, random.nextInt(4)));
-            }
+                if (plant == PlantType.BerryBush) {
+                    //set block directly so we can set the age of the berry bush
+                    worldGenregion.setBlock(x, y, z, LocalMaterials.BERRY_BUSH.withProperty(MaterialProperties.AGE_0_3, random.nextInt(4)));
+                } else {
+                    plant.spawn(worldGenregion, x, y, z);
+                }            }
         }
 
     }
