@@ -343,6 +343,7 @@ public class PaperMaterials extends LocalMaterials
 		COAL_BLOCK = PaperMaterialData.ofBlockData(Blocks.COAL_BLOCK.defaultBlockState());
 		QUARTZ_BLOCK = PaperMaterialData.ofBlockData(Blocks.QUARTZ_BLOCK.defaultBlockState());
 		EMERALD_BLOCK = PaperMaterialData.ofBlockData(Blocks.EMERALD_BLOCK.defaultBlockState());
+		BERRY_BUSH = PaperMaterialData.ofBlockData(Blocks.SWEET_BERRY_BUSH.defaultBlockState());
 		RAW_IRON_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_IRON_BLOCK.defaultBlockState());
 		RAW_COPPER_BLOCK = PaperMaterialData.ofBlockData(Blocks.RAW_COPPER_BLOCK.defaultBlockState());
 	}
