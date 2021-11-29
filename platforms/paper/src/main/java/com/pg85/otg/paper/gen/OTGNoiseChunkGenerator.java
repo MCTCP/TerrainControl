@@ -518,28 +518,42 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		
 		try
 		{
+			/*
+			* Here's how the code works that was added for the ImprovedBorderDecoration code.
+			* - List of biome ids is initialized, will be used to ensure biomes are not populated twice.
+			* - Placement is done for the main biome
+			* - If ImprovedBorderDecoration is true, will attempt to perform decoration from any biomes that have not
+			* already been decorated. Thus preventing decoration from happening twice.
+			*
+			* - Frank
+			*/
 			List<Integer> alreadyDecorated = new ArrayList<>();
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
 			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
 			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
 			if (getPreset().getWorldConfig().improvedBorderDecoration()) {
-				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId())) {
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
-				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId())) ((PaperBiome)biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-				alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
-				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+					((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId())) {
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
-				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId())) ((PaperBiome)biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-				alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
-				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+					((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId())) {
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
-				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId())) ((PaperBiome)biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-				alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
-				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+					((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
+				}
+				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId())) {
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
-				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId())) ((PaperBiome)biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+				}
+			} else {
+				((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			}
-			((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			// Template biomes handle their own snow, OTG biomes use OTG snow.
 			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
 			if(!biome.getBiomeConfig().getTemplateForBiome())
