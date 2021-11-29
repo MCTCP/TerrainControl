@@ -309,7 +309,7 @@ public class CustomStructureCache
 
 	private void loadStructureCache(Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{		
-		logger.log(LogLevel.INFO, LogCategory.MAIN, "Loading structures and pre-generator data");
+		logger.log(LogLevel.INFO, LogCategory.MAIN, "Loading structure data");
 
 		this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
