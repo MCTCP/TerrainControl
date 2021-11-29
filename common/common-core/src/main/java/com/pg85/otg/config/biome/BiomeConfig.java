@@ -487,7 +487,7 @@ public class BiomeConfig extends BiomeConfigBase
 			"  River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)");
 
 		writer.putSetting(BiomeStandardValues.BIOME_RARITY, this.settings.biomeRarity,
-			"Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.",
+			"Biome rarity from 100 to 1. If this is normal or ice biome - chance to spawn this biome, then others.",
 			"Example for normal biome :",
 			"  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).",
 			"  50 rarity mean 1/11 chance than other",
@@ -665,8 +665,7 @@ public class BiomeConfig extends BiomeConfigBase
 			writer.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, this.settings.biomeTemperature,
 				"Biome temperature. Float value from 0.0 to 2.0.",
 				"When this value is around 0.2, snow will fall on mountain peaks above y=90.",
-				"When this value is around 0.1, the whole biome will be covered in snow and ice.",
-				"However, on default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+				"When this value is around 0.1, the whole biome will be covered in snow and ice.");
 	
 			writer.putSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, this.settings.useFrozenOceanTemperature,
 				"Set this to true to use variable temperatures within the biome based on noise.",
@@ -674,8 +673,7 @@ public class BiomeConfig extends BiomeConfigBase
 			
 			writer.putSetting(BiomeStandardValues.BIOME_WETNESS, this.settings.biomeWetness,
 				"Biome wetness. Float value from 0.0 to 1.0.",
-				"If this biome is a custom biome, and this value is set to 0, no rain will fall.",
-				"On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+				"Affects rain and snow.");
 	
 			writer.putSetting(BiomeStandardValues.SKY_COLOR, this.settings.skyColor, "Biome sky color.");
 	
@@ -823,12 +821,12 @@ public class BiomeConfig extends BiomeConfigBase
 			"");
 		writer.addConfigFunctions(this.settings.resourceQueue);
 
-		writer.header1("Sapling resource",
+		writer.header1("Saplings",
 			Constants.MOD_ID + " allows you to grow your custom objects from saplings, instead",
 			"of the vanilla trees. Add one or more Sapling functions here to override vanilla",
 			"spawning for that sapling.", "",
 			"The syntax is: Sapling(SaplingType,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])",
-			"Works like Tree resource instead first parameter.",
+			"Works like Tree resource except first parameter.",
 			"For custom saplings; Sapling(Custom,SaplingMaterial,WideTrunk,TreeType,TreeType_Chance.....)",
 			"SaplingMaterial is the name of the sapling block.",
 			"WideTrunk is 'true' or 'false', whether or not it requires 4 saplings.", "",
@@ -992,7 +990,7 @@ public class BiomeConfig extends BiomeConfigBase
 				"the mob spawn settings in this biome config. Any mob type defined in this biome config",
 				"will override inherited mob settings for the same mob in the same mob category.",
 				"Use this setting to inherit mob spawn lists from other biomes.",
-				"Accepts both OTG and non-OTG (vanilla or other mods') biomes. See also: BiomeDictId.");
+				"Accepts both OTG and non-OTG (vanilla or other mods') biomes. See also: BiomeDictTags.");
 		}
 	}
 
