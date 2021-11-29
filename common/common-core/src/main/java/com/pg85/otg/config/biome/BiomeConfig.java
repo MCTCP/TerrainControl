@@ -98,6 +98,7 @@ public class BiomeConfig extends BiomeConfigBase
 	// changing only its id and registry key, used for non-otg 
 	// biomes in otg worlds.
 	private SettingsContainer privateSettings = new SettingsContainer();
+
 	class SettingsContainer
 	{	
 		private int configWaterLevelMax;
@@ -171,10 +172,10 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader, String presetFolderName)
 	{
-		this.settings.templateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
+		this.settings.isTemplateForBiome = reader.getSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, logger);
 
-		boolean isTemplateBiome = this.settings.templateForBiome;
-		
+		boolean isTemplateBiome = this.settings.isTemplateForBiome;
+
 		if(!isTemplateBiome)
 		{
 			this.settings.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
@@ -239,13 +240,22 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 			this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);
 		} else {
+			this.settings.isNetherTemplateBiome = reader.getSetting(BiomeStandardValues.IS_NETHER_TEMPLATE_BIOME, logger);
 			this.settings.biomeCategory = BiomeStandardValues.BIOME_CATEGORY.getDefaultValue();
 			this.settings.biomeTemperature = BiomeStandardValues.BIOME_TEMPERATURE.getDefaultValue();
 			this.settings.biomeWetness = BiomeStandardValues.BIOME_WETNESS.getDefaultValue();
-			this.settings.stoneBlock = LocalMaterials.STONE;
-			this.settings.surfaceBlock = LocalMaterials.STONE;
-			this.settings.groundBlock = LocalMaterials.STONE;
-			this.settings.underWaterSurfaceBlock = LocalMaterials.STONE;		
+			if(this.settings.isNetherTemplateBiome)
+			{
+				this.settings.stoneBlock = LocalMaterials.NETHERRACK;
+				this.settings.surfaceBlock = LocalMaterials.NETHERRACK;
+				this.settings.groundBlock = LocalMaterials.NETHERRACK;
+				this.settings.underWaterSurfaceBlock = LocalMaterials.NETHERRACK;
+			} else {
+				this.settings.stoneBlock = LocalMaterials.STONE;
+				this.settings.surfaceBlock = LocalMaterials.STONE;
+				this.settings.groundBlock = LocalMaterials.STONE;
+				this.settings.underWaterSurfaceBlock = LocalMaterials.STONE;
+			}
 			this.settings.skyColor = BiomeStandardValues.SKY_COLOR.getDefaultValue();
 			this.settings.waterColor = BiomeStandardValues.WATER_COLOR.getDefaultValue();
 			this.settings.waterColorControl = BiomeStandardValues.WATER_COLOR_CONTROL.getDefaultValue();
@@ -443,11 +453,11 @@ public class BiomeConfig extends BiomeConfigBase
 	@Override
 	protected void writeConfigSettings(SettingsMap writer)
 	{
-		boolean isTemplateBiome = this.settings.templateForBiome;
+		boolean isTemplateBiome = this.settings.isTemplateForBiome;
 		
 		writer.header1("Biome Identity");
-		
-		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.templateForBiome,
+
+		writer.putSetting(BiomeStandardValues.TEMPLATE_FOR_BIOME, this.settings.isTemplateForBiome,
 			"Set this to true if this biome config is used with non-OTG biomes, configured in the WorldConfig via TemplateBiome()",
 			"OTG generates the terrain for the biome as configured in this file and spawns resources, but also allows the biome to spawn ",
 			"its own resources and mobs and apply its settings. Because of this, the following OTG settings cannot be used:",
@@ -457,6 +467,14 @@ public class BiomeConfig extends BiomeConfigBase
 			" - Terrain settings.",
 			" - Resources. Non-OTG biome resources are currently spawned after all OTG resources in the resourcequeue.",
 			" - OTG settings not mentioned above that are handled by OTG and don't rely on MC logic.");
+
+		if(isTemplateBiome)
+		{
+			writer.putSetting(BiomeStandardValues.IS_NETHER_TEMPLATE_BIOME, this.settings.isNetherTemplateBiome,
+					"If this is a template biome config for an overworld biome, set this to false. This assumes the world uses STONE/WATER for base terrain generation.",
+					"If this is a template biome config for a nether biome, set this to true. This assumes the world uses NETHERRACK/LAVA for base terrain generation."
+			);
+		}
 
 		if(!isTemplateBiome)
 		{		

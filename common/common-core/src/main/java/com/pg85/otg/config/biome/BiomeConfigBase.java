@@ -63,8 +63,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		protected IWorldConfig worldConfig;
 		
 		// Identity
-		
-		protected boolean templateForBiome;
+
+		protected boolean isTemplateForBiome;
+		protected boolean isNetherTemplateBiome;
 		protected String biomeCategory;
 		
 		// Inheritance
@@ -258,7 +259,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.settings.groundBlock;
 	}
-	
+
+	@Override
+	public LocalMaterialData getDefaultStoneBlock()
+	{
+		return this.settings.stoneBlock;
+	}
+
+	@Override
+	public LocalMaterialData getDefaultWaterBlock()
+	{
+		return this.settings.waterBlock;
+	}
+
 	private void initReplaceBlocks()
 	{
 		if(!this.settings.replacedBlocksInited)
@@ -446,11 +459,11 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.configName;
 	}
-	
+
 	@Override
-	public boolean getTemplateForBiome()
+	public boolean getIsTemplateForBiome()
 	{
-		return this.settings.templateForBiome;
+		return this.settings.isTemplateForBiome;
 	}
 
 	@Override

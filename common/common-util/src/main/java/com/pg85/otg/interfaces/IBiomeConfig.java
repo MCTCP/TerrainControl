@@ -53,7 +53,7 @@ public interface IBiomeConfig
 
 	List<String> getBiomeDictTags();
 	String getBiomeCategory();
-	boolean getTemplateForBiome();
+	boolean getIsTemplateForBiome();
 
 	// Placement
 
@@ -107,6 +107,8 @@ public interface IBiomeConfig
 	LocalMaterialData getBedrockBlockReplaced(int y);
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getDefaultGroundBlock();
+	LocalMaterialData getDefaultStoneBlock();
+	LocalMaterialData getDefaultWaterBlock();
 	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome);
 	boolean hasReplaceBlocksSettings();
 	ReplaceBlockMatrix getReplaceBlocks();

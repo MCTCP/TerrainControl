@@ -47,7 +47,8 @@ public class BiomeStandardValues extends Settings
 		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false),
 		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false),
 		USE_FROZEN_OCEAN_TEMPERATURE = booleanSetting("UseFrozenOceanTemperature", false),
-		TEMPLATE_FOR_BIOME = booleanSetting("TemplateForBiome", false)
+		TEMPLATE_FOR_BIOME = booleanSetting("TemplateForBiome", false),
+		IS_NETHER_TEMPLATE_BIOME = booleanSetting("NetherTemplateBiome", false)
 	;
 
 	public static final Setting<String>

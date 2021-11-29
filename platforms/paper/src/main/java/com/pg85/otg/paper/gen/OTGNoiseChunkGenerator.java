@@ -411,41 +411,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, ChunkAccess chunk)
 	{
 		// OTG handles surface/ground blocks during base terrain gen. For non-OTG biomes used
-		// with TemplateForBiome, we want to use registered surfacebuilders though.
-		// TODO: Disable any surface/ground block related features for Template BiomeConfigs. 
-
-		ChunkPos chunkpos = chunk.getPos();
-		int i = chunkpos.x;
-		int j = chunkpos.z;
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
-		sharedseedrandom.setBaseChunkSeed(i, j);
-		ChunkPos chunkpos1 = chunk.getPos();
-		int chunkMinX = chunkpos1.getMinBlockX();
-		int chunkMinZ = chunkpos1.getMinBlockZ();
-		int worldX;
-		int worldZ;
-		int i2;
-		double d1;
-		IBiome[] biomesForChunk = this.internalGenerator.getCachedBiomeProvider().getBiomesForChunk(ChunkCoordinate.fromBlockCoords(chunkMinX, chunkMinZ));
-		IBiome biome;
-		for(int xInChunk = 0; xInChunk < Constants.CHUNK_SIZE; ++xInChunk)
-		{
-			for(int zInChunk = 0; zInChunk < Constants.CHUNK_SIZE; ++zInChunk)
-			{
-				worldX = chunkMinX + xInChunk;
-				worldZ = chunkMinZ + zInChunk;
-				biome = biomesForChunk[xInChunk * Constants.CHUNK_SIZE + zInChunk];
-				if(biome.getBiomeConfig().getTemplateForBiome())
-				{
-					i2 = chunk.getHeight(Types.WORLD_SURFACE_WG, xInChunk, zInChunk) + 1;
-					d1 = this.surfaceNoise.getSurfaceNoiseValue((double)worldX * 0.0625D, (double)worldZ * 0.0625D, 0.0625D, (double)xInChunk * 0.0625D) * 15.0D;
-					
-					// TODO this method needs an additional long now
-					((PaperBiome)biome).getBiome().buildSurfaceAt(sharedseedrandom, chunk, worldX, worldZ, i2, d1, defaultBlock, defaultFluid, this.getSeaLevel(), 50, worldSeed);
-				}
-			}
-		}
-		// Skip bedrock, OTG always handles that.
 	}
 
 	// Carvers: Caves and ravines
@@ -554,12 +519,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			} else {
 				((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 			}
-			// Template biomes handle their own snow, OTG biomes use OTG snow.
-			// TODO: Snow is handled per chunk, so this may cause some artifacts on biome borders.
-			if(!biome.getBiomeConfig().getTemplateForBiome())
-			{
-				this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
-			}
+			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);
 		}
 		catch (Exception exception)
 		{

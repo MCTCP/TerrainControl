@@ -111,7 +111,7 @@ public class PaperPresetLoader extends LocalPresetLoader
 		Map<IBiomeResourceLocation, IBiomeConfig> biomeConfigsByResourceLocation = new LinkedHashMap<>();
 		for(IBiomeConfig biomeConfig : biomeConfigs)
 		{
-			if(!biomeConfig.getTemplateForBiome())
+			if(!biomeConfig.getIsTemplateForBiome())
 			{
 				IBiomeResourceLocation otgLocation = new OTGBiomeResourceLocation(preset.getPresetFolder(), preset.getShortPresetName(), preset.getMajorVersion(), biomeConfig.getName());
 				biomeConfigsByResourceLocation.put(otgLocation, biomeConfig);
@@ -138,42 +138,22 @@ public class PaperPresetLoader extends LocalPresetLoader
 			ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getKey().toResourceLocationString());
 			ResourceKey<Biome> registryKey;
 			Biome biome;
-			if(biomeConfig.getValue().getTemplateForBiome())
-			{
-				biome = biomeRegistry.get(resourceLocation);
-				if(biome == null)
-				{
-					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.CONFIGS))
-					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.CONFIGS, "Could not find biome " + resourceLocation + " for template biomeconfig " + biomeConfig.getValue().getName());
-					}
-					continue;
+			if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation)) {
+				if (OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY)) {
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
 				}
-				registryKey = ResourceKey.create(BIOME_KEY, resourceLocation);
-				presetBiomes.add(registryKey);
-				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
-				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
-			} else {
-				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
-				{
-					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
-					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.BIOME_REGISTRY, "Could not process template biomeconfig " + biomeConfig.getValue().getName() + ", did you set TemplateForBiome:true in the BiomeConfig?");
-					}
-					continue;
-				}				
-				biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
-				biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
- 				registryKey = ResourceKey.create(BIOME_KEY, resourceLocation);
-				presetBiomes.add(registryKey);
- 				biome = PaperBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+				continue;
+			}
+			biomeConfig.getValue().setRegistryKey(biomeConfig.getKey());
+			biomeConfig.getValue().setOTGBiomeId(otgBiomeId);
+			registryKey = ResourceKey.create(BIOME_KEY, resourceLocation);
+			presetBiomes.add(registryKey);
+			biome = PaperBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
 
-				if(!refresh)
-				{
-					biomeRegistry.register(registryKey, biome, Lifecycle.experimental());
-				} else {
-					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.experimental());
-				}
+			if(!refresh) {
+				biomeRegistry.register(registryKey, biome, Lifecycle.experimental());
+			} else {
+				biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.experimental());
 			}
 
 			// Populate our map for syncing
