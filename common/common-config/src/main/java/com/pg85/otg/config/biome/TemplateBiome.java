@@ -53,7 +53,7 @@ public final class TemplateBiome extends ConfigFunction<IWorldConfig>
 	{
 		if(this.minTemp != 0 || this.maxTemp != 0)
 		{
-			return baseTemperature >= this.minTemp && baseTemperature < this.maxTemp;
+			return baseTemperature >= this.minTemp && baseTemperature <= this.maxTemp;
 		}
 		return true;
 	}
