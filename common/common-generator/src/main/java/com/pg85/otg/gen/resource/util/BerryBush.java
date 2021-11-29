@@ -1,4 +1,4 @@
-package com.pg85.otg.gen.resource;
+package com.pg85.otg.gen.resource.util;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.interfaces.IWorldGenRegion;
@@ -11,12 +11,12 @@ import java.util.Random;
 
 public class BerryBush {
 
-    protected enum SparseOption {
+    public enum SparseOption {
         Sparse,
         Decorated
     }
 
-    protected static void spawnBerryBushes(IWorldGenRegion worldGenregion, Random random, int centerX, int centerZ, int frequency, int minAltitude, int maxAltitude, MaterialSet sourceBlocks, SparseOption sparseOption) {
+    public static void spawnBerryBushes(IWorldGenRegion worldGenregion, Random random, int centerX, int centerZ, int frequency, int minAltitude, int maxAltitude, MaterialSet sourceBlocks, SparseOption sparseOption) {
         int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ);
 
         if (centerY < Constants.WORLD_DEPTH) {

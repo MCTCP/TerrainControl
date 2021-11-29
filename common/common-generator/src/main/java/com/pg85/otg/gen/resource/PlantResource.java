@@ -2,6 +2,7 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exceptions.InvalidConfigException;
+import com.pg85.otg.gen.resource.util.BerryBush;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -10,7 +11,7 @@ import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.PlantType;
-import com.pg85.otg.gen.resource.BerryBush.SparseOption;
+import com.pg85.otg.gen.resource.util.BerryBush.SparseOption;
 
 import java.util.List;
 import java.util.Random;
