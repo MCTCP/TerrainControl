@@ -112,7 +112,7 @@ public abstract class OTGEngine
 			globalObjectsDir.mkdirs();
 		}
 
-		unpackDefaultPreset(presetsDir);
+		unpackDefaultPresetAndExamples(presetsDir);
 
 		// Create manager objects
 
@@ -137,7 +137,7 @@ public abstract class OTGEngine
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, this.logger);
 	}
 
-	private void unpackDefaultPreset(File presetsDir)
+	private void unpackDefaultPresetAndExamples(File presetsDir)
 	{
 		JarFile jarFile = null;
 		try
@@ -182,13 +182,17 @@ public abstract class OTGEngine
 				}
 	
 				String rootDir = getOTGRootFolder().toString();
-				String path = "resources/Presets/Default/";
+				String defaultPresetPath = "resources/Presets/Default/";
+				String dimensionConfigsPath = "resources/DimensionConfigs/";
 				entries = jarFile.entries();
 	
 				while (entries.hasMoreElements())
 				{
 					JarEntry entry = entries.nextElement();
-					if (entry.getName().startsWith(path))
+					if (
+							entry.getName().startsWith(dimensionConfigsPath) ||
+									entry.getName().startsWith(defaultPresetPath)
+					)
 					{
 						File file = new File(rootDir + File.separator + (entry.getName().substring(10)));
 	
