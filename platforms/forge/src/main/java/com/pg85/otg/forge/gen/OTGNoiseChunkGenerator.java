@@ -222,13 +222,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Generates the base terrain for a chunk.
 	public void buildNoise(StructureFeatureManager manager, ChunkAccess chunk)
 	{
-		LevelAccessor world = chunk.getWorldForge();
-
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 
+		// Dummy random, as we can't get the level random right now
+		Random random = new Random();
 		// Fetch any chunks that are cached in the WorldGenRegion, so we can
 		// pre-emptively generate and cache base terrain for them asynchronously.
-		this.shadowChunkGenerator.queueChunksForWorkerThreads((WorldGenRegion)world, manager, chunk, this, (OTGBiomeProvider)this.biomeSource, this.internalGenerator, this.getSettings(), this.preset.getWorldConfig().getWorldHeightCap());
+		//this.shadowChunkGenerator.queueChunksForWorkerThreads((WorldGenRegion)world, manager, chunk, this, (OTGBiomeProvider)this.biomeSource, this.internalGenerator, this.getSettings(), this.preset.getWorldConfig().getWorldHeightCap());
 		
 		// If we've already (shadow-)generated and cached this	
 		// chunk while it was unloaded, use cached data.
@@ -288,7 +288,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					}
 				});
 			}
-			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate(), structures, junctions);			
+			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 			this.shadowChunkGenerator.setChunkGenerated(chunkCoord);
 		}
 	}
