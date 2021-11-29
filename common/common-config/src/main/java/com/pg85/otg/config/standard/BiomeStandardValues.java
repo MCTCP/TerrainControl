@@ -4,6 +4,7 @@ import com.pg85.otg.config.settingType.DoubleArraySetting;
 import com.pg85.otg.config.settingType.MaterialSetting;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.settingType.Settings;
+import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
@@ -47,8 +48,7 @@ public class BiomeStandardValues extends Settings
 		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false),
 		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false),
 		USE_FROZEN_OCEAN_TEMPERATURE = booleanSetting("UseFrozenOceanTemperature", false),
-		TEMPLATE_FOR_BIOME = booleanSetting("TemplateForBiome", false),
-		IS_NETHER_TEMPLATE_BIOME = booleanSetting("NetherTemplateBiome", false)
+			TEMPLATE_FOR_BIOME = booleanSetting("TemplateForBiome", false)
 	;
 
 	public static final Setting<String>
@@ -163,8 +163,8 @@ public class BiomeStandardValues extends Settings
 	public static final Setting<RareBuildingType> RARE_BUILDING_TYPE = enumSetting("RareBuildingType", RareBuildingType.disabled);
 	public static final Setting<RuinedPortalType> RUINED_PORTAL_TYPE = enumSetting("RuinedPortalType", RuinedPortalType.disabled);
 	public static final Setting<OceanRuinsType> OCEAN_RUINS_TYPE = enumSetting("OceanRuinsType", OceanRuinsType.disabled);
-	public static final Setting<GrassColorModifier> GRASS_COLOR_MODIFIER = enumSetting("GrassColorModifier", GrassColorModifier.None);	
-	
+	public static final Setting<GrassColorModifier> GRASS_COLOR_MODIFIER = enumSetting("GrassColorModifier", GrassColorModifier.None);
+	public static final Setting<SettingsEnums.TemplateBiomeType> TEMPLATE_BIOME_TYPE = enumSetting("VillageType", SettingsEnums.TemplateBiomeType.Overworld);
 	public static final Setting<ReplaceBlockMatrix> REPLACED_BLOCKS = replacedBlocksSetting("ReplacedBlocks");	
 	public static final Object[] SURFACE_AND_GROUND_CONTROL = new Object[0];
 }

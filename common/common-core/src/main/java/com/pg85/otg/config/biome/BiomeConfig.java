@@ -13,6 +13,7 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
 import com.pg85.otg.customobject.resource.CustomObjectResource;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
@@ -240,16 +241,21 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 			this.settings.useFrozenOceanTemperature = reader.getSetting(BiomeStandardValues.USE_FROZEN_OCEAN_TEMPERATURE, logger);
 		} else {
-			this.settings.isNetherTemplateBiome = reader.getSetting(BiomeStandardValues.IS_NETHER_TEMPLATE_BIOME, logger);
+			this.settings.templateBiomeType = reader.getSetting(BiomeStandardValues.TEMPLATE_BIOME_TYPE, logger);
 			this.settings.biomeCategory = BiomeStandardValues.BIOME_CATEGORY.getDefaultValue();
 			this.settings.biomeTemperature = BiomeStandardValues.BIOME_TEMPERATURE.getDefaultValue();
 			this.settings.biomeWetness = BiomeStandardValues.BIOME_WETNESS.getDefaultValue();
-			if(this.settings.isNetherTemplateBiome)
+			if(this.settings.templateBiomeType == SettingsEnums.TemplateBiomeType.Nether)
 			{
 				this.settings.stoneBlock = LocalMaterials.NETHERRACK;
 				this.settings.surfaceBlock = LocalMaterials.NETHERRACK;
 				this.settings.groundBlock = LocalMaterials.NETHERRACK;
 				this.settings.underWaterSurfaceBlock = LocalMaterials.NETHERRACK;
+			} else if(this.settings.templateBiomeType == SettingsEnums.TemplateBiomeType.End) {
+				this.settings.stoneBlock = LocalMaterials.END_STONE;
+				this.settings.surfaceBlock = LocalMaterials.END_STONE;
+				this.settings.groundBlock = LocalMaterials.END_STONE;
+				this.settings.underWaterSurfaceBlock = LocalMaterials.END_STONE;
 			} else {
 				this.settings.stoneBlock = LocalMaterials.STONE;
 				this.settings.surfaceBlock = LocalMaterials.STONE;
@@ -470,9 +476,10 @@ public class BiomeConfig extends BiomeConfigBase
 
 		if(isTemplateBiome)
 		{
-			writer.putSetting(BiomeStandardValues.IS_NETHER_TEMPLATE_BIOME, this.settings.isNetherTemplateBiome,
-					"If this is a template biome config for an overworld biome, set this to false. This assumes the world uses STONE/WATER for base terrain generation.",
-					"If this is a template biome config for a nether biome, set this to true. This assumes the world uses NETHERRACK/LAVA for base terrain generation."
+			writer.putSetting(BiomeStandardValues.TEMPLATE_BIOME_TYPE, this.settings.templateBiomeType,
+					"If this is a template biome config for an overworld biome, set this to Overworld. STONE is used for base terrain generation.",
+					"If this is a template biome config for a nether biome, set this to Nether. NETHERRACK is used for base terrain generation.",
+					"If this is a template biome config for an end biome, set this to End. END_STONE is used for base terrain generation."
 			);
 		}
 

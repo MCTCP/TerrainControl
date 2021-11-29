@@ -202,6 +202,7 @@ public class PaperMaterials extends LocalMaterials
 		SILVER_TERRACOTTA = PaperMaterialData.ofBlockData(Blocks.LIGHT_GRAY_TERRACOTTA.defaultBlockState());
 		STONE = PaperMaterialData.ofBlockData(Blocks.STONE.defaultBlockState());
 		NETHERRACK = PaperMaterialData.ofBlockData(Blocks.NETHERRACK.defaultBlockState());
+		END_STONE = PaperMaterialData.ofBlockData(Blocks.END_STONE.defaultBlockState());
 		SAND = PaperMaterialData.ofBlockData(Blocks.SAND.defaultBlockState());
 		RED_SAND = PaperMaterialData.ofBlockData(Blocks.RED_SAND.defaultBlockState());
 		SANDSTONE = PaperMaterialData.ofBlockData(Blocks.SANDSTONE.defaultBlockState());

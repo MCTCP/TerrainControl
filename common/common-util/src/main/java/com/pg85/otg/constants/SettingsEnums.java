@@ -117,5 +117,12 @@ public class SettingsEnums
 		Basement,
 		HugeSpike,
 		SmallSpike;
-	}	
+	}
+
+	public enum TemplateBiomeType
+	{
+		Overworld,
+		Nether,
+		End;
+	}
 }

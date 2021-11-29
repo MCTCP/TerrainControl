@@ -9,6 +9,7 @@ import java.util.Map;
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
@@ -65,7 +66,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		// Identity
 
 		protected boolean isTemplateForBiome;
-		protected boolean isNetherTemplateBiome;
+		protected SettingsEnums.TemplateBiomeType templateBiomeType;
 		protected String biomeCategory;
 		
 		// Inheritance
