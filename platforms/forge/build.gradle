@@ -91,7 +91,7 @@ minecraft {
 configurations {
     library
     implementation.extendsFrom library
-	// <shadow configuration>.extendsFrom library
+    // <shadow configuration>.extendsFrom library
 }
 minecraft.runs.all {
     lazyToken('minecraft_classpath') {
@@ -100,16 +100,16 @@ minecraft.runs.all {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.17.1-37.1.0'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.1.0'
 
     annotationProcessor("org.spongepowered:mixin:0.8.4:processor")
 
     implementation(project(":common:common-core"))
 
-	// Add WorldEdit and WorldEditCore as dependencies
-	implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
-	// WorldEditCore is not a mod, add it as a library
-	library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
+    // Add WorldEdit and WorldEditCore as dependencies
+    implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
+    // WorldEditCore is not a mod, add it as a library
+    library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
 }
 
 tasks {
