@@ -106,7 +106,7 @@ dependencies {
 
     implementation(project(":common:common-core"))
 
-	// Adds WorldEdit as runtime and WorldEditCore as compile time dependency
+	// Add WorldEdit and WorldEditCore as dependencies
 	implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
 	// WorldEditCore is not a mod, add it as a library
 	library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
