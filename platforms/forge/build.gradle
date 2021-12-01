@@ -16,13 +16,13 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle"
 apply plugin: "org.spongepowered.mixin"
+apply plugin: "eclipse"
 
-// This node shouldn"t be needed, temp fix
-// for forge maven repo move issues.
 repositories {
-    maven { url = "https://libraries.minecraft.net/" }
-    maven { url = "https://maven.minecraftforge.net/" }
-    maven { url = "https://maven.enginehub.org/repo/" }
+	maven {
+		name = "sk89q maven"
+		url = "https://maven.sk89q.com/artifactory/repo"
+	}
 }
 
 minecraft {
@@ -88,19 +88,28 @@ minecraft {
     }
 }
 
+configurations {
+    library
+    implementation.extendsFrom library
+	// <shadow configuration>.extendsFrom library
+}
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 dependencies {
-    minecraft('net.minecraftforge:forge:1.17.1-37.0.126')
+	minecraft 'net.minecraftforge:forge:1.17.1-37.1.0'
 
     annotationProcessor("org.spongepowered:mixin:0.8.4:processor")
 
     implementation(project(":common:common-core"))
 
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.7") {
-        exclude group: "org.yaml"
-    }
-
-    // We may not need this, remove if so
-    compileOnly(fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.2.7"))
+	// Adds WorldEdit as runtime and WorldEditCore as compile time dependency
+	implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
+	// WorldEditCore is not a mod, add it as a library
+	library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
 }
 
 tasks {
