@@ -10,6 +10,8 @@ about: An error that happens in OTG mod/plugin (not crash!).
 
 #### OTG Version
 [Please specify the full OTG version that you are running by placing "x" into []]
+- [ ] 1.16.5
+- [ ] 1.17.1
 - [ ] 1.12.2_v8_r1
 - [ ] 1.12.2_v7_DEV_r26
 - [ ] 1.12.2-v6
