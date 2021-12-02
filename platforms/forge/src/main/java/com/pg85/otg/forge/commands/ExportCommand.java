@@ -2,10 +2,7 @@ package com.pg85.otg.forge.commands;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,7 +46,7 @@ import net.minecraft.ChatFormatting;
 public class ExportCommand extends BaseCommand
 {
 	private static final String[] FLAGS = new String[]
-	{ "-o", "-a", "-b" };
+	{ "-o", "-a", "-b", "-e" };
 	
 	public ExportCommand() 
 	{
@@ -70,7 +67,9 @@ public class ExportCommand extends BaseCommand
 						Commands.argument("type", StringArgumentType.word()).executes(this::execute)
 						.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
 							Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-								Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
+								Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags).then(
+										Commands.argument("excludes", BlockStateArgument.block()).executes(this::execute)
+								)
 							)
 						)
 					)
@@ -81,7 +80,9 @@ public class ExportCommand extends BaseCommand
 							Commands.argument("type", StringArgumentType.word()).executes(this::execute)
 							.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
 								Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-									Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags)
+									Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags).then(
+											Commands.argument("excludes", BlockStateArgument.block()).executes(this::execute)
+									)
 								)
 							)
 						)
@@ -111,7 +112,7 @@ public class ExportCommand extends BaseCommand
 			String presetName = null;
 			ObjectType type = ObjectType.BO3; // Defaults to BO3 for simplicity
 			String templateName = "default";
-			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false;
+			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false, hasExcludes = false;
 
 			try
 			{
@@ -135,6 +136,7 @@ public class ExportCommand extends BaseCommand
 				overwrite = flags.contains("-o");
 				isStructure = flags.contains("-b");
 				includeAir = flags.contains("-a");
+				hasExcludes = flags.contains("-e");
 			}
 			catch (IllegalArgumentException ignored)
 			{} // We can deal with any of these not being there
@@ -231,30 +233,61 @@ public class ExportCommand extends BaseCommand
 
 			// Create a new BO from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
-
-			StructuredCustomObject object = ObjectCreator.create(
-				type,
-				lowCorner,
-				highCorner,
-				center,
-				centerBlock,
-				objectName,
-				includeAir,
-				isStructure,
-				false,
-				objectPath,
-				worldGenRegion,
-				nbtHelper,
-				null,
-				template.getConfig(),
-				preset.getFolderName(),
-				OTG.getEngine().getOTGRootFolder(),
-				OTG.getEngine().getLogger(),
-				OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-				OTG.getEngine().getCustomObjectResourcesManager(),
-				OTG.getEngine().getModLoadedChecker()
-			);
+			StructuredCustomObject object;
+			if (hasExcludes) {
+				BlockState excludeBlockState = context.getArgument("excludes", BlockStateInput.class).getState();
+				LocalMaterialData exclude = ForgeMaterialData.ofBlockState(excludeBlockState);
+				List<LocalMaterialData> excludes = new ArrayList<>();
+				excludes.add(exclude);
+				object = ObjectCreator.create(
+						type,
+						lowCorner,
+						highCorner,
+						center,
+						centerBlock,
+						objectName,
+						includeAir,
+						isStructure,
+						false,
+						objectPath,
+						worldGenRegion,
+						nbtHelper,
+						null,
+						template.getConfig(),
+						preset.getFolderName(),
+						OTG.getEngine().getOTGRootFolder(),
+						OTG.getEngine().getLogger(),
+						OTG.getEngine().getCustomObjectManager(),
+						OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+						OTG.getEngine().getCustomObjectResourcesManager(),
+						OTG.getEngine().getModLoadedChecker(),
+						excludes
+				);
+			} else {
+				object = ObjectCreator.create(
+						type,
+						lowCorner,
+						highCorner,
+						center,
+						centerBlock,
+						objectName,
+						includeAir,
+						isStructure,
+						false,
+						objectPath,
+						worldGenRegion,
+						nbtHelper,
+						null,
+						template.getConfig(),
+						preset.getFolderName(),
+						OTG.getEngine().getOTGRootFolder(),
+						OTG.getEngine().getLogger(),
+						OTG.getEngine().getCustomObjectManager(),
+						OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
+						OTG.getEngine().getCustomObjectResourcesManager(),
+						OTG.getEngine().getModLoadedChecker()
+				);
+			}
 
 			// Send feedback, and register the BO3 for immediate use
 			if (object != null)

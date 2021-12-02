@@ -2,6 +2,7 @@ package com.pg85.otg.forge.commands.arguments;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 public class FlagsArgument implements ArgumentType<String>
 {
@@ -16,10 +17,7 @@ public class FlagsArgument implements ArgumentType<String>
 	}
 
 	@Override
-	public String parse(StringReader reader)
-	{
-		final String text = reader.getRemaining();
-		reader.setCursor(reader.getTotalLength());
-		return text;
+	public String parse(StringReader reader) throws CommandSyntaxException {
+		return reader.readString();
 	}
 }
