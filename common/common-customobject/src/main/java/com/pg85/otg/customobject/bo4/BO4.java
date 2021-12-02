@@ -451,36 +451,33 @@ public class BO4 implements StructuredCustomObject
 									
 									if(sourceBlockMaterial != null)
 									{								
-										if(!sourceBlockMaterial.isSolid())
+										blockToQueueForSpawn = new BO4BlockFunction();
+										blockToQueueForSpawn.x = x + newBlock.x;
+										blockToQueueForSpawn.y = (short) blockY;
+										blockToQueueForSpawn.z = z + newBlock.z;
+										blockToQueueForSpawn.material = replaceBelowMaterial;										
+										blockToQueueForSpawn.nbtName = newBlock.nbtName;
+										blockToQueueForSpawn.nbt = newBlock.nbt;
+										
+										destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
+										if(chunkCoord.equals(destChunk))
 										{
-											blockToQueueForSpawn = new BO4BlockFunction();
-											blockToQueueForSpawn.x = x + newBlock.x;
-											blockToQueueForSpawn.y = (short) blockY;
-											blockToQueueForSpawn.z = z + newBlock.z;
-											blockToQueueForSpawn.material = replaceBelowMaterial;										
-											blockToQueueForSpawn.nbtName = newBlock.nbtName;
-											blockToQueueForSpawn.nbt = newBlock.nbt;
-											
-											destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
-											if(chunkCoord.equals(destChunk))
+											// Apply sagc'd biome blocks
+											if(replaceWithBiomeBlocks)
 											{
-												// Apply sagc'd biome blocks
-												if(replaceWithBiomeBlocks)
-												{
-													blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);												
-												} else {
-													blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : replaceBelowMaterial;
-													if(blockToQueueForSpawn.material == null)
-													{
-														blockToQueueForSpawn.material = LocalMaterials.DIRT;
-													}
-												}
-												setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+												blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);												
 											} else {
-												outOfBounds = true;
+												blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : replaceBelowMaterial;
+												if(blockToQueueForSpawn.material == null)
+												{
+													blockToQueueForSpawn.material = LocalMaterials.DIRT;
+												}
 											}
+											setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+										} else {
+											outOfBounds = true;
 										}
-										else if(sourceBlockMaterial.isSolid())
+										if(sourceBlockMaterial.isSolid())
 										{
 											break;
 										}
@@ -645,37 +642,34 @@ public class BO4 implements StructuredCustomObject
 									sourceBlockMaterial = worldGenRegion.getMaterial(x + block.x, blockY, z + block.z);
 									
 									if(sourceBlockMaterial != null)
-									{								
-										if(!sourceBlockMaterial.isSolid())
+									{
+										blockToQueueForSpawn = new BO4BlockFunction();
+										blockToQueueForSpawn.x = x + block.x;
+										blockToQueueForSpawn.y = (short) blockY;
+										blockToQueueForSpawn.z = z + block.z;
+										blockToQueueForSpawn.material = replaceBelowMaterial;										
+										blockToQueueForSpawn.nbtName = block.nbtName;
+										blockToQueueForSpawn.nbt = block.nbt;
+										
+										destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
+										if(chunkCoord.equals(destChunk))
 										{
-											blockToQueueForSpawn = new BO4BlockFunction();
-											blockToQueueForSpawn.x = x + block.x;
-											blockToQueueForSpawn.y = (short) blockY;
-											blockToQueueForSpawn.z = z + block.z;
-											blockToQueueForSpawn.material = replaceBelowMaterial;										
-											blockToQueueForSpawn.nbtName = block.nbtName;
-											blockToQueueForSpawn.nbt = block.nbt;
-											
-											destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
-											if(chunkCoord.equals(destChunk))
+											// Apply sagc'd biome blocks
+											if(replaceWithBiomeBlocks)
 											{
-												// Apply sagc'd biome blocks
-												if(replaceWithBiomeBlocks)
-												{
-													blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);											
-												} else {
-													blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : replaceBelowMaterial;
-													if(blockToQueueForSpawn.material == null)
-													{
-														blockToQueueForSpawn.material = LocalMaterials.DIRT;
-													}
-												}
-												setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+												blockToQueueForSpawn.material = biomeConfig.getGroundBlockAtHeight(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);											
 											} else {
-												outOfBounds = true;
+												blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), blockToQueueForSpawn.y) : replaceBelowMaterial;
+												if(blockToQueueForSpawn.material == null)
+												{
+													blockToQueueForSpawn.material = LocalMaterials.DIRT;
+												}
 											}
+											setBlock(worldGenRegion, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.nbt, isStructureAtSpawn);
+										} else {
+											outOfBounds = true;
 										}
-										else if(sourceBlockMaterial.isSolid())
+										if(sourceBlockMaterial.isSolid())
 										{
 											break;
 										}
