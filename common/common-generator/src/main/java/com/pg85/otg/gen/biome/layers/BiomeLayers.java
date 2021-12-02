@@ -71,7 +71,7 @@ public class BiomeLayers
 		boolean riversStarted = false;
 		boolean oceanTemperatureStarted = false;
 
-		if(!(data.biomeMode == BiomeMode.FromImage && data.imageMode != ImageMode.ContinueNormal))
+		if(data.biomeMode != BiomeMode.FromImage || data.imageMode == ImageMode.ContinueNormal)
 		{
 			// Iterate through the depth, manipulating the factory at specific points
 			for (int depth = 0; depth <= data.generationDepth; depth++)
@@ -111,7 +111,7 @@ public class BiomeLayers
 					factory = new AddIslandsLayer().create(contextProvider.apply(depth), factory);
 				}
 
-				if(data.biomeMode == BiomeMode.Normal)
+				if(data.biomeMode == BiomeMode.Normal || data.biomeMode == BiomeMode.FromImage)
 				{
 					if (data.groups.containsKey(depth))
 					{

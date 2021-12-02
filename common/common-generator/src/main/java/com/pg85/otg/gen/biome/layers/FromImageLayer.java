@@ -159,10 +159,6 @@ public class FromImageLayer implements ParentedLayer
 				return this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
 			case ContinueNormal:
 				int childBiome = 0;
-				if (parent != null)
-				{
-					childBiome = parent.sample(x, z);
-				}
 				Buffer_x = x - this.data.imageXOffset;
 				Buffer_z = z - this.data.imageZOffset;
 				// if X or Z is outside map bounds
@@ -170,6 +166,7 @@ public class FromImageLayer implements ParentedLayer
 				{
 					if (parent != null)
 					{
+						childBiome = parent.sample(x, z);
 						return childBiome;
 					} else {
 						return this.data.imageFillBiome;
@@ -181,12 +178,13 @@ public class FromImageLayer implements ParentedLayer
 					{
 						if (parent != null)
 						{
+							childBiome = parent.sample(x, z);
 							return childBiome;
 						} else {
 							return this.data.imageFillBiome;
 						}
 					}
-					return biome_id_buffer;							
+					return biome_id_buffer;
 				}
 			case FillEmpty:
 				// Some fastened version
