@@ -48,7 +48,7 @@ public class CachedBiomeProvider implements ICachedBiomeProvider
 		this.logger = logger;
 	}
 
-	// Used by any method that can preemptively request a region of biomeconfigs,
+	// Used by any method that can preemptively request a chunk of biomeconfigs,
 	// rather than making separate requests for each column. 
 	// TODO: Allow regions rather than chunks.
 	@Override
@@ -207,7 +207,7 @@ public class CachedBiomeProvider implements ICachedBiomeProvider
 	// Used by any method that can preemptively request a region of biomeconfigs, rather than 
 	// making separate requests for each column. Regions are requested and cached per 8x8, 
 	// each cell equal to 4x4 blocks in the world.
-	//@Override
+	@Override
 	public IBiomeConfig[] getNoiseBiomeConfigsForRegion(int noiseStartX, int noiseStartZ, int widthHeight)
 	{
 		int regionSize = 8;
