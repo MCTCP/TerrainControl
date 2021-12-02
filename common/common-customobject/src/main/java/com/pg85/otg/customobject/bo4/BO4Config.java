@@ -1362,7 +1362,7 @@ public class BO4Config extends CustomObjectConfigFile
 
 	private int bo4DataVersion = 3;
 	void writeToStream(DataOutput stream, String presetFolderName, Path otgRootFolder, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
-	{	
+	{		
 		stream.writeInt(this.bo4DataVersion);
 		// Version 3 added fixedRotation		
 		StreamHelper.writeStringToStream(stream, this.fixedRotation == null ? null : this.fixedRotation.toString());

@@ -82,7 +82,7 @@ public class BiomeLayerData
 		this.presetDir = data.presetDir;
 		this.imageFile = data.imageFile;
 		this.imageOrientation = data.imageOrientation;
-		
+
 		this.biomeMode = data.biomeMode;
 		this.generationDepth = data.generationDepth;
 		this.landSize = data.landSize;
