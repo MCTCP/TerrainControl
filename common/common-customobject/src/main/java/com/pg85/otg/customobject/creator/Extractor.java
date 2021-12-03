@@ -40,11 +40,10 @@ public class Extractor
 						}
 					}
 
-					if (materialData == null
+					if (stop || materialData == null
 						|| materialData.isMaterial(LocalMaterials.STRUCTURE_VOID)
 						|| materialData.isMaterial(LocalMaterials.STRUCTURE_BLOCK)
-						|| (!includeAir && materialData.isAir())
-						|| stop)
+						|| (!includeAir && materialData.isAir()))
 					{
 						continue;
 					}
