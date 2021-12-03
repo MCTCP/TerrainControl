@@ -46,7 +46,7 @@ import net.minecraft.ChatFormatting;
 public class ExportCommand extends BaseCommand
 {
 	private static final String[] FLAGS = new String[]
-	{ "-o", "-a", "-b", "-e" };
+	{ "-o", "-a", "-b", "-e", "-oa", "-ob", "-oe", "-ab", "-ae", "-be", "-oab", "-obe", "-oae", "-abe", "-oabe"};
 	
 	public ExportCommand() 
 	{
@@ -133,10 +133,10 @@ public class ExportCommand extends BaseCommand
 				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
 				String flags = context.getArgument("flags", String.class);
 
-				overwrite = flags.contains("-o");
-				isStructure = flags.contains("-b");
-				includeAir = flags.contains("-a");
-				hasExcludes = flags.contains("-e");
+				overwrite = flags.contains("o");
+				isStructure = flags.contains("b");
+				includeAir = flags.contains("a");
+				hasExcludes = flags.contains("e");
 			}
 			catch (IllegalArgumentException ignored)
 			{} // We can deal with any of these not being there
