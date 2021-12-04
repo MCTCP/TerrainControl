@@ -1,10 +1,10 @@
-package com.pg85.otg.gen;
+package com.pg85.otg.core.gen;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.ErroredFunction;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.config.biome.BiomeConfig;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;

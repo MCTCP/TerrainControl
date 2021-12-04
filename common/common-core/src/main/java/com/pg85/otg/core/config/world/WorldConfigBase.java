@@ -1,4 +1,4 @@
-package com.pg85.otg.config.world;
+package com.pg85.otg.core.config.world;
 
 import java.util.ArrayList;
 import java.util.List;

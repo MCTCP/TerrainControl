@@ -13,8 +13,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 
 import net.minecraft.commands.CommandSourceStack;

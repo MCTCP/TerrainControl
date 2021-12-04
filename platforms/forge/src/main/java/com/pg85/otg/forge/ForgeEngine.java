@@ -1,7 +1,7 @@
 package com.pg85.otg.forge;
 
-import com.pg85.otg.OTGEngine;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTGEngine;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterials;
 import com.pg85.otg.forge.presets.ForgePresetLoader;

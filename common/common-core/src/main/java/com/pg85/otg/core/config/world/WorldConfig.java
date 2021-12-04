@@ -1,4 +1,4 @@
-package com.pg85.otg.config.world;
+package com.pg85.otg.core.config.world;
 
 import java.io.File;
 import java.nio.file.Path;

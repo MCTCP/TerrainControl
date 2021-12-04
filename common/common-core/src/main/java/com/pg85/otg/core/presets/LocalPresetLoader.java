@@ -1,4 +1,4 @@
-package com.pg85.otg.presets;
+package com.pg85.otg.core.presets;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -7,7 +7,6 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.FileSettingsReader;
@@ -15,8 +14,9 @@ import com.pg85.otg.config.io.FileSettingsWriter;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.biome.BiomeConfig;
+import com.pg85.otg.core.config.world.WorldConfig;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldConfig;

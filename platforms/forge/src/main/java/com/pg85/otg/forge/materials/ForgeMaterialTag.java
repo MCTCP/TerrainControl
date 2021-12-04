@@ -1,14 +1,11 @@
 package com.pg85.otg.forge.materials;
 
-import java.util.Optional;
-
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.util.materials.LocalMaterialTag;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.ResourceLocationException;
 

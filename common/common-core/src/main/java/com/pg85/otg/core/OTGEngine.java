@@ -1,21 +1,21 @@
-package com.pg85.otg;
+package com.pg85.otg.core;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.PluginConfig;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
 import com.pg85.otg.config.standard.WorldStandardValues;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.PluginConfig;
+import com.pg85.otg.core.config.biome.BiomeConfig;
+import com.pg85.otg.core.config.world.WorldConfig;
+import com.pg85.otg.core.presets.LocalPresetLoader;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.interfaces.IPluginConfig;
-import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 

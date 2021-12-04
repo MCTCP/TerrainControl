@@ -1,5 +1,6 @@
-package com.pg85.otg.config;
+package com.pg85.otg.core.config;
 
+import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.LogLevels;
 import com.pg85.otg.interfaces.IPluginConfig;

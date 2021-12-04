@@ -2,9 +2,8 @@ package com.pg85.otg.forge.biome;
 
 import java.util.List;
 import java.util.Optional;
-import com.pg85.otg.OTG;
+
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
@@ -12,6 +11,8 @@ import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.config.biome.BiomeConfig;
 import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
@@ -33,7 +34,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
 import net.minecraft.world.level.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.level.levelgen.GenerationStep;

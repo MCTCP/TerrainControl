@@ -1,11 +1,11 @@
-package com.pg85.otg.presets;
+package com.pg85.otg.core.presets;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.core.config.biome.BiomeConfig;
+import com.pg85.otg.core.config.world.WorldConfig;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
 

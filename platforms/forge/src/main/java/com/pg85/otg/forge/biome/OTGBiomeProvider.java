@@ -20,8 +20,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.BiomeSource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;

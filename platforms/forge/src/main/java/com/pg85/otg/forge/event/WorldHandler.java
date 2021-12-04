@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.event;
 
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IWorldConfig;
 

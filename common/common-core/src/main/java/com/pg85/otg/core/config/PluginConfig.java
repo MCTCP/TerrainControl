@@ -1,4 +1,4 @@
-package com.pg85.otg.config;
+package com.pg85.otg.core.config;
 
 import java.nio.file.Path;
 

@@ -1,6 +1,5 @@
 package com.pg85.otg.forge.commands;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;

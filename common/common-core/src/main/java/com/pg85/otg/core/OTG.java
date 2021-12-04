@@ -1,4 +1,4 @@
-package com.pg85.otg;
+package com.pg85.otg.core;
 
 /**
  * Main entry-point. Used for logging and to access OTGEngine.

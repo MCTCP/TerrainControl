@@ -1,4 +1,4 @@
-package com.pg85.otg.gen;
+package com.pg85.otg.core.gen;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -6,8 +6,9 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.gen.biome.CachedBiomeProvider;
 import com.pg85.otg.gen.carver.Carver;
 import com.pg85.otg.gen.carver.CaveCarver;
@@ -23,7 +24,6 @@ import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.ISurfaceGeneratorNoiseProvider;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.DecorationArea;

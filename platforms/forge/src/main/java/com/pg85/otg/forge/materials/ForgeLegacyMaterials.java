@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.materials;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.minecraft.BlockNames;

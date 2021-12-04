@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.util;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
 import com.pg85.otg.util.nbt.NamedBinaryTag;

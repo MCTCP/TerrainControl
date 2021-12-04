@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import com.pg85.otg.core.gen.OTGChunkGenerator;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.util.BlockPos2D;

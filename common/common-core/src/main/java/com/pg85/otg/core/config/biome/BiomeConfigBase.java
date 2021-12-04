@@ -1,4 +1,4 @@
-package com.pg85.otg.config.biome;
+package com.pg85.otg.core.config.biome;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

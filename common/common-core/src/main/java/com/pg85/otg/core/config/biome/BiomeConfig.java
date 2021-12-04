@@ -1,10 +1,9 @@
-package com.pg85.otg.config.biome;
+package com.pg85.otg.core.config.biome;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -15,6 +14,7 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.constants.SettingsEnums.IceSpikeType;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.customobject.resource.CustomObjectResource;
 import com.pg85.otg.customobject.resource.CustomStructureResource;
 import com.pg85.otg.customobject.resource.SaplingResource;
