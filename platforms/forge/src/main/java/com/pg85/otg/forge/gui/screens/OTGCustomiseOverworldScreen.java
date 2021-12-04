@@ -90,14 +90,6 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 	{
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 	}
-
-	/*
-	@Override
-	public void updateDisplayOptions()
-	{
-		 ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).setDisplayOptions(true);
-	}
-	*/
 	
 	@Override
 	public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_)

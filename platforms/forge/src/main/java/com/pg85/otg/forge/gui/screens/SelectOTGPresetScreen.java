@@ -186,7 +186,7 @@ public class SelectOTGPresetScreen extends Screen
 			@Override
 			public Component getNarration()
 			{
-				return null;
+				return new TextComponent(this.preset.getFolderName());
 			}
 		}
 	}

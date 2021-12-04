@@ -27,7 +27,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class CreateOTGDimensionsScreen extends Screen
-{	
+{
 	public final CreateWorldScreen parent;
 	public WorldGenSettings dimGenSettings;
 	private final Consumer<OTGDimensionSettingsContainer> dimensionConfigConsumer;
@@ -256,7 +256,7 @@ public class CreateOTGDimensionsScreen extends Screen
 			@Override
 			public Component getNarration()
 			{
-				return null;
+				return new TextComponent("dimension " + dimensionName + " preset " + presetFolderName);
 			}
 		}
 	}
