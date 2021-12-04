@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
-import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGOverWorld;
 
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -78,17 +78,17 @@ public class CreateOTGDimensionsScreen extends Screen
 		this.columnType = new TranslatableComponent("otg.createDimensions.customize.dimension");
 		this.columnHeight = new TranslatableComponent("otg.createDimensions.customize.preset");
 		this.list = new CreateOTGDimensionsScreen.DetailsList();
-		this.children.add(this.list);
+		this.addWidget(this.list);
 
 		if(!this.uiLocked)
 		{
-			this.addDimButton = this.addButton(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
+			this.addDimButton = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.addDimension"), (p_213007_1_) -> {
 				this.currentSelection.Dimensions.add(new OTGDimension(null, -1l));
 				this.list.resetRows();
 				this.updateButtonValidity();
 			}));
 	
-			this.removeDimButton = this.addButton(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
+			this.removeDimButton = this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.removeDimension"), (p_213007_1_) -> {
 				if (this.hasValidSelection() && this.currentSelection.Dimensions.size() > this.list.getSelected().dimId - 3)
 				{
 					this.currentSelection.Dimensions.remove(this.list.getSelected().dimId - 3);
@@ -97,7 +97,7 @@ public class CreateOTGDimensionsScreen extends Screen
 				}
 			}));
 			
-			this.editDimButton = this.addButton(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
+			this.editDimButton = this.addRenderableWidget(new Button(this.width / 2 + 53, this.height - 52, 95, 20, new TranslatableComponent("otg.createDimensions.customize.dimension.editDimension"), (p_213007_1_) -> {
 				if (this.hasValidSelection())
 				{
 					this.minecraft.setScreen(new SelectOTGPresetScreen(CreateOTGDimensionsScreen.this, CreateOTGDimensionsScreen.this.currentSelection, this.list.getSelected().dimId));
@@ -106,7 +106,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		}
 
 		// Done
-		this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, CommonComponents.GUI_DONE, 
+		this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 28, 150, 20, CommonComponents.GUI_DONE, 
 			(p_213010_1_) -> {
 				if(!(this.parent instanceof ModpackCreateWorldScreen))
 				{
@@ -117,7 +117,7 @@ public class CreateOTGDimensionsScreen extends Screen
 		));
 
 		// Cancel
-		this.addButton(new Button(this.width / 2 + 5, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_213009_1_) -> {
+		this.addRenderableWidget(new Button(this.width / 2 + 5, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_213009_1_) -> {
 			this.minecraft.setScreen(this.parent);
 		}));
 
@@ -251,6 +251,12 @@ public class CreateOTGDimensionsScreen extends Screen
 				} else {
 					return false;
 				}
+			}
+
+			@Override
+			public Component getNarration()
+			{
+				return null;
 			}
 		}
 	}

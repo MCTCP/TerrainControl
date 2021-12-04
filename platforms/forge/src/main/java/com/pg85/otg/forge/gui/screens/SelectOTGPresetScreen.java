@@ -6,11 +6,11 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.pg85.otg.OTG;
-import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
-import com.pg85.otg.config.dimensions.DimensionConfig.OTGOverWorld;
-import com.pg85.otg.presets.Preset;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGDimension;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGOverWorld;
+import com.pg85.otg.core.presets.Preset;
 
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.chat.NarratorChatListener;
@@ -79,7 +79,7 @@ public class SelectOTGPresetScreen extends Screen
 	{
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		this.guiPresetList = new SelectOTGPresetScreen.PresetList();
-		this.children.add(this.guiPresetList);
+		this.addWidget(this.guiPresetList);
 		
 		this.guiPresetList.setSelected(
 			this.guiPresetList.children().stream().filter(
@@ -181,6 +181,12 @@ public class SelectOTGPresetScreen extends Screen
 				} else {
 					return false;
 				}
+			}
+
+			@Override
+			public Component getNarration()
+			{
+				return null;
 			}
 		}
 	}

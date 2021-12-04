@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.gui.screens;
 
-import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
 
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 

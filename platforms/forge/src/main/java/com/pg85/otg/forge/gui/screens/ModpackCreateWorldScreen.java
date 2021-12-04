@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.client.Minecraft;
@@ -28,9 +28,11 @@ import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.WorldGenSettingsComponent;
 import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.FileUtil;
@@ -62,15 +64,15 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	private ModpackCreateWorldScreen.GameMode gameMode = ModpackCreateWorldScreen.GameMode.SURVIVAL;
 	@Nullable
 	private ModpackCreateWorldScreen.GameMode oldGameMode;
-	private Difficulty selectedDifficulty = Difficulty.NORMAL;
+	private Difficulty difficulty = Difficulty.NORMAL;
 	private boolean commandsChanged;
 	@Nullable
 	private Path tempDataPackDir;
 	@Nullable
 	private PackRepository tempDataPackRepository;
 	private Button createButton;
-	private Button difficultyButton;
-	private Button commandsButton;
+	private CycleButton<Difficulty> difficultyButton;
+	private CycleButton<Boolean> commandsButton;
 	private Component gameModeHelp1;
 	private Component gameModeHelp2;
 	private String initName;
@@ -160,13 +162,13 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			this.createButton.active = !this.nameEdit.getValue().isEmpty();
 			this.updateResultFolder();
 		});
-		this.children.add(this.nameEdit);
+		this.addWidget(this.nameEdit);
 		this.seedEdit.setResponder((p_214319_1_) ->
 		{
 			this.initSeed = p_214319_1_;
 		});
-		this.children.add(this.seedEdit);
-		this.addButton(
+		this.addWidget(this.seedEdit);
+		this.addRenderableWidget(
 			new Button(i, 110, 150, 20, TextComponent.EMPTY, 
 				(p_214316_1_) ->
 				{
@@ -182,7 +184,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 							this.setGameMode(ModpackCreateWorldScreen.GameMode.SURVIVAL);
 					}
 				
-					p_214316_1_.queueNarration(250);
+					//p_214316_1_.queueNarration(250);
 				}
 			) {
 				public Component getMessage()
@@ -196,37 +198,16 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				}
 			}
 		);
-		this.difficultyButton = this.addButton(
-			new Button(j, 110, 150, 20, new TranslatableComponent("options.difficulty"),
-			(p_238956_1_) -> {
-				this.selectedDifficulty = this.selectedDifficulty.nextById();
-				this.effectiveDifficulty = this.selectedDifficulty;
-				p_238956_1_.queueNarration(250);
-			}) {
-				public Component getMessage()
-				{
-					return (new TranslatableComponent("options.difficulty")).append(": ").append(ModpackCreateWorldScreen.this.effectiveDifficulty.getDisplayName());
-				}
-			}
-		);
-		this.commandsButton = this.addButton(new Button(i, 161, 150, 20, new TranslatableComponent("selectWorld.allowCommands"), 
-			(p_214322_1_) -> {
-				this.commandsChanged = true;
-				this.commands = !this.commands;
-				p_214322_1_.queueNarration(250);
-			}) {
-				public Component getMessage()
-				{
-					return CommonComponents.optionStatus(super.getMessage(), ModpackCreateWorldScreen.this.commands && !ModpackCreateWorldScreen.this.hardCore);
-				}
-		
-				protected MutableComponent createNarrationMessage()
-				{
-					return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.allowCommands.info"));
-				}
-			}
-		);
-		this.addButton(new Button(j, 161, 150, 20, new TextComponent("Dimensions"), // TODO: Use translationtext
+		this.difficultyButton = this.addRenderableWidget(CycleButton.builder(Difficulty::getDisplayName).withValues(Difficulty.values()).withInitialValue((this.gameMode == GameMode.HARDCORE ? Difficulty.HARD : this.difficulty)).create(j, 100, 150, 20, new TranslatableComponent("options.difficulty"), (p_170162_, p_170163_) -> {
+			this.difficulty = p_170163_;
+		}));
+		this.commandsButton = this.addRenderableWidget(CycleButton.onOffBuilder(this.commands && !this.hardCore).withCustomNarration((p_170160_) -> {
+			return CommonComponents.joinForNarration(p_170160_.createDefaultNarrationMessage(), new TranslatableComponent("selectWorld.allowCommands.info"));
+		}).create(i, 151, 150, 20, new TranslatableComponent("selectWorld.allowCommands"), (p_170168_, p_170169_) -> {
+			this.commandsChanged = true;
+			this.commands = p_170169_;
+		}));		
+		this.addRenderableWidget(new Button(j, 161, 150, 20, new TextComponent("Dimensions"), // TODO: Use translationtext
 			(p_214322_1_) -> {
 				Optional<WorldPreset> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
 				WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(preset);
@@ -251,7 +232,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				}
 			}
 		);
-		this.createButton = this.addButton(
+		this.createButton = this.addRenderableWidget(
 			new Button(i, this.height - 28, 150, 20, new TranslatableComponent("selectWorld.create"),
 				(p_214318_1_) -> {
 					this.onCreate();
@@ -259,7 +240,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			)
 		);
 		this.createButton.active = !this.initName.isEmpty();
-		this.addButton(
+		this.addRenderableWidget(
 			new Button(j, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, 
 				(p_214317_1_) -> {
 					this.popScreen();
@@ -269,7 +250,6 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 
 		this.worldGenSettingsComponent.init(this, this.minecraft, this.font);
 		
-		this.updateDisplayOptions();
 		this.setInitialFocus(this.nameEdit);
 		this.setGameMode(this.gameMode);
 		this.updateResultFolder();
@@ -321,7 +301,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		if (this.copyTempDataPackDirToNewWorld())
 		{
 			this.cleanupTempResources();
-			LevelSettings worldsettings = new LevelSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, this.effectiveDifficulty, this.commands && !this.hardCore, this.gameRules, this.dataPacks);
+			LevelSettings worldsettings = new LevelSettings(this.nameEdit.getValue().trim(), this.gameMode.gameType, this.hardCore, (this.gameMode == GameMode.HARDCORE ? Difficulty.HARD : this.difficulty), this.commands && !this.hardCore, this.gameRules, this.dataPacks);
 			this.minecraft.createLevel(this.resultFolder, worldsettings, this.worldGenSettingsComponent.registryHolder(), this.worldGenSettingsComponent.makeSettings(worldsettings.hardcore()).withSeed(worldsettings.hardcore(), parseSeed()));
 		}
 	}
@@ -360,27 +340,29 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		if (!this.commandsChanged)
 		{
 			this.commands = p_228200_1_ == ModpackCreateWorldScreen.GameMode.CREATIVE;
+			this.commandsButton.setValue(this.commands);			
 		}
 
 		if (p_228200_1_ == ModpackCreateWorldScreen.GameMode.HARDCORE)
 		{
 			this.hardCore = true;
 			this.commandsButton.active = false;
-			this.effectiveDifficulty = Difficulty.HARD;
+			this.commandsButton.setValue(false);
+			this.worldGenSettingsComponent.switchToHardcore();
+			this.difficultyButton.setValue(Difficulty.HARD);
 			this.difficultyButton.active = false;
 		} else {
 			this.hardCore = false;
 			this.commandsButton.active = true;
-			this.effectiveDifficulty = this.selectedDifficulty;
+			this.commandsButton.setValue(this.commands);
+			this.worldGenSettingsComponent.switchOutOfHardcode();
+			this.difficultyButton.setValue(this.difficulty);
 			this.difficultyButton.active = true;
 		}
 
 		this.gameMode = p_228200_1_;
 		this.updateGameModeHelp();
 	}
-
-	@Override
-	public void updateDisplayOptions() { }
 
 	@Override
 	public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_)
@@ -436,23 +418,18 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		{
 			drawString(p_230430_1_, this.font, COMMANDS_INFO, this.width / 2 - 150, 182, -6250336);
 		}
-
-		for(int i = 0; i < this.buttons.size(); ++i)
-		{
-			this.buttons.get(i).render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
-		}
 	}
 
 	@Override
-	protected <T extends GuiEventListener> T addWidget(T p_230481_1_)
+	protected <T extends GuiEventListener & NarratableEntry> T addWidget(T p_100948_)
 	{
-		return super.addWidget(p_230481_1_);
+		return super.addWidget(p_100948_);
 	}
-
+	
 	@Override
-	protected <T extends AbstractWidget> T addButton(T p_230480_1_)
+	protected <T extends GuiEventListener & Widget & NarratableEntry> T addRenderableWidget(T p_170199_)
 	{
-		return super.addButton(p_230480_1_);
+		return super.addRenderableWidget(p_170199_);
 	}
 
 	@Override

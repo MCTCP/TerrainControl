@@ -4,13 +4,14 @@ import java.util.OptionalLong;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
 
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
@@ -70,18 +71,18 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 		int i = this.width / 2 - 155;
 		int j = this.width / 2 + 5;
 		((OTGWorldOptionsScreen)this.worldGenSettingsComponent).init(this, this.minecraft, this.font);
-		this.createButton = this.addButton(new Button(i, this.height - 28, 150, 20, CommonComponents.GUI_DONE, (p_214318_1_) ->
+		this.createButton = this.addRenderableWidget(new Button(i, this.height - 28, 150, 20, CommonComponents.GUI_DONE, (p_214318_1_) ->
 		{
 			this.dimConfig.Overworld.NonOTGWorldType = ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).preset.get().description().getString().replace("generator.", "");
 			this.parent.dimGenSettings = ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).settings;
 			this.popScreen();
 		}));
 		this.createButton.active = true;
-		this.addButton(new Button(j, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_214317_1_) ->
+		this.addRenderableWidget(new Button(j, this.height - 28, 150, 20, CommonComponents.GUI_CANCEL, (p_214317_1_) ->
 		{
 			this.popScreen();
 		}));
-		 ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).setDisplayOptions(true);
+		((OTGWorldOptionsScreen)this.worldGenSettingsComponent).setVisibility(true);
 	}	
 
 	@Override
@@ -90,11 +91,13 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 	}
 
+	/*
 	@Override
 	public void updateDisplayOptions()
 	{
 		 ((OTGWorldOptionsScreen)this.worldGenSettingsComponent).setDisplayOptions(true);
 	}
+	*/
 	
 	@Override
 	public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_)
@@ -129,22 +132,15 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 	{
 		this.renderBackground(p_230430_1_);
 		drawCenteredString(p_230430_1_, this.font, this.title, this.width / 2, 20, -1);
-
-		for(int i = 0; i < this.buttons.size(); ++i)
-		{
-			this.buttons.get(i).render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
-		}
 	}
 
-	@Override
-	protected <T extends GuiEventListener> T addWidget(T p_230481_1_)
+	protected <T extends GuiEventListener & NarratableEntry> T addWidget(T p_100948_)
 	{
-		return super.addWidget(p_230481_1_);
+		return super.addWidget(p_100948_);
 	}
-
-	@Override
-	protected <T extends AbstractWidget> T addButton(T p_230480_1_)
+	
+	protected <T extends GuiEventListener & Widget & NarratableEntry> T addRenderableWidget(T p_170199_)
 	{
-		return super.addButton(p_230480_1_);
+		return super.addRenderableWidget(p_170199_);
 	}
 }

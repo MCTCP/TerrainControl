@@ -1,8 +1,10 @@
 package com.pg85.otg.forge;
 
 import java.nio.file.Path;
-import com.pg85.otg.OTG;
+
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.client.MultipleColorHandler;
 import com.pg85.otg.forge.commands.OTGCommand;
@@ -12,8 +14,8 @@ import com.pg85.otg.forge.dimensions.portals.OTGPortalBlocks;
 import com.pg85.otg.forge.dimensions.portals.OTGCapabilities;
 import com.pg85.otg.forge.dimensions.portals.OTGPortalPois;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.gui.OTGGui;
 import com.pg85.otg.forge.network.OTGClientSyncManager;
-import com.pg85.otg.presets.Preset;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -71,20 +73,18 @@ public class OTGPlugin
 		OTGCapabilities.register();
 	}
 
-
-
 	// OTG World Type SP: We use our own world type registration logic so we can add a "customise"
 	// button to the world creation gui that shows OTG preset selection and customisation screens.
 	private void clientSetup(final FMLClientSetupEvent event)
 	{
 		// Register the OTG world type and any OTG GUI's for the world creation screen.
-		//OTGGui.init(); // Removed for 1.17 update, needs reimplementing
+		OTGGui.init();
 	}
 
 	// OTG World Type MP: Register the OTG world type. 
 	// For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
-	//@OnlyIn(Dist.DEDICATED_SERVER)
+	@OnlyIn(Dist.DEDICATED_SERVER)
 	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)
 	{
 		ForgeRegistries.WORLD_TYPES.register(new OTGWorldType());
