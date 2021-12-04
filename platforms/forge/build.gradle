@@ -19,6 +19,16 @@ apply plugin: "org.spongepowered.mixin"
 apply plugin: "eclipse"
 
 repositories {
+
+	// Add common jar output dirs as repo's for the development environment
+    flatDir {
+		dir '../../common/common-util/build/libs'
+		dir '../../common/common-config/build/libs'
+		dir '../../common/common-generator/build/libs'		
+		dir '../../common/common-customobject/build/libs'		
+		dir '../../common/common-core/build/libs'
+    }
+
 	maven {
 		name = "sk89q maven"
 		url = "https://maven.sk89q.com/artifactory/repo"
@@ -99,17 +109,40 @@ minecraft.runs.all {
     }
 }
 
+
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.17.1-37.1.0'
 
     annotationProcessor("org.spongepowered:mixin:0.8.4:processor")
 
-    implementation(project(":common:common-core"))
+    // Add common projects for compile-time (not picked up by the development 
+    // environment by Forge, presumably because they're non-mod jars)
 
-    // Add WorldEdit and WorldEditCore as dependencies
+    implementation project(':common:common-core')
+
+    // Add any mod dependencies (these are picked up by the development environment)
+
     implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
-    // WorldEditCore is not a mod, add it as a library
+
+    // Add common projects and non-mod dependencies as libraries, so they're picked up
+    // by the development environment
+
     library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
+
+    library 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
+    library 'com.fasterxml.jackson.core:jackson-core:2.9.7'
+    library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
+    library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    library 'org.yaml:snakeyaml:1.23'
+
+    // TODO: Uncomment these to be able to run in the dev environment
+    // Unfortunately this doesn't build common before forge tho ><
+    //library 'com.pg85.otg:common-util:1.17.1-0.0.22'
+    //library 'com.pg85.otg:common-config:1.17.1-0.0.22'
+    //library 'com.pg85.otg:common-customobject:1.17.1-0.0.22'
+    //library 'com.pg85.otg:common-generator:1.17.1-0.0.22'
+    //library 'com.pg85.otg:common-core:1.17.1-0.0.22'
 }
 
 tasks {

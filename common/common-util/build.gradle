@@ -1,1 +1,2 @@
 description = "Core files of OpenTerrainGenerator"
+archivesBaseName = 'common-util'
