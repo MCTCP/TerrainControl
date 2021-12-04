@@ -42,6 +42,8 @@ public class ClientFogHandler
 	@SubscribeEvent
 	public static void onRenderFog(EntityViewRenderEvent.RenderFogEvent event)
 	{
+		if(1 == 1) { return; } // TODO: This causes a crash on world join for 1.17, reimplement
+		
 		Entity entity = event.getInfo().getEntity();
 		Options settings = Minecraft.getInstance().options;
 
