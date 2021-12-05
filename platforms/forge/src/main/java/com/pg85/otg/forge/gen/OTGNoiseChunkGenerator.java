@@ -585,7 +585,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public boolean hasStronghold(ChunkPos chunkPos)
 	{
-		// super.hasStronghold generates stronghold start points (default settingds appear 
+		// super.hasStronghold generates stronghold start points (default settings appear 
 		// determined per dim type), so check worldconfig and biomeconfig toggles.
 		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkPos.x << 2) + 2, (chunkPos.z << 2) + 2);
 		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
@@ -677,37 +677,25 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
 				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
-					{
-						((ForgeBiome)biome1).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-						alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());						
-					}					
+					((ForgeBiome)biome1).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());										
 				}
 				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
 				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
-					{
-						((ForgeBiome)biome2).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-						alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
-					}					
+					((ForgeBiome)biome2).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());					
 				}
 				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
 				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
-					{
-						((ForgeBiome)biome3).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-						alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
-					}					
+					((ForgeBiome)biome3).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());					
 				}
 				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
 				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
-					{
-						((ForgeBiome)biome4).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-					}
+					((ForgeBiome)biome4).getBiomeBase().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 				}
 			}
 			// Template biomes handle their own snow, OTG biomes use OTG snow.
