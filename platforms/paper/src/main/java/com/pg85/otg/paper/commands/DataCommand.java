@@ -15,7 +15,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

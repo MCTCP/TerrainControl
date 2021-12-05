@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.interfaces.IBiome;

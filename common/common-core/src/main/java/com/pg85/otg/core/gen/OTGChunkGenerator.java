@@ -32,6 +32,7 @@ import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+import com.pg85.otg.util.materials.LocalMaterialData;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;

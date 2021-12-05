@@ -6,8 +6,9 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.creator.ObjectCreator;
@@ -19,7 +20,6 @@ import com.pg85.otg.paper.gen.MCWorldGenRegion;
 import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.util.PaperNBTHelper;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterials;

@@ -220,12 +220,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 				if(refresh)
 				{
 					biome = biomeRegistry.get(resourceLocation);
-					Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+					Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
 					registryKey = key.isPresent() ? key.get() : null;
 				} else {
 					biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 					// TODO: Can we not fetch an existing key?
-					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+					registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 				}
 			} else {
 				if(!(biomeConfig.getKey() instanceof OTGBiomeResourceLocation))
@@ -241,7 +241,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					// For developer-mode, always re-create OTG biomes, to pick up any config changes.
 					// This does break any kind of datapack support we might implement for OTG biomes.
 					biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
-					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
+					registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
 					if(refresh)
 					{
 						biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
@@ -252,11 +252,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 					if(refresh)
 					{
 						biome = biomeRegistry.get(resourceLocation);
-						Optional<RegistryKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+						Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
 						registryKey = key.isPresent() ? key.get() : null;
 					} else {
 						biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
-						registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+						registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 						ForgeRegistries.BIOMES.register(biome);
 					}
 				}
@@ -731,7 +731,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 								{
 									if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.BIOME_REGISTRY))
 									{
-										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biomeForTag.location().toString() + " found for " + templateBiome.toString() + " with temperature: " + biome.getBaseTemperature() + " Category: " + biome.getBiomeCategory() + " Tags: " + String.join(",", BiomeDictionary.getTypes(RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName())).stream().map(a -> a.getName()).collect(Collectors.toList())));
+										OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.BIOME_REGISTRY, "Biome " + biomeForTag.location().toString() + " found for " + templateBiome.toString() + " with temperature: " + biome.getBaseTemperature() + " Category: " + biome.getBiomeCategory() + " Tags: " + String.join(",", BiomeDictionary.getTypes(ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName())).stream().map(a -> a.getName()).collect(Collectors.toList())));
 									}										
 									biomeConfigsByResourceLocation.put(otgLocation, biomeConfig.createTemplateBiome());
 									biomeConfigsByName.put(biomeConfig.getName(), biomeConfig);

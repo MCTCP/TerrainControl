@@ -4,8 +4,6 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.TextComponent;
@@ -17,8 +15,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.*;
 
 import com.google.gson.JsonSyntaxException;
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
@@ -41,7 +39,6 @@ import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.worldgen.Features;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -117,7 +114,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			return ChunkCoordinate.fromBlockCoords(this.getWorldConfig().getSpawnPointX(), this.getWorldConfig().getSpawnPointZ());
 		} else {
-			BlockPosition spawnPos = this.worldGenRegion.getMinecraftWorld().getSpawn();
+			BlockPos spawnPos = this.worldGenRegion.getMinecraftWorld().getSharedSpawnPos();
 			return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
 		}
 	}

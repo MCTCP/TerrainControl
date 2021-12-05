@@ -1337,9 +1337,9 @@ class ForgeLegacyMaterials
 					switch(data)
 					{
 						case 0:
-							return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, 1);
+							return Blocks.SNOW.defaultBlockState().setValue(SnowLayerBlock.LAYERS, 1);
 						default:
-							return Blocks.SNOW.defaultBlockState().setValue(SnowBlock.LAYERS, data);						
+							return Blocks.SNOW.defaultBlockState().setValue(SnowLayerBlock.LAYERS, data);						
 					}
 				default:
 					return null;

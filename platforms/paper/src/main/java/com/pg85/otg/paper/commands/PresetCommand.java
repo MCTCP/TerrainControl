@@ -1,8 +1,8 @@
 package com.pg85.otg.paper.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.presets.Preset;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

@@ -10,12 +10,8 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import com.pg85.otg.paper.util.ObfuscationHelper;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -23,7 +19,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.gen.OTGChunkGenerator;
+import com.pg85.otg.core.gen.OTGChunkGenerator;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.paper.biome.PaperBiome;
@@ -40,14 +36,13 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.feature.PillagerOutpostFeature;
-import net.minecraft.world.level.levelgen.feature.VillageFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
 /**
  * Shadow chunk generation means generating base terrain for chunks
@@ -223,31 +218,31 @@ public class ShadowChunkGenerator
 			}
 			
 			@SuppressWarnings("unchecked")
-			ArrayList<StructureGenerator<?>>[] structuresPerDistance = new ArrayList[radiusInChunks];
-			structuresPerDistance[4] = new ArrayList<StructureGenerator<?>>(Arrays.asList(
-				new StructureGenerator<?>[] {
-					StructureGenerator.VILLAGE,
-					StructureGenerator.ENDCITY,
-					StructureGenerator.BASTION_REMNANT,
-					StructureGenerator.MONUMENT,
-					StructureGenerator.MANSION
+			ArrayList<StructureFeature<?>>[] structuresPerDistance = new ArrayList[radiusInChunks];
+			structuresPerDistance[4] = new ArrayList<StructureFeature<?>>(Arrays.asList(
+				new StructureFeature<?>[] {
+					StructureFeature.VILLAGE,
+					StructureFeature.END_CITY,
+					StructureFeature.BASTION_REMNANT,
+					StructureFeature.OCEAN_MONUMENT,
+					StructureFeature.WOODLAND_MANSION
 				}
 			));
-			structuresPerDistance[3] = new ArrayList<StructureGenerator<?>>(Arrays.asList(new StructureGenerator<?>[]{}));
-			structuresPerDistance[2] = new ArrayList<StructureGenerator<?>>(Arrays.asList(new StructureGenerator<?>[]{}));
-			structuresPerDistance[1] = new ArrayList<StructureGenerator<?>>(Arrays.asList(
-				new StructureGenerator<?>[] {
-					StructureGenerator.JUNGLE_PYRAMID,
-					StructureGenerator.DESERT_PYRAMID,
-					StructureGenerator.RUINED_PORTAL,
-					StructureGenerator.SWAMP_HUT,
-					StructureGenerator.IGLOO,
-					StructureGenerator.SHIPWRECK,
-					StructureGenerator.PILLAGER_OUTPOST,
-					StructureGenerator.OCEAN_RUIN
+			structuresPerDistance[3] = new ArrayList<StructureFeature<?>>(Arrays.asList(new StructureFeature<?>[]{}));
+			structuresPerDistance[2] = new ArrayList<StructureFeature<?>>(Arrays.asList(new StructureFeature<?>[]{}));
+			structuresPerDistance[1] = new ArrayList<StructureFeature<?>>(Arrays.asList(
+				new StructureFeature<?>[] {
+					StructureFeature.JUNGLE_TEMPLE,
+					StructureFeature.DESERT_PYRAMID,
+					StructureFeature.RUINED_PORTAL,
+					StructureFeature.SWAMP_HUT,
+					StructureFeature.IGLOO,
+					StructureFeature.SHIPWRECK,
+					StructureFeature.PILLAGER_OUTPOST,
+					StructureFeature.OCEAN_RUIN
 				}
 			));
-			structuresPerDistance[0] = new ArrayList<StructureGenerator<?>>(Arrays.asList(new StructureGenerator<?>[]{}));
+			structuresPerDistance[0] = new ArrayList<StructureFeature<?>>(Arrays.asList(new StructureFeature<?>[]{}));
 		
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
@@ -262,15 +257,15 @@ public class ShadowChunkGenerator
 				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
 				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((PaperBiome)biome).getBiome().getGenerationSettings().structures())
 				{
-					StructureFeature<?, ?> structure = supplier.get();
-					if(structure.d.f() == Decoration.SURFACE_STRUCTURES)
+					ConfiguredStructureFeature<?, ?> structure = supplier.get();
+					if(structure.feature.step() == Decoration.SURFACE_STRUCTURES)
 					{
 						for(int i = structuresPerDistance.length - 1; i > 0; i--)
 						{
-							ArrayList<StructureGenerator<?>> structuresAtDistance = structuresPerDistance[i];
-							if(structuresAtDistance.contains(structure.d))
+							ArrayList<StructureFeature<?>> structuresAtDistance = structuresPerDistance[i];
+							if(structuresAtDistance.contains(structure.feature))
 							{
-								if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((SpigotBiome)biome).getBiomeBase()))
+								if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
 								{
 									chunksHandled.put(chunkToHandle, new Integer(i));
 									if(i >= distance)
@@ -327,7 +322,7 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	private static boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, long seed, ChunkPos chunkPos)
+	private boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, long seed, ChunkPos chunkPos)
 	{
 		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)

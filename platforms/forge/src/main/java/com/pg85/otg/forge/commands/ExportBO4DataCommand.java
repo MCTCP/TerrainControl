@@ -4,10 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.config.biome.BiomeConfig;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo4.BO4;
 import com.pg85.otg.customobject.bo4.BO4Data;
@@ -20,15 +21,14 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IStructuredCustomObject;
 import com.pg85.otg.interfaces.IWorldGenRegion;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class ExportBO4DataCommand extends BaseCommand
 {
@@ -46,30 +46,30 @@ public class ExportBO4DataCommand extends BaseCommand
 	}
 	
 	@Override
-	public void build(LiteralArgumentBuilder<CommandSource> builder)
+	public void build(LiteralArgumentBuilder<CommandSourceStack> builder)
 	{
 		builder.then(Commands.literal("exportbo4data")
 			.executes(context -> exportBO4Data(context.getSource()))
 		);
 	}
 	
-	private int exportBO4Data(CommandSource source)
+	private int exportBO4Data(CommandSourceStack source)
 	{		
 		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
+			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 
 		Preset preset = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getPreset();
         if(preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4)
-        {	        
+        {
         	if(!isRunning)
         	{
         		isDone = false;
         		isRunning = true;        		
-            	source.sendSuccess(new StringTextComponent("Exporting .BO4Data files for world, this may take a while."), false);
-            	source.sendSuccess(new StringTextComponent("Run this command again to see progress or check the logs."), false);
+            	source.sendSuccess(new TextComponent("Exporting .BO4Data files for world, this may take a while."), false);
+            	source.sendSuccess(new TextComponent("Run this command again to see progress or check the logs."), false);
         		new Thread(() -> {        		
 		            OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Initializing and exporting structure starts");
 			                    
@@ -95,7 +95,7 @@ public class ExportBO4DataCommand extends BaseCommand
 				        	                	// Get minimum size (size if spawned with branchDepth 0)
 				        	                	try {
 				        	                		// World save folder name may not be identical to level name, fetch it.
-				        	                		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+				        	                		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 				        	                		IWorldGenRegion worldGenRegion = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), source.getLevel(), (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator());
 				        	                		structureStart.getMinimumSize(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder), worldGenRegion, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 				        						}
@@ -139,13 +139,13 @@ public class ExportBO4DataCommand extends BaseCommand
         		{
 					isRunning = false;
 					isDone = false;        			
-        			source.sendSuccess(new StringTextComponent("OTG exportbo4data is done."), false);
+        			source.sendSuccess(new TextComponent("OTG exportbo4data is done."), false);
         		} else {
-        			source.sendSuccess(new StringTextComponent("OTG exportbo4data is running, " + (current == 0 ? "exporting structure start " + boName : " exporting " + current + "/" + total)), false);	
+        			source.sendSuccess(new TextComponent("OTG exportbo4data is running, " + (current == 0 ? "exporting structure start " + boName : " exporting " + current + "/" + total)), false);	
         		}
         	}
         } else {
-        	source.sendSuccess(new StringTextComponent("The ExportBO4Data command is only available for CustomStructureType:BO4 worlds."), false);
+        	source.sendSuccess(new TextComponent("The ExportBO4Data command is only available for CustomStructureType:BO4 worlds."), false);
         }
 		return 0;
 	}

@@ -17,7 +17,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bo2.BO2;
 import com.pg85.otg.customobject.bo3.BO3;
@@ -42,7 +43,6 @@ import com.pg85.otg.paper.commands.arguments.PresetArgument;
 import com.pg85.otg.paper.gen.PaperWorldGenRegion;
 import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.util.PaperNBTHelper;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -60,7 +60,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
 
 public class EditCommand extends BaseCommand
 {

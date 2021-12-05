@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 
@@ -22,20 +21,19 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.gen.OTGChunkDecorator;
+import com.pg85.otg.core.gen.OTGChunkGenerator;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
-import com.pg85.otg.gen.OTGChunkDecorator;
-import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.paper.biome.PaperBiome;
-import com.pg85.otg.paper.materials.PaperMaterialData;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
@@ -65,16 +63,12 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-import net.minecraft.world.level.levelgen.synth.PerlinNoise;
-import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
-import net.minecraft.world.level.levelgen.synth.SurfaceNoise;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
 {	
@@ -109,7 +103,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final ShadowChunkGenerator shadowChunkGenerator;
 	public final OTGChunkGenerator internalGenerator;
 	private final OTGChunkDecorator chunkDecorator;
-	private final SurfaceNoise surfaceNoise;
 	private final String presetFolderName;
 	private final Preset preset;
 	private final StructureSettings structSettings;
@@ -154,7 +147,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.defaultFluid = dimensionsettings.getDefaultFluid();
 
 		this.random = new WorldgenRandom(seed);
-		this.surfaceNoise = noisesettings.useSimplexSurfaceNoise() ? new PerlinSimplexNoise(this.random, IntStream.rangeClosed(-3, 0)) : new PerlinNoise(this.random, IntStream.rangeClosed(-3, 0));
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		this.shadowChunkGenerator = new ShadowChunkGenerator();

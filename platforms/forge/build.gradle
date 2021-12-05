@@ -119,7 +119,11 @@ dependencies {
     // Add common projects for compile-time (not picked up by the development 
     // environment by Forge, presumably because they're non-mod jars)
 
-    implementation project(':common:common-core')
+    implementation project(':common:common-util')
+    implementation project(':common:common-config')
+    implementation project(':common:common-customobject')
+    implementation project(':common:common-generator')
+    implementation project(':common:common-core')	
 
     // Add any mod dependencies (these are picked up by the development environment)
 

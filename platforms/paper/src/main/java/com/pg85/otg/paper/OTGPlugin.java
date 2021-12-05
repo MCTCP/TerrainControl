@@ -6,12 +6,9 @@ import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.pg85.otg.paper.util.ObfuscationHelper;
-import io.papermc.paper.brigadier.PaperBrigadier;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
@@ -21,15 +18,15 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.paper.biome.OTGBiomeProvider;
 import com.pg85.otg.paper.commands.OTGCommandExecutor;
 import com.pg85.otg.paper.events.OTGHandler;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.paper.gen.OTGPaperChunkGen;
 import com.pg85.otg.paper.networking.NetworkingListener;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 

@@ -1,8 +1,8 @@
 package com.pg85.otg.paper.gen;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.paper.PaperEngine;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 

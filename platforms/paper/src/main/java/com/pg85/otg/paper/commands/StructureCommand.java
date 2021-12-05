@@ -3,7 +3,7 @@ package com.pg85.otg.paper.commands;
 import java.nio.file.Path;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo4.BO4;

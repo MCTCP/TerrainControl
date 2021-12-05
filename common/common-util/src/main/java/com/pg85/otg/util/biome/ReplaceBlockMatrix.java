@@ -275,18 +275,6 @@ public class ReplaceBlockMatrix
 		}
 		return false;
 	}
-  
-	public boolean replacesBlock(LocalMaterialData targetBlock)
-	{				
-		for(ReplacedBlocksInstruction instruction : this.instructions)
-		{
-			if(instruction.from.matches(targetBlock))
-			{
-				return true;
-			}
-		}
-		return false;
-	}	
 	
 	public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
 	{

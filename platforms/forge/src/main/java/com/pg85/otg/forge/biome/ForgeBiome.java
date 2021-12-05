@@ -215,18 +215,18 @@ public class ForgeBiome implements IBiome
 			}
 			category = isOceanBiome ? Biome.BiomeCategory.OCEAN : Biome.BiomeCategory.NONE;
 		}
-		Biome.RainType rainType = 
-			biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.RainType.NONE : 
-			biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.RainType.RAIN : 
-			Biome.RainType.SNOW
+		Biome.Precipitation rainType = 
+			biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE : 
+			biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN : 
+			Biome.Precipitation.SNOW
 		;
 
 		// Fire Forge BiomeLoadingEvent to allow other mods to enrich otg biomes with decoration features, structure features and mob spawns.
 		BiomeGenerationSettingsBuilder genBuilder = new BiomeGenerationSettingsBuilder(biomeGenerationSettingsBuilder.build());
 		MobSpawnInfoBuilder spawnBuilder = new MobSpawnInfoBuilder(mobSpawnInfoBuilder.build());
-		BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.Climate(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeConfig.getBiomeHeight(), biomeConfig.getBiomeVolatility(), biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
+		BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.ClimateSettings(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeConfig.getBiomeHeight(), biomeConfig.getBiomeVolatility(), biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
 		MinecraftForge.EVENT_BUS.post(event1);
-		BiomeAmbience biomeAmbienceBuilder2 = event1.getEffects();
+		BiomeSpecialEffects biomeAmbienceBuilder2 = event1.getEffects();
 		BiomeGenerationSettingsBuilder biomeGenerationSettingsBuilder2 = event1.getGeneration();
 		MobSpawnInfoBuilder mobSpawnInfoBuilder2 = event1.getSpawns();
 		//

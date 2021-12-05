@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 

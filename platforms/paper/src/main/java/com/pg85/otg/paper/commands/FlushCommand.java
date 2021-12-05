@@ -1,7 +1,7 @@
 package com.pg85.otg.paper.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.pg85.otg.OTG;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;

@@ -468,7 +468,6 @@ public class OTGPortalBlock extends NetherPortalBlock
 			}
 		}
 		
-		@SuppressWarnings("deprecation")
 		protected boolean isEmptyBlock(BlockState pos)
 		{
 			Block block = pos.getBlock();

@@ -14,6 +14,7 @@ import com.mojang.serialization.JsonOps;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.dimensions.OTGDimensionTypeHelper;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;

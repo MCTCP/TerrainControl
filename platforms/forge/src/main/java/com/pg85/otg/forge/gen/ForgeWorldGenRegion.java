@@ -27,9 +27,19 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.minecraft.TreeType;
 
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
@@ -37,21 +47,11 @@ import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.monster.Guardian;
+import net.minecraft.core.BlockPos;
+import net.minecraft.data.worldgen.Features;
 import net.minecraft.nbt.*;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.HugeFungusConfig;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.WorldGenRegion;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
 public class ForgeWorldGenRegion extends LocalWorldGenRegion

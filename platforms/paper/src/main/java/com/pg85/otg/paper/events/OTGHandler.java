@@ -16,8 +16,8 @@ import org.bukkit.event.world.SpawnChangeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.paper.OTGPlugin;

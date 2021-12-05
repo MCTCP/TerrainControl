@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.dimensions.DimensionConfig.OTGDimension;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.config.dimensions.DimensionConfig;
+import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGDimension;
 import com.pg85.otg.forge.gui.OTGGui;
 
 import net.minecraft.network.chat.CommonComponents;

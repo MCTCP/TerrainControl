@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PaperMaterialData extends LocalMaterialData
 {
-	static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
-	private static final ConcurrentHashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new ConcurrentHashMap<>(); // TODO: Move to SpigotMaterialReader?
+	static final LocalMaterialData blank = new PaperMaterialData(null, null, true);
+	private static final ConcurrentHashMap<BlockState, LocalMaterialData> stateToMaterialDataMap = new ConcurrentHashMap<>(); // TODO: Move to SpigotMaterialReader?
 
 	private final BlockState blockData;
 	private String name = null;
@@ -58,7 +58,7 @@ public class PaperMaterialData extends LocalMaterialData
 		{
 			return existingData;
 		}
-		LocalMaterialData newData = new SpigotMaterialData(blockData, raw);
+		LocalMaterialData newData = new PaperMaterialData(blockData, raw);
 		existingData = stateToMaterialDataMap.putIfAbsent(blockData, newData);
 		if(existingData != null)
 		{

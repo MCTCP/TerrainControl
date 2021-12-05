@@ -1,6 +1,6 @@
 package com.pg85.otg.paper;
 
-import com.pg85.otg.OTGEngine;
+import com.pg85.otg.core.OTGEngine;
 import com.pg85.otg.paper.materials.PaperMaterials;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
 import com.pg85.otg.paper.util.PaperLogger;

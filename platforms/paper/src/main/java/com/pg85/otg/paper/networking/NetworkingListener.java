@@ -9,12 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.paper.OTGPlugin;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 

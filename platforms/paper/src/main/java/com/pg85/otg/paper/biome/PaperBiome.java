@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.config.biome.BiomeConfig;
 import com.pg85.otg.gen.resource.GlowLichenResource;
 import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;

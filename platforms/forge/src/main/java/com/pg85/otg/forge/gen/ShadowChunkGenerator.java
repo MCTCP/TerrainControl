@@ -29,7 +29,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -37,9 +37,11 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.StructureFeatureManager;
-import net.minecraft.world.level.levelgen.feature.VillageFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.server.level.ServerLevel;
@@ -62,7 +64,7 @@ public class ShadowChunkGenerator
 {
 	// TODO: Add a setting to the worldconfig for the size of these caches?
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
-	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(512);
+	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkAccess>(512);
 	private final FifoMap<ChunkCoordinate, Integer> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
 	private final FifoMap<ChunkCoordinate, Integer> hasVanillaNoiseStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
 
@@ -287,7 +289,7 @@ public class ShadowChunkGenerator
 	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
 
-	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, DimensionStructuresSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider, boolean noiseAffectingStructuresOnly)
+	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider, boolean noiseAffectingStructuresOnly)
 	{
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
@@ -358,12 +360,12 @@ public class ShadowChunkGenerator
 				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
 				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((ForgeBiome)biome).getBiomeBase().getGenerationSettings().structures())
 				{
-					StructureFeature<?, ?> structure = supplier.get();
+					ConfiguredStructureFeature<?, ?> structure = supplier.get();
 					if(
 						structure.feature.step() == Decoration.SURFACE_STRUCTURES &&
 						(
 							!noiseAffectingStructuresOnly ||
-							Structure.NOISE_AFFECTING_FEATURES.contains(structure.feature)
+							StructureFeature.NOISE_AFFECTING_FEATURES.contains(structure.feature)
 						)
 					)
 					{
@@ -373,7 +375,7 @@ public class ShadowChunkGenerator
 						{
 							// For modded structures, use a default radius
 							int moddedStructuresDefaultRadius = 1;
-							if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
+							if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos))
 							{
 								chunksHandled.put(chunkToHandle, new Integer(moddedStructuresDefaultRadius));
 								if(moddedStructuresDefaultRadius >= distance)
@@ -399,7 +401,7 @@ public class ShadowChunkGenerator
 								ArrayList<String> structuresAtDistance = structuresPerDistance[i];
 								if(structuresAtDistance.contains(structureRegistryName))
 								{
-									if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos, ((ForgeBiome)biome).getBiomeBase()))
+									if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), chunkGenerator, biomeProvider, serverWorld.getSeed(), chunkpos))
 									{
 										chunksHandled.put(chunkToHandle, new Integer(i));
 										if(i >= distance)
@@ -473,7 +475,7 @@ public class ShadowChunkGenerator
 	}
 
 	// Taken from PillagerOutpostStructure.isNearVillage
-	private boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, RegistryAccess dynamicRegistries, StructureFeatureManager structureManager, ChunkAccess chunk, StructureManager templateManager, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, long seed, ChunkPos chunkPos, Biome biome)
+	private boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, RegistryAccess dynamicRegistries, StructureFeatureManager structureManager, ChunkAccess chunk, StructureManager templateManager, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, long seed, ChunkPos chunkPos)
 	{
 		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
