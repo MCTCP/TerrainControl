@@ -288,7 +288,8 @@ public class OTGDimensionTypeHelper
 		{
 			folder.mkdirs();
 		}
-		data = "{ \"ultrawarm\": " + worldConfig.getUltraWarm() + ", \"natural\": " + worldConfig.getNatural() + ", \"piglin_safe\": " + worldConfig.getPiglinSafe() + ", \"respawn_anchor_works\": " + worldConfig.getRespawnAnchorWorks() + ", \"bed_works\": " + worldConfig.getBedWorks() + ", \"has_raids\": " + worldConfig.getHasRaids() + ", \"has_skylight\": " + worldConfig.getHasSkyLight() + ", \"has_ceiling\": " + worldConfig.getHasCeiling() + ", \"coordinate_scale\": " + worldConfig.getCoordinateScale() + ", \"ambient_light\": " + worldConfig.getAmbientLight() + ", \"logical_height\": " + worldConfig.getLogicalHeight() + ", \"effects\": \"" + worldConfig.getEffectsLocation() + "\", \"infiniburn\": \"" + worldConfig.getInfiniburn() + "\" }";
+		// TODO: Make height/min_y configurable? Add name?
+		data = "{ \"name\": \"\", \"height\":256, \"min_y\": 0, \"ultrawarm\": " + worldConfig.getUltraWarm() + ", \"infiniburn\": \"" + worldConfig.getInfiniburn() + "\", \"logical_height\": " + worldConfig.getLogicalHeight() + ", \"has_raids\": " + worldConfig.getHasRaids() + ", \"respawn_anchor_works\": " + worldConfig.getRespawnAnchorWorks() + ", \"bed_works\": " + worldConfig.getBedWorks() + ", \"piglin_safe\": " + worldConfig.getPiglinSafe() + ", \"natural\": " + worldConfig.getNatural() + ", \"coordinate_scale\": " + worldConfig.getCoordinateScale() + ", \"ambient_light\": " + worldConfig.getAmbientLight() + ", \"has_skylight\": " + worldConfig.getHasSkyLight() + ", \"has_ceiling\": " + worldConfig.getHasCeiling() + ", \"effects\": \"" + worldConfig.getEffectsLocation() + "\"" + (worldConfig.getFixedTime().isPresent() ? ", \"fixed_time\": " + worldConfig.getFixedTime().getAsLong() : "") + " }";
         try(    		        	
     		FileOutputStream fos = new FileOutputStream(file);
     		BufferedOutputStream bos = new BufferedOutputStream(fos)
