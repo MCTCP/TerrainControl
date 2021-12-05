@@ -2,10 +2,12 @@ package com.pg85.otg.paper.gen;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -19,6 +21,8 @@ import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.constants.Constants;
@@ -32,6 +36,7 @@ import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
+import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.paper.biome.PaperBiome;
 import com.pg85.otg.paper.presets.PaperPresetLoader;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -65,6 +70,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.StrongholdConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -129,7 +135,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	private OTGNoiseChunkGenerator (String presetFolderName, BiomeSource biomeProvider1, BiomeSource biomeProvider2, long seed, Supplier<NoiseGeneratorSettings> generatorSettings)
 	{
-		super(biomeProvider1, biomeProvider2, generatorSettings.get().structureSettings(), seed);
+		super(biomeProvider1, biomeProvider2, overrideStructureSettings(generatorSettings.get().structureSettings(), presetFolderName), seed);
 		structSettings = generatorSettings.get().structureSettings();
 		if (!(biomeProvider1 instanceof ILayerSource))
 		{
@@ -154,6 +160,59 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
 
+	private static StructureSettings overrideStructureSettings(StructureSettings oldSettings, String presetFolderName)
+	{
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
+		IWorldConfig worldConfig = preset.getWorldConfig();		
+		StructureSettings newSettings = new StructureSettings(
+			Optional.of(new StrongholdConfiguration(worldConfig.getStrongHoldDistance(), worldConfig.getStrongHoldSpread(), worldConfig.getStrongHoldCount())),
+			Maps.newHashMap(
+				ImmutableMap.<StructureFeature<?>, StructureFeatureConfiguration>builder()
+				.put(StructureFeature.VILLAGE, new StructureFeatureConfiguration(worldConfig.getVillageSpacing(), worldConfig.getVillageSeparation(), 10387312))
+				.put(StructureFeature.DESERT_PYRAMID, new StructureFeatureConfiguration(worldConfig.getDesertPyramidSpacing(), worldConfig.getDesertPyramidSeparation(), 14357617))
+				.put(StructureFeature.IGLOO, new StructureFeatureConfiguration(worldConfig.getIglooSpacing(), worldConfig.getIglooSeparation(), 14357618))
+				.put(StructureFeature.JUNGLE_TEMPLE, new StructureFeatureConfiguration(worldConfig.getJungleTempleSpacing(), worldConfig.getJungleTempleSeparation(), 14357619))
+				.put(StructureFeature.SWAMP_HUT, new StructureFeatureConfiguration(worldConfig.getSwampHutSpacing(), worldConfig.getSwampHutSeparation(), 14357620))
+				.put(StructureFeature.PILLAGER_OUTPOST, new StructureFeatureConfiguration(worldConfig.getPillagerOutpostSpacing(), worldConfig.getPillagerOutpostSeparation(), 165745296))
+				.put(StructureFeature.STRONGHOLD, new StructureFeatureConfiguration(worldConfig.getStrongholdSpacing(), worldConfig.getStrongholdSeparation(), 0))
+				.put(StructureFeature.OCEAN_MONUMENT, new StructureFeatureConfiguration(worldConfig.getOceanMonumentSpacing(), worldConfig.getOceanMonumentSeparation(), 10387313))
+				.put(StructureFeature.END_CITY, new StructureFeatureConfiguration(worldConfig.getEndCitySpacing(), worldConfig.getEndCitySeparation(), 10387313))
+				.put(StructureFeature.WOODLAND_MANSION, new StructureFeatureConfiguration(worldConfig.getWoodlandMansionSpacing(), worldConfig.getWoodlandMansionSeparation(), 10387319))
+				.put(StructureFeature.BURIED_TREASURE, new StructureFeatureConfiguration(worldConfig.getBuriedTreasureSpacing(), worldConfig.getBuriedTreasureSeparation(), 0))
+				.put(StructureFeature.MINESHAFT, new StructureFeatureConfiguration(worldConfig.getMineshaftSpacing(), worldConfig.getMineshaftSeparation(), 0))
+				.put(StructureFeature.RUINED_PORTAL, new StructureFeatureConfiguration(worldConfig.getRuinedPortalSpacing(), worldConfig.getRuinedPortalSeparation(), 34222645))
+				.put(StructureFeature.SHIPWRECK, new StructureFeatureConfiguration(worldConfig.getShipwreckSpacing(), worldConfig.getShipwreckSeparation(), 165745295))
+				.put(StructureFeature.OCEAN_RUIN, new StructureFeatureConfiguration(worldConfig.getOceanRuinSpacing(), worldConfig.getOceanRuinSeparation(), 14357621))
+				.put(StructureFeature.BASTION_REMNANT, new StructureFeatureConfiguration(worldConfig.getBastionRemnantSpacing(), worldConfig.getBastionRemnantSeparation(), 30084232))
+				.put(StructureFeature.NETHER_BRIDGE, new StructureFeatureConfiguration(worldConfig.getNetherFortressSpacing(), worldConfig.getNetherFortressSeparation(), 30084232))
+				.put(StructureFeature.NETHER_FOSSIL, new StructureFeatureConfiguration(worldConfig.getNetherFossilSpacing(), worldConfig.getNetherFossilSeparation(), 14357921))
+				.putAll(
+					oldSettings.structureConfig().entrySet().stream().filter(a -> 
+						a.getKey() != StructureFeature.VILLAGE &&
+						a.getKey() != StructureFeature.DESERT_PYRAMID &&
+						a.getKey() != StructureFeature.IGLOO &&
+						a.getKey() != StructureFeature.JUNGLE_TEMPLE &&
+						a.getKey() != StructureFeature.SWAMP_HUT &&
+						a.getKey() != StructureFeature.PILLAGER_OUTPOST &&
+						a.getKey() != StructureFeature.STRONGHOLD &&
+						a.getKey() != StructureFeature.OCEAN_MONUMENT &&
+						a.getKey() != StructureFeature.END_CITY &&
+						a.getKey() != StructureFeature.WOODLAND_MANSION &&
+						a.getKey() != StructureFeature.BURIED_TREASURE &&
+						a.getKey() != StructureFeature.MINESHAFT &&
+						a.getKey() != StructureFeature.RUINED_PORTAL &&
+						a.getKey() != StructureFeature.SHIPWRECK &&
+						a.getKey() != StructureFeature.OCEAN_RUIN &&
+						a.getKey() != StructureFeature.BASTION_REMNANT &&
+						a.getKey() != StructureFeature.NETHER_BRIDGE &&
+						a.getKey() != StructureFeature.NETHER_FOSSIL
+					).collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+				).build()
+			)
+		);
+		return newSettings;
+	}	
+	
 	public ICachedBiomeProvider getCachedBiomeProvider()
 	{
 		return this.internalGenerator.getCachedBiomeProvider();
@@ -172,25 +231,30 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.structSettings;
 	}
 
+	// Override structure spawning to make sure any structures registered
+	// to biomes are allowed to spawn according to worldconfig settings.
 	// Code borrowed from ChunkGenerator.java
 	@Override
-	public void createStructures(RegistryAccess iregistrycustom, StructureFeatureManager structuremanager, ChunkAccess chunk, StructureManager definedstructuremanager, long i)
+	public void createStructures(RegistryAccess iregistrycustom, StructureFeatureManager structuremanager, ChunkAccess chunk, StructureManager definedstructuremanager, long seed)
 	{
-		ChunkPos chunkcoordintpair = chunk.getPos();
-		Biome biomebase = this.biomeSource.getPrimaryBiome(chunk.getPos());
-		this.createSingleStructure(StructureFeatures.STRONGHOLD, iregistrycustom, structuremanager, chunk, definedstructuremanager, i, chunkcoordintpair, biomebase);
-
-		for (Supplier<ConfiguredStructureFeature<?, ?>> supplier : biomebase.getGenerationSettings().structures())
+		ChunkPos chunkpos = chunk.getPos();
+		PaperBiome biome = (PaperBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
+		// Strongholds are hardcoded apparently, even if they aren't registered to the biome, so check worldconfig and biomeconfig toggles. 
+		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
+		{
+			createSingleStructure(StructureFeatures.STRONGHOLD, iregistrycustom, structuremanager, chunk, definedstructuremanager, seed, chunkpos, biome.getBiome());
+		}
+		for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : biome.getBiome().getGenerationSettings().structures())
 		{
 			ConfiguredStructureFeature<?, ?> structurefeature = supplier.get();
 			if (structurefeature == StructureFeatures.STRONGHOLD)
 			{
 				synchronized(structurefeature)
 				{
-					this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, chunk, definedstructuremanager, i, chunkcoordintpair, biomebase);
+					this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, chunk, definedstructuremanager, seed, chunkpos, biome.getBiome());
 				}
 			} else {
-				this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, chunk, definedstructuremanager, i, chunkcoordintpair, biomebase);
+				this.createSingleStructure(structurefeature, iregistrycustom, structuremanager, chunk, definedstructuremanager, seed, chunkpos, biome.getBiome());
 			}
 		}
 	}
@@ -207,6 +271,19 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			structuremanager.setStartForFeature(SectionPos.bottomOf(chunk), structurefeature.feature, structurestart1, chunk);
 		}
 	}
+	
+	@Override
+	public boolean hasStronghold(ChunkPos chunkPos)
+	{
+		// super.hasStronghold generates stronghold start points (default settings appear 
+		// determined per dim type), so check worldconfig and biomeconfig toggles.
+		PaperBiome biome = (PaperBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkPos.x << 2) + 2, (chunkPos.z << 2) + 2);
+		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
+		{
+			return super.hasStronghold(chunkPos);
+		}
+		return false;
+	}
 
 	// Base terrain gen
 
@@ -220,6 +297,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.shadowChunkGenerator.fillWorldGenChunkFromShadowChunk(chunkCoord, chunk, cachedChunk);
 		} else {
 			// Setup jigsaw data
+			// TODO: Why is this here, clean this up?
 //			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 //			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
 //			ChunkPos pos = new ChunkPos(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -451,23 +529,29 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		Path worldSaveFolder = worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath();
 
 		// Get most common biome in chunk and use that for decoration - Frank
-		if (!getPreset().getWorldConfig().improvedBorderDecoration()) {
+		if (!getPreset().getWorldConfig().improvedBorderDecoration())
+		{
 			List<IBiome> biomes = new ArrayList<IBiome>();
 			biomes.add(biome);
 			biomes.add(biome1);
 			biomes.add(biome2);
 			biomes.add(biome3);
 			biomes.add(biome4);
+
 			Map<IBiome, Integer> map = new HashMap<>();
-			for (IBiome b : biomes) {
+			for (IBiome b : biomes)
+			{
 				Integer val = map.get(b);
 				map.put(b, val == null ? 1 : val + 1);
 			}
 
 			Map.Entry<IBiome, Integer> max = null;
-
-			for (Map.Entry<IBiome, Integer> ent : map.entrySet()) {
-				if (max == null || ent.getValue() > max.getValue()) max = ent;
+			for (Map.Entry<IBiome, Integer> ent : map.entrySet())
+			{
+				if (max == null || ent.getValue() > max.getValue())
+				{
+					max = ent;
+				}
 			}
 
 			biome = max.getKey();
@@ -488,23 +572,28 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
 			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
 			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
-			if (getPreset().getWorldConfig().improvedBorderDecoration()) {
-				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId())) {
+			if (getPreset().getWorldConfig().improvedBorderDecoration())
+			{
+				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
 					((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
 				}
-				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId())) {
+				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
 					((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
 				}
-				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId())) {
+				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
 					((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
 				}
-				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId())) {
+				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+				{
 					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
 					((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 				}
@@ -692,12 +781,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (density > 0.0D)
 		{
 			return this.defaultBlock;
-			//return ((PaperMaterialData) config.getStoneBlockReplaced(y)).internalBlock();
 		}
 		else if (y < this.getSeaLevel())
 		{
 			return this.defaultFluid;
-			//return ((PaperMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
 		} else {
 			return Blocks.AIR.defaultBlockState();
 		}
