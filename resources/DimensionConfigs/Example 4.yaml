@@ -5,10 +5,10 @@
 # - Rename this file to Modpack.yaml, OTG will automatically replace the world creation GUI with a locked custom world creation screen.
 # For more information, see: https://openterraingen.fandom.com/wiki/Dimension_%26_Modpack_Configuration
 #
-# This config creates a vanilla "flat" overworld with OTG Nether and End using the "AlienJungle" and "Skylands" presets.
+# This config creates a vanilla "flat" overworld with OTG Nether and End using the "AlienJungle" and "Skylands" presets. 
 # It also adds 2 dimensions using the "Wildlands" and "VanillaVistas" presets.
 # Note: The NonOTGGeneratorSettings setting can be used to add a generator-settings JSON string for the "flat" overworld.
-  ---
+---
 Version: 1
 ModpackName: "My Awesome Modpack"
 Overworld:
@@ -19,18 +19,18 @@ Nether:
 End:
   PresetFolderName: "Skylands"
 Dimensions:
-  - PresetFolderName: "Wildlands"
-    Seed: 14
-    PortalColor: "beige"
-    PortalMob: "minecraft:zombified_piglin"
-    PortalIgnitionSource: "minecraft:flint_and_steel"
-    PortalBlocks: "minecraft:redstone_block"
-  - PresetFolderName: "VanillaVistas"
-    Seed: 14
-    PortalColor: "gold"
-    PortalMob: "minecraft:zombified_piglin"
-    PortalIgnitionSource: "minecraft:flint_and_steel"
-    PortalBlocks: "minecraft:diamond_block"
+- PresetFolderName: "Wildlands"
+  Seed: 14
+  PortalColor: "beige"
+  PortalMob: "minecraft:zombified_piglin"
+  PortalIgnitionSource: "minecraft:flint_and_steel"
+  PortalBlocks: "minecraft:redstone_block"
+- PresetFolderName: "VanillaVistas"
+  Seed: 14
+  PortalColor: "gold"
+  PortalMob: "minecraft:zombified_piglin"
+  PortalIgnitionSource: "minecraft:flint_and_steel"
+  PortalBlocks: "minecraft:diamond_block"  
 Settings:
   GenerateStructures: true
   BonusChest: false

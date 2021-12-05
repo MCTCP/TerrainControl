@@ -7,9 +7,9 @@
 #
 # This config creates an vanilla "flat" overworld, and adds a dimension using the "VanillaVistas" preset.
 # Note: The NonOTGGeneratorSettings setting can be used to add a generator-settings JSON string for the "flat" overworld.
-  ---
+---
 Overworld:
   NonOTGWorldType: "flat"
   NonOTGGeneratorSettings:
 Dimensions:
-  - PresetFolderName: "VanillaVistas"
+- PresetFolderName: "VanillaVistas"

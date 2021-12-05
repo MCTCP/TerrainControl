@@ -6,8 +6,8 @@
 # For more information, see: https://openterraingen.fandom.com/wiki/Dimension_%26_Modpack_Configuration
 #
 # This config creates an OTG overworld using OTG's "Default" preset, and adds a dimension using the "VanillaVistas" preset.
-  ---
+---
 Overworld:
   PresetFolderName: "Default"
 Dimensions:
-  - PresetFolderName: "VanillaVistas"
+- PresetFolderName: "VanillaVistas"

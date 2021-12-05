@@ -5,10 +5,10 @@
 # - Rename this file to Modpack.yaml, OTG will automatically replace the world creation GUI with a locked custom world creation screen.
 # For more information, see: https://openterraingen.fandom.com/wiki/Dimension_%26_Modpack_Configuration
 #
-# This config creates a Biomes O' Plenty overworld with OTG Nether and End using the "Skylands" and "SkylandsTall" presets.
+# This config creates a Biomes O' Plenty overworld with OTG Nether and End using the "Skylands" and "SkylandsTall" presets. 
 # It also add a dimension using the "VanillaVistas" preset.
 # Note: The NonOTGGeneratorSettings setting can be used to add a generator-settings JSON string for the "biomesoplenty" overworld.
-  ---
+---
 Overworld:
   NonOTGWorldType: "biomesoplenty"
   NonOTGGeneratorSettings:
@@ -17,4 +17,4 @@ Nether:
 End:
   PresetFolderName: "SkylandsTall"
 Dimensions:
-  - PresetFolderName: "VanillaVistas"
+- PresetFolderName: "VanillaVistas"
