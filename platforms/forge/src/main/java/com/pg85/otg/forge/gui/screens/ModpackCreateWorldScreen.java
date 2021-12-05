@@ -144,9 +144,19 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		{
 			protected MutableComponent createNarrationMessage()
 			{
-				return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
+				return CommonComponents.joinForNarration(super.createNarrationMessage(), new TranslatableComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
 			}
 		};
+		this.nameEdit.setValue(this.initName);
+		this.nameEdit.setResponder(
+			(p_100932_) -> {
+				this.initName = p_100932_;
+				this.createButton.active = !this.nameEdit.getValue().isEmpty();
+				this.updateResultFolder();
+			}
+		);
+		this.addWidget(this.nameEdit);
+	      
 		this.seedEdit = new EditBox(this.font, j, 60, 150, 20, new TranslatableComponent("selectWorld.enterName"))
 		{
 			protected MutableComponent createNarrationMessage()
@@ -154,20 +164,13 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				return super.createNarrationMessage().append(". ").append(new TranslatableComponent("selectWorld.resultFolder")).append(" ").append(ModpackCreateWorldScreen.this.resultFolder);
 			}
 		};		
-		this.nameEdit.setValue(this.initName);
 		this.seedEdit.setValue(this.initSeed);
-		this.nameEdit.setResponder((p_214319_1_) ->
-		{
-			this.initName = p_214319_1_;
-			this.createButton.active = !this.nameEdit.getValue().isEmpty();
-			this.updateResultFolder();
-		});
-		this.addWidget(this.nameEdit);
 		this.seedEdit.setResponder((p_214319_1_) ->
 		{
 			this.initSeed = p_214319_1_;
 		});
 		this.addWidget(this.seedEdit);
+		
 		this.addRenderableWidget(
 			new Button(i, 110, 150, 20, TextComponent.EMPTY, 
 				(p_214316_1_) ->
@@ -198,12 +201,12 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				}
 			}
 		);
-		this.difficultyButton = this.addRenderableWidget(CycleButton.builder(Difficulty::getDisplayName).withValues(Difficulty.values()).withInitialValue((this.gameMode == GameMode.HARDCORE ? Difficulty.HARD : this.difficulty)).create(j, 100, 150, 20, new TranslatableComponent("options.difficulty"), (p_170162_, p_170163_) -> {
+		this.difficultyButton = this.addRenderableWidget(CycleButton.builder(Difficulty::getDisplayName).withValues(Difficulty.values()).withInitialValue((this.gameMode == GameMode.HARDCORE ? Difficulty.HARD : this.difficulty)).create(j, 110, 150, 20, new TranslatableComponent("options.difficulty"), (p_170162_, p_170163_) -> {
 			this.difficulty = p_170163_;
 		}));
 		this.commandsButton = this.addRenderableWidget(CycleButton.onOffBuilder(this.commands && !this.hardCore).withCustomNarration((p_170160_) -> {
 			return CommonComponents.joinForNarration(p_170160_.createDefaultNarrationMessage(), new TranslatableComponent("selectWorld.allowCommands.info"));
-		}).create(i, 151, 150, 20, new TranslatableComponent("selectWorld.allowCommands"), (p_170168_, p_170169_) -> {
+		}).create(i, 161, 150, 20, new TranslatableComponent("selectWorld.allowCommands"), (p_170168_, p_170169_) -> {
 			this.commandsChanged = true;
 			this.commands = p_170169_;
 		}));		
@@ -418,6 +421,11 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		{
 			drawString(p_230430_1_, this.font, COMMANDS_INFO, this.width / 2 - 150, 182, -6250336);
 		}
+
+		for(Widget widget : this.renderables)
+		{
+			widget.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
+		}
 	}
 
 	@Override
@@ -446,110 +454,178 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 				this.popScreen();
 			}
 		}
+		
 		return this.tempDataPackDir;
 	}
-
+	
 	private void removeTempDataPackDir()
 	{
 		if (this.tempDataPackDir != null)
 		{
-			try (Stream<Path> stream = Files.walk(this.tempDataPackDir))
-			{
-				stream.sorted(Comparator.reverseOrder()).forEach(
-					(p_238948_0_) -> {
+			try {
+				Stream<Path> stream = Files.walk(this.tempDataPackDir);
+				
+				try {
+					stream.sorted(Comparator.reverseOrder()).forEach((p_170192_) -> {
 						try {
-							Files.delete(p_238948_0_);
+							Files.delete(p_170192_);
 						} catch (IOException ioexception1) {
-							LOGGER.warn("Failed to remove temporary file {}", p_238948_0_, ioexception1);
+							LOGGER.warn("Failed to remove temporary file {}", p_170192_, ioexception1);
+						}		
+					});
+				} catch (Throwable throwable1) {
+					if (stream != null)
+					{
+						try {
+							stream.close();
+						} catch (Throwable throwable) {
+							throwable1.addSuppressed(throwable);
 						}
-		
 					}
-				);
+					
+					throw throwable1;
+				}
+				
+				if (stream != null)
+				{
+					stream.close();
+				}
 			} catch (IOException ioexception) {
 				LOGGER.warn("Failed to list temporary dir {}", (Object)this.tempDataPackDir);
 			}
+			
 			this.tempDataPackDir = null;
 		}
 	}
-
-	private static void copyBetweenDirs(Path p_238945_0_, Path p_238945_1_, Path p_238945_2_)
+	
+	private static void copyBetweenDirs(Path p_100913_, Path p_100914_, Path p_100915_)
 	{
 		try {
-			Util.copyBetweenDirs(p_238945_0_, p_238945_1_, p_238945_2_);
+			Util.copyBetweenDirs(p_100913_, p_100914_, p_100915_);
 		} catch (IOException ioexception) {
-			LOGGER.warn("Failed to copy datapack file from {} to {}", p_238945_2_, p_238945_1_);
-			throw new ModpackCreateWorldScreen.DatapackException(ioexception);
+			LOGGER.warn("Failed to copy datapack file from {} to {}", p_100915_, p_100914_);
+			throw new ModpackCreateWorldScreen.OperationFailedException(ioexception);
 		}
 	}
-
+	
 	private boolean copyTempDataPackDirToNewWorld()
 	{
 		if (this.tempDataPackDir != null)
 		{
-			try (
-					LevelStorageSource.LevelStorageAccess saveformat$levelsave = this.minecraft.getLevelSource().createAccess(this.resultFolder);
+			try {
+				LevelStorageSource.LevelStorageAccess levelstoragesource$levelstorageaccess = this.minecraft.getLevelSource().createAccess(this.resultFolder);
+				
+				try {
 					Stream<Path> stream = Files.walk(this.tempDataPackDir);
-			) {
-				Path path = saveformat$levelsave.getLevelPath(LevelResource.DATAPACK_DIR);
-				Files.createDirectories(path);
-				stream.filter(
-					(p_238942_1_) -> {
-						return !p_238942_1_.equals(this.tempDataPackDir);
-					}).forEach((p_238949_2_) -> {
-						copyBetweenDirs(this.tempDataPackDir, path, p_238949_2_);
-					});
-			} catch (ModpackCreateWorldScreen.DatapackException | IOException ioexception) {
+					
+					try {
+						Path path = levelstoragesource$levelstorageaccess.getLevelPath(LevelResource.DATAPACK_DIR);
+						Files.createDirectories(path);
+						stream.filter((p_170174_) -> {
+							return !p_170174_.equals(this.tempDataPackDir);
+						}).forEach((p_170195_) -> {
+							copyBetweenDirs(this.tempDataPackDir, path, p_170195_);
+						});
+					} catch (Throwable throwable2) {
+						if (stream != null)
+						{
+							try {
+								stream.close();
+							} catch (Throwable throwable1) {
+								throwable2.addSuppressed(throwable1);
+							}
+						}		
+						throw throwable2;
+					}
+					
+					if (stream != null)
+					{
+						stream.close();
+					}
+				} catch (Throwable throwable3) {
+					if (levelstoragesource$levelstorageaccess != null)
+					{
+						try {
+							levelstoragesource$levelstorageaccess.close();
+						} catch (Throwable throwable) {
+							throwable3.addSuppressed(throwable);
+						}
+					}		
+					throw throwable3;
+				}
+				
+				if (levelstoragesource$levelstorageaccess != null)
+				{
+					levelstoragesource$levelstorageaccess.close();
+				}
+			} catch (ModpackCreateWorldScreen.OperationFailedException | IOException ioexception) {
 				LOGGER.warn("Failed to copy datapacks to world {}", this.resultFolder, ioexception);
 				SystemToast.onPackCopyFailure(this.minecraft, this.resultFolder);
 				this.popScreen();
 				return false;
 			}
-		}
-	
+		}	
 		return true;
 	}
 
 	@Nullable
-	public static Path createTempDataPackDirFromExistingWorld(Path p_238943_0_, Minecraft p_238943_1_)
+	public static Path createTempDataPackDirFromExistingWorld(Path p_100907_, Minecraft p_100908_)
 	{
 		MutableObject<Path> mutableobject = new MutableObject<>();
-
-		try (Stream<Path> stream = Files.walk(p_238943_0_))
-		{
-			stream.filter(
-				(p_238944_1_) -> {
-					return !p_238944_1_.equals(p_238943_0_);
-				}).forEach((p_238947_2_) -> {
-					Path path = mutableobject.getValue();
-					if (path == null)
-					{
-						try {
-							path = Files.createTempDirectory("mcworld-");
-						} catch (IOException ioexception1) {
-							LOGGER.warn("Failed to create temporary dir");
-							throw new ModpackCreateWorldScreen.DatapackException(ioexception1);
-						}
 		
-						mutableobject.setValue(path);
+		try {
+			Stream<Path> stream = Files.walk(p_100907_);
+			
+			try {
+				stream.filter((p_170177_) -> {
+					return !p_170177_.equals(p_100907_);
+				}).forEach((p_170186_) -> {
+				Path path = mutableobject.getValue();
+				if (path == null)
+				{
+					try {
+						path = Files.createTempDirectory("mcworld-");
+					} catch (IOException ioexception1) {
+						LOGGER.warn("Failed to create temporary dir");
+						throw new ModpackCreateWorldScreen.OperationFailedException(ioexception1);
 					}
-					copyBetweenDirs(p_238943_0_, path, p_238947_2_);
+					mutableobject.setValue(path);
+				}
+				copyBetweenDirs(p_100907_, path, p_170186_);
 				});
-		} catch (ModpackCreateWorldScreen.DatapackException | IOException ioexception) {
-			LOGGER.warn("Failed to copy datapacks from world {}", p_238943_0_, ioexception);
-			SystemToast.onPackCopyFailure(p_238943_1_, p_238943_0_.toString());
+			} catch (Throwable throwable1) {
+				if (stream != null)
+				{
+					try {
+						stream.close();
+					} catch (Throwable throwable) {
+						throwable1.addSuppressed(throwable);
+					}
+				}
+				
+				throw throwable1;
+			}
+			
+			if (stream != null)
+			{
+				stream.close();
+			}
+		} catch (ModpackCreateWorldScreen.OperationFailedException | IOException ioexception) {
+			LOGGER.warn("Failed to copy datapacks from world {}", p_100907_, ioexception);
+			SystemToast.onPackCopyFailure(p_100908_, p_100907_.toString());
 			return null;
 		}
-	
+		
 		return mutableobject.getValue();
 	}
 
 	@SuppressWarnings("serial")
 	@OnlyIn(Dist.CLIENT)
-	static class DatapackException extends RuntimeException
+	static class OperationFailedException extends RuntimeException
 	{
-		public DatapackException(Throwable p_i232309_1_)
+		public OperationFailedException(Throwable p_101023_)
 		{
-			super(p_i232309_1_);
+			super(p_101023_);
 		}
 	}
 
