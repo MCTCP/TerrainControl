@@ -44,6 +44,7 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	private final ThreadLocal<CachingLayerSampler> layer;
 	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
+	private final IWorldConfig worldConfig;
 
 	public OTGBiomeProvider (String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
@@ -60,6 +61,11 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
 		IBiome[] biomeLookup = ((PaperPresetLoader) OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
+		if(biomeLookup == null)
+		{
+			throw new RuntimeException("No OTG preset found with name \"" + presetFolderName + "\". Install the correct preset or update your server.properties.");
+		}
+
 		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
 		{
 			IBiomeConfig config = biomeLookup[biomeId].getBiomeConfig();
@@ -109,5 +115,4 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	{
 		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
-
 }
