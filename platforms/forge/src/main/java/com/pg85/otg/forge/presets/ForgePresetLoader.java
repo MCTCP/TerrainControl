@@ -238,15 +238,28 @@ public class ForgePresetLoader extends LocalPresetLoader
 				}
 				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 				{
-					// For developer-mode, always re-create OTG biomes, to pick up any config changes.
-					// This does break any kind of datapack support we might implement for OTG biomes.
-					biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
-					registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);		
-					if(refresh)
+					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);					
+					if(registryKey != null)
 					{
-						biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
-					} else {	 			
-						ForgeRegistries.BIOMES.register(biome);
+						// For OTG biomes, add Forge biome dictionary tags.
+						biomeConfig.getValue().getBiomeDictTags().forEach(biomeDictId -> {
+							if(biomeDictId != null && biomeDictId.trim().length() > 0)
+							{
+								BiomeDictionary.addTypes(registryKey, BiomeDictionary.Type.getType(biomeDictId.trim()));
+							}
+						});					
+						
+						// For developer-mode, always re-create OTG biomes, to pick up any config changes.
+						// This does break any kind of datapack support we might implement for OTG biomes.
+						biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());		
+						if(refresh)
+						{
+							biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
+						} else {	 			
+							ForgeRegistries.BIOMES.register(biome);
+						}
+					} else {
+						biome = null;
 					}
 				} else {
 					if(refresh)
@@ -254,10 +267,23 @@ public class ForgePresetLoader extends LocalPresetLoader
 						biome = biomeRegistry.get(resourceLocation);
 						Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
 						registryKey = key.isPresent() ? key.get() : null;
-					} else {
-						biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
-						registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
-						ForgeRegistries.BIOMES.register(biome);
+					} else {						
+						registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+						if(registryKey != null)
+						{
+							// For OTG biomes, add Forge biome dictionary tags.
+							biomeConfig.getValue().getBiomeDictTags().forEach(biomeDictId -> {
+								if(biomeDictId != null && biomeDictId.trim().length() > 0)
+								{
+									BiomeDictionary.addTypes(registryKey, BiomeDictionary.Type.getType(biomeDictId.trim()));
+								}
+							});
+							
+							biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig.getValue());
+							ForgeRegistries.BIOMES.register(biome);
+						} else {
+							biome = null;
+						}
 					}
 				}
 			}
@@ -292,17 +318,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 			if (biomeConfig.getValue().getName().equals(worldConfig.getDefaultFrozenOceanBiome()))
 			{
 				oceanTemperatures[3] = otgBiomeId;
-			}
-
-			if(biomeConfig.getKey() instanceof OTGBiomeResourceLocation)
-			{
-				// For OTG biomes, add Forge biome dictionary tags.
-				biomeConfig.getValue().getBiomeDictTags().forEach(biomeDictId -> {
-					if(biomeDictId != null && biomeDictId.trim().length() > 0)
-					{
-						BiomeDictionary.addTypes(registryKey, BiomeDictionary.Type.getType(biomeDictId.trim()));
-					}
-				});
 			}
 
 			IBiome otgBiome = new ForgeBiome(biome, biomeConfig.getValue());
