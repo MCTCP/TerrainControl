@@ -19,7 +19,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.exceptions.InvalidConfigException;

@@ -1,6 +1,8 @@
-package com.pg85.otg.customobject.creator;
+package com.pg85.otg.core.objectcreator;
 
 import com.pg85.otg.constants.SettingsEnums;
+import com.pg85.otg.core.OTG;
+import com.pg85.otg.core.OTGEngine;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Config;
@@ -20,6 +22,7 @@ import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.exceptions.InvalidConfigException;
 import com.pg85.otg.interfaces.ILogger;
 import com.pg85.otg.interfaces.IMaterialReader;
@@ -27,6 +30,7 @@ import com.pg85.otg.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
+import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -35,40 +39,47 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ObjectCreator
 {
 	// Method for creating either object or structure; used by Export to cut down code duplication
 	public static StructuredCustomObject create(
-		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, boolean isStructure, boolean leaveIllegalLeaves, Path objectPath,
+		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean isStructure, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BlockFunction<?>> extraBlocks, CustomObjectConfigFile template,
-		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
-		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
+		String presetFolderName,
+		Set<LocalMaterialData> filter
 	)
 	{
+		if (filter == null) filter = new HashSet<>(List.of(LocalMaterials.AIR));
 		if (isStructure)
 		{
 			return createStructure(
-				type, min, max, center, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
-				template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
+				type, min, max, center, objectName, objectPath, localWorld, nbtHelper, template, presetFolderName, filter);
 		} else {
 			return createObject(
-				type, min, max, center, centerBlock, objectName, includeAir, leaveIllegalLeaves, objectPath, localWorld, nbtHelper,
-				extraBlocks, template, presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
+				type, min, max, center, centerBlock, objectName, false, objectPath, localWorld, nbtHelper,
+				extraBlocks, template, presetFolderName, filter);
 		}
 	}
 
 	// Method for creating a custom object
 	public static StructuredCustomObject createObject(
-		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path exportPath,
+		ObjectType type, Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean leaveIllegalLeaves, Path exportPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BlockFunction<?>> extraBlocks, CustomObjectConfigFile template,
-		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
-		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
+		String presetFolderName, Set<LocalMaterialData> filter
 	)
 	{
+		OTGEngine eng = OTG.getEngine();
+		Path rootPath = eng.getOTGRootFolder();
+		ILogger logger = eng.getLogger();
+		CustomObjectManager boManager = eng.getCustomObjectManager();
+		IMaterialReader mr = eng.getPresetLoader().getMaterialReader(presetFolderName);
+		CustomObjectResourcesManager manager = eng.getCustomObjectResourcesManager();
+		IModLoadedChecker mlc = eng.getModLoadedChecker();
+
+		if (filter == null) filter = new HashSet<>(List.of(LocalMaterials.AIR));
+
 		File exportFolder = exportPath.toFile();
 		searchForCenter:
 		{
@@ -86,7 +97,7 @@ public class ObjectCreator
 						}
 		}
 		// Loop through region, getting the block from the localWorld
-		List<BlockFunction<?>> blocks = Extractor.getBlockFunctions(type, min, max, center, localWorld, nbtHelper, includeAir, leaveIllegalLeaves, objectName, exportFolder);
+		List<BlockFunction<?>> blocks = Extractor.getBlockFunctions(type, min, max, center, localWorld, nbtHelper, leaveIllegalLeaves, objectName, exportFolder, filter);
 
 		// Add extra blocks in (from updating, mainly)
 		if (extraBlocks != null) blocks.addAll(extraBlocks);
@@ -127,12 +138,19 @@ public class ObjectCreator
 
 	// Separate branch for creating a structure, since structures need to create branches
 	public static StructuredCustomObject createStructure(
-		ObjectType type, Corner min, Corner max, Corner center, String objectName, boolean includeAir, boolean leaveIllegalLeaves, Path objectPath,
+		ObjectType type, Corner min, Corner max, Corner center, String objectName, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, CustomObjectConfigFile template,
-		String presetFolderName, Path rootPath, ILogger logger, CustomObjectManager boManager,
-		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc
+		String presetFolderName, Set<LocalMaterialData> filter
 	)
 	{
+		OTGEngine eng = OTG.getEngine();
+		Path rootPath = eng.getOTGRootFolder();
+		ILogger logger = eng.getLogger();
+		CustomObjectManager boManager = eng.getCustomObjectManager();
+		IMaterialReader mr = eng.getPresetLoader().getMaterialReader(presetFolderName);
+		CustomObjectResourcesManager manager = eng.getCustomObjectResourcesManager();
+		IModLoadedChecker mlc = eng.getModLoadedChecker();
+
 		File branchFolder = new File(objectPath.toFile(), objectName);
 		branchFolder.mkdirs();
 
@@ -166,7 +184,7 @@ public class ObjectCreator
 				String branchName = objectName + "_C" + branchX + "_R" + branchZ;
 
 				branchGrid[branchX][branchZ] = Extractor.getBlockFunctions(type, branchMin, branchMax, branchMin,
-					localWorld, nbtHelper, includeAir, leaveIllegalLeaves, branchName, branchFolder);
+					localWorld, nbtHelper, false, branchName, branchFolder, filter);
 				exists[branchX][branchZ] = !branchGrid[branchX][branchZ].isEmpty();
 			}
 		}
@@ -222,7 +240,7 @@ public class ObjectCreator
 
 				// For BO4's, we need to make fresh BO4 configs for each new branch
 				// For BO3's, we pass the template, as it is cloned
-				CustomObjectConfigFile branchTemplate = null;
+				CustomObjectConfigFile branchTemplate;
 				try
 				{
 					branchTemplate = type == ObjectType.BO4 ? new BO4Config(
@@ -286,22 +304,14 @@ public class ObjectCreator
 	{
 		switch (type)
 		{
-			case BO3:
-			{
-				branches.add((BO3BranchFunction) CustomObjectConfigFunction.create(null, BO3BranchFunction.class, logger, mr,
-					x, y, z, (objectName + "_C" + chunkX + "_R" + chunkZ), "NORTH", 100));
-				break;
-			}
-			case BO4:
-			{
-				branches.add(((BO4BranchFunction) CustomObjectConfigFunction.create(null, BO4BranchFunction.class, logger, mr,
-					x, y, z, true,
-					(objectName + "_C" + chunkX + "_R" + chunkZ), "NORTH", 100, 0)));
-				break;
-			}
-			case BO2:
-			default:
-				throw new RuntimeException("Tried adding branch to BO2");
+			case BO3 -> branches.add((BO3BranchFunction) CustomObjectConfigFunction.create(
+				null, BO3BranchFunction.class, logger, mr,
+				x, y, z, (objectName + "_C" + chunkX + "_R" + chunkZ), "NORTH", 100));
+			case BO4 -> branches.add(((BO4BranchFunction) CustomObjectConfigFunction.create(
+				null, BO4BranchFunction.class, logger, mr,
+				x, y, z, true, (objectName + "_C" + chunkX + "_R" + chunkZ), "NORTH", 100, 0)));
+			case BO2 -> throw new RuntimeException("Tried adding branch to BO2");
+			default -> throw new IllegalStateException("Unexpected value: " + type);
 		}
 	}
 
@@ -316,8 +326,7 @@ public class ObjectCreator
 
 		switch (type)
 		{
-			case BO3:
-			{
+			case BO3 -> {
 				BO3Config config = ((BO3Config) template).cloneConfigValues(reader);
 				if (branches != null)
 					config.setBranches(branches);
@@ -332,8 +341,7 @@ public class ObjectCreator
 				config.rotateBlocksAndChecks(presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
 				return config;
 			}
-			case BO4:
-			{
+			case BO4 -> {
 				BO4Config config = (BO4Config) template;
 				if (config.settingsMode == SettingsEnums.ConfigMode.WriteDisable)
 					config.settingsMode = SettingsEnums.ConfigMode.WriteWithoutComments;
@@ -343,17 +351,17 @@ public class ObjectCreator
 				{
 					branches = Arrays.asList(config.getbranches());
 				}
-				
+
 				// Re-add any AIR blocks that were in the original BO4
 				List<BlockFunction<?>> mergedBlocks = new ArrayList<>(blocks);
-				BlockFunction<?>[] blocksListOriginal = config.getBlockFunctions(presetFolderName, rootPath, logger, boManager, mr, manager, mlc);				
-				for(BlockFunction<?> block : blocksListOriginal)
+				BlockFunction<?>[] blocksListOriginal = config.getBlockFunctions(presetFolderName, rootPath, logger, boManager, mr, manager, mlc);
+				for (BlockFunction<?> block : blocksListOriginal)
 				{
-					if(
+					if (
 						!(block instanceof BO4RandomBlockFunction) &&
 						block.material != null &&
-						block.material.isAir() && 
-						!blocks.stream().anyMatch(a -> a.x == block.x && a.y == block.y && a.z == block.z)
+						block.material.isAir() &&
+						blocks.stream().noneMatch(a -> a.x == block.x && a.y == block.y && a.z == block.z)
 					)
 					{
 						mergedBlocks.add(block);
@@ -374,23 +382,22 @@ public class ObjectCreator
 						objectName,
 						objectFilePath.toFile(),
 						logger
-				);
+					);
 
 				if (object == null)
 				{
-					throw new RuntimeException("Could not load BO4 "+objectName+" at "+objectFilePath);
+					throw new RuntimeException("Could not load BO4 " + objectName + " at " + objectFilePath);
 				}
 
 				if (!object.onEnable(presetFolderName, rootPath, logger, boManager, mr, manager, mlc))
 				{
-					throw new RuntimeException("Could not enable BO4 "+objectName);
+					throw new RuntimeException("Could not enable BO4 " + objectName);
 				}
 
 				return object.getConfig();
 			}
-			case BO2:
-			default:
-				throw new RuntimeException("Tried to create BO2 config");
+			case BO2 -> throw new RuntimeException("Tried to create BO2 config");
+			default -> throw new IllegalStateException("Unexpected value: " + type);
 		}
 	}
 }

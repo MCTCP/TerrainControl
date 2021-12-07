@@ -6,11 +6,8 @@ import java.util.List;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
-import net.minecraft.commands.synchronization.ArgumentTypes;
 
 public class OTGCommand
 {
@@ -35,6 +32,7 @@ public class OTGCommand
 		commands.add(new RegionCommand());
 		commands.add(new UpdateCommand());
 		commands.add(new ExportBO4DataCommand());
+		commands.add(new ConfigExportCommand());
 		
 		commands.sort(Comparator.comparing(BaseCommand::getName));
 
@@ -49,10 +47,6 @@ public class OTGCommand
 		}
 		
 		dispatcher.register(commandBuilder);
-	}
-	
-	public static void registerArguments() {
-		ArgumentTypes.register("flags", FlagsArgument.class, new EmptyArgumentSerializer<>(FlagsArgument::create));
 	}
 	
 	public static List<BaseCommand> getCommands() {

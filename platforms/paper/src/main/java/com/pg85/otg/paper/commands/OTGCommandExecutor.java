@@ -36,6 +36,7 @@ public class OTGCommandExecutor
 		commands.add(new ExportCommand());
 		commands.add(new RegionCommand());
 		commands.add(new ExportBO4DataCommand());
+		commands.add(new ConfigExportCommand());
 		
 		commands.sort(Comparator.comparing(BaseCommand::getName));
 

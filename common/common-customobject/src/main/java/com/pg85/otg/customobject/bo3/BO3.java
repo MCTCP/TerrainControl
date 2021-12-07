@@ -15,7 +15,7 @@ import com.pg85.otg.customobject.bo3.checks.BO3Check;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
@@ -126,7 +126,7 @@ public class BO3 implements StructuredCustomObject
 	@Override
 	public boolean loadChecks(IModLoadedChecker modLoadedChecker)
 	{
-		return this.settings == null ? false : this.settings.parseModChecks(modLoadedChecker);
+		return this.settings != null && this.settings.parseModChecks(modLoadedChecker);
 	}
 
 	// Used to safely spawn this object from a grown sapling

@@ -8,11 +8,10 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.exceptions.InvalidConfigException;
-import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.util.logging.LogCategory;
@@ -49,7 +48,7 @@ public class UpdateCommand extends BaseCommand
 				.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, false))
 				.executes(this::update)
 				.then(
-					Commands.argument("flags", FlagsArgument.create()).executes(this::update).suggests(this::suggestFlags)
+					Commands.argument("flags", StringArgumentType.greedyString()).executes(this::update).suggests(this::suggestFlags)
 				)
 		));
 	}
@@ -96,7 +95,7 @@ public class UpdateCommand extends BaseCommand
 			//OTG.getEngine().getLogger().log(LogLevel.INFO, LogCategory.MAIN, "Updating object '"+objectName+"'");
 
 			// get object
-			StructuredCustomObject inputObject = null;
+			StructuredCustomObject inputObject;
 			try
 			{
 				inputObject = EditCommand.getStructuredObject(objectName, presetFolderName);

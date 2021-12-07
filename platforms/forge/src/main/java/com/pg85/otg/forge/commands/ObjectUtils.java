@@ -5,8 +5,8 @@ import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
-import com.pg85.otg.customobject.creator.ObjectCreator;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.core.objectcreator.ObjectCreator;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
@@ -125,16 +125,12 @@ public class ObjectUtils
 		Corner max = region.getMax();
 		int xlen = Math.abs(max.x - min.x);
 		int zlen = Math.abs(max.z - min.z);
-		switch (type)
-		{
-			case BO3:
-				return xlen > 31 || zlen > 31;
-			case BO4:
-				return xlen > 15 || zlen > 15;
-			case BO2:
-			default:
-				return false;
-		}
+		return switch (type)
+			{
+				case BO3 -> xlen > 31 || zlen > 31;
+				case BO4 -> xlen > 15 || zlen > 15;
+				case BO2 -> false;
+			};
 	}
 
 	/** Gets a region large enough to fit an object, positioned away from the player
@@ -232,7 +228,6 @@ public class ObjectUtils
 				center,
 				null,
 				inputObject.getName(),
-				false,
 				leaveIllegalLeaves,
 				exportPath,
 				worldGenRegion,
@@ -240,10 +235,7 @@ public class ObjectUtils
 				extraBlocks,
 				inputObject.getConfig(),
 				presetFolderName,
-				OTG.getEngine().getOTGRootFolder(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				null);
 
 			if (verbose && fixedObject != null)
 			{

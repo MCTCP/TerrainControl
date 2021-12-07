@@ -13,7 +13,7 @@ import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
 import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;

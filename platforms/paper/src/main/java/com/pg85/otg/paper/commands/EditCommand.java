@@ -29,8 +29,8 @@ import com.pg85.otg.customobject.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
-import com.pg85.otg.customobject.creator.ObjectCreator;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.core.objectcreator.ObjectCreator;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.exceptions.InvalidConfigException;
@@ -314,7 +314,6 @@ public class EditCommand extends BaseCommand
 			session.extraBlocks.isEmpty() ? region.getCenter() : session.originalCenterPoint,
 			null,
 			session.object.getName(),
-			false,
 			session.leaveIllegalLeaves,
 			session.objectPath,
 			session.genRegion,
@@ -322,12 +321,7 @@ public class EditCommand extends BaseCommand
 			session.extraBlocks,
 			session.object.getConfig(),
 			session.presetFolderName,
-			OTG.getEngine().getOTGRootFolder(),
-			OTG.getEngine().getLogger(),
-			OTG.getEngine().getCustomObjectManager(),
-			OTG.getEngine().getPresetLoader().getMaterialReader(session.presetFolderName),
-			OTG.getEngine().getCustomObjectResourcesManager(),
-			OTG.getEngine().getModLoadedChecker()
+			null
 		);
 	}
 
@@ -348,28 +342,12 @@ public class EditCommand extends BaseCommand
 		return 0;
 	}
 
-	private static class EditSession {
-		private final ObjectType type;
-		private final PaperWorldGenRegion genRegion;
-		private final StructuredCustomObject object;
-		private final ArrayList<BlockFunction<?>> extraBlocks;
-		private final Path objectPath;
-		private final String presetFolderName;
-		private final Corner originalCenterPoint;
-		private final boolean leaveIllegalLeaves;
-
-		public EditSession(ObjectType type, PaperWorldGenRegion genRegion, StructuredCustomObject object, ArrayList<BlockFunction<?>> extraBlocks, Path objectPath, String presetFolderName, Corner originalCenterPoint, boolean leaveIllegalLeaves)
-		{
-			this.type = type;
-			this.genRegion = genRegion;
-			this.object = object;
-			this.extraBlocks = extraBlocks;
-			this.objectPath = objectPath;
-			this.presetFolderName = presetFolderName;
-			this.originalCenterPoint = originalCenterPoint;
-			this.leaveIllegalLeaves = leaveIllegalLeaves;
-		}
-	}
+	private record EditSession(ObjectType type,
+							   PaperWorldGenRegion genRegion,
+							   StructuredCustomObject object,
+							   ArrayList<BlockFunction<?>> extraBlocks,
+							   Path objectPath, String presetFolderName,
+							   Corner originalCenterPoint, boolean leaveIllegalLeaves) { }
 
 	protected static ArrayList<BlockFunction<?>> spawnAndFixObject(int x, int y, int z, StructuredCustomObject object, PaperWorldGenRegion worldGenRegion, boolean fixObject, String presetFolderName, Path otgRootFolder, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{

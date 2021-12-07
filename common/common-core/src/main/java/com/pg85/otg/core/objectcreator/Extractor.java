@@ -1,9 +1,10 @@
-package com.pg85.otg.customobject.creator;
+package com.pg85.otg.core.objectcreator;
 
 import com.pg85.otg.customobject.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
 import com.pg85.otg.util.nbt.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
@@ -15,12 +16,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Extractor
 {
 	public static List<BlockFunction<?>> getBlockFunctions
 		(ObjectType type, Corner min, Corner max, Corner center, LocalWorldGenRegion localWorld,
-		 LocalNBTHelper nbtHelper, boolean includeAir, boolean leaveIllegalLeaves, String objectName, File objectFolder)
+		 LocalNBTHelper nbtHelper, boolean leaveIllegalLeaves, String objectName, File objectFolder,
+		 Set<LocalMaterialData> filter)
 	{
 		File nbtFolder = new File(objectFolder, objectName);
 		ArrayList<BlockFunction<?>> blocks = new ArrayList<>();
@@ -32,18 +35,13 @@ public class Extractor
 				for (int y = min.y; y <= max.y; y++)
 				{
 					LocalMaterialData materialData = localWorld.getMaterial(x, y, z);
-					boolean stop = false;
-					for (LocalMaterialData exclude : excludes) {
-						if (exclude.matches(materialData)) {
-							stop = true;
-							break;
-						}
-					}
 
-					if (stop || materialData == null
+					LocalMaterialData finalMaterialData = materialData;
+					if (materialData == null
+						// Returns true if any item in the filter set matches the found material
+						|| filter.stream().anyMatch(item -> item.isMaterial(finalMaterialData))
 						|| materialData.isMaterial(LocalMaterials.STRUCTURE_VOID)
-						|| materialData.isMaterial(LocalMaterials.STRUCTURE_BLOCK)
-						|| (!includeAir && materialData.isAir()))
+						|| materialData.isMaterial(LocalMaterials.STRUCTURE_BLOCK))
 					{
 						continue;
 					}
@@ -53,19 +51,12 @@ public class Extractor
 						materialData = materialData.legalOrPersistentLeaves(leaveIllegalLeaves);
 					}
 
-					BlockFunction<?> block;
-					switch(type)
-					{
-						case BO3:
-							block = new BO3BlockFunction();
-							break;
-						case BO4:
-							block = new BO4BlockFunction();
-							break;
-						case BO2:
-						default:
-							throw new RuntimeException("Tried to make BlockFunctions for a BO2");
-					}
+					BlockFunction<?> block = switch (type)
+						{
+							case BO3 -> new BO3BlockFunction();
+							case BO4 -> new BO4BlockFunction();
+							case BO2 -> throw new RuntimeException("Tried to make BlockFunctions for a BO2");
+						};
 					block.material = materialData;
 					block.nbt = null;
 					block.nbtName = "";

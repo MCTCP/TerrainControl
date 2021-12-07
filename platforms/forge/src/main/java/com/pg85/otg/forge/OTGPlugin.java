@@ -63,8 +63,6 @@ public class OTGPlugin
 		// Deferred registers
 		OTGPortalPois.poi.register(modEventBus);
 		OTGPortalBlocks.blocks.register(modEventBus);
-		
-		OTGCommand.registerArguments();
 	}
 
 	// Register player capabilities for dimension portal timer.

@@ -2,10 +2,7 @@ package com.pg85.otg.paper.commands;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -18,8 +15,8 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.presets.Preset;
-import com.pg85.otg.customobject.creator.ObjectCreator;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.core.objectcreator.ObjectCreator;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.paper.commands.RegionCommand.Region;
@@ -30,6 +27,7 @@ import com.pg85.otg.paper.util.PaperNBTHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.nbt.LocalNBTHelper;
 
 import net.minecraft.ChatFormatting;
@@ -40,10 +38,22 @@ import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ExportCommand extends BaseCommand
 {
+	public static HashMap<Entity, CommandOptions> configMap = new HashMap<>();
+	protected static class CommandOptions {
+		String preset = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+		String template = "default";
+		ObjectType objectType = ObjectType.BO3;
+		BlockState centerBlock = null;
+		boolean overwrite = false;
+		boolean exportToGlobal = false;
+		HashSet<LocalMaterialData> filter = new HashSet<>(List.of(LocalMaterials.AIR));
+	}
+
 	private static final String[] FLAGS = new String[]
 	{ "-o", "-a", "-b" };
 	
@@ -61,26 +71,13 @@ public class ExportCommand extends BaseCommand
 			Commands.literal("export")
 					.executes(this::execute).then(
 				Commands.argument("name", StringArgumentType.string()).executes(this::execute).then(
-					// Skip center block
-					Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
-					.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
-						Commands.argument("type", StringArgumentType.word()).executes(this::execute)
+					Commands.argument("type", StringArgumentType.word()).executes(this::execute)
 						.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
-							Commands.argument("template", StringArgumentType.word()).suggests(this::suggestTemplates).executes(this::execute).then(
-								Commands.argument("flags", StringArgumentType.word()).executes(this::execute).suggests(this::suggestFlags)
-							)
-						)
-					)
-				).then(
-					Commands.argument("center", BlockStateArgument.block()).executes(this::execute).then(
 						Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
 						.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
-							Commands.argument("type", StringArgumentType.word()).executes(this::execute)
-							.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
-								Commands.argument("template", StringArgumentType.word()).suggests(this::suggestTemplates).executes(this::execute).then(
-									Commands.argument("flags", StringArgumentType.word()).executes(this::execute).suggests(this::suggestFlags)
-								)
-							)
+							Commands.argument("template", StringArgumentType.word()).suggests(
+								(context, suggestionsBuilder) -> suggestTemplates(suggestionsBuilder, context.getArgument("preset", String.class))
+							).executes(this::execute)
 						)
 					)
 				)
@@ -99,48 +96,32 @@ public class ExportCommand extends BaseCommand
 		CommandSourceStack source = context.getSource();
 		try
 		{
-			if (!(source.getEntity() instanceof ServerPlayer))
+			if (!(source.getEntity() instanceof ServerPlayer playerEntity))
 			{
 				source.sendSuccess(new TextComponent("Only players can execute this command"), false);
 				return 0;
 			}
-			ServerPlayer playerEntity = (ServerPlayer) source.getEntity();
+			CommandOptions options = configMap.get(playerEntity);
 
 			// Extract here; this is kinda complex, would be messy in OTGCommand
 			String objectName = "";
-			BlockState centerBlockState;
-			String presetName = null;
-			ObjectType type = ObjectType.BO3; // Defaults to BO3 for simplicity
-			String templateName = "default";
-			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false;
-
-			try
-			{
-				centerBlockState = context.getArgument("center", BlockInput.class).getState();
-			}
-			catch (IllegalArgumentException ex)
-			{
-				centerBlockState = null;
-			}
+			BlockState centerBlockState = options.centerBlock;
+			String presetName = options.preset;
+			ObjectType type = options.objectType;
+			String templateName = options.template;
+			boolean overwrite = options.overwrite;
+			boolean isGlobal = options.exportToGlobal;
 
 			try
 			{
 				objectName = context.getArgument("name", String.class);
+				type = ObjectType.valueOf(context.getArgument("type", String.class).toUpperCase(Locale.ROOT));
 				presetName = context.getArgument("preset", String.class);
-				String raw = context.getArgument("type", String.class);
-				type = ObjectType.valueOf(raw.toUpperCase(Locale.ROOT));
 				templateName = context.getArgument("template", String.class);
-				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
-				String flags = context.getArgument("flags", String.class);
-
-				overwrite = flags.contains("-o");
-				isStructure = flags.contains("-b");
-				includeAir = flags.contains("-a");
 			}
-			catch (IllegalArgumentException ignored)
-			{} // We can deal with any of these not being there
+			catch (IllegalArgumentException ignored) {} // We can deal with any of these not being there
 
-			if (presetName == null || presetName.equalsIgnoreCase("global"))
+			if (presetName.equalsIgnoreCase("global"))
 			{
 				// Set folder name to default, in case we need fallback settings
 				presetName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
@@ -177,11 +158,6 @@ public class ExportCommand extends BaseCommand
 				return 0;
 			}
 
-			if (ObjectUtils.isOutsideBounds(region, type))
-			{
-				isStructure = true;
-			}
-
 			Preset preset = ObjectUtils.getPresetOrDefault(presetName);
 			if (preset == null)
 			{
@@ -200,9 +176,6 @@ public class ExportCommand extends BaseCommand
 				}
 			}
 
-			PaperWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel().getWorld());
-
-			LocalNBTHelper nbtHelper = new PaperNBTHelper();
 			Corner lowCorner = region.getMin();
 			Corner highCorner = region.getMax();
 			Corner center = region.getCenter() != null ? region.getCenter() :
@@ -240,21 +213,14 @@ public class ExportCommand extends BaseCommand
 				center,
 				centerBlock,
 				objectName,
-				includeAir,
-				isStructure,
-				false,
+				ObjectUtils.isOutsideBounds(region, type),
 				objectPath,
-				worldGenRegion,
-				nbtHelper,
+				ObjectUtils.getWorldGenRegion(preset, source.getLevel().getWorld()),
+				new PaperNBTHelper(),
 				null,
 				template.getConfig(),
 				preset.getFolderName(),
-				OTG.getEngine().getOTGRootFolder(),
-				OTG.getEngine().getLogger(),
-				OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-				OTG.getEngine().getCustomObjectResourcesManager(),
-				OTG.getEngine().getModLoadedChecker()
+				options.filter
 			);
 
 			// Send feedback, and register the BO3 for immediate use
@@ -299,7 +265,7 @@ public class ExportCommand extends BaseCommand
 		return 0;
 	}
 	
-	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
+	protected static CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder, boolean includeBO2)
 	{
 		Set<String> set = Stream.of(ObjectType.values())
@@ -320,10 +286,8 @@ public class ExportCommand extends BaseCommand
 	
 	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
 
-	private CompletableFuture<Suggestions> suggestTemplates(CommandContext<CommandSourceStack> context,
-			SuggestionsBuilder builder)
+	protected static CompletableFuture<Suggestions> suggestTemplates(SuggestionsBuilder builder, String preset)
 		{
-			String preset = context.getArgument("preset", String.class);
 			List<String> list;
 			// Get global objects if global, else fetch based on preset
 			if (preset.equalsIgnoreCase("global"))

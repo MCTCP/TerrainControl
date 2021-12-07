@@ -11,8 +11,8 @@ import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.presets.Preset;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.bofunctions.BlockFunction;
-import com.pg85.otg.customobject.creator.ObjectCreator;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.core.objectcreator.ObjectCreator;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.Corner;
@@ -232,7 +232,6 @@ public class ObjectUtils
 				center,
 				null,
 				inputObject.getName(),
-				false,
 				leaveIllegalLeaves,
 				exportPath,
 				worldGenRegion,
@@ -240,10 +239,7 @@ public class ObjectUtils
 				extraBlocks,
 				inputObject.getConfig(),
 				presetFolderName,
-				OTG.getEngine().getOTGRootFolder(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-				OTG.getEngine().getPresetLoader().getMaterialReader(presetFolderName),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				null);
 
 			if (verbose && fixedObject != null)
 			{

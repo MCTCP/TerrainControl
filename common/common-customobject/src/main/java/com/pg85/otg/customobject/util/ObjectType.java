@@ -1,4 +1,4 @@
-package com.pg85.otg.customobject.creator;
+package com.pg85.otg.customobject.util;
 
 import java.nio.file.Path;
 

@@ -39,7 +39,7 @@ public abstract class BaseCommand
 		return this.detailedHelp;
 	}
 	
-	public MutableComponent createComponent(String text, String text2, ChatFormatting color1, ChatFormatting color2) {
+	public static MutableComponent createComponent(String text, String text2, ChatFormatting color1, ChatFormatting color2) {
 		return new TextComponent(text).withStyle(color1).append(new TextComponent(text2).withStyle(color2));
 	}
 

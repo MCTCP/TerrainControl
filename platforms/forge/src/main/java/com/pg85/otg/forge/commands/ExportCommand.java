@@ -8,36 +8,31 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.presets.Preset;
-import com.pg85.otg.customobject.creator.ObjectCreator;
-import com.pg85.otg.customobject.creator.ObjectType;
+import com.pg85.otg.core.objectcreator.ObjectCreator;
+import com.pg85.otg.customobject.util.ObjectType;
 import com.pg85.otg.customobject.structures.StructuredCustomObject;
 import com.pg85.otg.customobject.util.Corner;
 import com.pg85.otg.forge.commands.RegionCommand.Region;
-import com.pg85.otg.forge.commands.arguments.FlagsArgument;
 import com.pg85.otg.forge.commands.arguments.PresetArgument;
-import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
-import com.pg85.otg.util.nbt.LocalNBTHelper;
+import com.pg85.otg.util.materials.LocalMaterials;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.TextComponent;
@@ -45,8 +40,16 @@ import net.minecraft.ChatFormatting;
 
 public class ExportCommand extends BaseCommand
 {
-	private static final String[] FLAGS = new String[]
-	{ "-o", "-a", "-b", "-e", "-oa", "-ob", "-oe", "-ab", "-ae", "-be", "-oab", "-obe", "-oae", "-abe", "-oabe"};
+	public static HashMap<Entity, CommandOptions> configMap = new HashMap<>();
+	protected static class CommandOptions {
+		String preset = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
+		String template = "default";
+		ObjectType objectType = ObjectType.BO3;
+		BlockState centerBlock = null;
+		boolean overwrite = false;
+		boolean exportToGlobal = false;
+		HashSet<LocalMaterialData> filter = new HashSet<>(List.of(LocalMaterials.AIR));
+	}
 	
 	public ExportCommand() 
 	{
@@ -61,30 +64,14 @@ public class ExportCommand extends BaseCommand
 		builder.then(
 			Commands.literal("export").executes(this::execute).then(
 				Commands.argument("name", StringArgumentType.string()).executes(this::execute).then(
-					// Skip center block
-					Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
-					.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
-						Commands.argument("type", StringArgumentType.word()).executes(this::execute)
-						.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
-							Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-								Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags).then(
-										Commands.argument("excludes", BlockStateArgument.block()).executes(this::execute)
-								)
-							)
-						)
-					)
-				).then(
-					Commands.argument("center", BlockStateArgument.block()).executes(this::execute).then(
+					Commands.argument("type", StringArgumentType.word()).executes(this::execute)
+					.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
 						Commands.argument("preset", StringArgumentType.string()).executes(this::execute)
 						.suggests((context, suggestionBuilder) -> PresetArgument.suggest(context, suggestionBuilder, true)).then(
-							Commands.argument("type", StringArgumentType.word()).executes(this::execute)
-							.suggests((context, suggestionBuilder) -> suggestTypes(context, suggestionBuilder, false)).then(
-								Commands.argument("template", new TemplateArgument()).executes(this::execute).then(
-									Commands.argument("flags", FlagsArgument.create()).executes(this::execute).suggests(this::suggestFlags).then(
-											Commands.argument("excludes", BlockStateArgument.block()).executes(this::execute)
-									)
-								)
-							)
+							Commands.argument("template", StringArgumentType.string())
+							.suggests((context, suggestionsBuilder) -> suggestTemplate(
+								suggestionsBuilder, context.getArgument("preset", String.class))
+							).executes(this::execute)
 						)
 					)
 				)
@@ -99,49 +86,37 @@ public class ExportCommand extends BaseCommand
 		CommandSourceStack source = context.getSource();
 		try
 		{
-			if (!(source.getEntity() instanceof ServerPlayer))
+			if (!(source.getEntity() instanceof ServerPlayer playerEntity))
 			{
 				source.sendSuccess(new TextComponent("Only players can execute this command"), false);
 				return 0;
 			}
-			ServerPlayer playerEntity = (ServerPlayer) source.getEntity();
+
+			if (!configMap.containsKey(playerEntity))
+			{
+				configMap.put(playerEntity, new CommandOptions());
+			}
+			CommandOptions options = configMap.get(playerEntity);
 
 			// Extract here; this is kinda complex, would be messy in OTGCommand
 			String objectName = "";
-			BlockState centerBlockState;
-			String presetName = null;
-			ObjectType type = ObjectType.BO3; // Defaults to BO3 for simplicity
-			String templateName = "default";
-			boolean overwrite = false, isStructure = false, includeAir = false, isGlobal = false, hasExcludes = false;
-
-			try
-			{
-				centerBlockState = context.getArgument("center", BlockInput.class).getState();
-			}
-			catch (IllegalArgumentException ex)
-			{
-				centerBlockState = null;
-			}
+			BlockState centerBlockState = options.centerBlock;
+			String presetName = options.preset;
+			ObjectType type = options.objectType;
+			String templateName = options.template;
+			boolean overwrite = options.overwrite;
+			boolean isGlobal = options.exportToGlobal;
 
 			try
 			{
 				objectName = context.getArgument("name", String.class);
+				type = ObjectType.valueOf(context.getArgument("type", String.class).toUpperCase(Locale.ROOT));
 				presetName = context.getArgument("preset", String.class);
-				String raw = context.getArgument("type", String.class);
-				type = ObjectType.valueOf(raw.toUpperCase(Locale.ROOT));
 				templateName = context.getArgument("template", String.class);
-				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
-				String flags = context.getArgument("flags", String.class);
-
-				overwrite = flags.contains("o");
-				isStructure = flags.contains("b");
-				includeAir = flags.contains("a");
-				hasExcludes = flags.contains("e");
 			}
-			catch (IllegalArgumentException ignored)
-			{} // We can deal with any of these not being there
+			catch (IllegalArgumentException ignored) {} // We can deal with any of these not being there
 
-			if (presetName == null || presetName.equalsIgnoreCase("global"))
+			if (presetName.equalsIgnoreCase("global"))
 			{
 				// Set folder name to default, in case we need fallback settings
 				presetName = OTG.getEngine().getPresetLoader().getDefaultPresetFolderName();
@@ -178,15 +153,10 @@ public class ExportCommand extends BaseCommand
 				return 0;
 			}
 
-			if (ObjectUtils.isOutsideBounds(region, type))
-			{
-				isStructure = true;
-			}
-
 			Preset preset = ObjectUtils.getPresetOrDefault(presetName);
 			if (preset == null)
 			{
-				source.sendSuccess(new TextComponent("Could not find preset " + (presetName == null ? "" : presetName)), false);
+				source.sendSuccess(new TextComponent("Could not find preset " + presetName), false);
 				return 0;
 			}
 
@@ -201,9 +171,6 @@ public class ExportCommand extends BaseCommand
 				}
 			}
 
-			ForgeWorldGenRegion worldGenRegion = ObjectUtils.getWorldGenRegion(preset, source.getLevel());
-
-			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
 			Corner lowCorner = region.getMin();
 			Corner highCorner = region.getMax();
 			Corner center = region.getCenter() != null ? region.getCenter() :
@@ -234,60 +201,23 @@ public class ExportCommand extends BaseCommand
 			// Create a new BO from our settings
 			LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
 			StructuredCustomObject object;
-			if (hasExcludes) {
-				BlockState excludeBlockState = context.getArgument("excludes", BlockStateInput.class).getState();
-				LocalMaterialData exclude = ForgeMaterialData.ofBlockState(excludeBlockState);
-				List<LocalMaterialData> excludes = new ArrayList<>();
-				excludes.add(exclude);
-				object = ObjectCreator.create(
-						type,
-						lowCorner,
-						highCorner,
-						center,
-						centerBlock,
-						objectName,
-						includeAir,
-						isStructure,
-						false,
-						objectPath,
-						worldGenRegion,
-						nbtHelper,
-						null,
-						template.getConfig(),
-						preset.getFolderName(),
-						OTG.getEngine().getOTGRootFolder(),
-						OTG.getEngine().getLogger(),
-						OTG.getEngine().getCustomObjectManager(),
-						OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-						OTG.getEngine().getCustomObjectResourcesManager(),
-						OTG.getEngine().getModLoadedChecker(),
-						excludes
-				);
-			} else {
-				object = ObjectCreator.create(
-						type,
-						lowCorner,
-						highCorner,
-						center,
-						centerBlock,
-						objectName,
-						includeAir,
-						isStructure,
-						false,
-						objectPath,
-						worldGenRegion,
-						nbtHelper,
-						null,
-						template.getConfig(),
-						preset.getFolderName(),
-						OTG.getEngine().getOTGRootFolder(),
-						OTG.getEngine().getLogger(),
-						OTG.getEngine().getCustomObjectManager(),
-						OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()),
-						OTG.getEngine().getCustomObjectResourcesManager(),
-						OTG.getEngine().getModLoadedChecker()
-				);
-			}
+
+			object = ObjectCreator.create(
+					type,
+					lowCorner,
+					highCorner,
+					center,
+					centerBlock,
+					objectName,
+					ObjectUtils.isOutsideBounds(region, type),
+					objectPath,
+					ObjectUtils.getWorldGenRegion(preset, source.getLevel()),
+					new ForgeNBTHelper(),
+					null,
+					template.getConfig(),
+					preset.getFolderName(),
+					options.filter
+			);
 
 			// Send feedback, and register the BO3 for immediate use
 			if (object != null)
@@ -326,7 +256,7 @@ public class ExportCommand extends BaseCommand
 		return 0;
 	}
 	
-	private CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
+	public static CompletableFuture<Suggestions> suggestTypes(CommandContext<CommandSourceStack> context,
 			SuggestionsBuilder builder, boolean includeBO2)
 	{
 		Set<String> set = Stream.of(ObjectType.values())
@@ -338,43 +268,26 @@ public class ExportCommand extends BaseCommand
 			}
 			return SharedSuggestionProvider.suggest(set, builder);
 	}
-	
-	private CompletableFuture<Suggestions> suggestFlags(CommandContext<CommandSourceStack> context,
-			SuggestionsBuilder builder)
-	{
-		return SharedSuggestionProvider.suggest(FLAGS, builder);
-	}
-	
-	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
-	
-	private static class TemplateArgument implements ArgumentType<String>
-	{
-		@Override
-		public String parse(StringReader reader) throws CommandSyntaxException
-		{
-			return reader.readString();
-		}
 
-		@Override
-		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
+
+	public static CompletableFuture<Suggestions> suggestTemplate(SuggestionsBuilder builder, String preset)
+	{
+		List<String> list;
+		// Get global objects if global, else fetch based on preset
+		if (preset.equalsIgnoreCase("global"))
 		{
-			String preset = context.getArgument("preset", String.class);
-			List<String> list;
-			// Get global objects if global, else fetch based on preset
-			if (preset.equalsIgnoreCase("global"))
-			{
-				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
-					.getGlobalTemplates(OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
-			}
-			else
-			{
-				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
-					.getTemplatesForPreset(preset, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
-			}
-			if (list == null) list = new ArrayList<>();
-			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
-			list.add("default");
-			return SharedSuggestionProvider.suggest(list.stream(), builder);
+			list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getGlobalTemplates(OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
 		}
+		else
+		{
+			list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getTemplatesForPreset(preset, OTG.getEngine().getLogger(), OTG.getEngine().getOTGRootFolder());
+		}
+		if (list == null) list = new ArrayList<>();
+		list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+		list.add("default");
+		return SharedSuggestionProvider.suggest(list.stream(), builder);
 	}
 }
