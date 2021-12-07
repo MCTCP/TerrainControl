@@ -27,8 +27,6 @@ import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ILayerSource;
-import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.presets.Preset;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -54,7 +52,6 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	private final ThreadLocal<CachingLayerSampler> layer;
 	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
-	private final IWorldConfig worldConfig;
 	
 	public OTGBiomeProvider(String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
@@ -71,12 +68,10 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
 		IBiome[] biomeLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetFolderName);
-		Preset preset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetByFolderName(presetFolderName);
-		if(biomeLookup == null || preset == null)
+		if(biomeLookup == null)
 		{
 			throw new RuntimeException("No OTG preset found with name \"" + presetFolderName + "\". Install the correct preset or update your server.properties.");
 		}
-		this.worldConfig = preset.getWorldConfig();
 				
 		IBiome biome;
 		ResourceKey<Biome> key;
@@ -149,48 +144,5 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	public Set<BlockState> getSurfaceBlocks()
 	{
 		return super.getSurfaceBlocks();
-	}
-	
-	@Override
-	public boolean canGenerateStructure(Structure<?> structure)
-	{
-		return isWorldConfigAllowedStructure(structure) && this.supportedStructures.computeIfAbsent(structure, (structure2) ->
-		{
-			return this.possibleBiomes.stream().anyMatch((biome) ->
-			{
-				return biome.getGenerationSettings().isValidStart(structure2);
-			});
-		});	
-	}
-	
-	private boolean isWorldConfigAllowedStructure(Structure<?> structure)
-	{
-		// This doesn't catch modded structures, modded structures don't appear to have a type so we can't filter except by name.
-		// We don't have to check biomeconfig toggles here, as that would only apply to non-template biomes and for those we
-		// register structures ourselves, so we just don't register them in the first place.
-		if(
-			(this.worldConfig.getStrongholdsEnabled() || !(structure instanceof StrongholdStructure)) &&
-			(this.worldConfig.getVillagesEnabled() || !(structure instanceof VillageStructure)) &&
-			(this.worldConfig.getRareBuildingsEnabled() || !(structure instanceof SwampHutStructure)) &&
-			(this.worldConfig.getRareBuildingsEnabled() || !(structure instanceof IglooStructure)) &&
-			(this.worldConfig.getRareBuildingsEnabled() || !(structure instanceof JunglePyramidStructure)) &&
-			(this.worldConfig.getRareBuildingsEnabled() || !(structure instanceof DesertPyramidStructure)) &&
-			(this.worldConfig.getMineshaftsEnabled() || !(structure instanceof MineshaftStructure)) &&
-			(this.worldConfig.getRuinedPortalsEnabled() || !(structure instanceof RuinedPortalStructure)) &&
-			(this.worldConfig.getOceanRuinsEnabled() || !(structure instanceof OceanRuinStructure)) &&
-			(this.worldConfig.getShipWrecksEnabled() || !(structure instanceof ShipwreckStructure)) &&
-			(this.worldConfig.getOceanMonumentsEnabled() || !(structure instanceof OceanMonumentStructure)) &&
-			(this.worldConfig.getBastionRemnantsEnabled() || !(structure instanceof BastionRemantsStructure)) &&
-			(this.worldConfig.getBuriedTreasureEnabled() || !(structure instanceof BuriedTreasureStructure)) &&
-			(this.worldConfig.getEndCitiesEnabled() || !(structure instanceof EndCityStructure)) &&
-			(this.worldConfig.getNetherFortressesEnabled() || !(structure instanceof FortressStructure)) &&
-			(this.worldConfig.getNetherFossilsEnabled() || !(structure instanceof NetherFossilStructure)) &&
-			(this.worldConfig.getPillagerOutpostsEnabled() || !(structure instanceof PillagerOutpostStructure)) &&
-			(this.worldConfig.getWoodlandMansionsEnabled() || !(structure instanceof WoodlandMansionStructure))
-		)
-		{
-			return true;
-		}
-		return false;
 	}
 }

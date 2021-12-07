@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -213,52 +214,111 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		IWorldConfig worldConfig = preset.getWorldConfig();
+		Builder<Structure<?>, StructureSeparationSettings> separationSettings = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder();
+		if(worldConfig.getVillagesEnabled())
+		{
+			separationSettings.put(Structure.VILLAGE, new StructureSeparationSettings(worldConfig.getVillageSpacing(), worldConfig.getVillageSeparation(), 10387312));
+		}
+		if(worldConfig.getRareBuildingsEnabled())
+		{
+			separationSettings.put(Structure.DESERT_PYRAMID, new StructureSeparationSettings(worldConfig.getDesertPyramidSpacing(), worldConfig.getDesertPyramidSeparation(), 14357617));
+		}
+		if(worldConfig.getRareBuildingsEnabled())
+		{
+			separationSettings.put(Structure.IGLOO, new StructureSeparationSettings(worldConfig.getIglooSpacing(), worldConfig.getIglooSeparation(), 14357618));
+		}
+		if(worldConfig.getRareBuildingsEnabled())
+		{
+			separationSettings.put(Structure.JUNGLE_TEMPLE, new StructureSeparationSettings(worldConfig.getJungleTempleSpacing(), worldConfig.getJungleTempleSeparation(), 14357619));
+		}
+		if(worldConfig.getRareBuildingsEnabled())
+		{
+			separationSettings.put(Structure.SWAMP_HUT, new StructureSeparationSettings(worldConfig.getSwampHutSpacing(), worldConfig.getSwampHutSeparation(), 14357620));
+		}
+		if(worldConfig.getPillagerOutpostsEnabled())
+		{
+			separationSettings.put(Structure.PILLAGER_OUTPOST, new StructureSeparationSettings(worldConfig.getPillagerOutpostSpacing(), worldConfig.getPillagerOutpostSeparation(), 165745296));
+		}
+		if(worldConfig.getStrongholdsEnabled())
+		{
+			separationSettings.put(Structure.STRONGHOLD, new StructureSeparationSettings(worldConfig.getStrongholdSpacing(), worldConfig.getStrongholdSeparation(), 0));
+		}
+		if(worldConfig.getOceanMonumentsEnabled())
+		{
+			separationSettings.put(Structure.OCEAN_MONUMENT, new StructureSeparationSettings(worldConfig.getOceanMonumentSpacing(), worldConfig.getOceanMonumentSeparation(), 10387313));
+		}
+		if(worldConfig.getEndCitiesEnabled())
+		{
+			separationSettings.put(Structure.END_CITY, new StructureSeparationSettings(worldConfig.getEndCitySpacing(), worldConfig.getEndCitySeparation(), 10387313));
+		}
+		if(worldConfig.getWoodlandMansionsEnabled())
+		{
+			separationSettings.put(Structure.WOODLAND_MANSION, new StructureSeparationSettings(worldConfig.getWoodlandMansionSpacing(), worldConfig.getWoodlandMansionSeparation(), 10387319));
+		}
+		if(worldConfig.getBuriedTreasureEnabled())
+		{
+			separationSettings.put(Structure.BURIED_TREASURE, new StructureSeparationSettings(worldConfig.getBuriedTreasureSpacing(), worldConfig.getBuriedTreasureSeparation(), 0));
+		}
+		if(worldConfig.getMineshaftsEnabled())
+		{
+			separationSettings.put(Structure.MINESHAFT, new StructureSeparationSettings(worldConfig.getMineshaftSpacing(), worldConfig.getMineshaftSeparation(), 0));
+		}
+		if(worldConfig.getRuinedPortalsEnabled())
+		{
+			separationSettings.put(Structure.RUINED_PORTAL, new StructureSeparationSettings(worldConfig.getRuinedPortalSpacing(), worldConfig.getRuinedPortalSeparation(), 34222645));
+		}
+		if(worldConfig.getShipWrecksEnabled())
+		{
+			separationSettings.put(Structure.SHIPWRECK, new StructureSeparationSettings(worldConfig.getShipwreckSpacing(), worldConfig.getShipwreckSeparation(), 165745295));
+		}
+		if(worldConfig.getOceanRuinsEnabled())
+		{
+			separationSettings.put(Structure.OCEAN_RUIN, new StructureSeparationSettings(worldConfig.getOceanRuinSpacing(), worldConfig.getOceanRuinSeparation(), 14357621));
+		}
+		if(worldConfig.getBastionRemnantsEnabled())
+		{
+			separationSettings.put(Structure.BASTION_REMNANT, new StructureSeparationSettings(worldConfig.getBastionRemnantSpacing(), worldConfig.getBastionRemnantSeparation(), 30084232));
+		}
+		if(worldConfig.getNetherFortressesEnabled())
+		{
+			separationSettings.put(Structure.NETHER_BRIDGE, new StructureSeparationSettings(worldConfig.getNetherFortressSpacing(), worldConfig.getNetherFortressSeparation(), 30084232));
+		}
+		if(worldConfig.getNetherFossilsEnabled())
+		{
+			separationSettings.put(Structure.NETHER_FOSSIL, new StructureSeparationSettings(worldConfig.getNetherFossilSpacing(), worldConfig.getNetherFossilSeparation(), 14357921));
+		}
+		separationSettings.putAll(
+			oldSettings.structureConfig().entrySet().stream().filter(a -> 
+				a.getKey() != Structure.VILLAGE &&
+				a.getKey() != Structure.DESERT_PYRAMID &&
+				a.getKey() != Structure.IGLOO &&
+				a.getKey() != Structure.JUNGLE_TEMPLE &&
+				a.getKey() != Structure.SWAMP_HUT &&
+				a.getKey() != Structure.PILLAGER_OUTPOST &&
+				a.getKey() != Structure.STRONGHOLD &&
+				a.getKey() != Structure.OCEAN_MONUMENT &&
+				a.getKey() != Structure.END_CITY &&
+				a.getKey() != Structure.WOODLAND_MANSION &&
+				a.getKey() != Structure.BURIED_TREASURE &&
+				a.getKey() != Structure.MINESHAFT &&
+				a.getKey() != Structure.RUINED_PORTAL &&
+				a.getKey() != Structure.SHIPWRECK &&
+				a.getKey() != Structure.OCEAN_RUIN &&
+				a.getKey() != Structure.BASTION_REMNANT &&
+				a.getKey() != Structure.NETHER_BRIDGE &&
+				a.getKey() != Structure.NETHER_FOSSIL
+			).collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+		);
 
-		StructureSettings newSettings = new StructureSettings(
-			Optional.of(new StrongholdConfiguration(worldConfig.getStrongHoldDistance(), worldConfig.getStrongHoldSpread(), worldConfig.getStrongHoldCount())), 
-			Maps.newHashMap(
-				ImmutableMap.<StructureFeature<?>, StructureFeatureConfiguration>builder()
-				.put(StructureFeature.VILLAGE, new StructureFeatureConfiguration(worldConfig.getVillageSpacing(), worldConfig.getVillageSeparation(), 10387312))
-				.put(StructureFeature.DESERT_PYRAMID, new StructureFeatureConfiguration(worldConfig.getDesertPyramidSpacing(), worldConfig.getDesertPyramidSeparation(), 14357617))
-				.put(StructureFeature.IGLOO, new StructureFeatureConfiguration(worldConfig.getIglooSpacing(), worldConfig.getIglooSeparation(), 14357618))
-				.put(StructureFeature.JUNGLE_TEMPLE, new StructureFeatureConfiguration(worldConfig.getJungleTempleSpacing(), worldConfig.getJungleTempleSeparation(), 14357619))
-				.put(StructureFeature.SWAMP_HUT, new StructureFeatureConfiguration(worldConfig.getSwampHutSpacing(), worldConfig.getSwampHutSeparation(), 14357620))
-				.put(StructureFeature.PILLAGER_OUTPOST, new StructureFeatureConfiguration(worldConfig.getPillagerOutpostSpacing(), worldConfig.getPillagerOutpostSeparation(), 165745296))
-				.put(StructureFeature.STRONGHOLD, new StructureFeatureConfiguration(worldConfig.getStrongholdSpacing(), worldConfig.getStrongholdSeparation(), 0))
-				.put(StructureFeature.OCEAN_MONUMENT, new StructureFeatureConfiguration(worldConfig.getOceanMonumentSpacing(), worldConfig.getOceanMonumentSeparation(), 10387313))
-				.put(StructureFeature.END_CITY, new StructureFeatureConfiguration(worldConfig.getEndCitySpacing(), worldConfig.getEndCitySeparation(), 10387313))
-				.put(StructureFeature.WOODLAND_MANSION, new StructureFeatureConfiguration(worldConfig.getWoodlandMansionSpacing(), worldConfig.getWoodlandMansionSeparation(), 10387319))
-				.put(StructureFeature.BURIED_TREASURE, new StructureFeatureConfiguration(worldConfig.getBuriedTreasureSpacing(), worldConfig.getBuriedTreasureSeparation(), 0))
-				.put(StructureFeature.MINESHAFT, new StructureFeatureConfiguration(worldConfig.getMineshaftSpacing(), worldConfig.getMineshaftSeparation(), 0))
-				.put(StructureFeature.RUINED_PORTAL, new StructureFeatureConfiguration(worldConfig.getRuinedPortalSpacing(), worldConfig.getRuinedPortalSeparation(), 34222645))
-				.put(StructureFeature.SHIPWRECK, new StructureFeatureConfiguration(worldConfig.getShipwreckSpacing(), worldConfig.getShipwreckSeparation(), 165745295))
-				.put(StructureFeature.OCEAN_RUIN, new StructureFeatureConfiguration(worldConfig.getOceanRuinSpacing(), worldConfig.getOceanRuinSeparation(), 14357621))
-				.put(StructureFeature.BASTION_REMNANT, new StructureFeatureConfiguration(worldConfig.getBastionRemnantSpacing(), worldConfig.getBastionRemnantSeparation(), 30084232))
-				.put(StructureFeature.NETHER_BRIDGE, new StructureFeatureConfiguration(worldConfig.getNetherFortressSpacing(), worldConfig.getNetherFortressSeparation(), 30084232))
-				.put(StructureFeature.NETHER_FOSSIL, new StructureFeatureConfiguration(worldConfig.getNetherFossilSpacing(), worldConfig.getNetherFossilSeparation(), 14357921))
-				.putAll(
-					oldSettings.structureConfig().entrySet().stream().filter(a -> 
-						a.getKey() != StructureFeature.VILLAGE &&
-						a.getKey() != StructureFeature.DESERT_PYRAMID &&
-						a.getKey() != StructureFeature.IGLOO &&
-						a.getKey() != StructureFeature.JUNGLE_TEMPLE &&
-						a.getKey() != StructureFeature.SWAMP_HUT &&
-						a.getKey() != StructureFeature.PILLAGER_OUTPOST &&
-						a.getKey() != StructureFeature.STRONGHOLD &&
-						a.getKey() != StructureFeature.OCEAN_MONUMENT &&
-						a.getKey() != StructureFeature.END_CITY &&
-						a.getKey() != StructureFeature.WOODLAND_MANSION &&
-						a.getKey() != StructureFeature.BURIED_TREASURE &&
-						a.getKey() != StructureFeature.MINESHAFT &&
-						a.getKey() != StructureFeature.RUINED_PORTAL &&
-						a.getKey() != StructureFeature.SHIPWRECK &&
-						a.getKey() != StructureFeature.OCEAN_RUIN &&
-						a.getKey() != StructureFeature.BASTION_REMNANT &&
-						a.getKey() != StructureFeature.NETHER_BRIDGE &&
-						a.getKey() != StructureFeature.NETHER_FOSSIL
-					).collect(Collectors.toMap(Entry::getKey, Entry::getValue))
-				).build()
-			)
+		DimensionStructuresSettings newSettings = new DimensionStructuresSettings(
+			worldConfig.getStrongholdsEnabled() ? Optional.of(
+				new StructureSpreadSettings(
+					worldConfig.getStrongHoldDistance(), 
+					worldConfig.getStrongHoldSpread(), 
+					worldConfig.getStrongHoldCount()
+				)
+			) : Optional.empty(), 
+			Maps.newHashMap(separationSettings.build())
 		);
 		return newSettings;
 	}
@@ -491,110 +551,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			}
 		}
 	}
-	
-	// Structures
-	
-	// Override structure spawning to make sure any structures registered
-	// to biomes are allowed to spawn according to worldconfig settings. 
-	@Override
-	public void createStructures(RegistryAccess p_242707_1_, StructureFeatureManager p_242707_2_, ChunkAccess p_242707_3_, StructureManager p_242707_4_, long p_242707_5_)
-	{
-		ChunkPos chunkpos = p_242707_3_.getPos();
-		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-		// Strongholds are hardcoded apparently, even if they aren't registered to the biome, so check worldconfig and biomeconfig toggles. 
-		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
-		{
-			createStructure(StructureFeatures.STRONGHOLD, p_242707_1_, p_242707_2_, p_242707_3_, p_242707_4_, p_242707_5_, chunkpos, biome.getBiomeBase());
-		}
-		for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : biome.getBiomeBase().getGenerationSettings().structures())
-		{
-			// This doesn't catch modded structures, modded structures don't appear to have a type so we can't filter except by name.
-			// We don't have to check biomeconfig toggles here, as that would only apply to non-template biomes and for those we
-			// register structures ourselves, so we just don't register them in the first place.
-			if(
-				(this.preset.getWorldConfig().getStrongholdsEnabled() || !(supplier.get().feature instanceof StrongholdFeature)) &&
-				(this.preset.getWorldConfig().getVillagesEnabled() || !(supplier.get().feature instanceof VillageFeature)) &&				
-				(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(supplier.get().feature instanceof SwamplandHutFeature)) &&				
-				(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(supplier.get().feature instanceof IglooFeature)) &&
-				(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(supplier.get().feature instanceof JunglePyramidFeature)) &&								
-				(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(supplier.get().feature instanceof DesertPyramidFeature)) &&				
-				(this.preset.getWorldConfig().getMineshaftsEnabled() || !(supplier.get().feature instanceof MineshaftFeature)) &&
-				(this.preset.getWorldConfig().getRuinedPortalsEnabled() || !(supplier.get().feature instanceof RuinedPortalFeature)) &&
-				(this.preset.getWorldConfig().getOceanRuinsEnabled() || !(supplier.get().feature instanceof OceanRuinFeature)) &&
-				(this.preset.getWorldConfig().getShipWrecksEnabled() || !(supplier.get().feature instanceof ShipwreckFeature)) &&
-				(this.preset.getWorldConfig().getOceanMonumentsEnabled() || !(supplier.get().feature instanceof OceanMonumentFeature)) &&
-				(this.preset.getWorldConfig().getBastionRemnantsEnabled() || !(supplier.get().feature instanceof BastionFeature)) &&
-				(this.preset.getWorldConfig().getBuriedTreasureEnabled() || !(supplier.get().feature instanceof BuriedTreasureFeature)) &&
-				(this.preset.getWorldConfig().getEndCitiesEnabled() || !(supplier.get().feature instanceof EndCityFeature)) &&
-				(this.preset.getWorldConfig().getNetherFortressesEnabled() || !(supplier.get().feature instanceof NetherFortressFeature)) &&
-				(this.preset.getWorldConfig().getNetherFossilsEnabled() || !(supplier.get().feature instanceof NetherFossilFeature)) &&
-				(this.preset.getWorldConfig().getPillagerOutpostsEnabled() || !(supplier.get().feature instanceof PillagerOutpostFeature)) &&
-				(this.preset.getWorldConfig().getWoodlandMansionsEnabled() || !(supplier.get().feature instanceof WoodlandMansionFeature))
-			)
-			{
-				createStructure(supplier.get(), p_242707_1_, p_242707_2_, p_242707_3_, p_242707_4_, p_242707_5_, chunkpos, biome.getBiomeBase());
-			}
-		}
-	}
-	
-	private void createStructure(ConfiguredStructureFeature<?, ?> p_242705_1_, RegistryAccess p_242705_2_, StructureFeatureManager p_242705_3_, ChunkAccess p_242705_4_, StructureManager p_242705_5_, long p_242705_6_, ChunkPos p_242705_8_, Biome p_242705_9_)
-	{
-		StructureStart<?> structurestart = p_242705_3_.getStartForFeature(SectionPos.of(p_242705_4_.getPos(), 0), p_242705_1_.feature, p_242705_4_);
-		int i = structurestart != null ? structurestart.getReferences() : 0;
-		StructureFeatureConfiguration structureseparationsettings = this.getSettings().getConfig(p_242705_1_.feature);
-		if (structureseparationsettings != null)
-		{
-			StructureStart<?> structurestart1 = p_242705_1_.generate(p_242705_2_, this, this.biomeSource, p_242705_5_, p_242705_6_, p_242705_8_, p_242705_9_, i, structureseparationsettings, p_242705_4_);
-			p_242705_3_.setStartForFeature(SectionPos.of(p_242705_4_.getPos(), 0), p_242705_1_.feature, structurestart1, p_242705_4_);
-		}
-	}
 
-	@Nullable
-	@Override
-	public BlockPos findNearestMapFeature(ServerLevel world, StructureFeature<?> structure, BlockPos blockPos, int i1, boolean b1) 
-	{
-		// This doesn't catch modded structures, modded structures don't appear to have a type so we can't filter except by name.
-		// We don't have to check biomeconfig toggles here, as that would only apply to non-template biomes and for those we
-		// register structures ourselves, so we just don't register them in the first place.
-		if(
-			(this.preset.getWorldConfig().getStrongholdsEnabled() || !(structure instanceof StrongholdFeature)) &&
-			(this.preset.getWorldConfig().getVillagesEnabled() || !(structure instanceof VillageFeature)) &&
-			(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(structure instanceof SwamplandHutFeature)) &&
-			(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(structure instanceof IglooFeature)) &&
-			(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(structure instanceof JunglePyramidFeature)) &&
-			(this.preset.getWorldConfig().getRareBuildingsEnabled() || !(structure instanceof DesertPyramidFeature)) &&
-			(this.preset.getWorldConfig().getMineshaftsEnabled() || !(structure instanceof MineshaftFeature)) &&
-			(this.preset.getWorldConfig().getRuinedPortalsEnabled() || !(structure instanceof RuinedPortalFeature)) &&
-			(this.preset.getWorldConfig().getOceanRuinsEnabled() || !(structure instanceof OceanRuinFeature)) &&
-			(this.preset.getWorldConfig().getShipWrecksEnabled() || !(structure instanceof ShipwreckFeature)) &&
-			(this.preset.getWorldConfig().getOceanMonumentsEnabled() || !(structure instanceof OceanMonumentFeature)) &&
-			(this.preset.getWorldConfig().getBastionRemnantsEnabled() || !(structure instanceof BastionFeature)) &&
-			(this.preset.getWorldConfig().getBuriedTreasureEnabled() || !(structure instanceof BuriedTreasureFeature)) &&
-			(this.preset.getWorldConfig().getEndCitiesEnabled() || !(structure instanceof EndCityFeature)) &&
-			(this.preset.getWorldConfig().getNetherFortressesEnabled() || !(structure instanceof NetherFortressFeature)) &&
-			(this.preset.getWorldConfig().getNetherFossilsEnabled() || !(structure instanceof NetherFossilFeature)) &&
-			(this.preset.getWorldConfig().getPillagerOutpostsEnabled() || !(structure instanceof PillagerOutpostFeature)) &&
-			(this.preset.getWorldConfig().getWoodlandMansionsEnabled() || !(structure instanceof WoodlandMansionFeature))
-		)
-		{
-			return super.findNearestMapFeature(world, structure, blockPos, i1, b1);
-		}
-		return null;
-	}
-
-	@Override
-	public boolean hasStronghold(ChunkPos chunkPos)
-	{
-		// super.hasStronghold generates stronghold start points (default settings appear 
-		// determined per dim type), so check worldconfig and biomeconfig toggles.
-		ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome((chunkPos.x << 2) + 2, (chunkPos.z << 2) + 2);
-		if(this.preset.getWorldConfig().getStrongholdsEnabled() && biome.getBiomeConfig().getStrongholdsEnabled())
-		{
-			return super.hasStronghold(chunkPos);
-		}
-		return false;
-	}
-	
 	// Decoration
 
 	// Does decoration for a given pos/chunk
