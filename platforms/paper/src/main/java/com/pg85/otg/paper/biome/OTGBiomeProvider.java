@@ -44,7 +44,6 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	private final ThreadLocal<CachingLayerSampler> layer;
 	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
-	private final IWorldConfig worldConfig;
 
 	public OTGBiomeProvider (String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{

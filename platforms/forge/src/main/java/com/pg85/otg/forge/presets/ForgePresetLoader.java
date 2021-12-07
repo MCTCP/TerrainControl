@@ -238,7 +238,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				}
 				if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 				{
-					registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);					
+					registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);					
 					if(registryKey != null)
 					{
 						// For OTG biomes, add Forge biome dictionary tags.
@@ -268,7 +268,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 						Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
 						registryKey = key.isPresent() ? key.get() : null;
 					} else {						
-						registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+						registryKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
 						if(registryKey != null)
 						{
 							// For OTG biomes, add Forge biome dictionary tags.
