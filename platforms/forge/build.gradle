@@ -19,16 +19,6 @@ apply plugin: "org.spongepowered.mixin"
 apply plugin: "eclipse"
 
 repositories {
-
-	// Add common jar output dirs as repo's for the development environment
-    flatDir {
-		dir '../../common/common-util/build/libs'
-		dir '../../common/common-config/build/libs'
-		dir '../../common/common-generator/build/libs'		
-		dir '../../common/common-customobject/build/libs'		
-		dir '../../common/common-core/build/libs'
-    }
-
 	maven {
 		name = "sk89q maven"
 		url = "https://maven.sk89q.com/artifactory/repo"
@@ -60,6 +50,11 @@ minecraft {
             mods {
                 openterraingenerator {
                     source sourceSets.main
+                    source project(':common:common-core').sourceSets.main
+                    source project(':common:common-config').sourceSets.main
+                    source project(':common:common-customobject').sourceSets.main
+                    source project(':common:common-generator').sourceSets.main
+                    source project(':common:common-util').sourceSets.main
                 }
             }
         }
@@ -75,6 +70,11 @@ minecraft {
             mods {
                 openterraingenerator {
                     source sourceSets.main
+                    source project(':common:common-core').sourceSets.main
+                    source project(':common:common-config').sourceSets.main
+                    source project(':common:common-customobject').sourceSets.main
+                    source project(':common:common-generator').sourceSets.main
+                    source project(':common:common-util').sourceSets.main
                 }
             }
         }
@@ -92,6 +92,11 @@ minecraft {
             mods {
                 openterraingenerator {
                     source sourceSets.main
+                    source project(':common:common-core').sourceSets.main
+                    source project(':common:common-config').sourceSets.main
+                    source project(':common:common-customobject').sourceSets.main
+                    source project(':common:common-generator').sourceSets.main
+                    source project(':common:common-util').sourceSets.main
                 }
             }
         }
@@ -139,14 +144,6 @@ dependencies {
     library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
     library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
     library 'org.yaml:snakeyaml:1.23'
-
-    // TODO: Uncomment these to be able to run in the dev environment
-    // Unfortunately this doesn't build common before forge tho ><
-    //library 'com.pg85.otg:common-util:1.17.1-0.0.22'
-    //library 'com.pg85.otg:common-config:1.17.1-0.0.22'
-    //library 'com.pg85.otg:common-customobject:1.17.1-0.0.22'
-    //library 'com.pg85.otg:common-generator:1.17.1-0.0.22'
-    //library 'com.pg85.otg:common-core:1.17.1-0.0.22'
 }
 
 tasks {
