@@ -31,7 +31,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 			parent,
 			new OTGWorldOptionsScreen(
 				parent.parent.worldGenSettingsComponent.registryHolder(),
-				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
+				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldPreset().map(
 					type -> type.create(
 						parent.parent.worldGenSettingsComponent.registryHolder(), 
 						new java.util.Random().nextLong(), 
@@ -45,7 +45,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
 					)
 				),
-				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType(), OptionalLong.empty()
+				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldPreset(), OptionalLong.empty()
 			),
 			dimConfig
 		);

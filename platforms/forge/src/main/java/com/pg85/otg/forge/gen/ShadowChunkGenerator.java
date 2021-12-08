@@ -39,6 +39,8 @@ import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.server.level.ServerLevel;
@@ -477,8 +479,7 @@ public class ShadowChunkGenerator
 		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
 		if (structureSeparationSettings != null)
 		{
-			WorldgenRandom sharedSeedRandom = new WorldgenRandom();
-			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
+			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, chunkPos.x, chunkPos.z);
 			if (
 				chunkPos.x == chunkPosPotential.x &&
 				chunkPos.z == chunkPosPotential.z

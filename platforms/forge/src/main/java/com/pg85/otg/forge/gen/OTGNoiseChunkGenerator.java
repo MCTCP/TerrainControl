@@ -417,7 +417,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkPos chunkpos = chunk.getPos();
 		int i = chunkpos.x;
 		int j = chunkpos.z;
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		WorldgenRandom sharedseedrandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
 		sharedseedrandom.setBaseChunkSeed(i, j);
 		ChunkPos chunkpos1 = chunk.getPos();
 		int chunkMinX = chunkpos1.getMinBlockX();
@@ -491,7 +491,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void applyNonOTGCarvers(long seed, BiomeManager biomeManager, ChunkAccess chunk, GenerationStep.Carving stage)
 	{
 		BiomeManager biomemanager = biomeManager.withDifferentSource(this.biomeSource);
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		WorldgenRandom sharedseedrandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
 		CarvingContext carvingcontext = new CarvingContext(this, chunk);
 		ChunkPos chunkpos = chunk.getPos();
 		Aquifer aquifer = this.createAquifer(chunk);
@@ -546,7 +546,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
 		int worldZ = worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
 		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
-		WorldgenRandom sharedseedrandom = new WorldgenRandom();
+		WorldgenRandom sharedseedrandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);	
 		//
 
@@ -660,7 +660,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			int chunkX = worldGenRegion.getCenter().x;
 			int chunkZ = worldGenRegion.getCenter().z;
 			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getBiome(chunkX * Constants.CHUNK_SIZE, chunkZ * Constants.CHUNK_SIZE);
-			WorldgenRandom sharedseedrandom = new WorldgenRandom();
+			WorldgenRandom sharedseedrandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
 			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
 			NaturalSpawner.spawnMobsForChunkGeneration(worldGenRegion, ((ForgeBiome)biome).getBiomeBase(), worldGenRegion.getCenter(), sharedseedrandom);
 		}

@@ -82,7 +82,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 	public static ModpackCreateWorldScreen create(@Nullable Screen screen)
 	{
 		RegistryAccess.RegistryHolder dynamicregistry = RegistryAccess.builtin();
-		WorldGenSettings dimGenSettings = net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType().map(
+		WorldGenSettings dimGenSettings = net.minecraftforge.client.ForgeHooksClient.getDefaultWorldPreset().map(
 			type -> type.create(
 					dynamicregistry, 
 					new java.util.Random().nextLong(), 
@@ -103,7 +103,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			new WorldGenSettingsComponent(
 				dynamicregistry, 
 				dimGenSettings, 
-				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldType(), 
+				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldPreset(), 
 				OptionalLong.empty()
 			),
 			dimGenSettings
@@ -118,7 +118,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 		// Does the same as opening the customisation/dimensions menu and applying, registering the dimensions from the modpack config.
 		Optional<WorldPreset> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
 		WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(preset);
-		biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
+		biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getPresetEditor(preset, biomegeneratortypescreens$ifactory);
 		if (biomegeneratortypescreens$ifactory != null)
 		{
 			((CreateOTGDimensionsScreen)biomegeneratortypescreens$ifactory.createEditScreen(this, dimGenSettings)).applySettings();
@@ -214,7 +214,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 			(p_214322_1_) -> {
 				Optional<WorldPreset> preset = Optional.of(OTGGui.OTG_WORLD_TYPE);
 				WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(preset);
-				biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(preset, biomegeneratortypescreens$ifactory);
+				biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getPresetEditor(preset, biomegeneratortypescreens$ifactory);
 				if (biomegeneratortypescreens$ifactory != null)
 				{
 					this.minecraft.setScreen(biomegeneratortypescreens$ifactory.createEditScreen(this, this.worldGenSettingsComponent.makeSettings(this.hardCore)));

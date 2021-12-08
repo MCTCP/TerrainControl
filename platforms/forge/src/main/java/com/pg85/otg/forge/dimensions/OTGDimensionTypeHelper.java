@@ -47,13 +47,14 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class OTGDimensionTypeHelper
 {
-	public static DimensionType make(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int minY, int height, int logicalHeight, BiomeZoomer biomeZoomer, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
+	public static DimensionType make(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean createDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int minY, int height, int logicalHeight, ResourceLocation infiniburn, ResourceLocation effectsLocation, float ambientLight)
 	{
-		return DimensionType.create(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, createDragonFight, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, minY, height, logicalHeight, biomeZoomer, infiniburn, effectsLocation, ambientLight);
+		return DimensionType.create(fixedTime, hasSkylight, hasCeiling, ultraWarm, natural, coordinateScale, createDragonFight, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight);
 	}
 	
 	// Used for MP when starting the server, with settings from server.properties.
@@ -84,7 +85,7 @@ public class OTGDimensionTypeHelper
 		} else {
 			dimConfigName = generatorSettings;
 			// Non-otg overworld, generatorsettings contains non-otg world type.
-			ForgeWorldType def = dimConfig.Overworld.NonOTGWorldType == null || dimConfig.Overworld.NonOTGWorldType.trim().length() == 0 ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
+			ForgeWorldPreset def = dimConfig.Overworld.NonOTGWorldType == null || dimConfig.Overworld.NonOTGWorldType.trim().length() == 0 ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
 			if(def != null)
 			{
 				WorldGenSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateStructures, bonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);
@@ -232,7 +233,6 @@ public class OTGDimensionTypeHelper
 			Constants.WORLD_DEPTH,
 			Constants.WORLD_HEIGHT,
 			worldConfig.getLogicalHeight(),
-			FuzzyOffsetConstantColumnBiomeZoomer.INSTANCE,
 			new ResourceLocation(worldConfig.getInfiniburn()),
 			new ResourceLocation(worldConfig.getEffectsLocation()),
 			worldConfig.getAmbientLight()

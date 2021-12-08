@@ -44,17 +44,17 @@ public class ClientFogHandler
 	{
 		if(1 == 1) { return; } // TODO: This causes a crash on world join for 1.17, reimplement
 		
-		Entity entity = event.getInfo().getEntity();
+		Entity entity = event.getCamera().getEntity();
 		Options settings = Minecraft.getInstance().options;
 
 		if (!(entity instanceof LocalPlayer))
 		{
-			resetFogDistance(Minecraft.getInstance(), event.getType());
+			resetFogDistance(Minecraft.getInstance(), event.getMode());
 			return;
 		}
 
 		ResourceLocation key = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY)
-				.getKey(Minecraft.getInstance().level.getBiome(event.getInfo().getBlockPosition()));
+				.getKey(Minecraft.getInstance().level.getBiome(event.getCamera().getBlockPosition()));
 
 		BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
@@ -62,7 +62,7 @@ public class ClientFogHandler
 		{
 			if (otgDidLastFogRender)
 			{
-				resetFogDistance(Minecraft.getInstance(), event.getType());
+				resetFogDistance(Minecraft.getInstance(), event.getMode());
 			}
 			return;
 		}
@@ -139,7 +139,7 @@ public class ClientFogHandler
 		float fogDistanceScale = (fogDistanceScaleBiome * weightBiomeFog + 1f * weightDefault) / weightMixed;
 
 		float finalFogDistance = Math.min(fogDistance, event.getFarPlaneDistance());
-		float fogStart = event.getType() == FogMode.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
+		float fogStart = event.getMode() == FogMode.FOG_SKY ? 0.0f : finalFogDistance * fogDistanceScale;
 
 		// set cache values
 		lastX = posX;
