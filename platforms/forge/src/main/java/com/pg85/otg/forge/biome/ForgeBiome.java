@@ -1,8 +1,12 @@
 package com.pg85.otg.forge.biome;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map.Entry;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
@@ -28,6 +32,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.BlockPos;
@@ -69,6 +74,7 @@ import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 public class ForgeBiome implements IBiome
@@ -127,9 +133,6 @@ public class ForgeBiome implements IBiome
 			}
 		}
 
-		// Default structures
-		addVanillaStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
-		
 		float safeTemperature = biomeConfig.getBiomeTemperature();
 		if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
 		{
@@ -279,242 +282,6 @@ public class ForgeBiome implements IBiome
 				}
 			}
 		}
-	}	
-	
-	private static void addVanillaStructures(Builder biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
-	{
-		// TODO: Currently we can only enable/disable structures per biome and use any configuration options exposed by the vanilla structure 
-		// classes (size for villages fe). If we want to be able to customise more, we'll need to implement our own structure classes.
-		// TODO: Allow users to create their own jigsaw patterns (for villages, end cities, pillager outposts etc)?
-		// TODO: Amethyst Geodes (1.17?)	
-
-		// Villages
-		// TODO: Allow spawning multiple types in a single biome?
-		if(worldConfig.getVillagesEnabled() && biomeConfig.getVillageType() != VillageType.disabled)
-		{
-			int villageSize = biomeConfig.getVillageSize();
-			VillageType villageType = biomeConfig.getVillageType();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customVillage = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
-				StructureFeature.VILLAGE.configured(
-					new JigsawConfiguration(
-						() -> {
-							switch(villageType)
-							{
-								case sandstone:
-									return DesertVillagePools.START;
-								case savanna:
-									return SavannaVillagePools.START;
-								case taiga:
-									return TaigaVillagePools.START;
-								case wood:
-									return PlainVillagePools.START;
-								case snowy:
-									return SnowyVillagePools.START;
-								case disabled: // Should never happen
-									break;
-							}
-							return PlainVillagePools.START;
-						},
-						villageSize
-					)
-				)
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customVillage);
-		}
-		
-		// Strongholds
-		if(worldConfig.getStrongholdsEnabled() && biomeConfig.getStrongholdsEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.STRONGHOLD);
-		}
-
-		// Ocean Monuments
-		if(worldConfig.getOceanMonumentsEnabled() && biomeConfig.getOceanMonumentsEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.OCEAN_MONUMENT);
-		}
-		
-		// Rare buildings
-		// TODO: Allow spawning multiple types in a single biome?
-		if(worldConfig.getRareBuildingsEnabled() && biomeConfig.getRareBuildingType() != RareBuildingType.disabled)
-		{
-			switch(biomeConfig.getRareBuildingType())
-			{
-				case desertPyramid:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.DESERT_PYRAMID);
-					break;
-				case igloo:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.IGLOO);
-					break;
-				case jungleTemple:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.JUNGLE_TEMPLE);				
-					break;
-				case swampHut:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.SWAMP_HUT);
-					break;
-				case disabled:
-					break;					
-			}
-		}
-		
-		// Woodland Mansions
-		if(worldConfig.getWoodlandMansionsEnabled() && biomeConfig.getWoodlandMansionsEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.WOODLAND_MANSION);
-		}
-		
-		// Nether Fortresses
-		if(worldConfig.getNetherFortressesEnabled() && biomeConfig.getNetherFortressesEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.NETHER_BRIDGE);
-		}
-
-		// Mineshafts
-		if(worldConfig.getMineshaftsEnabled() && biomeConfig.getMineShaftType() != MineshaftType.disabled)
-		{
-			float mineShaftProbability = biomeConfig.getMineShaftProbability();
-			MineshaftType mineShaftType = biomeConfig.getMineShaftType();
-			ConfiguredStructureFeature<MineshaftConfiguration, ? extends StructureFeature<MineshaftConfiguration>> customMineShaft = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("mineshaft").toResourceLocationString(),
-				StructureFeature.MINESHAFT.configured(
-					new MineshaftConfiguration(
-						mineShaftProbability,
-						mineShaftType == MineshaftType.mesa ? MineshaftFeature.Type.MESA : MineshaftFeature.Type.NORMAL
-					)
-				)
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customMineShaft);
-		}
-		
-		// Buried Treasure
-		if(worldConfig.getBuriedTreasureEnabled() && biomeConfig.getBuriedTreasureEnabled())
-		{
-			float buriedTreasureProbability = biomeConfig.getBuriedTreasureProbability();
-			ConfiguredStructureFeature<ProbabilityFeatureConfiguration, ? extends StructureFeature<ProbabilityFeatureConfiguration>> customBuriedTreasure = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("buried_treasure").toResourceLocationString(),
-				StructureFeature.BURIED_TREASURE.configured(new ProbabilityFeatureConfiguration(buriedTreasureProbability))
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customBuriedTreasure);
-		}
-		
-		// Ocean Ruins
-		if(worldConfig.getOceanRuinsEnabled() && biomeConfig.getOceanRuinsType() != OceanRuinsType.disabled)
-		{
-			float oceanRuinsLargeProbability = biomeConfig.getOceanRuinsLargeProbability();
-			float oceanRuinsClusterProbability = biomeConfig.getOceanRuinsClusterProbability();
-			OceanRuinsType oceanRuinsType = biomeConfig.getOceanRuinsType();
-			ConfiguredStructureFeature<OceanRuinConfiguration, ? extends StructureFeature<OceanRuinConfiguration>> customOceanRuins = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("ocean_ruin").toResourceLocationString(),
-				StructureFeature.OCEAN_RUIN.configured(
-					new OceanRuinConfiguration(
-						oceanRuinsType == OceanRuinsType.cold ? OceanRuinFeature.Type.COLD : OceanRuinFeature.Type.WARM,
-						oceanRuinsLargeProbability,
-						oceanRuinsClusterProbability
-					)
-				)
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customOceanRuins);
-		}
-
-		// Shipwrecks
-		// TODO: Allowing both types in the same biome, make sure this won't cause problems.
-		if(worldConfig.getShipWrecksEnabled())
-		{
-			if(biomeConfig.getShipWreckEnabled())
-			{
-				biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.SHIPWRECK);
-			}
-			if(biomeConfig.getShipWreckBeachedEnabled())
-			{
-				biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.SHIPWRECK_BEACHED);
-			}			
-		}
-		
-		// Pillager Outpost
-		if(worldConfig.getPillagerOutpostsEnabled() && biomeConfig.getPillagerOutpostEnabled())
-		{
-			int outpostSize = biomeConfig.getPillagerOutPostSize();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customOutpost = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("pillager_outpost").toResourceLocationString(), 
-				StructureFeature.PILLAGER_OUTPOST.configured(
-					new JigsawConfiguration(
-						() -> {
-							return PillagerOutpostPools.START;
-						},
-						outpostSize
-					)
-				)
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customOutpost);			
-		}
-		
-		// Bastion Remnants
-		if(worldConfig.getBastionRemnantsEnabled() && biomeConfig.getBastionRemnantEnabled())
-		{
-			int bastionRemnantSize = biomeConfig.getBastionRemnantSize();
-			ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customBastionRemnant = register(
-				((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("bastion_remnant").toResourceLocationString(), 
-				StructureFeature.BASTION_REMNANT.configured(
-					new JigsawConfiguration(
-						() -> {
-							return BastionPieces.START;
-						},
-						bastionRemnantSize
-					)
-				)
-			);
-			biomeGenerationSettingsBuilder.addStructureStart(customBastionRemnant);
-		}
-		
-		// Nether Fossils
-		if(worldConfig.getNetherFossilsEnabled() && biomeConfig.getNetherFossilEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.NETHER_FOSSIL);
-		}
-		
-		// End Cities
-		if(worldConfig.getEndCitiesEnabled() && biomeConfig.getEndCityEnabled())
-		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.END_CITY);
-		}
-		
-		// Ruined Portals
-		if(worldConfig.getRuinedPortalsEnabled() && biomeConfig.getRuinedPortalType() != RuinedPortalType.disabled)
-		{
-			switch(biomeConfig.getRuinedPortalType())
-			{
-				case normal:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_STANDARD);
-					break;
-				case desert:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_DESERT);
-					break;
-				case jungle:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_JUNGLE);
-					break;
-				case swamp:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_SWAMP);
-					break;
-				case mountain:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_MOUNTAIN);
-					break;
-				case ocean:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_OCEAN);
-					break;
-				case nether:
-					biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.RUINED_PORTAL_NETHER);
-					break;
-				case disabled:
-					break;
-			}
-		}
-	}
-
-	// StructureFeatures.register()
-	private static <FC extends FeatureConfiguration, F extends StructureFeature<FC>> ConfiguredStructureFeature<FC, F> register(String name, ConfiguredStructureFeature<FC, F> structure)
-	{
-		return BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, name, structure);
 	}
 	
 	private static int getSkyColorForTemp(float p_244206_0_)

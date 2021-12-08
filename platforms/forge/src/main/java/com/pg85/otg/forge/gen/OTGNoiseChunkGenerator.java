@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -14,11 +15,17 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
+import com.pg85.otg.constants.SettingsEnums.MineshaftType;
+import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
+import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
+import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
+import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.config.dimensions.DimensionConfig;
 import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGDimension;
@@ -32,11 +39,13 @@ import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.interfaces.IBiome;
+import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.interfaces.ILayerSource;
 import com.pg85.otg.interfaces.IMaterialReader;
 import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -47,6 +56,16 @@ import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.BastionPieces;
+import net.minecraft.data.worldgen.DesertVillagePools;
+import net.minecraft.data.worldgen.PillagerOutpostPools;
+import net.minecraft.data.worldgen.PlainVillagePools;
+import net.minecraft.data.worldgen.SavannaVillagePools;
+import net.minecraft.data.worldgen.SnowyVillagePools;
+import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.data.worldgen.TaigaVillagePools;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
@@ -67,12 +86,20 @@ import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.carver.CarvingContext;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.MineshaftFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.MineshaftConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.OceanRuinConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.StrongholdConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
 import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool.Projection;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
@@ -186,7 +213,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.chunkDecorator = new OTGChunkDecorator();
 	}
 	
-	private static StructureSettings overrideStructureSettings(StructureSettings oldSettings, String presetFolderName)
+	// Structure settings
+	
+	private static StructureSettings overrideStructureSettings(StructureSettings oldSettings, String presetFolderName, OTGBiomeProvider otgBiomeProvider)
 	{
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByFolderName(presetFolderName);
 		IWorldConfig worldConfig = preset.getWorldConfig();
@@ -296,9 +325,283 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			) : Optional.empty(), 
 			Maps.newHashMap(separationSettings.build())
 		);
+
+		addBiomeConfigStructures(preset, preset.getWorldConfig(), otgBiomeProvider, newSettings);
+		
 		return newSettings;
 	}
+	
+	private static void addBiomeConfigStructures(Preset preset, IWorldConfig worldConfig, OTGBiomeProvider otgBiomeProvider, StructureSettings newSettings)
+	{
+		// TODO: Currently we can only enable/disable structures per biome and use any configuration options exposed by the vanilla structure 
+		// classes (size for villages fe). If we want to be able to customise more, we'll need to implement our own structure classes.
+		// TODO: Allow users to create their own jigsaw patterns (for villages, end cities, pillager outposts etc)?
+		// TODO: Amethyst Geodes (1.17?)	
 
+		// Add structures for OTG biomes
+		List<ResourceKey<Biome>> biomeKeys = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(preset.getFolderName());
+		HashMap<StructureFeature<?>, Builder<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> hashmap = new HashMap<>(newSettings.configuredStructures);
+		preset.getAllBiomeConfigs().stream().forEach(biomeConfig -> {
+			if(!biomeConfig.getIsTemplateForBiome())
+			{
+				Optional<ResourceKey<Biome>> biomeKey = biomeKeys.stream().filter(b -> b.getRegistryName().toString().equals(biomeConfig.getRegistryKey().toResourceLocationString())).findFirst();
+				if(biomeKey.isPresent())
+				{
+					Optional<Biome> biome = otgBiomeProvider.possibleBiomes().stream().filter(b -> b.getRegistryName().toString().equals(biomeConfig.getRegistryKey().toResourceLocationString())).findFirst();
+					if(biome.isPresent())
+					{
+						// Villages
+						// TODO: Allow spawning multiple types in a single biome?
+						if(worldConfig.getVillagesEnabled() && biomeConfig.getVillageType() != VillageType.disabled)
+						{
+							int villageSize = biomeConfig.getVillageSize();
+							VillageType villageType = biomeConfig.getVillageType();
+							ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customVillage = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("village").toResourceLocationString(),
+								StructureFeature.VILLAGE.configured(
+									new JigsawConfiguration(
+										() -> {
+											switch(villageType)
+											{
+												case sandstone:
+													return DesertVillagePools.START;
+												case savanna:
+													return SavannaVillagePools.START;
+												case taiga:
+													return TaigaVillagePools.START;
+												case wood:
+													return PlainVillagePools.START;
+												case snowy:
+													return SnowyVillagePools.START;
+												case disabled: // Should never happen
+													break;
+											}
+											return PlainVillagePools.START;
+										},
+										villageSize
+									)
+								)
+							);
+							addStructureToBiome(hashmap, customVillage, biomeKey.get());
+						}
+						
+						// Strongholds
+						if(worldConfig.getStrongholdsEnabled() && biomeConfig.getStrongholdsEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.STRONGHOLD, biomeKey.get());
+						}		
+
+						// Ocean Monuments
+						if(worldConfig.getOceanMonumentsEnabled() && biomeConfig.getOceanMonumentsEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.OCEAN_MONUMENT, biomeKey.get());
+						}
+						
+						// Rare buildings
+						// TODO: Allow spawning multiple types in a single biome?
+						if(worldConfig.getRareBuildingsEnabled() && biomeConfig.getRareBuildingType() != RareBuildingType.disabled)
+						{
+							switch(biomeConfig.getRareBuildingType())
+							{
+								case desertPyramid:
+									addStructureToBiome(hashmap, StructureFeatures.DESERT_PYRAMID, biomeKey.get());
+									break;
+								case igloo:
+									addStructureToBiome(hashmap, StructureFeatures.IGLOO, biomeKey.get());
+									break;
+								case jungleTemple:
+									addStructureToBiome(hashmap, StructureFeatures.JUNGLE_TEMPLE, biomeKey.get());			
+									break;
+								case swampHut:
+									addStructureToBiome(hashmap, StructureFeatures.SWAMP_HUT, biomeKey.get());
+									break;
+								case disabled:
+									break;					
+							}
+						}
+						
+						// Woodland Mansions
+						if(worldConfig.getWoodlandMansionsEnabled() && biomeConfig.getWoodlandMansionsEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.WOODLAND_MANSION, biomeKey.get());
+						}
+						
+						// Nether Fortresses
+						if(worldConfig.getNetherFortressesEnabled() && biomeConfig.getNetherFortressesEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.NETHER_BRIDGE, biomeKey.get());
+						}
+
+						// Mineshafts
+						if(worldConfig.getMineshaftsEnabled() && biomeConfig.getMineShaftType() != MineshaftType.disabled)
+						{
+							float mineShaftProbability = biomeConfig.getMineShaftProbability();
+							MineshaftType mineShaftType = biomeConfig.getMineShaftType();
+							ConfiguredStructureFeature<MineshaftConfiguration, ? extends StructureFeature<MineshaftConfiguration>> customMineShaft = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("mineshaft").toResourceLocationString(),
+								StructureFeature.MINESHAFT.configured(
+									new MineshaftConfiguration(
+										mineShaftProbability,
+										mineShaftType == MineshaftType.mesa ? MineshaftFeature.Type.MESA : MineshaftFeature.Type.NORMAL
+									)
+								)
+							);
+							addStructureToBiome(hashmap, customMineShaft, biomeKey.get());
+						}
+						
+						// Buried Treasure
+						if(worldConfig.getBuriedTreasureEnabled() && biomeConfig.getBuriedTreasureEnabled())
+						{
+							float buriedTreasureProbability = biomeConfig.getBuriedTreasureProbability();
+							ConfiguredStructureFeature<ProbabilityFeatureConfiguration, ? extends StructureFeature<ProbabilityFeatureConfiguration>> customBuriedTreasure = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("buried_treasure").toResourceLocationString(),
+								StructureFeature.BURIED_TREASURE.configured(new ProbabilityFeatureConfiguration(buriedTreasureProbability))
+							);
+							addStructureToBiome(hashmap, customBuriedTreasure, biomeKey.get());
+						}
+						
+						// Ocean Ruins
+						if(worldConfig.getOceanRuinsEnabled() && biomeConfig.getOceanRuinsType() != OceanRuinsType.disabled)
+						{
+							float oceanRuinsLargeProbability = biomeConfig.getOceanRuinsLargeProbability();
+							float oceanRuinsClusterProbability = biomeConfig.getOceanRuinsClusterProbability();
+							OceanRuinsType oceanRuinsType = biomeConfig.getOceanRuinsType();
+							ConfiguredStructureFeature<OceanRuinConfiguration, ? extends StructureFeature<OceanRuinConfiguration>> customOceanRuins = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("ocean_ruin").toResourceLocationString(),
+								StructureFeature.OCEAN_RUIN.configured(
+									new OceanRuinConfiguration(
+										oceanRuinsType == OceanRuinsType.cold ? OceanRuinFeature.Type.COLD : OceanRuinFeature.Type.WARM,
+										oceanRuinsLargeProbability,
+										oceanRuinsClusterProbability
+									)
+								)
+							);
+							addStructureToBiome(hashmap, customOceanRuins, biomeKey.get());
+						}
+
+						// Shipwrecks
+						// TODO: Allowing both types in the same biome, make sure this won't cause problems.
+						if(worldConfig.getShipWrecksEnabled())
+						{
+							if(biomeConfig.getShipWreckEnabled())
+							{
+								addStructureToBiome(hashmap, StructureFeatures.SHIPWRECK, biomeKey.get());
+							}
+							if(biomeConfig.getShipWreckBeachedEnabled())
+							{
+								addStructureToBiome(hashmap, StructureFeatures.SHIPWRECK_BEACHED, biomeKey.get());
+							}			
+						}
+						
+						// Pillager Outpost
+						if(worldConfig.getPillagerOutpostsEnabled() && biomeConfig.getPillagerOutpostEnabled())
+						{
+							int outpostSize = biomeConfig.getPillagerOutPostSize();
+							ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customOutpost = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("pillager_outpost").toResourceLocationString(), 
+								StructureFeature.PILLAGER_OUTPOST.configured(
+									new JigsawConfiguration(
+										() -> {
+											return PillagerOutpostPools.START;
+										},
+										outpostSize
+									)
+								)
+							);
+							addStructureToBiome(hashmap, customOutpost, biomeKey.get());							
+						}
+						
+						// Bastion Remnants
+						if(worldConfig.getBastionRemnantsEnabled() && biomeConfig.getBastionRemnantEnabled())
+						{
+							int bastionRemnantSize = biomeConfig.getBastionRemnantSize();
+							ConfiguredStructureFeature<JigsawConfiguration, ? extends StructureFeature<JigsawConfiguration>> customBastionRemnant = register(
+								((OTGBiomeResourceLocation)biomeConfig.getRegistryKey()).withBiomeResource("bastion_remnant").toResourceLocationString(), 
+								StructureFeature.BASTION_REMNANT.configured(
+									new JigsawConfiguration(
+										() -> {
+											return BastionPieces.START;
+										},
+										bastionRemnantSize
+									)
+								)
+							);
+							addStructureToBiome(hashmap, customBastionRemnant, biomeKey.get());
+						}
+						
+						// Nether Fossils
+						if(worldConfig.getNetherFossilsEnabled() && biomeConfig.getNetherFossilEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.NETHER_FOSSIL, biomeKey.get());
+						}
+						
+						// End Cities
+						if(worldConfig.getEndCitiesEnabled() && biomeConfig.getEndCityEnabled())
+						{
+							addStructureToBiome(hashmap, StructureFeatures.END_CITY, biomeKey.get());
+						}
+						
+						// Ruined Portals
+						if(worldConfig.getRuinedPortalsEnabled() && biomeConfig.getRuinedPortalType() != RuinedPortalType.disabled)
+						{
+							switch(biomeConfig.getRuinedPortalType())
+							{
+								case normal:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_STANDARD, biomeKey.get());
+									break;
+								case desert:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_DESERT, biomeKey.get());
+									break;
+								case jungle:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_JUNGLE, biomeKey.get());
+									break;
+								case swamp:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_SWAMP, biomeKey.get());
+									break;
+								case mountain:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_MOUNTAIN, biomeKey.get());
+									break;
+								case ocean:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_OCEAN, biomeKey.get());
+									break;
+								case nether:
+									addStructureToBiome(hashmap, StructureFeatures.RUINED_PORTAL_NETHER, biomeKey.get());
+									break;
+								case disabled:
+									break;
+							}
+						}											
+					}
+				}
+			}
+		});
+		
+		newSettings.configuredStructures = hashmap.entrySet().stream().collect(ImmutableMap.toImmutableMap(Entry::getKey, (p_189370_) -> {
+			return p_189370_.getValue().build();
+		}));	
+	}
+	
+	// StructureFeatures.register()
+	private static <FC extends FeatureConfiguration, F extends StructureFeature<FC>> ConfiguredStructureFeature<FC, F> register(String name, ConfiguredStructureFeature<FC, F> structure)
+	{
+		return BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, name, structure);
+	}	
+	
+	private static void addStructureToBiome(HashMap<StructureFeature<?>, Builder<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> hashmap, ConfiguredStructureFeature<?, ?> configuredStructureFeature, ResourceKey<Biome> biomeKey)
+	{
+		BiConsumer<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> consumer = (p_189367_, p_189368_) -> {
+			hashmap.computeIfAbsent(
+				p_189367_.feature,
+				(p_189374_) -> { 
+					return new ImmutableMap.Builder<ConfiguredStructureFeature<?,?>,ResourceKey<Biome>>(); 
+				}
+			).put(p_189367_, p_189368_);
+		};
+		consumer.accept(configuredStructureFeature, biomeKey);
+	}	
+	
+	//
+	
 	public ICachedBiomeProvider getCachedBiomeProvider()
 	{
 		return this.internalGenerator.getCachedBiomeProvider();
