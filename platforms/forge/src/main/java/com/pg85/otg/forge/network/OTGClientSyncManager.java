@@ -6,7 +6,6 @@ import java.util.Map;
 import com.pg85.otg.constants.Constants;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -27,6 +26,7 @@ public class OTGClientSyncManager
 
 	public static void setup()
 	{
+		/*
 		LOGIN.messageBuilder(PacketSyncBiomeSettings.class, 0, NetworkDirection.LOGIN_TO_CLIENT)
 			.loginIndex(OTGLoginMessage::getLoginIndex, OTGLoginMessage::setLoginIndex)
 			.encoder(PacketSyncBiomeSettings::encode).decoder(PacketSyncBiomeSettings::decode).markAsLoginPacket()
@@ -41,6 +41,7 @@ public class OTGClientSyncManager
 
 		SPIGOT.registerMessage(1, PacketSyncBiomeSettings.class, PacketSyncBiomeSettings::encode,
 			PacketSyncBiomeSettings::decodeSpigot, PacketSyncBiomeSettings::handleLogin);
+		*/
 	}
 
 	public static Map<String, BiomeSettingSyncWrapper> getSyncedData()

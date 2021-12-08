@@ -1,27 +1,17 @@
 package com.pg85.otg.forge.biome;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Map.Entry;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.constants.SettingsEnums.MineshaftType;
-import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
-import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
-import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
-import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.config.biome.BiomeConfig;
 import com.pg85.otg.gen.resource.RegistryResource;
 import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.interfaces.IWorldConfig;
-import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
@@ -32,51 +22,30 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
-import net.minecraft.world.level.biome.BiomeGenerationSettings.Builder;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.data.worldgen.BastionPieces;
-import net.minecraft.data.worldgen.DesertVillagePools;
-import net.minecraft.world.level.levelgen.feature.configurations.MineshaftConfiguration;
-import net.minecraft.world.level.levelgen.feature.MineshaftFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OceanRuinConfiguration;
-import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
-import net.minecraft.data.worldgen.PillagerOutpostPools;
-import net.minecraft.data.worldgen.PlainVillagePools;
-import net.minecraft.data.worldgen.SavannaVillagePools;
-import net.minecraft.data.worldgen.SnowyVillagePools;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.data.worldgen.StructureFeatures;
-import net.minecraft.data.worldgen.TaigaVillagePools;
-import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.common.world.MobSpawnSettingsBuilder;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public class ForgeBiome implements IBiome
 {
@@ -116,13 +85,14 @@ public class ForgeBiome implements IBiome
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
 		// TODO: What if there's no grass around spawn?
-		biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
+		//biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
 
 		// Register default carvers, we won't actually use these since we have
 		// our own carvers, but if they're replaced we'll know there are modded carvers.
-		BiomeDefaultFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
+		//BiomeDefaultFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
 
 		// Register any Registry() resources to the biome, to be handled by MC.
+		/*
 		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
 		{
 			if (res instanceof RegistryResource)
@@ -133,6 +103,7 @@ public class ForgeBiome implements IBiome
 				biomeGenerationSettingsBuilder.addFeature(stage, registry);
 			}
 		}
+		*/
 
 		float safeTemperature = biomeConfig.getBiomeTemperature();
 		if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
@@ -264,7 +235,7 @@ public class ForgeBiome implements IBiome
 		addMobGroup(MobCategory.WATER_CREATURE, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_CREATURE), biomeConfig.getName());
 		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_AMBIENT), biomeConfig.getName());
 		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MISC), biomeConfig.getName());
-		mobSpawnInfoBuilder.setPlayerCanSpawn();
+		//mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}
 

@@ -6,7 +6,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -14,14 +13,16 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 // Player capabilities used for tracking players in OTG portals. 
 public class OTGCapabilities
 {
-	@CapabilityInject(OTGPlayer.class)
+	//@CapabilityInject(OTGPlayer.class)
 	public static final Capability<OTGPlayer> OTG_PLAYER_CAPABILITY = null;
 	
 	public static void register()
 	{
+		/*
 		CapabilityManager.INSTANCE.register(
 			OTGPlayer.class
 		);
+		*/
 	}
 
 	@EventBusSubscriber(modid = Constants.MOD_ID_SHORT)

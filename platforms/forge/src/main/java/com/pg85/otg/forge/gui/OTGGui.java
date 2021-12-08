@@ -6,19 +6,14 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
+import com.mojang.datafixers.util.Pair;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.config.dimensions.DimensionConfig;
 import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.forge.biome.OTGBiomeProvider.PresetInstance;
 import com.pg85.otg.forge.dimensions.OTGDimensionTypeHelper;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gui.screens.CreateOTGDimensionsScreen;
@@ -30,20 +25,16 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.ParameterList;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.biome.Climate.ParameterPoint;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.DebugLevelSource;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -65,11 +56,22 @@ public class OTGGui
 				currentSelection.Overworld = new OTGOverWorld(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, null, null);
 				Registry<Biome> biomeRegistry = registry.registryOrThrow(Registry.BIOME_REGISTRY);
 				Registry<NoiseParameters> noiseParamsRegistry = registry.registryOrThrow(Registry.NOISE_REGISTRY);
+				
+				// Dummy list
+				ParameterList<Supplier<Biome>> paramList = new Climate.ParameterList<Supplier<Biome>>(
+					ImmutableList.of(
+						Pair.of(
+							(ParameterPoint)Climate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F), 
+							(Supplier<Biome>)() -> { return biomeRegistry.getOrThrow(Biomes.PLAINS); }
+						)
+					)
+				);
+				
 				return new OTGNoiseChunkGenerator(
 					noiseParamsRegistry,
 					new OTGBiomeProvider(
 						OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(),
-						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						paramList,
 						Optional.of(new OTGBiomeProvider.PresetInstance(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), OTGBiomeProvider.Preset.DEFAULT, biomeRegistry))				
 					),
 					seed,
@@ -127,6 +129,7 @@ public class OTGGui
 									} else {
 										MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(dynamicRegistries, seed);		      
 										WorldGenSettings existingDimSetting = null;
+										/*
 										switch(dimConfig.Overworld.NonOTGWorldType == null ? "" : dimConfig.Overworld.NonOTGWorldType)
 										{
 											case "flat":
@@ -153,6 +156,7 @@ public class OTGGui
 												existingDimSetting = new WorldGenSettings(seed, generateFeatures, generateBonusChest, WorldGenSettings.withOverworld(dimensionTypesRegistry, simpleregistry, WorldGenSettings.makeDefaultOverworld(dynamicRegistries, seed)));
 												break;
 										}
+										*/
 										dimensions = existingDimSetting.dimensions();
 									}
 								}

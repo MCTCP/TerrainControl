@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -26,8 +25,6 @@ import net.minecraft.resources.RegistryLookupCodec;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
-import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.biome.Climate.Sampler;
 import net.minecraft.world.level.biome.BiomeSource;
 
@@ -191,9 +188,15 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	{
 		public static final OTGBiomeProvider.Preset DEFAULT = new OTGBiomeProvider.Preset(
 			new ResourceLocation("default"), 
-			(biomeRegistry) -> {
-				Builder<Pair<Climate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
-				return new Climate.ParameterList<>(builder.build());
+			(biomeRegistry) -> { 
+				// Dummy list
+				return new Climate.ParameterList<>(
+					ImmutableList.of(
+						Pair.of(Climate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F), () -> {
+							return biomeRegistry.getOrThrow(Biomes.PLAINS);
+						})
+					)
+				);
 			}
 		);
 		
@@ -223,8 +226,14 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 					return Optional.ofNullable(new OTGBiomeProvider.Preset(
 						new ResourceLocation("otg"),
 						(biomeRegistry) -> {
-							Builder<Pair<Climate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
-							return new Climate.ParameterList<>(builder.build());
+							// Dummy list
+							return new Climate.ParameterList<>(
+								ImmutableList.of(
+									Pair.of(Climate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F), () -> {
+										return biomeRegistry.getOrThrow(Biomes.PLAINS);
+									})
+								)
+							);
 						}
 					)).map(DataResult::success).orElseGet(() -> {
 						return DataResult.error("Unknown preset: " + key);

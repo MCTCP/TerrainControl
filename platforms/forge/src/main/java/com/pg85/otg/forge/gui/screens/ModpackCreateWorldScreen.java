@@ -39,7 +39,6 @@ import net.minecraft.FileUtil;
 import net.minecraft.Util;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;

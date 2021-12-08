@@ -8,17 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map.Entry;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
-import org.apache.logging.log4j.LogManager;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.OTG;
@@ -32,7 +27,6 @@ import com.pg85.otg.interfaces.IWorldConfig;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
-import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.RegistryAccess;
@@ -42,14 +36,13 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.ParameterList;
+import net.minecraft.world.level.biome.Climate.ParameterPoint;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -101,6 +94,7 @@ public class OTGDimensionTypeHelper
 				Registry<NoiseGeneratorSettings> registry1 = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 				MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(dynamicRegistries, seed);		      
 				WorldGenSettings existingDimSetting = null;
+				/*
 				switch(dimConfig.Overworld.NonOTGWorldType == null ? "" : dimConfig.Overworld.NonOTGWorldType)
 				{
 					case "flat":
@@ -127,6 +121,7 @@ public class OTGDimensionTypeHelper
 						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, WorldGenSettings.makeDefaultOverworld(dynamicRegistries, seed)));
 						break;
 				}
+				*/
 				dimensions = existingDimSetting.dimensions();
 			}
 		}
@@ -152,15 +147,25 @@ public class OTGDimensionTypeHelper
 		MappedRegistry<LevelStem> dimensions = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
 		boolean nonOTGOverWorld = dimConfig.Overworld.PresetFolderName == null;
 
+		// Dummy list
+		ParameterList<Supplier<Biome>> paramList = new Climate.ParameterList<Supplier<Biome>>(
+			ImmutableList.of(
+				Pair.of(
+					(ParameterPoint)Climate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F), 
+					(Supplier<Biome>)() -> { return biomesRegistry.getOrThrow(Biomes.PLAINS); }
+				)
+			)
+		);
+		
 		if(dimConfig.Overworld != null && dimConfig.Overworld.PresetFolderName != null && !nonOTGOverWorld)
-		{			
+		{
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
 				dimConfig.Overworld.PresetFolderName, 
 				dimConfigName,
 				noiseParamsRegistry,
 				new OTGBiomeProvider(
 					dimConfig.Overworld.PresetFolderName,
-					new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+					paramList,
 					Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Overworld.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
 				),
 				seed,
@@ -177,7 +182,7 @@ public class OTGDimensionTypeHelper
 					noiseParamsRegistry,
 					new OTGBiomeProvider(
 						dimConfig.Nether.PresetFolderName,
-						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						paramList,
 						Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Nether.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
 					),					
 					dimSeed,
@@ -193,8 +198,8 @@ public class OTGDimensionTypeHelper
 					dimConfigName, 
 					noiseParamsRegistry,
 					new OTGBiomeProvider(
-							dimConfig.End.PresetFolderName,
-						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						dimConfig.End.PresetFolderName,
+						paramList,
 						Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Nether.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
 					),					
 					dimSeed,
@@ -215,7 +220,7 @@ public class OTGDimensionTypeHelper
 						noiseParamsRegistry,
 						new OTGBiomeProvider(
 							otgDim.PresetFolderName,
-							new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+							paramList,
 							Optional.of(new OTGBiomeProvider.PresetInstance(otgDim.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
 						),
 						dimSeed,

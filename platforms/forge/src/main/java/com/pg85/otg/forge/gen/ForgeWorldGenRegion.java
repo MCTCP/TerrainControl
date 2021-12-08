@@ -786,7 +786,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		//Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 	
 	@Override

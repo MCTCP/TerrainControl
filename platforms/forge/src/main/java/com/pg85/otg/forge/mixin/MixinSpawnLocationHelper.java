@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerRespawnLogic.class)
 public class MixinSpawnLocationHelper
 {
-	@Inject(method = "getOverworldRespawnPos", at = @At("HEAD"), cancellable = true)
+	//@Inject(method = "getOverworldRespawnPos", at = @At("HEAD"), cancellable = true)
 	private static void fixSpawningInGround(ServerLevel world, int x, int z, boolean needsValidSpawn, CallbackInfoReturnable<BlockPos> cir)
 	{
 		if (world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)

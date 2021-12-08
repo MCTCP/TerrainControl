@@ -37,8 +37,6 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.ticks.ScheduledTick;
-import net.minecraft.world.ticks.TickPriority;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
