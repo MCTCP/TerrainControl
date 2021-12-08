@@ -13,12 +13,12 @@ public class OTGForgeAPI
 	@SuppressWarnings("resource")
 	public static IBiomeConfig getOTGBiome(ServerLevel world, BlockPos pos)
 	{
-		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			return null;
 		}
 
-		return ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getCachedBiomeProvider()
+		return ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getCachedBiomeProvider()
 				.getBiomeConfig(pos.getX(), pos.getZ());
 	}
 

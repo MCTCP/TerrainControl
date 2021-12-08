@@ -29,7 +29,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.OverworldBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -39,7 +38,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraftforge.common.world.ForgeWorldType;
+import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class OTGGui
@@ -49,7 +48,8 @@ public class OTGGui
 	// Define a new world type for the world creation screen
 	public static final WorldPreset OTG_WORLD_TYPE = new WorldPreset(Constants.MOD_ID_SHORT)
 	{
-		protected ChunkGenerator generator(Registry<Biome> biomes, Registry<NoiseGeneratorSettings> dimensionSettings, long seed)
+		@Override
+		protected ChunkGenerator generator(RegistryAccess p_194083_, long p_194084_)
 		{
 			// Called when selecting the OTG world type in the world creation gui.
 			currentSelection = DimensionConfig.createDefaultConfig();
@@ -103,7 +103,7 @@ public class OTGGui
 								if(dimConfig.isModpackConfig())
 								{
 									// Non-otg overworld, generatorsettings contains non-otg world type.
-									ForgeWorldType def = dimConfig.Overworld.NonOTGWorldType == null ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
+									ForgeWorldPreset def = dimConfig.Overworld.NonOTGWorldType == null ? null : ForgeRegistries.WORLD_TYPES.getValue(new ResourceLocation(dimConfig.Overworld.NonOTGWorldType));
 									if(def != null)
 									{
 										WorldGenSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateFeatures, generateBonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);

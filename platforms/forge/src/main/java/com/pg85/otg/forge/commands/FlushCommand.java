@@ -29,7 +29,7 @@ public class FlushCommand extends BaseCommand
 	
 	protected int flushCache(CommandSourceStack source)
 	{
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;

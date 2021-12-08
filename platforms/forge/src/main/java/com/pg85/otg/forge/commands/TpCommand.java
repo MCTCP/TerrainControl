@@ -65,13 +65,13 @@ public class TpCommand extends BaseCommand
 		biome = biome.toLowerCase();
 
 		ServerLevel world = source.getLevel();
-		if (!(world.getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 
-		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().generator).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator) world.getChunkSource().getGenerator()).getPreset();
 
 		ResourceLocation key = new ResourceLocation(new OTGBiomeResourceLocation(preset.getPresetFolder(),
 				preset.getShortPresetName(), preset.getMajorVersion(), biome).toResourceLocationString());
@@ -84,7 +84,7 @@ public class TpCommand extends BaseCommand
 			throw ERROR_BIOME_NOT_FOUND.create(biome);
 		} else
 		{
-			int y = world.getChunkSource().generator.getBaseHeight(pos.getX(), pos.getZ(),
+			int y = world.getChunkSource().getGenerator().getBaseHeight(pos.getX(), pos.getZ(),
 					Types.MOTION_BLOCKING_NO_LEAVES, world);
 			source.getPlayerOrException().teleportTo(pos.getX(), y, pos.getZ());
 			source.sendSuccess(new TextComponent("Teleporting you to the nearest " + biome + "."), false);
@@ -97,9 +97,9 @@ public class TpCommand extends BaseCommand
 	{
 		List<String> biomes = new ArrayList<>();
 
-		if (context.getSource().getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if (context.getSource().getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
-			biomes = ((OTGNoiseChunkGenerator) context.getSource().getLevel().getChunkSource().generator).getPreset()
+			biomes = ((OTGNoiseChunkGenerator) context.getSource().getLevel().getChunkSource().getGenerator()).getPreset()
 					.getAllBiomeNames().stream().map(name -> name.replace(' ', '_')).collect(Collectors.toList());
 		}
 

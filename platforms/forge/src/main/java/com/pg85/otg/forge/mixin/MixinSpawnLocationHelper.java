@@ -17,7 +17,7 @@ public class MixinSpawnLocationHelper
 	@Inject(method = "getOverworldRespawnPos", at = @At("HEAD"), cancellable = true)
 	private static void fixSpawningInGround(ServerLevel world, int x, int z, boolean needsValidSpawn, CallbackInfoReturnable<BlockPos> cir)
 	{
-		if (world.getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if (world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
 			LevelChunk chunk = world.getChunk(x >> 4, z >> 4);
 			int topY = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15);

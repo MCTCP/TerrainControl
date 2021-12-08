@@ -38,7 +38,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.registries.RegistryObject;
 
 public class OTGTeleporter implements ITeleporter
 {
@@ -218,7 +218,7 @@ public class OTGTeleporter implements ITeleporter
 	{
 		if (
 			entity.level.dimension() != Level.OVERWORLD &&
-			!(((ServerLevel)entity.level).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			!(((ServerLevel)entity.level).getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		)
 		{
 			return null;
@@ -248,10 +248,10 @@ public class OTGTeleporter implements ITeleporter
 						world.dimension() != Level.OVERWORLD &&
 						world.dimension() != Level.END &&
 						world.dimension() != Level.NETHER &&
-						world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+						world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 					)
 					{
-						OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().generator);
+						OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().getGenerator());
 						String portalColor = generator.getPortalColor().toLowerCase().trim();
 						while(usedColors.contains(portalColor))
 						{

@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.world.ForgeWorldType;
+import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -83,7 +83,7 @@ public class OTGPlugin
 	// For MP we use server.properties level-type:otg + generatorSettings:presetFolderName
 	@SubscribeEvent
 	@OnlyIn(Dist.DEDICATED_SERVER)
-	public static void registerWorldType(RegistryEvent.Register<ForgeWorldType> event)
+	public static void registerWorldType(RegistryEvent.Register<ForgeWorldPreset> event)
 	{
 		ForgeRegistries.WORLD_TYPES.register(new OTGWorldType());
 	}
@@ -118,10 +118,10 @@ public class OTGPlugin
 		// Unfortunately there doesn't appear to be a way to persist them via code(?)
 		if(!event.getWorld().isClientSide())
 		{
-			if(((ServerLevel)event.getWorld()).getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			if(((ServerLevel)event.getWorld()).getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 			{
 				Path datapackDir = ((ServerLevel)event.getWorld()).getLevel().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
-				Preset preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getLevel().getChunkSource().generator).getPreset();
+				Preset preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getLevel().getChunkSource().getGenerator()).getPreset();
 				String dimName = ((ServerLevel)event.getWorld()).dimension().location().getPath();
 				OTGDimensionTypeHelper.saveDataPackFile(datapackDir, dimName, preset.getWorldConfig(), preset.getFolderName());
 			}

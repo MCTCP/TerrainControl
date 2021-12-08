@@ -56,10 +56,9 @@ import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.data.worldgen.TaigaVillagePools;
 import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
-import net.minecraft.data.worldgen.SurfaceBuilders;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
-import net.minecraftforge.common.world.MobSpawnInfoBuilder;
+import net.minecraftforge.common.world.MobSpawnSettingsBuilder;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -223,19 +222,17 @@ public class ForgeBiome implements IBiome
 
 		// Fire Forge BiomeLoadingEvent to allow other mods to enrich otg biomes with decoration features, structure features and mob spawns.
 		BiomeGenerationSettingsBuilder genBuilder = new BiomeGenerationSettingsBuilder(biomeGenerationSettingsBuilder.build());
-		MobSpawnInfoBuilder spawnBuilder = new MobSpawnInfoBuilder(mobSpawnInfoBuilder.build());
-		BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.ClimateSettings(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeConfig.getBiomeHeight(), biomeConfig.getBiomeVolatility(), biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
+		MobSpawnSettingsBuilder spawnBuilder = new MobSpawnSettingsBuilder(mobSpawnInfoBuilder.build());
+		BiomeLoadingEvent event1 = new BiomeLoadingEvent(registryName, new Biome.ClimateSettings(rainType, safeTemperature, TemperatureModifier.NONE, biomeConfig.getBiomeWetness()), category, biomeAmbienceBuilder.build(), genBuilder, spawnBuilder);
 		MinecraftForge.EVENT_BUS.post(event1);
 		BiomeSpecialEffects biomeAmbienceBuilder2 = event1.getEffects();
 		BiomeGenerationSettingsBuilder biomeGenerationSettingsBuilder2 = event1.getGeneration();
-		MobSpawnInfoBuilder mobSpawnInfoBuilder2 = event1.getSpawns();
+		MobSpawnSettingsBuilder mobSpawnInfoBuilder2 = event1.getSpawns();
 		//
 
 		Biome.BiomeBuilder biomeBuilder = 
 			new Biome.BiomeBuilder()
 			.precipitation(rainType)
-			.depth(biomeConfig.getBiomeHeight())
-			.scale(biomeConfig.getBiomeVolatility())
 			.temperature(safeTemperature)
 			.downfall(biomeConfig.getBiomeWetness())
 			.specialEffects(biomeAmbienceBuilder2)
@@ -430,7 +427,7 @@ public class ForgeBiome implements IBiome
 			}
 			if(biomeConfig.getShipWreckBeachedEnabled())
 			{
-				biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.SHIPWRECH_BEACHED);
+				biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.SHIPWRECK_BEACHED);
 			}			
 		}
 		

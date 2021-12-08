@@ -29,7 +29,7 @@ public abstract class MixinLocateCommand
 	@Inject(method = "locate", at = @At("HEAD"), cancellable = true)
 	private static void searchInSmallerRadius(CommandSourceStack source, StructureFeature<?> structure, CallbackInfoReturnable<Integer> cir) throws CommandSyntaxException
 	{
-		if (source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if (source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
 			BlockPos blockpos = new BlockPos(source.getPosition());
 			BlockPos blockpos1 = source.getLevel().findNearestMapFeature(structure, blockpos, 20, false);

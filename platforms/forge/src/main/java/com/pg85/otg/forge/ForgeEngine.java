@@ -46,10 +46,10 @@ public class ForgeEngine extends OTGEngine
 		if(
 			!world.isClientSide() && 
 			world.getChunkSource() instanceof ServerChunkCache && 
-			((ServerChunkCache)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+			((ServerChunkCache)world.getChunkSource()).getGenerator() instanceof OTGNoiseChunkGenerator
 		)
 		{
-			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).generator).saveStructureCache();
+			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).getGenerator()).saveStructureCache();
 		}
 	}
 
@@ -59,10 +59,10 @@ public class ForgeEngine extends OTGEngine
 		if(
 			!world.isClientSide() && 
 			world.getChunkSource() instanceof ServerChunkCache && 
-			((ServerChunkCache)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+			((ServerChunkCache)world.getChunkSource()).getGenerator() instanceof OTGNoiseChunkGenerator
 		)
 		{
-			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).generator).stopWorkerThreads();
+			((OTGNoiseChunkGenerator)((ServerChunkCache)world.getChunkSource()).getGenerator()).stopWorkerThreads();
 		}
 	}
 	

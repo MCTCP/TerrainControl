@@ -100,8 +100,8 @@ public class MapCommand extends BaseCommand
 	private static int mapBiomes(CommandSourceStack source, int width, int height, int threads)
 	{
 		if (
-			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
-			!(source.getLevel().getChunkSource().generator.getBiomeSource() instanceof OTGBiomeProvider)
+			!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator) || 
+			!(source.getLevel().getChunkSource().getGenerator().getBiomeSource() instanceof OTGBiomeProvider)
 		)
 		{
 			source.sendSuccess(new TextComponent("Please run this command in an OTG world."), false);
@@ -111,7 +111,7 @@ public class MapCommand extends BaseCommand
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		Instant start = Instant.now();
-		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, true, threads);
+		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator(), true, threads);
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish); // Note: This is probably the least helpful time duration helper class I've ever seen ...
 		
@@ -137,8 +137,8 @@ public class MapCommand extends BaseCommand
 	private static int mapTerrain(CommandSourceStack source, int width, int height, int threads)
 	{
 		if (
-			!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator) || 
-			!(source.getLevel().getChunkSource().generator.getBiomeSource() instanceof OTGBiomeProvider)
+			!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator) || 
+			!(source.getLevel().getChunkSource().getGenerator().getBiomeSource() instanceof OTGBiomeProvider)
 		)
 		{
 			source.sendSuccess(new TextComponent("Please run this command in an OTG world."), false);
@@ -148,7 +148,7 @@ public class MapCommand extends BaseCommand
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		Instant start = Instant.now();
-		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator, false, threads);
+		handleArea(width, height, img, source, (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator(), false, threads);
 		Instant finish = Instant.now();
 		Duration duration = Duration.between(start, finish);		
 		

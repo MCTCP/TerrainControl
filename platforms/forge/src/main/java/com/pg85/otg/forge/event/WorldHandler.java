@@ -30,9 +30,9 @@ public class WorldHandler
 		{
 			// If a fixed spawn point is configured in the WorldConfig, apply it.
 			IWorldConfig worldConfig = null;
-			if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+			if(((ServerLevel)event.getWorld()).getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 			{
-				worldConfig = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset().getWorldConfig();
+				worldConfig = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().getGenerator()).getPreset().getWorldConfig();
 				if(worldConfig.getSpawnPointSet())
 				{
 					event.setCanceled(true);
@@ -130,7 +130,7 @@ public class WorldHandler
 		{
 			if(!((ServerLevel)event.getWorld()).dimension().location().equals(LevelStem.OVERWORLD.location()))
 			{
-				ChunkGenerator chunkGenerator = ((ServerLevel)event.getWorld()).getChunkSource().generator;
+				ChunkGenerator chunkGenerator = ((ServerLevel)event.getWorld()).getChunkSource().getGenerator();
 				if(chunkGenerator instanceof OTGNoiseChunkGenerator)
 				{
 					((ServerLevel)event.getWorld()).getServer().overworld().setDayTime(event.getNewTime());

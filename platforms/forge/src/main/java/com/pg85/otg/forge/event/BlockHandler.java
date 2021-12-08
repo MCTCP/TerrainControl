@@ -21,9 +21,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 // Only used for portal ignition logic atm.
 @EventBusSubscriber(modid = Constants.MOD_ID_SHORT)
@@ -39,7 +39,7 @@ public class BlockHandler
 			event.getWorld().dimension() != Level.NETHER && 
 			(
 				event.getWorld().dimension() == Level.OVERWORLD ||
-				((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator
+				((ServerLevel)event.getWorld()).getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 			)
 		)
 		{
@@ -55,10 +55,10 @@ public class BlockHandler
 					world.dimension() != Level.END && 
 					world.dimension() != Level.NETHER && 
 					world.dimension() != Level.OVERWORLD &&
-					world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+					world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 				)
 				{
-					OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().generator);	
+					OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().getGenerator());	
 					Item ignitionItem = null;
 					try
 					{

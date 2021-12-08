@@ -37,7 +37,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.registries.RegistryObject;
 
 // TODO: Customisable portal particles, requires preset lookup on client.
 public class OTGPortalBlock extends NetherPortalBlock
@@ -54,7 +54,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 	{
 		if(
 			serverworld.dimension() == Level.OVERWORLD ||
-			serverworld.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+			serverworld.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 		)
 		{
 			boolean tryPortal = false;
@@ -183,10 +183,10 @@ public class OTGPortalBlock extends NetherPortalBlock
 					world.dimension() != Level.OVERWORLD &&
 					world.dimension() != Level.END &&
 					world.dimension() != Level.NETHER &&
-					world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+					world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 				)
 				{
-					OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().generator);
+					OTGNoiseChunkGenerator generator = ((OTGNoiseChunkGenerator)world.getChunkSource().getGenerator());
 					String portalColor = generator.getPortalColor().toLowerCase().trim();
 					while(usedColors.contains(portalColor))
 					{
@@ -231,7 +231,7 @@ public class OTGPortalBlock extends NetherPortalBlock
 				serverWorld.dimension() != Level.NETHER &&
 				(
 					serverWorld.dimension() == Level.OVERWORLD ||
-					serverWorld.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+					serverWorld.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 				)
 			)
 			{
@@ -244,10 +244,10 @@ public class OTGPortalBlock extends NetherPortalBlock
 						world.dimension() != Level.OVERWORLD &&
 						world.dimension() != Level.END &&
 						world.dimension() != Level.NETHER &&
-						world.getChunkSource().generator instanceof OTGNoiseChunkGenerator
+						world.getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator
 					)
 					{
-						String portalColor = ((OTGNoiseChunkGenerator)world.getChunkSource().generator).getPortalColor().toLowerCase().trim();
+						String portalColor = ((OTGNoiseChunkGenerator)world.getChunkSource().getGenerator()).getPortalColor().toLowerCase().trim();
 						while(usedColors.contains(portalColor))
 						{
 							portalColor = OTGPortalColors.getNextPortalColor(portalColor);	

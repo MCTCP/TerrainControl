@@ -55,13 +55,13 @@ public class ExportBO4DataCommand extends BaseCommand
 	
 	private int exportBO4Data(CommandSourceStack source)
 	{		
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
 
-		Preset preset = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()).getPreset();
         if(preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4)
         {
         	if(!isRunning)
@@ -97,7 +97,7 @@ public class ExportBO4DataCommand extends BaseCommand
 				        	                		// World save folder name may not be identical to level name, fetch it.
 				        	                		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 				        	                		IWorldGenRegion worldGenRegion = new ForgeWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), source.getLevel(), (OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator());
-				        	                		structureStart.getMinimumSize(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder), worldGenRegion, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				        	                		structureStart.getMinimumSize(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder), worldGenRegion, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 				        						}
 				        	                	catch (InvalidConfigException e)
 				        	                	{

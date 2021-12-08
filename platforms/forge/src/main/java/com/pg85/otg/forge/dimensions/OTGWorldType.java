@@ -3,9 +3,9 @@ package com.pg85.otg.forge.dimensions;
 import com.pg85.otg.constants.Constants;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.world.ForgeWorldType;
+import net.minecraftforge.common.world.ForgeWorldPreset;
 
-public class OTGWorldType extends ForgeWorldType
+public class OTGWorldType extends ForgeWorldPreset
 {
 	public OTGWorldType()
 	{

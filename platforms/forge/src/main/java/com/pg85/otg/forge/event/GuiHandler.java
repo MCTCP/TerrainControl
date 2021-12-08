@@ -6,7 +6,6 @@ import com.pg85.otg.forge.gui.screens.ModpackCreateWorldScreen;
 
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 

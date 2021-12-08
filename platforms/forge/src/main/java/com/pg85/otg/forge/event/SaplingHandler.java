@@ -47,14 +47,14 @@ public class SaplingHandler
         BlockPos blockPos = event.getPos();
 		ForgeWorldGenRegion worldGenRegion;	
 		Preset preset;
-		if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if(((ServerLevel)event.getWorld()).getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
-			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset();
+			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().getGenerator()).getPreset();
 			worldGenRegion = new ForgeWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
 				(ServerLevel)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator)
+				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().getGenerator())
 			);
 		} else { 
 			return;
@@ -170,14 +170,14 @@ public class SaplingHandler
         BlockPos blockPos = event.getPos();        
 		IWorldGenRegion worldGenRegion;	
 		Preset preset;
-		if(((ServerLevel)event.getWorld()).getChunkSource().generator instanceof OTGNoiseChunkGenerator)
+		if(((ServerLevel)event.getWorld()).getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator)
 		{
-			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator).getPreset();
+			preset = ((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().getGenerator()).getPreset();
 			worldGenRegion = new ForgeWorldGenRegion(
 				preset.getFolderName(), 
 				preset.getWorldConfig(), 
 				(ServerLevel)event.getWorld(), 
-				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().generator)
+				((OTGNoiseChunkGenerator)((ServerLevel)event.getWorld()).getChunkSource().getGenerator())
 			);
 		} else {
 			return;

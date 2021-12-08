@@ -40,9 +40,6 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.FuzzyOffsetConstantColumnBiomeZoomer;
-import net.minecraft.world.level.biome.BiomeZoomer;
-import net.minecraft.world.level.biome.OverworldBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -50,7 +47,6 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraftforge.common.world.ForgeWorldType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class OTGDimensionTypeHelper
