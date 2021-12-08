@@ -46,6 +46,7 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.data.worldgen.BastionPieces;
 import net.minecraft.data.worldgen.DesertVillagePools;
@@ -128,7 +129,7 @@ public class ForgeBiome implements IBiome
 			{
 				RegistryResource registryResource = (RegistryResource)res;
 				Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
-				ConfiguredFeature<?, ?> registry = BuiltinRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
+				PlacedFeature registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
 				biomeGenerationSettingsBuilder.addFeature(stage, registry);
 			}
 		}

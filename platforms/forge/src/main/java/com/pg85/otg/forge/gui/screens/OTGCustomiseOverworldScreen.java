@@ -39,11 +39,7 @@ public class OTGCustomiseOverworldScreen extends CreateWorldScreen
 						false
 					)
 				).orElseGet(
-					() -> WorldGenSettings.makeDefault(
-						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY),
-						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY),
-						parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
-					)
+					() -> WorldGenSettings.makeDefault(parent.parent.worldGenSettingsComponent.registryHolder())
 				),
 				net.minecraftforge.client.ForgeHooksClient.getDefaultWorldPreset(), OptionalLong.empty()
 			),

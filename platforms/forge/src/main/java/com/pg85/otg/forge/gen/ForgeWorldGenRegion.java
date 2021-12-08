@@ -418,11 +418,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 			if (material.isLiquid())
 			{
-				this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
+				this.worldGenRegion.scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
 			}
 			else if (material.isMaterial(LocalMaterials.COMMAND_BLOCK))
 			{
-				this.worldGenRegion.getBlockTicks().scheduleTick(pos, ((ForgeMaterialData) material).internalBlock().getBlock(), 0);
+				this.worldGenRegion.scheduleTick(pos, ((ForgeMaterialData) material).internalBlock().getBlock(), 0);
 			}
 
 			if (nbt != null)

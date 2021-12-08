@@ -1,7 +1,9 @@
 package com.pg85.otg.forge.gui;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +18,7 @@ import com.pg85.otg.core.OTG;
 import com.pg85.otg.core.config.dimensions.DimensionConfig;
 import com.pg85.otg.core.config.dimensions.DimensionConfig.OTGOverWorld;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.biome.OTGBiomeProvider.PresetInstance;
 import com.pg85.otg.forge.dimensions.OTGDimensionTypeHelper;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gui.screens.CreateOTGDimensionsScreen;
@@ -29,6 +32,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.Climate.ParameterList;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -38,6 +44,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters;
 import net.minecraftforge.common.world.ForgeWorldPreset;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,24 +56,32 @@ public class OTGGui
 	public static final WorldPreset OTG_WORLD_TYPE = new WorldPreset(Constants.MOD_ID_SHORT)
 	{
 		@Override
-		protected ChunkGenerator generator(RegistryAccess p_194083_, long p_194084_)
+		protected ChunkGenerator generator(RegistryAccess registry, long seed)
 		{
 			// Called when selecting the OTG world type in the world creation gui.
 			currentSelection = DimensionConfig.createDefaultConfig();
 			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 			{
 				currentSelection.Overworld = new OTGOverWorld(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, null, null);
-				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(NoiseGeneratorSettings.OVERWORLD));
+				Registry<Biome> biomeRegistry = registry.registryOrThrow(Registry.BIOME_REGISTRY);
+				Registry<NoiseParameters> noiseParamsRegistry = registry.registryOrThrow(Registry.NOISE_REGISTRY);
+				return new OTGNoiseChunkGenerator(
+					noiseParamsRegistry,
+					new OTGBiomeProvider(
+						OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(),
+						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						Optional.of(new OTGBiomeProvider.PresetInstance(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName(), OTGBiomeProvider.Preset.DEFAULT, biomeRegistry))				
+					),
+					seed,
+					() -> registry.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY).getOrThrow(NoiseGeneratorSettings.OVERWORLD)
+				);
 			} else {
 				// If no presets are installed, return the default chunkgenerator / biomeprovider
-				return new NoiseBasedChunkGenerator(new OverworldBiomeSource(seed, false, false, biomes), seed, () ->
-				{
-					return dimensionSettings.getOrThrow(NoiseGeneratorSettings.OVERWORLD);
-				});
+				return WorldGenSettings.makeDefaultOverworld(registry, seed);
 			}
 		}
 	};
-	
+
 	public static void init()
 	{
 		// Register the otg worldtype for the world creation screen
@@ -91,6 +106,7 @@ public class OTGGui
 								WritableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 								Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 								Registry<NoiseGeneratorSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+								Registry<NoiseParameters> noiseParamsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_REGISTRY);
 
 								long seed = dimensionGeneratorSettings.seed();
 								boolean generateFeatures = dimensionGeneratorSettings.generateFeatures();
@@ -109,7 +125,7 @@ public class OTGGui
 										WorldGenSettings existingDimSetting = def.createSettings(dynamicRegistries, seed, generateFeatures, generateBonusChest, dimConfig.Overworld.NonOTGGeneratorSettings);
 										dimensions = existingDimSetting.dimensions();
 									} else {
-										MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed);		      
+										MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(dynamicRegistries, seed);		      
 										WorldGenSettings existingDimSetting = null;
 										switch(dimConfig.Overworld.NonOTGWorldType == null ? "" : dimConfig.Overworld.NonOTGWorldType)
 										{
@@ -134,7 +150,7 @@ public class OTGGui
 												})));
 												break;
 											default:
-												existingDimSetting = new WorldGenSettings(seed, generateFeatures, generateBonusChest, WorldGenSettings.withOverworld(dimensionTypesRegistry, simpleregistry, WorldGenSettings.makeDefaultOverworld(biomesRegistry, dimensionSettingsRegistry, seed)));
+												existingDimSetting = new WorldGenSettings(seed, generateFeatures, generateBonusChest, WorldGenSettings.withOverworld(dimensionTypesRegistry, simpleregistry, WorldGenSettings.makeDefaultOverworld(dynamicRegistries, seed)));
 												break;
 										}
 										dimensions = existingDimSetting.dimensions();
@@ -157,6 +173,7 @@ public class OTGGui
 										dimensionTypesRegistry,
 										biomesRegistry,
 										dimensionSettingsRegistry,
+										noiseParamsRegistry,
 										seed,
 										generateFeatures,
 										generateBonusChest,

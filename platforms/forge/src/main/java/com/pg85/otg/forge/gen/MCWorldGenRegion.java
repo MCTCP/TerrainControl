@@ -123,7 +123,7 @@ public class MCWorldGenRegion extends ForgeWorldGenRegion
 
 		if (material.isLiquid())
 		{
-			this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
+			this.worldGenRegion.scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
 		}
 
 		if (nbt != null)

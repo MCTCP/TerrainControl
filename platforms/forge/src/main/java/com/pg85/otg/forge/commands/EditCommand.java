@@ -37,6 +37,8 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.ticks.ScheduledTick;
+import net.minecraft.world.ticks.TickPriority;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -394,7 +396,8 @@ public class EditCommand extends BaseCommand
 				if (blockstate.is(BlockTags.LEAVES))
 				{
 					// Schedule a tick on this block in 1 unit of time
-					worldGenRegion.getInternal().getBlockTicks().scheduleTick(blockpos, blockstate.getBlock(), 1);
+					//T type, BlockPos pos, long triggerTick, TickPriority priority, long subTickOrder
+					worldGenRegion.getInternal().scheduleTick(blockpos, blockstate.getBlock(), 1);
 				} else {
 					BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, worldGenRegion.getInternal(), blockpos);
 					worldGenRegion.setBlockState(blockpos, blockstate1, 20);

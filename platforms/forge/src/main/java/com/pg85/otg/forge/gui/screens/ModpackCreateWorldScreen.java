@@ -90,11 +90,7 @@ public class ModpackCreateWorldScreen extends CreateWorldScreen
 					false
 				)
 			).orElseGet(() -> 
-				WorldGenSettings.makeDefault(
-					dynamicregistry.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), 
-					dynamicregistry.registryOrThrow(Registry.BIOME_REGISTRY), 
-					dynamicregistry.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)
-				)
+				WorldGenSettings.makeDefault(dynamicregistry)
 			);
 		
 		return new ModpackCreateWorldScreen(

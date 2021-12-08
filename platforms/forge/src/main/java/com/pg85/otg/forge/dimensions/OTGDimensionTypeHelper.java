@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
@@ -40,11 +42,13 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate.ParameterList;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraftforge.common.world.ForgeWorldPreset;
@@ -63,6 +67,7 @@ public class OTGDimensionTypeHelper
 		WritableRegistry<DimensionType> dimensionTypesRegistry = dynamicRegistries.ownedRegistryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 		Registry<NoiseGeneratorSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+		Registry<NormalNoise.NoiseParameters> noiseParamsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_REGISTRY);
 		
 		// If there is a dimensionconfig for the generatorsettings, use that. Otherwise find a preset by name.
 		DimensionConfig dimConfig = DimensionConfig.fromDisk(generatorSettings);
@@ -80,7 +85,7 @@ public class OTGDimensionTypeHelper
 			} else {
 				dimConfig = new DimensionConfig();
 				dimConfig.Overworld = new OTGOverWorld(preset.getFolderName(), seed, null, null);
-				dimensions = DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed);
+				dimensions = DimensionType.defaultDimensions(dynamicRegistries, seed);
 			}
 		} else {
 			dimConfigName = generatorSettings;
@@ -94,7 +99,7 @@ public class OTGDimensionTypeHelper
 				Registry<DimensionType> registry2 = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 				Registry<Biome> registry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 				Registry<NoiseGeneratorSettings> registry1 = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-				MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(registry2, registry, registry1, seed);		      
+				MappedRegistry<LevelStem> simpleregistry = DimensionType.defaultDimensions(dynamicRegistries, seed);		      
 				WorldGenSettings existingDimSetting = null;
 				switch(dimConfig.Overworld.NonOTGWorldType == null ? "" : dimConfig.Overworld.NonOTGWorldType)
 				{
@@ -119,7 +124,7 @@ public class OTGDimensionTypeHelper
 						})));
 						break;
 					default:
-						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, WorldGenSettings.makeDefaultOverworld(registry, registry1, seed)));
+						existingDimSetting = new WorldGenSettings(seed, generateStructures, bonusChest, WorldGenSettings.withOverworld(registry2, simpleregistry, WorldGenSettings.makeDefaultOverworld(dynamicRegistries, seed)));
 						break;
 				}
 				dimensions = existingDimSetting.dimensions();
@@ -132,6 +137,7 @@ public class OTGDimensionTypeHelper
 			dimensionTypesRegistry,
 			biomesRegistry,
 			dimensionSettingsRegistry,
+			noiseParamsRegistry,
 			seed,
 			generateStructures,
 			bonusChest,
@@ -140,16 +146,24 @@ public class OTGDimensionTypeHelper
 	}
 	
 	// Used for SP and MP
-	public static WorldGenSettings createOTGDimensionGeneratorSettings(String dimConfigName, DimensionConfig dimConfig, WritableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<NoiseGeneratorSettings> dimensionSettingsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, MappedRegistry<LevelStem> defaultDimensions)
+	public static WorldGenSettings createOTGDimensionGeneratorSettings(String dimConfigName, DimensionConfig dimConfig, WritableRegistry<DimensionType> dimensionTypesRegistry, Registry<Biome> biomesRegistry, Registry<NoiseGeneratorSettings> dimensionSettingsRegistry, Registry<NormalNoise.NoiseParameters> noiseParamsRegistry, long seed, boolean generateFeatures, boolean generateBonusChest, MappedRegistry<LevelStem> defaultDimensions)
 	{
 		// Create a new registry object and register dimensions to it.
 		MappedRegistry<LevelStem> dimensions = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
 		boolean nonOTGOverWorld = dimConfig.Overworld.PresetFolderName == null;
 
 		if(dimConfig.Overworld != null && dimConfig.Overworld.PresetFolderName != null && !nonOTGOverWorld)
-		{
+		{			
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-				dimConfig.Overworld.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Overworld.PresetFolderName, seed, false, false, biomesRegistry), seed,
+				dimConfig.Overworld.PresetFolderName, 
+				dimConfigName,
+				noiseParamsRegistry,
+				new OTGBiomeProvider(
+					dimConfig.Overworld.PresetFolderName,
+					new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+					Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Overworld.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
+				),
+				seed,
 				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.Overworld.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.OVERWORLD, chunkGenerator, DimensionType.OVERWORLD_LOCATION);
@@ -158,7 +172,15 @@ public class OTGDimensionTypeHelper
 		{
 			long dimSeed = dimConfig.Nether.Seed != -1l ? dimConfig.Nether.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-					dimConfig.Nether.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.Nether.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+					dimConfig.Nether.PresetFolderName, 
+					dimConfigName,
+					noiseParamsRegistry,
+					new OTGBiomeProvider(
+						dimConfig.Nether.PresetFolderName,
+						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Nether.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
+					),					
+					dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.Nether.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.NETHER, chunkGenerator, DimensionType.NETHER_LOCATION);
@@ -167,7 +189,15 @@ public class OTGDimensionTypeHelper
 		{
 			long dimSeed = dimConfig.End.Seed != -1l ? dimConfig.End.Seed : new Random().nextLong();
 			ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-					dimConfig.End.PresetFolderName, dimConfigName, new OTGBiomeProvider(dimConfig.End.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+					dimConfig.End.PresetFolderName, 
+					dimConfigName, 
+					noiseParamsRegistry,
+					new OTGBiomeProvider(
+							dimConfig.End.PresetFolderName,
+						new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+						Optional.of(new OTGBiomeProvider.PresetInstance(dimConfig.Nether.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
+					),					
+					dimSeed,
 				() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END) // TODO: Add OTG DimensionSettings?
 			);
 			addDimension(dimConfig.End.PresetFolderName, dimensions, dimensionTypesRegistry, LevelStem.END, chunkGenerator, DimensionType.END_LOCATION);
@@ -180,7 +210,15 @@ public class OTGDimensionTypeHelper
 				{
 					long dimSeed = otgDim.Seed != -1l ? otgDim.Seed : new Random().nextLong();
 					ChunkGenerator chunkGenerator = new OTGNoiseChunkGenerator(
-						otgDim.PresetFolderName, dimConfigName, new OTGBiomeProvider(otgDim.PresetFolderName, dimSeed, false, false, biomesRegistry), dimSeed,
+						otgDim.PresetFolderName,
+						dimConfigName,
+						noiseParamsRegistry,
+						new OTGBiomeProvider(
+							otgDim.PresetFolderName,
+							new ParameterList<Supplier<Biome>>(new ArrayList<>()),
+							Optional.of(new OTGBiomeProvider.PresetInstance(otgDim.PresetFolderName, OTGBiomeProvider.Preset.DEFAULT, biomesRegistry))				
+						),
+						dimSeed,
 						() -> dimensionSettingsRegistry.getOrThrow(NoiseGeneratorSettings.OVERWORLD) // TODO: Add OTG DimensionSettings?
 					);
 					ResourceKey<LevelStem> dimRegistryKey = ResourceKey.create(Registry.LEVEL_STEM_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, otgDim.PresetFolderName.trim().replace(" ", "_").toLowerCase()));

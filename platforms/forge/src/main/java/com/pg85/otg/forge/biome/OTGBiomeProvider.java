@@ -2,22 +2,33 @@ package com.pg85.otg.forge.biome;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryLookupCodec;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.biome.OverworldBiomeBuilder;
+import net.minecraft.world.level.biome.Climate.Sampler;
 import net.minecraft.world.level.biome.BiomeSource;
 
 import com.pg85.otg.forge.presets.ForgePresetLoader;
@@ -35,32 +46,59 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 {
- 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
-		(instance) -> instance.group(
-			Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetFolderName),
-			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
-			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
-			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
-			RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((provider) -> provider.registry)
-		).apply(instance, instance.stable(OTGBiomeProvider::new))
+	public static final MapCodec<OTGBiomeProvider> DIRECT_CODEC = RecordCodecBuilder.mapCodec(
+		(instance) -> {
+			return instance.group(
+				Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetFolderName),
+				ExtraCodecs.<Pair<Climate.ParameterPoint, Supplier<Biome>>>nonEmptyList(
+					RecordCodecBuilder.<Pair<Climate.ParameterPoint, Supplier<Biome>>>create(
+						(p_187078_) -> { return p_187078_.group(Climate.ParameterPoint.CODEC.fieldOf("parameters").forGetter(Pair::getFirst), Biome.CODEC.fieldOf("biome").forGetter(Pair::getSecond)).apply(p_187078_, Pair::of); }
+					).listOf()
+				).xmap(
+					Climate.ParameterList::new, 
+					(Function<Climate.ParameterList<Supplier<Biome>>, List<Pair<Climate.ParameterPoint, Supplier<Biome>>>>) Climate.ParameterList::values
+				).fieldOf("biomes").forGetter(
+					(p_187080_) -> { return p_187080_.parameters; }
+				)
+			).apply(instance, OTGBiomeProvider::new);
+		}
 	);
- 	
-	private final long seed;
-	private final boolean legacyBiomeInitLayer;
-	private final boolean largeBiomes;
+	public static final Codec<OTGBiomeProvider> CODEC = 
+		Codec.mapEither(
+			OTGBiomeProvider.PresetInstance.CODEC, 
+			DIRECT_CODEC
+		).xmap(
+			(p_187068_) -> {
+				return p_187068_.map(OTGBiomeProvider.PresetInstance::biomeSource, Function.identity());
+			}, 
+			(p_187066_) -> {
+				return p_187066_.preset().map(Either::<OTGBiomeProvider.PresetInstance, OTGBiomeProvider>left).orElseGet(
+					() -> { return Either.right(p_187066_); }
+				);
+			}
+		).codec()
+	;
+	private final Climate.ParameterList<Supplier<Biome>> parameters;
+	private final Optional<OTGBiomeProvider.PresetInstance> preset;
+
 	private final Registry<Biome> registry;
 	private final ThreadLocal<CachingLayerSampler> layer;
 	private final Int2ObjectMap<ResourceKey<Biome>> keyLookup;
 	private final String presetFolderName;
-	
-	public OTGBiomeProvider(String presetFolderName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
+
+	private OTGBiomeProvider(String presetFolderName, Climate.ParameterList<Supplier<Biome>> parameters)
 	{
-		super(getAllBiomesByPreset(presetFolderName, (WritableRegistry<Biome>)registry));
+		this(presetFolderName, parameters, Optional.empty());
+	}
+
+	public OTGBiomeProvider(String presetFolderName, Climate.ParameterList<Supplier<Biome>> parameters, Optional<OTGBiomeProvider.PresetInstance> preset)
+	{
+		super(getAllBiomesByPreset(presetFolderName, (WritableRegistry<Biome>)preset.get().biomes()));
+		long seed = 12; // TODO Reimplement this for 1.18, where did seed go? :/
+		this.preset = preset;
+		this.parameters = parameters;
 		this.presetFolderName = presetFolderName;
-		this.seed = seed;
-		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
-		this.largeBiomes = largeBiomes;
-		this.registry = registry;
+		this.registry = (WritableRegistry<Biome>)preset.get().biomes();
 		this.layer = ThreadLocal.withInitial(() -> BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetFolderName), OTG.getEngine().getLogger()));
 		this.keyLookup = new Int2ObjectOpenHashMap<>();
 
@@ -122,13 +160,23 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	@OnlyIn(Dist.CLIENT)
 	public BiomeSource withSeed(long seed)
 	{
-		return new OTGBiomeProvider(this.presetFolderName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
+		return this;
 	}
 
+	private Optional<OTGBiomeProvider.PresetInstance> preset()
+	{
+		return this.preset;
+	}
+	
+	public boolean stable(OTGBiomeProvider.Preset p_187064_)
+	{
+		return this.preset.isPresent() && Objects.equals(this.preset.get().preset(), p_187064_);
+	}
+	
 	// TODO: This is only used by MC internally, OTG fetches all biomes via CachedBiomeProvider.
 	// Could make this use the cache too?
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Sampler p_186738_)
 	{
 		return this.registry.get(this.keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
 	}
@@ -138,11 +186,63 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	{
 		return this.layer.get();
 	}
-	
-	// TODO: May have to override this for spawn?
-	@Override
-	public Set<BlockState> getSurfaceBlocks()
+
+	public static class Preset
 	{
-		return super.getSurfaceBlocks();
+		public static final OTGBiomeProvider.Preset DEFAULT = new OTGBiomeProvider.Preset(
+			new ResourceLocation("default"), 
+			(biomeRegistry) -> {
+				Builder<Pair<Climate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
+				return new Climate.ParameterList<>(builder.build());
+			}
+		);
+		
+		public final ResourceLocation name;
+		private final Function<Registry<Biome>, Climate.ParameterList<Supplier<Biome>>> parameterSource;
+	
+		public Preset(ResourceLocation key, Function<Registry<Biome>, Climate.ParameterList<Supplier<Biome>>> parameterSource)
+		{
+			this.name = key;
+			this.parameterSource = parameterSource;
+		}
+
+		OTGBiomeProvider biomeSource(OTGBiomeProvider.PresetInstance presetInstance, boolean withInstance)
+		{
+			Climate.ParameterList<Supplier<Biome>> parameterlist = this.parameterSource.apply(presetInstance.biomes());
+			return new OTGBiomeProvider(presetInstance.presetFolderName, parameterlist, withInstance ? Optional.of(presetInstance) : Optional.empty());
+		}
+	}
+
+	public static record PresetInstance(String presetFolderName, OTGBiomeProvider.Preset preset, Registry<Biome> biomes)
+	{
+		public static final MapCodec<OTGBiomeProvider.PresetInstance> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
+			return instance.group(
+			Codec.STRING.fieldOf("preset_name").stable().forGetter(OTGBiomeProvider.PresetInstance::presetFolderName),
+			ResourceLocation.CODEC.flatXmap(
+				(key) -> {
+					return Optional.ofNullable(new OTGBiomeProvider.Preset(
+						new ResourceLocation("otg"),
+						(biomeRegistry) -> {
+							Builder<Pair<Climate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
+							return new Climate.ParameterList<>(builder.build());
+						}
+					)).map(DataResult::success).orElseGet(() -> {
+						return DataResult.error("Unknown preset: " + key);
+					});
+				}, 
+				(preset) -> {
+					return DataResult.success(preset.name);
+				}
+			).fieldOf("preset").stable().forGetter(OTGBiomeProvider.PresetInstance::preset),
+			RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter(OTGBiomeProvider.PresetInstance::biomes)).apply(
+				instance, 
+				instance.stable(OTGBiomeProvider.PresetInstance::new)
+			);
+		});
+	
+		public OTGBiomeProvider biomeSource()
+		{
+			return this.preset.biomeSource(this, true);
+		}
 	}
 }

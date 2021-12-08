@@ -70,7 +70,7 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 		this.customizeTypeButton = ((OTGCustomiseOverworldScreen)p_239048_1_).addRenderableWidget(new Button(j, 120, 150, 20, new TranslatableComponent("selectWorld.customizeType"), (p_239044_3_) ->
 		{
 			WorldPreset.PresetEditor biomegeneratortypescreens$ifactory = WorldPreset.EDITORS.get(this.preset);
-			biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getBiomeGeneratorTypeScreenFactory(this.preset, biomegeneratortypescreens$ifactory);
+			biomegeneratortypescreens$ifactory = net.minecraftforge.client.ForgeHooksClient.getPresetEditor(this.preset, biomegeneratortypescreens$ifactory);
 			if (biomegeneratortypescreens$ifactory != null)
 			{
 				p_239048_2_.setScreen(biomegeneratortypescreens$ifactory.createEditScreen(p_239048_1_, this.settings));
@@ -117,7 +117,7 @@ public class OTGWorldOptionsScreen extends WorldGenSettingsComponent
 		{
 			this.customizeTypeButton.visible = false;
 		} else {
-			this.customizeTypeButton.visible = p_239059_1_ && (WorldPreset.EDITORS.containsKey(this.preset) || net.minecraftforge.client.ForgeHooksClient.hasBiomeGeneratorSettingsOptionsScreen(this.preset));
+			this.customizeTypeButton.visible = p_239059_1_ && (WorldPreset.EDITORS.containsKey(this.preset) || net.minecraftforge.client.ForgeHooksClient.hasPresetEditor(this.preset));
 		}
 	}
 
