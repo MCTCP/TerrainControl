@@ -20,5 +20,5 @@ include(
     "common:common-core",
     "platforms:forge",
     // "platforms:fabric",
-    "platforms:paper"
+    // "platforms:paper"
 )

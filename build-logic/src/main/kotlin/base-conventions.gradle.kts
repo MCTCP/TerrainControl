@@ -4,7 +4,7 @@ plugins {
 }
 
 configure<JavaPluginExtension> {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(16))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
     withSourcesJar()
 }
 
@@ -20,7 +20,7 @@ configure<PublishingExtension> {
 
 tasks {
     withType<JavaCompile> {
-        options.release.set(16)
+        options.release.set(17)
         options.encoding = Charsets.UTF_8.name()
     }
 

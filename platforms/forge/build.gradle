@@ -23,6 +23,11 @@ repositories {
 		name = "sk89q maven"
 		url = "https://maven.sk89q.com/artifactory/repo"
 	}
+	
+    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
+    // flatDir {
+    //     dir 'libs'
+    // }	
 }
 
 minecraft {
@@ -33,7 +38,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: "official", version: "1.17.1"
+    mappings channel: 'official', version: '1.18'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // Default run configurations.
@@ -114,10 +119,8 @@ minecraft.runs.all {
     }
 }
 
-
-
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.1.0'
+    minecraft 'net.minecraftforge:forge:1.18-38.0.14'
 
     annotationProcessor("org.spongepowered:mixin:0.8.4:processor")
 
@@ -128,22 +131,22 @@ dependencies {
     implementation project(':common:common-config')
     implementation project(':common:common-customobject')
     implementation project(':common:common-generator')
-    implementation project(':common:common-core')	
+    implementation project(':common:common-core')
 
     // Add any mod dependencies (these are picked up by the development environment)
 
-    implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.17.1:7.3.0-SNAPSHOT")
+    implementation fg.deobf("com.sk89q.worldedit:worldedit-forge-mc1.18:7.2.8-SNAPSHOT")
 
     // Add common projects and non-mod dependencies as libraries, so they're picked up
     // by the development environment
 
-    library 'com.sk89q.worldedit:worldedit-core:7.3.0-SNAPSHOT'
+    library 'com.sk89q.worldedit:worldedit-core:7.2.8-SNAPSHOT'
 
-    library 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
-    library 'com.fasterxml.jackson.core:jackson-core:2.9.7'
-    library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
-    library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
-    library 'org.yaml:snakeyaml:1.23'
+    //library 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
+    //library 'com.fasterxml.jackson.core:jackson-core:2.9.7'
+    //library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
+    //library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    //library 'org.yaml:snakeyaml:1.23'
 }
 
 tasks {

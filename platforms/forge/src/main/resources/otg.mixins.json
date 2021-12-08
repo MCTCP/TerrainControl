@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "com.pg85.otg.forge.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "refmap": "otg.refmap.json",
   "mixins": [
 	"MixinChunkManager",
