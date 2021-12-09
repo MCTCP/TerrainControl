@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.pg85.otg.core.gen.OTGChunkGenerator;
-import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.interfaces.IBiome;

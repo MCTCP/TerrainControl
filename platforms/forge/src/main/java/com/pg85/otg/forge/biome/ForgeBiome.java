@@ -28,7 +28,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
