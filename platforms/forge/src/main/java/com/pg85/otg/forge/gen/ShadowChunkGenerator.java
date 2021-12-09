@@ -1,11 +1,22 @@
 package com.pg85.otg.forge.gen;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMultimap;
 import com.pg85.otg.core.gen.OTGChunkGenerator;
+import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
+import com.pg85.otg.interfaces.IBiome;
 import com.pg85.otg.interfaces.ICachedBiomeProvider;
 import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -18,6 +29,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -25,9 +39,13 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraft.server.level.ServerLevel;
 
 /**
@@ -150,8 +168,7 @@ public class ShadowChunkGenerator
 
 	private ForgeChunkBuffer getUnloadedChunk(OTGChunkGenerator otgChunkGenerator, int worldHeightCap, Random random, ChunkCoordinate chunkCoordinate, ServerLevel level)
 	{
-		//ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level);
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, null, null);
+		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
 		ForgeChunkBuffer buffer = new ForgeChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -276,13 +293,11 @@ public class ShadowChunkGenerator
 
 	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, OTGBiomeProvider biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider, boolean noiseAffectingStructuresOnly)
 	{
-		/*
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 5;
 		ProtoChunk chunk;
-		ChunkPos chunkpos;
-		IBiome biome;
+		ChunkPos chunkpos;		
 		if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
 		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<>();
@@ -332,10 +347,10 @@ public class ShadowChunkGenerator
 				}
 			));
 			structuresPerDistance[0] = new ArrayList<String>(Arrays.asList(new String[]{}));
-		
+
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld);
+				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
 				chunkpos = chunk.getPos();
 				int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkToHandle.getChunkX() - chunkCoordinate.getChunkX(), 2) + Math.pow (chunkToHandle.getChunkZ() - chunkCoordinate.getChunkZ(), 2)));
 				
@@ -343,71 +358,82 @@ public class ShadowChunkGenerator
 				// based on biome and resource settings (distance etc). Does not plot any structure components.
 
 				// TODO: Optimise this for biome lookups, fetch a whole region of noise biome info at once?
-				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((ForgeBiome)biome).getBiomeBase().getGenerationSettings().structures())
+				IBiome biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
+				
+				for(Entry<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> supplier : chunkGenerator.getSettings().configuredStructures.entrySet())
 				{
-					ConfiguredStructureFeature<?, ?> structure = supplier.get();
+					StructureFeature<?> structure = supplier.getKey();
 					if(
-						structure.feature.step() == Decoration.SURFACE_STRUCTURES &&
+						structure.step() == Decoration.SURFACE_STRUCTURES &&
 						(
 							!noiseAffectingStructuresOnly ||
-							StructureFeature.NOISE_AFFECTING_FEATURES.contains(structure.feature)
+							StructureFeature.NOISE_AFFECTING_FEATURES.contains(structure)
 						)
 					)
 					{
-						ResourceLocation structureRegistryKey = ForgeRegistries.STRUCTURE_FEATURES.getKey(structure.feature);
+						List<ConfiguredStructureFeature<?,?>> structuresForBiome = supplier.getValue().entries().stream()
+							.filter(d -> d.getValue().toString().equals(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()))
+							.map(a -> a.getKey())
+							.collect(
+								Collectors.toList()
+							)
+						;
+						ResourceLocation structureRegistryKey = ForgeRegistries.STRUCTURE_FEATURES.getKey(structure);
 						String structureRegistryName = structureRegistryKey.toString();
-						if(!structureRegistryKey.getNamespace().equals("minecraft"))
+						for(ConfiguredStructureFeature<?, ?> configuredStructure : structuresForBiome)
 						{
-							// For modded structures, use a default radius
-							int moddedStructuresDefaultRadius = 1;
-							if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
+							if(!structureRegistryKey.getNamespace().equals("minecraft"))
 							{
-								chunksHandled.put(chunkToHandle, new Integer(moddedStructuresDefaultRadius));
-								if(moddedStructuresDefaultRadius >= distance)
+								// For modded structures, use a default radius
+								int moddedStructuresDefaultRadius = 1;
+								if(hasStructureStart(configuredStructure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
 								{
-									if(noiseAffectingStructuresOnly)
+									chunksHandled.put(chunkToHandle, new Integer(moddedStructuresDefaultRadius));
+									if(moddedStructuresDefaultRadius >= distance)
 									{
-										synchronized(this.hasVanillaNoiseStructureChunkCache)
+										if(noiseAffectingStructuresOnly)
 										{
-											this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
-										}
-									} else {
-										synchronized(this.hasVanillaStructureChunkCache)
-										{
-											this.hasVanillaStructureChunkCache.putAll(chunksHandled);
-										}
-									}									
-									return true;
-								}
-							}
-						} else {
-							for(int i = structuresPerDistance.length - 1; i > 0; i--)
-							{
-								ArrayList<String> structuresAtDistance = structuresPerDistance[i];
-								if(structuresAtDistance.contains(structureRegistryName))
-								{
-									if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
-									{
-										chunksHandled.put(chunkToHandle, new Integer(i));
-										if(i >= distance)
-										{
-											if(noiseAffectingStructuresOnly)
+											synchronized(this.hasVanillaNoiseStructureChunkCache)
 											{
-												synchronized(this.hasVanillaNoiseStructureChunkCache)
-												{													
-													this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
-												}
-											} else {
-												synchronized(this.hasVanillaStructureChunkCache)
-												{
-													this.hasVanillaStructureChunkCache.putAll(chunksHandled);
-												}
-											}							
-											return true;
-										}
+												this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+											}
+										} else {
+											synchronized(this.hasVanillaStructureChunkCache)
+											{
+												this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+											}
+										}									
+										return true;
 									}
-									break;
+								}
+							} else {
+								for(int i = structuresPerDistance.length - 1; i > 0; i--)
+								{
+									ArrayList<String> structuresAtDistance = structuresPerDistance[i];
+									if(structuresAtDistance.contains(structureRegistryName))
+									{
+										if(hasStructureStart(configuredStructure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
+										{
+											chunksHandled.put(chunkToHandle, new Integer(i));
+											if(i >= distance)
+											{
+												if(noiseAffectingStructuresOnly)
+												{
+													synchronized(this.hasVanillaNoiseStructureChunkCache)
+													{													
+														this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+													}
+												} else {
+													synchronized(this.hasVanillaStructureChunkCache)
+													{
+														this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+													}
+												}							
+												return true;
+											}
+										}
+										break;
+									}
 								}
 							}
 						}
@@ -428,7 +454,7 @@ public class ShadowChunkGenerator
 				}
 			}
 		}
-		*/
+
 		return false;
 	}
 	
