@@ -92,18 +92,25 @@ public class ForgeBiome implements IBiome
 		//BiomeDefaultFeatures.addDefaultCarvers(biomeGenerationSettingsBuilder);
 
 		// Register any Registry() resources to the biome, to be handled by MC.
-		/*
 		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
 		{
 			if (res instanceof RegistryResource)
 			{
 				RegistryResource registryResource = (RegistryResource)res;
 				Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
+				// This changed from CONFIGURED_FEATURES to PLACED_FEATURE, also registry names changed, so presets will need to be updated.
 				PlacedFeature registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
-				biomeGenerationSettingsBuilder.addFeature(stage, registry);
+				if(registry != null)
+				{
+					biomeGenerationSettingsBuilder.addFeature(stage, registry);
+				} else {
+					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.DECORATION))
+					{
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.DECORATION, "Registry() " + registryResource.getFeatureKey() + " could not be found for biomeconfig " + biomeConfig.getName());
+					}
+				}
 			}
 		}
-		*/
 
 		float safeTemperature = biomeConfig.getBiomeTemperature();
 		if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
