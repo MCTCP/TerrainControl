@@ -55,6 +55,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.data.worldgen.features.EndFeatures;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.data.worldgen.features.TreeFeatures;
+import net.minecraft.data.worldgen.placement.CavePlacements;
 import net.minecraft.data.worldgen.placement.EndPlacements;
 import net.minecraft.data.worldgen.placement.NetherPlacements;
 import net.minecraft.data.worldgen.placement.TreePlacements;
@@ -820,7 +821,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		//Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		if(y >= 0)
+		{
+			CavePlacements.FOSSIL_UPPER.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		} else {
+			CavePlacements.FOSSIL_LOWER.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		}
 	}
 	
 	@Override
