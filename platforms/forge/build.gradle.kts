@@ -26,12 +26,22 @@ repositories {
     maven("https://maven.enginehub.org/repo/")
 }
 
+val otg: Configuration by configurations.creating
+configurations {
+    implementation {
+        extendsFrom(otg)
+    }
+    forgeDependencies {
+        extendsFrom(otg)
+    }
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:$mcVersion")
     mappings(loom.officialMojangMappings())
     forge("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
-    implementation(project(":common:common-core"))
+    otg(project(":common:common-core"))
 
     val worldeditVersion = "7.2.7"
     compileOnly("com.sk89q.worldedit:worldedit-core:$worldeditVersion") {
@@ -55,6 +65,7 @@ tasks {
     }
 
     shadowJar {
+        configurations = listOf(otg) as List<FileCollection>
         archiveClassifier.set("deobf-all")
     }
 
