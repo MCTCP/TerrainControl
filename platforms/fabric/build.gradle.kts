@@ -8,12 +8,12 @@ loom {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.17.1")
+    minecraft("com.mojang:minecraft:1.18")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:0.11.6")
+    modImplementation("net.fabricmc:fabric-loader:0.12.8")
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.37.0+1.17")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.44.0+1.18")
 
     implementation(project(":common:common-core"))
 }

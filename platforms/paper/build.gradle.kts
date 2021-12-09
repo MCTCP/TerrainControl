@@ -1,6 +1,6 @@
 plugins {
     id("platform-conventions")
-    id("io.papermc.paperweight.userdev") version "1.2.0"
+    id("io.papermc.paperweight.userdev") version "1.3.1"
     id("xyz.jpenilla.run-paper") version "1.0.6" // Adds runServer and runMojangMappedServer tasks for testing
 }
 
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.17.1-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.18-R0.1-SNAPSHOT")
 
     implementation(project(":common:common-core"))
 

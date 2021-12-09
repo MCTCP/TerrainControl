@@ -31,7 +31,7 @@ tasks.build {
 listOf(
     // project(":platforms:paper"),
     project(":platforms:forge"),
-    project(":platforms:fabric"),
+    // project(":platforms:fabric"),
 ).forEach { proj ->
     proj.afterEvaluate {
         universalJar {
