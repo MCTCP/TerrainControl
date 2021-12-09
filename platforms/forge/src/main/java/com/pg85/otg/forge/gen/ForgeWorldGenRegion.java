@@ -25,6 +25,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
+import com.pg85.otg.util.minecraft.SaplingType;
 import com.pg85.otg.util.minecraft.TreeType;
 
 import net.minecraft.world.level.WorldGenLevel;
@@ -33,12 +34,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
@@ -51,6 +55,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.data.worldgen.features.EndFeatures;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.data.worldgen.features.TreeFeatures;
+import net.minecraft.data.worldgen.placement.EndPlacements;
+import net.minecraft.data.worldgen.placement.NetherPlacements;
+import net.minecraft.data.worldgen.placement.TreePlacements;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.WorldGenRegion;
@@ -221,6 +228,18 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public int getHighestBlockAboveYAt(int x, int z)
 	{
 		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false);
+		if(highestY >= 0)
+		{
+			return highestY + 1;
+		} else {
+			return -1;
+		}
+	}
+	
+	@Override
+	public int getHighestBlockAboveYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves)
+	{
+		int highestY = getHighestBlockYAt(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
 		if(highestY >= 0)
 		{
 			return highestY + 1;
@@ -489,96 +508,111 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return false;
 		}
 		BlockPos blockPos = new BlockPos(x, y, z);
+		
+		// For <1.18, trees used their sapling block to check for valid spawn
+		// spots. For 1.18 the code still makes it look like they do (see PlacedFeatures)
+		// but instead of not placing, trees place in things like leaves but add their own block of dirt.
+		// To emulate <1.18 behaviour, make sure the block is actually the highest solid block.
+		// TODO: We may have to rethink non-otg tree spawning, or figure out why the sapling  
+		// checks don't appear to be working.
+		// TODO: Trees can get half cut off when spawning next to walls, check if vanilla also does that..
+		int validY = this.getHighestBlockAboveYAt(x, z, true, false, false, true, true);
+		if(validY != y)
+		{
+			return true;
+		}
+		
 		try
 		{
 			switch (type)
 			{
 				case Tree:
-					ConfiguredFeature<TreeConfiguration, ?> oak = TreeFeatures.OAK;
-					oak.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config));
+					PlacedFeature oak = TreePlacements.OAK_CHECKED;					
+					oak.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case BigTree:
-					ConfiguredFeature<TreeConfiguration, ?> fancy_oak = TreeFeatures.FANCY_OAK;
-					fancy_oak.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config));
+					PlacedFeature fancy_oak = TreePlacements.FANCY_OAK_CHECKED;
+					fancy_oak.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case Forest:
 				case Birch:
-					ConfiguredFeature<TreeConfiguration, ?> birch = TreeFeatures.BIRCH;
-					birch.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config));
+					PlacedFeature birch = TreePlacements.BIRCH_CHECKED;
+					birch.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case TallBirch:
-					ConfiguredFeature<TreeConfiguration, ?> tall_birch = TreeFeatures.SUPER_BIRCH_BEES_0002;
-					tall_birch.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, tall_birch.config));
+					PlacedFeature tall_birch = TreePlacements.SUPER_BIRCH_BEES_0002;
+					tall_birch.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
-						ConfiguredFeature<FeatureConfiguration, ?> huge_brown_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) TreeFeatures.HUGE_BROWN_MUSHROOM;
-						huge_brown_mushroom.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config));
+						ConfiguredFeature<?, ?> huge_brown_mushroom = TreeFeatures.HUGE_BROWN_MUSHROOM;
+						huge_brown_mushroom.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					} else {
-						ConfiguredFeature<FeatureConfiguration, ?> huge_red_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) TreeFeatures.HUGE_RED_MUSHROOM;
-						huge_red_mushroom.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config));
+						ConfiguredFeature<?, ?> huge_red_mushroom = TreeFeatures.HUGE_RED_MUSHROOM;
+						huge_red_mushroom.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					}
 					return true;
 				case HugeRedMushroom:
-					ConfiguredFeature<FeatureConfiguration, ?> huge_red_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) TreeFeatures.HUGE_RED_MUSHROOM;
-					huge_red_mushroom.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config));
+					ConfiguredFeature<?, ?> huge_red_mushroom = TreeFeatures.HUGE_RED_MUSHROOM;
+					huge_red_mushroom.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case HugeBrownMushroom:
-					ConfiguredFeature<FeatureConfiguration, ?> huge_brown_mushroom = (ConfiguredFeature<FeatureConfiguration, ?>) TreeFeatures.HUGE_BROWN_MUSHROOM;
-					huge_brown_mushroom.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config));
+					ConfiguredFeature<?, ?> huge_brown_mushroom = TreeFeatures.HUGE_BROWN_MUSHROOM;
+					huge_brown_mushroom.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case SwampTree:
 					ConfiguredFeature<TreeConfiguration, ?> swamp_tree = TreeFeatures.SWAMP_OAK;
-					swamp_tree.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config));
+					swamp_tree.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case Taiga1:
-					ConfiguredFeature<TreeConfiguration, ?> pine = TreeFeatures.PINE;
-					pine.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config));
+					PlacedFeature pine = TreePlacements.PINE_CHECKED;
+					pine.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case Taiga2:
-					ConfiguredFeature<TreeConfiguration, ?> spruce = TreeFeatures.SPRUCE;
-					spruce.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config));
+					PlacedFeature spruce = TreePlacements.SPRUCE_CHECKED;
+					spruce.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case JungleTree:
-					ConfiguredFeature<TreeConfiguration, ?> mega_jungle_tree = TreeFeatures.MEGA_JUNGLE_TREE;
-					mega_jungle_tree.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_jungle_tree.config));
+					// TODO: Apparently there's another jungle tree (non-mega)
+					PlacedFeature mega_jungle_tree = TreePlacements.MEGA_JUNGLE_TREE_CHECKED;
+					mega_jungle_tree.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case CocoaTree:
-					ConfiguredFeature<TreeConfiguration, ?> jungle_tree = TreeFeatures.JUNGLE_TREE;
-					jungle_tree.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config));
+					PlacedFeature jungle_tree = TreePlacements.JUNGLE_TREE_CHECKED;
+					jungle_tree.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case GroundBush:
-					ConfiguredFeature<TreeConfiguration, ?> jungle_bush = TreeFeatures.JUNGLE_BUSH;
-					jungle_bush.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config));
+					PlacedFeature jungle_bush = TreePlacements.JUNGLE_BUSH;
+					jungle_bush.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case Acacia:
-					ConfiguredFeature<TreeConfiguration, ?> acacia = TreeFeatures.ACACIA;
-					acacia.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config));
+					PlacedFeature acacia = TreePlacements.ACACIA_CHECKED;
+					acacia.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case DarkOak:
-					ConfiguredFeature<TreeConfiguration, ?> dark_oak = TreeFeatures.DARK_OAK;
-					dark_oak.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config));
+					PlacedFeature dark_oak = TreePlacements.DARK_OAK_CHECKED;
+					dark_oak.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case HugeTaiga1:
-					ConfiguredFeature<TreeConfiguration, ?> mega_pine = TreeFeatures.MEGA_PINE;
-					mega_pine.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config));
+					PlacedFeature mega_pine = TreePlacements.MEGA_PINE_CHECKED;
+					mega_pine.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case HugeTaiga2:
-					ConfiguredFeature<TreeConfiguration, ?> mega_spruce = TreeFeatures.MEGA_SPRUCE;
-					mega_spruce.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config));
+					PlacedFeature mega_spruce = TreePlacements.MEGA_SPRUCE_CHECKED;
+					mega_spruce.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case CrimsonFungi:
-					ConfiguredFeature<FeatureConfiguration, ?> crimson_fungi = (ConfiguredFeature<FeatureConfiguration, ?>) NetherFeatures.CRIMSON_FOREST_VEGETATION;
-					crimson_fungi.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, crimson_fungi.config));
+					PlacedFeature crimson_fungi = NetherPlacements.CRIMSON_FOREST_VEGETATION;
+					crimson_fungi.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case WarpedFungi:
-					ConfiguredFeature<FeatureConfiguration, ?> warped_fungi = (ConfiguredFeature<FeatureConfiguration, ?>) NetherFeatures.WARPED_FOREST_VEGETION;
-					warped_fungi.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, warped_fungi.config));
+					PlacedFeature warped_fungi = NetherPlacements.WARPED_FOREST_VEGETATION;
+					warped_fungi.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;
 				case ChorusPlant:
-					ConfiguredFeature<FeatureConfiguration, ?> chorus_plant = (ConfiguredFeature<FeatureConfiguration, ?>) EndFeatures.CHORUS_PLANT;
-					chorus_plant.feature.place(new FeaturePlaceContext<>(Optional.empty(), this.worldGenRegion, this.chunkGenerator, rand, blockPos, chorus_plant.config));
+					PlacedFeature chorus_plant = EndPlacements.CHORUS_PLANT;
+					chorus_plant.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 					return true;					
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());

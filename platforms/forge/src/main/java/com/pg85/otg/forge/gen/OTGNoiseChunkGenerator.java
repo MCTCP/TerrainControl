@@ -1007,7 +1007,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 	*/
 	
-	public void applyBiomeDecoration(WorldGenLevel worldGenRegion, ChunkAccess p_187713_, StructureFeatureManager p_187714_)
+	public void applyBiomeDecoration(WorldGenLevel worldGenLevel, ChunkAccess p_187713_, StructureFeatureManager p_187714_)
 	{
 		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
 		{
@@ -1017,6 +1017,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkPos chunkpos = p_187713_.getPos();
 		if (!SharedConstants.debugVoidTerrain(chunkpos))
 		{
+			WorldGenRegion worldGenRegion = ((WorldGenRegion)worldGenLevel);
 			SectionPos sectionpos = SectionPos.of(chunkpos, worldGenRegion.getMinSection());
 			BlockPos blockpos = sectionpos.origin();
 			Map<Integer, List<StructureFeature<?>>> map = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy((p_187720_) -> {
@@ -1026,9 +1027,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			WorldgenRandom worldgenrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
 			long i = worldgenrandom.setDecorationSeed(worldGenRegion.getSeed(), blockpos.getX(), blockpos.getZ());
 			
-			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromChunkCoords(chunkpos.x, chunkpos.z);
-			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((blockpos.getX() << 2) + 2, (blockpos.getZ() << 2) + 2);
-			ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), (WorldGenRegion)worldGenRegion, this);
+			int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
+			int worldZ =worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
+			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
+			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
+			ForgeWorldGenRegion forgeWorldGenRegion = new ForgeWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
 			// World save folder name may not be identical to level name, fetch it.
 			Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();			
 			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));

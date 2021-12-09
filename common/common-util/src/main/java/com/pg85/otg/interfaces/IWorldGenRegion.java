@@ -33,6 +33,7 @@ public interface IWorldGenRegion extends ISurfaceGeneratorNoiseProvider
 	int getBlockAboveLiquidHeight(int x, int z);
 	int getBlockAboveSolidHeight(int x, int z);
 	int getHighestBlockAboveYAt(int x, int z);
+	int getHighestBlockAboveYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
 	int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves);
 	int getHeightMapHeight(int x, int z);
 	int getLightLevel(int x, int y, int z);
