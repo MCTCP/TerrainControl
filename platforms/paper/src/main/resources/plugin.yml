@@ -5,7 +5,7 @@ authors: ['PeeGee85', 'Authvin', 'SuperCoder79', 'Josh/Coll1234567', 'Frank', 'R
 main: com.pg85.otg.paper.OTGPlugin
 load: STARTUP
 softdepend: ['WorldEdit']
-api-version: 1.17
+api-version: 1.18
 permissions:
    #This entire section was broken and by the looks of it hadn't been edited since TerrainControl
    #So I went ahead and cleaned it up a bit - Frank
