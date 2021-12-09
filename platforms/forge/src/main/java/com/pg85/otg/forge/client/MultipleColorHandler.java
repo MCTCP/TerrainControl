@@ -32,14 +32,14 @@ public class MultipleColorHandler
 				// This shouldn't be null, but sometimes it is?
 				if (key == null)
 				{
-					return grassColorResolver.getColor(biome, posX, posZ);
+					return grassColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{
-					return grassColorResolver.getColor(biome, posX, posZ);
+					return grassColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);
@@ -54,14 +54,14 @@ public class MultipleColorHandler
 				
 				if (key == null)
 				{
-					return foliageColorResolver.getColor(biome, posX, posZ);
+					return foliageColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{
-					return foliageColorResolver.getColor(biome, posX, posZ);
+					return foliageColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);
@@ -76,14 +76,14 @@ public class MultipleColorHandler
 				
 				if (key == null)
 				{
-					return waterColorResolver.getColor(biome, posX, posZ);
+					return waterColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				BiomeSettingSyncWrapper wrapper = OTGClientSyncManager.getSyncedData().get(key.toString());
 
 				if (wrapper == null)
 				{
-					return waterColorResolver.getColor(biome, posX, posZ);
+					return waterColorResolver.m_130045_(biome, posX, posZ); // todo ?
 				}
 
 				double noise = Biome.BIOME_INFO_NOISE.getValue(posX * 0.0225D, posZ * 0.0225D, false);

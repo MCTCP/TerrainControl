@@ -12,6 +12,9 @@ nbproject
 build.xml
 nbbuild
 
+# Vscode
+.vscode
+
 # Idea stuff 
 /.idea
 *.iml

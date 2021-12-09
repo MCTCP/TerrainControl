@@ -1,6 +1,10 @@
 plugins {
     id("platform-conventions")
-    id("fabric-loom") version "0.10.+"
+    id("dev.architectury.loom") version "0.10.0-SNAPSHOT"
+}
+
+loom {
+    silentMojangMappingsLicense()
 }
 
 dependencies {
@@ -27,11 +31,11 @@ tasks {
     }
 
     jar {
-        archiveClassifier.set("dev")
+        archiveClassifier.set("deobf")
     }
 
     shadowJar {
-        archiveClassifier.set("dev-all")
+        archiveClassifier.set("deobf-all")
     }
 
     remapJar {
@@ -39,10 +43,7 @@ tasks {
     }
 
     remapSourcesJar {
-        // Workaround issue where loom doesn't tell Gradle that remapping sources depends on other submodules being built first
-        inputs.files(configurations.named(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME))
-            .ignoreEmptyDirectories()
-            .withPropertyName("remap-classpath")
+        fixRemapSourcesDependencies()
     }
 }
 
