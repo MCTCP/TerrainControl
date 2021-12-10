@@ -31,7 +31,7 @@ configurations {
     implementation {
         extendsFrom(otg)
     }
-    forgeDependencies {
+    forgeExtra {
         extendsFrom(otg)
     }
 }
