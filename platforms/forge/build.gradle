@@ -24,10 +24,14 @@ repositories {
 		url = "https://maven.sk89q.com/artifactory/repo"
 	}
 	
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-    // flatDir {
-    //     dir 'libs'
-    // }	
+    // Add common jar output dirs as repo's for the development environment
+    //flatDir {
+        //dir '../../common/common-util/build/libs'
+        //dir '../../common/common-config/build/libs'
+        //dir '../../common/common-generator/build/libs'        
+        //dir '../../common/common-customobject/build/libs'        
+        //dir '../../common/common-core/build/libs'
+    //}
 }
 
 minecraft {
@@ -142,11 +146,17 @@ dependencies {
 
     library 'com.sk89q.worldedit:worldedit-core:7.2.8-SNAPSHOT'
 
-    //library 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
-    //library 'com.fasterxml.jackson.core:jackson-core:2.9.7'
-    //library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
-    //library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
-    //library 'org.yaml:snakeyaml:1.23'
+    library 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
+    library 'com.fasterxml.jackson.core:jackson-core:2.9.7'
+    library 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7'
+    library 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    library 'org.yaml:snakeyaml:1.23'
+	
+	//library ':common:common-util:1.17.1-0.0.22'
+    //library ':common:common-config:1.17.1-0.0.22'
+    //library ':common:common-customobject:1.17.1-0.0.22'
+    //library ':common:common-generator:1.17.1-0.0.22'
+    //library ':common:common-core:1.17.1-0.0.22'
 }
 
 tasks {
