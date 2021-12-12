@@ -115,7 +115,7 @@ minecraft {
 configurations {
     library
     implementation.extendsFrom library
-    // <shadow configuration>.extendsFrom library
+    // shadow configuration.extendsFrom library
 }
 minecraft.runs.all {
     lazyToken('minecraft_classpath') {
