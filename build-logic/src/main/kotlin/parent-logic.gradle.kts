@@ -1,4 +1,9 @@
 plugins {
-    java
-    id("base-conventions")
+    base
+}
+
+tasks {
+    clean {
+        delete(layout.buildDirectory.dir("distributions"))
+    }
 }
