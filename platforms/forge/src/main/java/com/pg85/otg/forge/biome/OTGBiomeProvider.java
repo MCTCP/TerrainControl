@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.Sampler;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.biome.BiomeSource;
 
 import com.pg85.otg.forge.presets.ForgePresetLoader;
@@ -107,7 +109,7 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 		{
 			throw new RuntimeException("No OTG preset found with name \"" + presetFolderName + "\". Install the correct preset or update your server.properties.");
 		}
-				
+
 		IBiome biome;
 		ResourceKey<Biome> key;
 		for (int biomeId = 0; biomeId < biomeLookup.length; biomeId++)
@@ -138,15 +140,93 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 		List<ResourceKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetFolderName);
 		if(biomesForPreset == null)
 		{
-			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
+			biomesForPreset= ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetFolderName());
 		}
 		if(biomesForPreset == null)
 		{
 			biomesForPreset = new ArrayList<>();
 		}
-		return biomesForPreset.stream().map(
-			(p_242638_1_) -> () -> registry.getOrThrow(p_242638_1_)
-		);
+
+		return fixBiomeFeatureOrder(biomesForPreset, registry);
+	}
+
+	private static Stream<Supplier<Biome>> fixBiomeFeatureOrder(List<ResourceKey<Biome>> biomesForPreset, WritableRegistry<Biome> registry)
+	{
+		// For some reason Mojang thought it'd be funny to add a method (BiomeSource.buildFeaturesPerStep)
+		// that validates the order of features registered to biomes, making sure that all biomes have
+		// PlacedFeatures registered in the same order, otherwise it throws a "cycle order" exception.
+		// This requirement is not defined or enforced anywhere else in the code, so you can register
+		// features to biomes in any order without issue, but then it blows up on calling the BiomeSource
+		// constructor. Fix any feature order inconsistencies for OTG biomes before handing them to MC.	
+		
+		List<Biome> biomes = biomesForPreset.stream().map((key) -> registry.getOrThrow(key)).collect(Collectors.toList());
+		ArrayList<PlacedFeature> featureOrder = new ArrayList<>();
+		
+		// Fill the featureOrder list to establish the allowed order of PlacedFeatures per biome
+		
+		// Index minecraft biomes first to let them determine order for vanilla features
+		biomes.stream().filter(a -> a.getRegistryName().getNamespace().equals("minecraft")).forEach(biome -> {
+			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
+				listForDecorationStep.forEach(supplier ->
+				{
+					PlacedFeature feature = supplier.get();
+					if(!featureOrder.contains(feature))
+					{
+						featureOrder.add(feature);	
+					}
+				});
+			});
+		});
+
+		// Index modded biomes second to let them determine order for modded features
+		biomes.stream().filter(a -> !a.getRegistryName().getNamespace().equals("minecraft") && !a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
+			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
+				listForDecorationStep.forEach(supplier ->
+				{
+					PlacedFeature feature = supplier.get();
+					if(!featureOrder.contains(feature))
+					{
+						featureOrder.add(feature);
+					}
+				});
+			});
+		});
+		
+		// Index otg biomes last so they only affect feature order for otg biomes
+		biomes.stream().filter(a -> a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
+			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
+				listForDecorationStep.forEach(supplier ->
+				{
+					PlacedFeature feature = supplier.get();
+					if(!featureOrder.contains(feature))
+					{
+						featureOrder.add(feature);
+					}
+				});
+			});
+		});
+		
+		// For OTG biomes, reorder PlacedFeatures so MC doesn't blow up.
+		biomes.stream().filter(a -> a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
+			List<List<Supplier<PlacedFeature>>> orderedFeatures = new ArrayList<>();
+			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
+				List<Supplier<PlacedFeature>> orderedFeaturesForDecorationStep = new ArrayList<>();
+				featureOrder.forEach(orderedFeature -> {
+					listForDecorationStep.forEach(supplier ->
+					{
+						PlacedFeature feature = supplier.get();
+						if(orderedFeature == feature)
+						{
+							orderedFeaturesForDecorationStep.add(supplier);
+						}
+					});
+				});
+				orderedFeatures.add(orderedFeaturesForDecorationStep);
+			});
+			biome.getGenerationSettings().features = orderedFeatures.stream().map(ImmutableList::copyOf).collect(ImmutableList.toImmutableList());
+		});
+
+		return biomes.stream().map((p_242638_1_) -> () -> p_242638_1_);		
 	}
 
 	protected Codec<? extends BiomeSource> codec()
