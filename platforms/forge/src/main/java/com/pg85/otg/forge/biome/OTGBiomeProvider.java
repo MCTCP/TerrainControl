@@ -1,7 +1,9 @@
 package com.pg85.otg.forge.biome;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -160,49 +162,74 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 		// constructor. Fix any feature order inconsistencies for OTG biomes before handing them to MC.	
 		
 		List<Biome> biomes = biomesForPreset.stream().map((key) -> registry.getOrThrow(key)).collect(Collectors.toList());
-		ArrayList<PlacedFeature> featureOrder = new ArrayList<>();
-		
+		ArrayList<PlacedFeature> featureOrder = new ArrayList<>();		
+		HashMap<PlacedFeature,List<PlacedFeature>> dependenciesPerFeature = new HashMap<>();
+
 		// Fill the featureOrder list to establish the allowed order of PlacedFeatures per biome
 		
-		// Index minecraft biomes first to let them determine order for vanilla features
-		biomes.stream().filter(a -> a.getRegistryName().getNamespace().equals("minecraft")).forEach(biome -> {
+		// For each feature, find all dependencies (other features that are listed before it)
+		biomes.stream().filter(a -> !a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
 			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
-				listForDecorationStep.forEach(supplier ->
+				for(int i = listForDecorationStep.size() - 1; i >= 0; i--)
 				{
-					PlacedFeature feature = supplier.get();
-					if(!featureOrder.contains(feature))
+					PlacedFeature feature2 = listForDecorationStep.get(i).get();
+					List<PlacedFeature> dependenciesForFeature = dependenciesPerFeature.computeIfAbsent(feature2, g -> { return new ArrayList<PlacedFeature>(); });
+					if(i > 0)
 					{
-						featureOrder.add(feature);	
+						PlacedFeature feature3 = listForDecorationStep.get(i - 1).get();
+						if(feature3 != feature2 && !dependenciesForFeature.contains(feature3))
+						{
+							dependenciesForFeature.add(feature3);
+						}
 					}
-				});
+				}
 			});
 		});
 
-		// Index modded biomes second to let them determine order for modded features
-		biomes.stream().filter(a -> !a.getRegistryName().getNamespace().equals("minecraft") && !a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
-			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
-				listForDecorationStep.forEach(supplier ->
+		// Resolve dependencies in order: Go through all features and find any features that have no dependencies, add them to the 
+		// featureOrder list and remove them from all dependency lists. Repeat until the features list is empty or there are no 
+		// features that have no dependencies (cyclical dependency error).
+
+		while(!dependenciesPerFeature.isEmpty())
+		{
+			int itemsRemoved = 0;
+			for(Entry<PlacedFeature,List<PlacedFeature>> entry : new HashMap<PlacedFeature,List<PlacedFeature>>(dependenciesPerFeature).entrySet())
+			{
+				PlacedFeature feature = entry.getKey();
+				List<PlacedFeature> dependencies = entry.getValue();
+				if(dependencies.isEmpty())
 				{
-					PlacedFeature feature = supplier.get();
-					if(!featureOrder.contains(feature))
-					{
-						featureOrder.add(feature);
-					}
-				});
-			});
-		});
+					itemsRemoved++;
+					featureOrder.add(feature);
+					dependenciesPerFeature.remove(feature);
+					dependenciesPerFeature.entrySet().forEach(entry2 -> {
+						List<PlacedFeature> dependencies2 = entry2.getValue();
+						dependencies2.remove(feature);
+					});
+				}
+			};
+			if(itemsRemoved == 0)
+			{
+				// Detected a cyclical dependency
+				throw new IllegalStateException("Feature order cycle found: Some of your (non-OTG) biomes have the same Features added in a different order, MC doesn't allow this. If you're using a datapack, you'll have to fix this yourself. The mod Cyanide can tell you which biomes/features are the problem.");
+			}
+		}
+
+		// Now index any features added only to OTG biomes, we'll reorder these so will ignore order.
 		
-		// Index otg biomes last so they only affect feature order for otg biomes
+		// For each feature, find all the other features that are listed before it
 		biomes.stream().filter(a -> a.getRegistryName().getNamespace().equals(com.pg85.otg.constants.Constants.MOD_ID_SHORT)).forEach(biome -> {
 			biome.getGenerationSettings().features().stream().forEach(listForDecorationStep -> {
-				listForDecorationStep.forEach(supplier ->
+				for(int i = listForDecorationStep.size() - 1; i >= 0; i--)
 				{
-					PlacedFeature feature = supplier.get();
-					if(!featureOrder.contains(feature))
+					PlacedFeature feature2 = listForDecorationStep.get(i).get();
+					// Ignore any features that already have an order determined by non-otg biomes, 
+					// or have already been found in other otg biomes
+					if(!featureOrder.contains(feature2))
 					{
-						featureOrder.add(feature);
+						featureOrder.add(feature2);
 					}
-				});
+				}
 			});
 		});
 		
@@ -214,8 +241,7 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 				featureOrder.forEach(orderedFeature -> {
 					listForDecorationStep.forEach(supplier ->
 					{
-						PlacedFeature feature = supplier.get();
-						if(orderedFeature == feature)
+						if(orderedFeature == supplier.get())
 						{
 							orderedFeaturesForDecorationStep.add(supplier);
 						}
@@ -226,7 +252,7 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 			biome.getGenerationSettings().features = orderedFeatures.stream().map(ImmutableList::copyOf).collect(ImmutableList.toImmutableList());
 		});
 
-		return biomes.stream().map((p_242638_1_) -> () -> p_242638_1_);		
+		return biomes.stream().map((biome) -> () -> biome);		
 	}
 
 	protected Codec<? extends BiomeSource> codec()
