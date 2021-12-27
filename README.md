@@ -21,8 +21,10 @@ We're always looking for people to contribute or collaborate with. For OTG 1.17,
 
 ## Dev Builds
 There are dev builds available for 1.16.5 [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.16.4).
-Dev builds for 1.17.1 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.17.1)
-Dev builds for Forge 1.18 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.18.1)
+
+Dev builds for 1.17.1 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.17.1).
+
+Dev builds for Forge 1.18 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.18.1).
 
 You will **NOT** get official support for dev builds, and they may break. Please use the mod jars available to you on CurseForge and the [OTG Discord](https://discord.gg/vTqe4zr5Hc).
 
