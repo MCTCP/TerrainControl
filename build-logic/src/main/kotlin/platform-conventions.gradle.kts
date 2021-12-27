@@ -18,7 +18,7 @@ tasks {
             "Implementation-Title" to project.name,
             "Implementation-Version" to project.version,
             "Implementation-Vendor" to "Team OTG",
-            // This will cause jar + any tasks dependent on it to be out-of-date every build (timestamp will be different run-to-run)
+            // This will cause jar + any tasks dependent on it to be out-of-date every build (timestamp will be different run-to-run) // todo: Remove if not needed
             "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
         )
     }
