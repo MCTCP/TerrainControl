@@ -19,6 +19,13 @@ We're always looking for people to contribute or collaborate with. For OTG 1.17,
 - To create release jars in the `build/distributions` folder, update the build version in build.gradle, then run `/gradlew`.
 - If you're having problems, make a sacrifice to the gradle gods and/or run `/gradlew clean` and then `/gradlew --refresh-dependencies`.
 
+## Dev Builds
+There are dev builds available for 1.16.5 [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.16.4).
+Dev builds for 1.17.1 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.17.1)
+Dev builds for Forge 1.18 are available [here](https://github.com/PG85/OpenTerrainGenerator/actions?query=branch%3A1.18.1)
+
+You will **NOT** get official support for dev builds, and they may break. Please use the mod jars available to you on CurseForge and the [OTG Discord](https://discord.gg/vTqe4zr5Hc).
+
 ### IntelliJ Building Instructions
 
 - All you have to do is Open IntelliJ and import the project folder, make sure you Trust the gradle project, and IntelliJ will do the rest :)
