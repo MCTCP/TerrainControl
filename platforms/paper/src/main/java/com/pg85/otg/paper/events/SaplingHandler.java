@@ -3,7 +3,7 @@ package com.pg85.otg.paper.events;
 import java.nio.file.Path;
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import com.pg85.otg.core.OTG;

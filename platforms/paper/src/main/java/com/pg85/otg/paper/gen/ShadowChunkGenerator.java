@@ -16,7 +16,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
-import org.bukkit.craftbukkit.v1_18_R1.generator.CraftChunkData;
+import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.gen.OTGChunkGenerator;

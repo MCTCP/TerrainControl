@@ -3,7 +3,7 @@ package com.pg85.otg.paper.api;
 import java.util.Optional;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 
 import com.pg85.otg.interfaces.IBiomeConfig;
 import com.pg85.otg.paper.gen.OTGNoiseChunkGenerator;

@@ -19,7 +19,7 @@ import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePo
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

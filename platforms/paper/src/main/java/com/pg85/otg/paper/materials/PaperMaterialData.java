@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Material;
 
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_18_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
 
 import java.util.Collection;
 import java.util.Objects;
