@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import com.pg85.otg.paper.util.ObfuscationHelper;
-import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -99,7 +98,7 @@ public class ShadowChunkGenerator
 		// Make a dummy chunk, we'll fill this with base terrain data ourselves, without touching any MC worldgen logic.
 		// As an optimisation, we cache the dummy chunk in a limited size FIFO cache. Later when MC requests the chunk 
 		// during world generation, we swap the dummy chunk's data into the real chunk.
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
+		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, level);
 		PaperChunkBuffer buffer = new PaperChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -247,7 +246,7 @@ public class ShadowChunkGenerator
 		
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
+				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld);
 				chunkpos = chunk.getPos();
 				int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkToHandle.getChunkX() - chunkCoordinate.getChunkX(), 2) + Math.pow (chunkToHandle.getChunkZ() - chunkCoordinate.getChunkZ(), 2)));
 				
@@ -329,7 +328,7 @@ public class ShadowChunkGenerator
 		if (structureSeparationSettings != null)
 		{
 			WorldgenRandom sharedSeedRandom = new WorldgenRandom();
-			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, chunkPos.x, chunkPos.z);
+			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
 			if (
 				chunkPos.x == chunkPosPotential.x &&
 				chunkPos.z == chunkPosPotential.z
