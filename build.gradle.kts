@@ -29,7 +29,7 @@ tasks.build {
 }
 
 listOf(
-    // project(":platforms:paper"),
+    project(":platforms:paper"),
     project(":platforms:forge"),
     // project(":platforms:fabric"),
 ).forEach { proj ->
