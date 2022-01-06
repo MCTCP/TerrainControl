@@ -38,6 +38,12 @@ tasks {
     shadowJar {
         archiveClassifier.set("deobf-all")
     }
+    
+    reobfJar {
+43
+        inputJar.set(shadowJar.flatMap { it.archiveFile })
+44
+    }
 }
 
 otgPlatform {
