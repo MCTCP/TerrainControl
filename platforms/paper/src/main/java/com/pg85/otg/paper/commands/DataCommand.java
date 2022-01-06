@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

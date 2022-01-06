@@ -2,7 +2,7 @@ package com.pg85.otg.paper.networking;
 
 import net.minecraft.network.FriendlyByteBuf;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
