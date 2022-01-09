@@ -410,7 +410,7 @@ public class EditCommand extends BaseCommand
 				if (blockstate.is(BlockTags.LEAVES))
 				{
 					// Schedule a tick on this block in 1 unit of time
-					worldGenRegion.getInternal().getBlockTicks().scheduleTick(blockpos, blockstate.getBlock(), 1);
+					worldGenRegion.getInternal().scheduleTick(blockpos, blockstate.getBlock(), 1);
 				} else {
 					BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, worldGenRegion.getInternal(), blockpos);
 					worldGenRegion.setBlockState(blockpos, blockstate1, 20);

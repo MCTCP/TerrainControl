@@ -18,8 +18,6 @@ import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
 import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -64,7 +62,6 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
@@ -416,10 +413,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Therefore, we need to re-do these calls now, for that one chunk
 		if (fixBiomesForChunk != null && fixBiomesForChunk.equals(chunkCoord))
 		{
+
 			// Should only run when first creating the world, on a single chunk
 			this.createStructures(world.getMinecraftWorld().registryAccess(), world.getMinecraftWorld().structureFeatureManager(), chunk,
 				world.getMinecraftWorld().getStructureManager(), world.getMinecraftWorld().getSeed());
-			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), chunk);
+			this.createBiomes(chunk.biomeRegistry, chunk);
 			fixBiomesForChunk = null;
 		}
 		ChunkBuffer buffer = new PaperChunkBuffer(chunk);
@@ -612,12 +610,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	@Override
-	public void createBiomes (Registry<Biome> biomeRegistry, ChunkAccess chunk)
-	{
-		ChunkPos chunkcoordintpair = chunk.getPos();
-		((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, chunk, chunkcoordintpair, this.runtimeBiomeSource));
-	}
+//	@Override
+//	public void createBiomes (Registry<Biome> biomeRegistry, ChunkAccess chunk)
+//	{
+//		ChunkPos chunkcoordintpair = chunk.getPos();
+//		((ProtoChunk)chunk).setBiomes(new ChunkBiomeContainer(biomeRegistry, chunk, chunkcoordintpair, this.runtimeBiomeSource));
+//	}
 
 	// Mob spawning on initial chunk spawn (animals).
 	@Override

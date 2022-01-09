@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 
 public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 {
@@ -98,7 +99,7 @@ public class OTGBiomeProvider extends BiomeSource implements ILayerSource
 	// TODO: This is only used by MC internally, OTG fetches all biomes via CachedBiomeProvider.
 	// Could make this use the cache too?
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler p_186738_)
 	{
 		return registry.get(keyLookup.get(this.layer.get().sample(biomeX, biomeZ)));
 	}

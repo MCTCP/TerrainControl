@@ -9,14 +9,20 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMultimap;
 import com.pg85.otg.paper.util.ObfuscationHelper;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
-import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
+import org.bukkit.craftbukkit.v1_18_R1.generator.CraftChunkData;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.gen.OTGChunkGenerator;
@@ -63,7 +69,8 @@ public class ShadowChunkGenerator
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
 	private final FifoMap<ChunkCoordinate, ChunkAccess> unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkAccess>(512);
 	private final FifoMap<ChunkCoordinate, Integer> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
-	
+	private final FifoMap<ChunkCoordinate, Integer> hasVanillaNoiseStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
+
 	static Field heightMaps;
 	static Field light;
 	static Field sections;
@@ -98,7 +105,7 @@ public class ShadowChunkGenerator
 		// Make a dummy chunk, we'll fill this with base terrain data ourselves, without touching any MC worldgen logic.
 		// As an optimisation, we cache the dummy chunk in a limited size FIFO cache. Later when MC requests the chunk 
 		// during world generation, we swap the dummy chunk's data into the real chunk.
-		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, level);
+		ProtoChunk chunk = new ProtoChunk(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null, level, level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
 		PaperChunkBuffer buffer = new PaperChunkBuffer(chunk);
 
 		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
@@ -197,26 +204,36 @@ public class ShadowChunkGenerator
 	// Unfortunately this requires fetching structure data in a non-thread-safe manner, so we can't do async
 	// chunkgen (base terrain) for these chunks and have to avoid them.
 
-	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider)
+	public boolean checkHasVanillaStructureWithoutLoading(ServerLevel serverWorld, ChunkGenerator chunkGenerator, BiomeSource biomeProvider, StructureSettings dimensionStructuresSettings, ChunkCoordinate chunkCoordinate, ICachedBiomeProvider cachedBiomeProvider, boolean noiseAffectingStructuresOnly)
 	{
 		// Since we can't check for structure components/references, only structure starts,
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 5;
 		ProtoChunk chunk;
 		ChunkPos chunkpos;
-		IBiome biome;
 		if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
 		{
 			List<ChunkCoordinate> chunksToHandle = new ArrayList<>();
 			Map<ChunkCoordinate,Integer> chunksHandled = new HashMap<>();
-			synchronized(this.hasVanillaStructureChunkCache)
+			if(noiseAffectingStructuresOnly)
 			{
-				if(checkHasVanillaStructureWithoutLoadingCache(this.hasVanillaStructureChunkCache, chunkCoordinate, radiusInChunks, chunksToHandle))
+				synchronized(this.hasVanillaNoiseStructureChunkCache)
 				{
-					return true;
+					if(checkHasVanillaStructureWithoutLoadingCache(this.hasVanillaNoiseStructureChunkCache, chunkCoordinate, radiusInChunks, chunksToHandle))
+					{
+						return true;
+					}
+				}
+			} else {
+				synchronized(this.hasVanillaStructureChunkCache)
+				{
+					if(checkHasVanillaStructureWithoutLoadingCache(this.hasVanillaStructureChunkCache, chunkCoordinate, radiusInChunks, chunksToHandle))
+					{
+						return true;
+					}
 				}
 			}
-			
+
 			@SuppressWarnings("unchecked")
 			ArrayList<StructureFeature<?>>[] structuresPerDistance = new ArrayList[radiusInChunks];
 			structuresPerDistance[4] = new ArrayList<StructureFeature<?>>(Arrays.asList(
@@ -243,21 +260,25 @@ public class ShadowChunkGenerator
 				}
 			));
 			structuresPerDistance[0] = new ArrayList<StructureFeature<?>>(Arrays.asList(new StructureFeature<?>[]{}));
-		
+
 			for(ChunkCoordinate chunkToHandle : chunksToHandle)
 			{
-				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld);
+				chunk = new ProtoChunk(new ChunkPos(chunkToHandle.getChunkX(), chunkToHandle.getChunkZ()), null, serverWorld, serverWorld.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null);
 				chunkpos = chunk.getPos();
 				int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkToHandle.getChunkX() - chunkCoordinate.getChunkX(), 2) + Math.pow (chunkToHandle.getChunkZ() - chunkCoordinate.getChunkZ(), 2)));
-				
+
 				// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 				// based on biome and resource settings (distance etc). Does not plot any structure components.
 
 				// TODO: Optimise this for biome lookups, fetch a whole region of noise biome info at once?
-				biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
-				for(Supplier<ConfiguredStructureFeature<?, ?>> supplier : ((PaperBiome)biome).getBiome().getGenerationSettings().structures())
+				IBiome biome = cachedBiomeProvider.getNoiseBiome((chunkpos.x << 2) + 2, (chunkpos.z << 2) + 2);
+				// TODO: Should we store this in the biomes? Would save creating them anew here -auth
+				ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(biome.getBiomeConfig().getRegistryKey().toResourceLocationString()));
+				// TODO: This only checks for villages for now, needs reworking. The forge approach won't work.
+				ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> structureMap =  chunkGenerator.getSettings().structures(StructureFeature.VILLAGE);
+				ImmutableCollection<ConfiguredStructureFeature<?, ?>> structures = structureMap.inverse().get(key);
+				for (ConfiguredStructureFeature<?, ?> structure : structures)
 				{
-					ConfiguredStructureFeature<?, ?> structure = supplier.get();
 					if(structure.feature.step() == Decoration.SURFACE_STRUCTURES)
 					{
 						for(int i = structuresPerDistance.length - 1; i > 0; i--)
@@ -267,13 +288,13 @@ public class ShadowChunkGenerator
 							{
 								if(hasStructureStart(structure, dimensionStructuresSettings, serverWorld.getSeed(), chunkpos))
 								{
-									chunksHandled.put(chunkToHandle, new Integer(i));
+									chunksHandled.put(chunkToHandle, i);
 									if(i >= distance)
 									{
 										synchronized(this.hasVanillaStructureChunkCache)
 										{
 											this.hasVanillaStructureChunkCache.putAll(chunksHandled);
-										}							
+										}
 										return true;
 									}
 								}
@@ -282,11 +303,20 @@ public class ShadowChunkGenerator
 						}
 					}
 				}
-				chunksHandled.putIfAbsent(chunkToHandle, new Integer(0));
+
+				chunksHandled.putIfAbsent(chunkToHandle, 0);
 			}
-			synchronized(this.hasVanillaStructureChunkCache)
+			if(noiseAffectingStructuresOnly)
 			{
-				this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+				synchronized(this.hasVanillaNoiseStructureChunkCache)
+				{
+					this.hasVanillaNoiseStructureChunkCache.putAll(chunksHandled);
+				}
+			} else {
+				synchronized(this.hasVanillaStructureChunkCache)
+				{
+					this.hasVanillaStructureChunkCache.putAll(chunksHandled);
+				}
 			}
 		}
 		return false;
@@ -324,18 +354,11 @@ public class ShadowChunkGenerator
 	// Taken from PillagerOutpostStructure.isNearVillage
 	private boolean hasStructureStart(ConfiguredStructureFeature<?, ?> structureFeature, StructureSettings dimensionStructuresSettings, long seed, ChunkPos chunkPos)
 	{
-		StructureFeatureConfiguration structureSeparationSettings = dimensionStructuresSettings.getConfig(structureFeature.feature);
-		if (structureSeparationSettings != null)
+		StructureFeatureConfiguration structureFeatureConfiguration = dimensionStructuresSettings.getConfig(structureFeature.feature);
+		if (structureFeatureConfiguration != null)
 		{
-			WorldgenRandom sharedSeedRandom = new WorldgenRandom();
-			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureSeparationSettings, seed, sharedSeedRandom, chunkPos.x, chunkPos.z);
-			if (
-				chunkPos.x == chunkPosPotential.x &&
-				chunkPos.z == chunkPosPotential.z
-			) {
-				return true;
-			}
-			return false;
+			ChunkPos chunkPosPotential = structureFeature.feature.getPotentialFeatureChunk(structureFeatureConfiguration, seed, chunkPos.x, chunkPos.z);
+			return chunkPos.x == chunkPosPotential.x && chunkPos.z == chunkPosPotential.z;
 		}
 		return false;
 	}

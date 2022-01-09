@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.core.OTG;
