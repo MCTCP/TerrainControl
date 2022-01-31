@@ -25,7 +25,7 @@ public class PaperNBTHelper extends LocalNBTHelper
 			return null;
 		}
 		CompoundTag nmsTag = new CompoundTag();
-		tileEntity.save(nmsTag);
+		tileEntity.load(nmsTag);
 		nmsTag.remove("x");
 		nmsTag.remove("y");
 		nmsTag.remove("z");
