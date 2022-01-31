@@ -25,6 +25,7 @@ public class PaperNBTHelper extends LocalNBTHelper
 			return null;
 		}
 		CompoundTag nmsTag = new CompoundTag();
+		// Idk why but they changed .save() to .load() - Frank
 		tileEntity.load(nmsTag);
 		nmsTag.remove("x");
 		nmsTag.remove("y");
