@@ -3,6 +3,8 @@ package com.pg85.otg.paper.gen;
 import java.util.Random;
 
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.ticks.ScheduledTick;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.pg85.otg.constants.Constants;
@@ -70,7 +72,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
+		return PaperMaterialData.ofBlockData(chunk.getBlockState(internalX, y, internalZ));
 	}
 
 
@@ -115,7 +117,7 @@ public class MCWorldGenRegion extends PaperWorldGenRegion
 
 		if (material.isLiquid())
 		{
-			this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getFluidState().getType(), 0);
+			this.worldGenRegion.getFluidTicks().schedule(new ScheduledTick<Fluid>(((PaperMaterialData)material).internalBlock().getFluidState().getType(), pos, 0L, 0L));
 		}
 
 		if (nbt != null)

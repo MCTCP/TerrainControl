@@ -54,7 +54,7 @@ public class BiomeCommand extends BaseCommand
 			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
 			return 0;
 		}
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
@@ -62,7 +62,7 @@ public class BiomeCommand extends BaseCommand
 
 		Biome biome = source.getLevel()
 				.getBiome(new BlockPos(source.getPosition().x, source.getPosition().y, source.getPosition().z));
-		IBiomeConfig config = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator)
+		IBiomeConfig config = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator())
 				.getCachedBiomeProvider().getBiomeConfig((int) source.getPosition().x, (int) source.getPosition().z);
 
 		source.sendSuccess(new TextComponent("====================================================="), false);

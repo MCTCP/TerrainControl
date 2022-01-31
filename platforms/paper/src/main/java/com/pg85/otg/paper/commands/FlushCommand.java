@@ -38,7 +38,7 @@ public class FlushCommand extends BaseCommand
 			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
 			return 0;
 		}
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;

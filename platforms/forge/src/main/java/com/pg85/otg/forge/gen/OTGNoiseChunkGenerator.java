@@ -1161,7 +1161,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		} else {
 			WeightedRandomList<MobSpawnSettings.SpawnerData> spawns = net.minecraftforge.common.world.StructureSpawnManager.getStructureSpawns(structureManager, entityClassification, blockPos);
 			if (spawns != null) return spawns;
-			return (entityClassification == MobCategory.UNDERGROUND_WATER_CREATURE || entityClassification == MobCategory.AXOLOTLS) && structureManager.getStructureAt(blockPos, StructureFeature.OCEAN_MONUMENT).isValid() ? MobSpawnSettings.EMPTY_MOB_LIST : super.getMobsAt(biome, structureManager, entityClassification, blockPos);
+			return (entityClassification == MobCategory.UNDERGROUND_WATER_CREATURE || entityClassification == MobCategory.AXOLOTLS)
+					&& structureManager.getStructureAt(blockPos, StructureFeature.OCEAN_MONUMENT).isValid()
+					? MobSpawnSettings.EMPTY_MOB_LIST
+					: super.getMobsAt(biome, structureManager, entityClassification, blockPos);
 		}
 	}
 	

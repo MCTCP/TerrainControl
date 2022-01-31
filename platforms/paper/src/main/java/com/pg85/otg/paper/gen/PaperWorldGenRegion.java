@@ -4,6 +4,10 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.Random;
 
+import net.minecraft.data.worldgen.features.TreeFeatures;
+import net.minecraft.data.worldgen.placement.CavePlacements;
+import net.minecraft.data.worldgen.placement.EndPlacements;
+import net.minecraft.data.worldgen.placement.TreePlacements;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.TextComponent;
@@ -38,7 +42,6 @@ import com.pg85.otg.util.minecraft.TreeType;
 import com.pg85.otg.util.nbt.NamedBinaryTag;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.worldgen.Features;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -46,7 +49,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 // TODO: Split up worldgenregion into separate classes, one for decoration/worldgen, one for non-worldgen.
@@ -185,7 +188,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
+		return PaperMaterialData.ofBlockData(chunk.getBlockState(internalX, y, internalZ));
 	}
 
 	@Override
@@ -217,6 +220,17 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	{
 		int highestY = getHighestBlockYAt(x, z, true, true, false, false, false);
 		if (highestY >= 0)
+		{
+			return highestY + 1;
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
+	public int getHighestBlockAboveYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves) {
+		int highestY = getHighestBlockYAt(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow, ignoreLeaves);
+		if(highestY >= 0)
 		{
 			return highestY + 1;
 		} else {
@@ -413,11 +427,11 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 
 			if (material.isLiquid())
 			{
-				this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getFluidState().getType(), 0);
+				this.worldGenRegion.scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getFluidState().getType(), 0);
 			}
 			else if (material.isMaterial(LocalMaterials.COMMAND_BLOCK))
 			{
-				this.worldGenRegion.getBlockTicks().scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getBlock(), 0);
+				this.worldGenRegion.scheduleTick(pos, ((PaperMaterialData)material).internalBlock().getBlock(), 0);
 			}
 
 			if (nbt != null)
@@ -477,8 +491,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 	{
 		return worldGenRegion.getBlockEntity(blockPos);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
@@ -486,100 +499,95 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		{
 			return false;
 		}
+
+		// See explanation in ForgeWorldGenRegion::placeTree
+		if(y != this.getHighestBlockAboveYAt(x, z, true, false, false, true, true))
+		{
+			return true;
+		}
+
 		BlockPos blockPos = new BlockPos(x, y, z);
 		try
 		{
 			// Features -> BiomeDecoratorGroups
 			// ConfiguredFeature.feature -> WorldGenFeatureConfigured.e
 			// ConfiguredFeature.config -> WorldGenFeatureConfigured.f
-			ConfiguredFeature<TreeConfiguration, ?> tree = null;
-			ConfiguredFeature<FeatureConfiguration, ?> other = null;
+			PlacedFeature tree;
 			switch (type)
 			{
 				case Acacia:
-					tree = Features.ACACIA;
+					tree = TreePlacements.ACACIA_CHECKED;
 					break;
 				case BigTree:
-					tree = Features.FANCY_OAK;
+					tree = TreePlacements.FANCY_OAK_CHECKED;
 					break;
 				case Forest:
 				case Birch:
-					tree = Features.BIRCH;
+					tree = TreePlacements.BIRCH_CHECKED;
 					break;
 				case JungleTree:
-					tree = Features.MEGA_JUNGLE_TREE;
+					tree = TreePlacements.MEGA_JUNGLE_TREE_CHECKED;
 					break;
 				case CocoaTree:
-					tree = Features.JUNGLE_TREE;
+					tree = TreePlacements.JUNGLE_TREE_CHECKED;
 					break;
 				case DarkOak:
-					tree = Features.DARK_OAK;
+					tree = TreePlacements.DARK_OAK_CHECKED;
 					break;
 				case GroundBush:
-					tree = Features.JUNGLE_BUSH;
+					tree = TreePlacements.JUNGLE_BUSH;
 					break;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
-						other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
+						tree = TreeFeatures.HUGE_BROWN_MUSHROOM.placed();
 					} else {
-						other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
+						tree = TreeFeatures.HUGE_RED_MUSHROOM.placed();
 					}
 					break;
 				case HugeRedMushroom:
-					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_RED_MUSHROOM;
+					tree = TreeFeatures.HUGE_RED_MUSHROOM.placed();
 					break;
 				case HugeBrownMushroom:
-					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.HUGE_BROWN_MUSHROOM;
+					tree = TreeFeatures.HUGE_BROWN_MUSHROOM.placed();
 					break;
 				case SwampTree:
-					tree = Features.SWAMP_OAK;
+					tree = TreeFeatures.SWAMP_OAK.placed();
 					break;
 				case Taiga1:
-					tree = Features.PINE;
+					tree = TreePlacements.PINE_CHECKED;
 					break;
 				case Taiga2:
-					tree = Features.SPRUCE;
+					tree = TreePlacements.SPRUCE_CHECKED;
 					break;
 				case HugeTaiga1:
-					tree = Features.MEGA_PINE;
+					tree = TreePlacements.MEGA_PINE_CHECKED;
 					break;
 				case HugeTaiga2:
-					tree = Features.MEGA_SPRUCE;
+					tree = TreePlacements.MEGA_SPRUCE_CHECKED;
 					break;
 				case TallBirch:
-					tree = Features.SUPER_BIRCH_BEES_0002;
+					tree = TreePlacements.SUPER_BIRCH_BEES_0002;
 					break;
 				case Tree:
-					tree = Features.OAK;
+					tree = TreePlacements.OAK_CHECKED;
 					break;
 				case CrimsonFungi:
-					ConfiguredFeature<HugeFungusConfiguration, ?> crimsonFungi = Features.CRIMSON_FUNGI_PLANTED;
-					crimsonFungi.feature.place(new FeaturePlaceContext<>(worldGenRegion, chunkGenerator, rand, blockPos, HugeFungusConfiguration.HUGE_CRIMSON_FUNGI_NOT_PLANTED_CONFIG));
-					return true;
+					tree = TreePlacements.CRIMSON_FUNGI;
+					break;
 				case WarpedFungi:
-					ConfiguredFeature<HugeFungusConfiguration, ?> warpedFungi = Features.WARPED_FUNGI_PLANTED;
-					warpedFungi.feature.place(new FeaturePlaceContext<>(worldGenRegion, chunkGenerator, rand, blockPos, HugeFungusConfiguration.HUGE_WARPED_FUNGI_NOT_PLANTED_CONFIG));
-					return true;
+					tree = TreePlacements.WARPED_FUNGI;
+					break;
 				case ChorusPlant:
-					other = (ConfiguredFeature<FeatureConfiguration, ?>) Features.CHORUS_PLANT;
+					tree = EndPlacements.CHORUS_PLANT;
 					break;	
 				case Azalea:
-					tree = Features.AZALEA_TREE;
+					tree = TreeFeatures.AZALEA_TREE.placed();
 					break;	
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type);
 			}
-			if (tree != null)
-			{
-				tree.feature.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tree.config));
-			}
-			else if (other != null)
-			{
-				other.feature.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, rand, blockPos, other.config));
-			} else {
-				throw new RuntimeException("Incorrect handling of tree of type " + type);
-			}
+			tree.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos);
 			return true;
 		}
 		catch (NullPointerException ex)
@@ -706,21 +714,25 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 				mobEntity.setPersistenceRequired();
 				mobEntity.finalizeSpawn(this.worldGenRegion, this.worldGenRegion.getCurrentDifficultyAt(new BlockPos(entityData.getX(), entityData.getY(), entityData.getZ())), MobSpawnType.CHUNK_GENERATION, null, compoundTag);
 			}
-			this.worldGenRegion.addEntity(entity, CreatureSpawnEvent.SpawnReason.DEFAULT);
+			this.worldGenRegion.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.DEFAULT);
 		}
 	}
 
 	@Override
 	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		Feature.MONSTER_ROOM.place(new FeaturePlaceContext<>(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z), FeatureConfiguration.NONE));
+		Feature.MONSTER_ROOM.configured(FeatureConfiguration.NONE).place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFossil(Random random, int x, int y, int z)
 	{
-		// TODO: Add customization to fossile configuration?
-		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		if(y >= 0)
+		{
+			CavePlacements.FOSSIL_UPPER.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		} else {
+			CavePlacements.FOSSIL_LOWER.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		}
 	}
 
 	@Override
@@ -774,7 +786,7 @@ public class PaperWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return PaperMaterialData.ofBlockData(chunk.getType(internalX, y, internalZ));
+		return PaperMaterialData.ofBlockData(chunk.getBlockState(internalX, y, internalZ));
 	}	
 	
 	@Override

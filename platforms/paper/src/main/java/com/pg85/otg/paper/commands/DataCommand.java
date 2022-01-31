@@ -7,9 +7,6 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
-
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -70,29 +67,17 @@ public class DataCommand extends BaseCommand
 
 		Registry<?> registry;
 
-		switch (type.toLowerCase())
-		{
-			case "biome":
-				registry = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-				break;
-			case "block":
-				registry = Registry.BLOCK;
-				break;
-			case "entity":
-				registry = Registry.ENTITY_TYPE;
-				break;
-			case "sound":
-				registry = Registry.SOUND_EVENT;
-				break;
-			case "particle":
-				registry = Registry.PARTICLE_TYPE;
-				break;
-			case "configured_feature":
-				registry = BuiltinRegistries.CONFIGURED_FEATURE;
-				break;
-			default:
+		switch (type.toLowerCase()) {
+			case "biome" -> registry = source.getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+			case "block" -> registry = Registry.BLOCK;
+			case "entity" -> registry = Registry.ENTITY_TYPE;
+			case "sound" -> registry = Registry.SOUND_EVENT;
+			case "particle" -> registry = Registry.PARTICLE_TYPE;
+			case "configured_feature" -> registry = BuiltinRegistries.CONFIGURED_FEATURE;
+			default -> {
 				source.sendSuccess(new TextComponent(getUsage()), false);
 				return 0;
+			}
 		}
 
 		Set<ResourceLocation> set = registry.keySet();

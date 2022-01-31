@@ -47,6 +47,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.*;
 import net.minecraft.world.level.levelgen.feature.configurations.*;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
 
 public class PaperBiome implements IBiome
@@ -80,7 +81,8 @@ public class PaperBiome implements IBiome
 		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
 		// TODO: What if there's no grass around spawn?
-		biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
+		// Commenting out for the time being - Frank
+		//biomeGenerationSettingsBuilder.surfaceBuilder(SurfaceBuilders.GRASS);
 
 		// * Carvers are handled by OTG
 
@@ -90,7 +92,7 @@ public class PaperBiome implements IBiome
 			if (res instanceof RegistryResource registryResource)
 			{
 				GenerationStep.Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
-				ConfiguredFeature<?, ?> registry = BuiltinRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
+				PlacedFeature registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
 				if (registry == null)
 				{
 					OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Could not find feature "+registryResource.getFeatureKey()+" in the registry, please check spelling");
@@ -117,11 +119,12 @@ public class PaperBiome implements IBiome
 						list.add(data.internalBlock());
 					}
 				}
-				GlowLichenConfiguration config = new GlowLichenConfiguration(glow.nearbyAttempts, glow.canPlaceOnFloor, glow.canPlaceOnCeiling, glow.canPlaceOnWall, glow.chanceOfSpreading, list);
+				// Commenting out for now - Frank
+				/*GlowLichenConfiguration config = new GlowLichenConfiguration(glow.nearbyAttempts, glow.canPlaceOnFloor, glow.canPlaceOnCeiling, glow.canPlaceOnWall, glow.chanceOfSpreading, list);
 				biomeGenerationSettingsBuilder
 					.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Feature.GLOW_LICHEN.configured(config).squared()
 					.rangeUniform(VerticalAnchor.aboveBottom(glow.minX), VerticalAnchor.absolute(glow.maxX))
-					.count(UniformInt.of(glow.countMin, glow.countMax)));
+					.count(UniformInt.of(glow.countMin, glow.countMax)));*/
 			}
 		}
 
@@ -203,8 +206,8 @@ public class PaperBiome implements IBiome
 				.precipitation(biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.Precipitation.NONE :
 						biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.Precipitation.RAIN :
 								Biome.Precipitation.SNOW)
-				.depth(biomeConfig.getBiomeHeight())
-				.scale(biomeConfig.getBiomeVolatility())
+				//.depth(biomeConfig.getBiomeHeight())
+				//.scale(biomeConfig.getBiomeVolatility())
 				.temperature(safeTemperature)
 				.downfall(biomeConfig.getBiomeWetness())
 				.specialEffects(biomeAmbienceBuilder.build())
@@ -242,7 +245,8 @@ public class PaperBiome implements IBiome
 
 		// Villages
 		// TODO: Allow spawning multiple types in a single biome?
-		if (worldConfig.getVillagesEnabled() && biomeConfig.getVillageType() != SettingsEnums.VillageType.disabled)
+		// Cutting this out for the time being - Frank
+		/*if (worldConfig.getVillagesEnabled() && biomeConfig.getVillageType() != SettingsEnums.VillageType.disabled)
 		{
 			int villageSize = biomeConfig.getVillageSize();
 			SettingsEnums.VillageType villageType = biomeConfig.getVillageType();
@@ -272,13 +276,13 @@ public class PaperBiome implements IBiome
 							)
 					)
 			);
-			biomeGenerationSettingsBuilder.addStructureStart(customVillage);
+			biomeGenerationSettingsBuilder.(GenerationStep.Decoration.SURFACE_STRUCTURES, );
 		}
 
 		// Strongholds
 		if (worldConfig.getStrongholdsEnabled() && biomeConfig.getStrongholdsEnabled())
 		{
-			biomeGenerationSettingsBuilder.addStructureStart(StructureFeatures.STRONGHOLD);
+			biomeGenerationSettingsBuilder.addFeature(GenerationStep.Decoration.STRONGHOLDS, StructureFeatures.STRONGHOLD);
 		}
 
 		// Ocean Monuments
@@ -456,7 +460,7 @@ public class PaperBiome implements IBiome
 				case disabled:
 					break;
 			}
-		}
+		}*/
 	}
 
 	// StructureFeatures.register()
@@ -476,7 +480,8 @@ public class PaperBiome implements IBiome
 		addMobGroup(MobCategory.WATER_AMBIENT, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.WATER_AMBIENT), biomeConfig.getName());
 		addMobGroup(MobCategory.MISC, mobSpawnInfoBuilder, biomeConfig.getSpawnList(EntityCategory.MISC), biomeConfig.getName());
 
-		mobSpawnInfoBuilder.setPlayerCanSpawn();
+		// This functionality must've been removed? - Frank
+		//mobSpawnInfoBuilder.setPlayerCanSpawn();
 		return mobSpawnInfoBuilder;
 	}
 
