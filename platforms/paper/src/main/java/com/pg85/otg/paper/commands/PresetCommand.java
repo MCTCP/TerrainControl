@@ -31,12 +31,12 @@ public class PresetCommand extends BaseCommand
 			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
 			return 0;
 		}
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
-		Preset preset = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getPreset();
 		source.sendSuccess(new TextComponent
 			("Preset: " + preset.getFolderName()
 			 + "\nDescription: " + preset.getDescription()

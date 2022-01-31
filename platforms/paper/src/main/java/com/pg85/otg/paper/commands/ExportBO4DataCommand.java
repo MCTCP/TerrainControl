@@ -62,13 +62,13 @@ public class ExportBO4DataCommand extends BaseCommand
 		}
 		Player player = (Player) sender;
 
-		if (!(sender.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(sender.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			sender.sendSuccess(new TextComponent("\u00a7cOTG is not enabled in this world!"), false);
 			return 0;
 		}
 
-		Preset preset = ((OTGNoiseChunkGenerator) sender.getLevel().getChunkSource().generator).getPreset();
+		Preset preset = ((OTGNoiseChunkGenerator) sender.getLevel().getChunkSource().getGenerator()).getPreset();
         if(preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4)
         {
         	if(!isRunning)
@@ -103,8 +103,8 @@ public class ExportBO4DataCommand extends BaseCommand
 				        	                	try {
 				        	                		// World save folder name may not be identical to level name, fetch it.
 				        	                		Path worldSaveFolder = sender.getLevel().getWorld().getWorldFolder().toPath();
-				        	                		IWorldGenRegion worldGenRegion = new PaperWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), sender.getLevel(), (OTGNoiseChunkGenerator)sender.getLevel().getChunkSource().generator);
-				        	                		structureStart.getMinimumSize(((OTGNoiseChunkGenerator)sender.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder), worldGenRegion, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				        	                		IWorldGenRegion worldGenRegion = new PaperWorldGenRegion(preset.getFolderName(), preset.getWorldConfig(), sender.getLevel(), (OTGNoiseChunkGenerator)sender.getLevel().getChunkSource().getGenerator());
+				        	                		structureStart.getMinimumSize(((OTGNoiseChunkGenerator)sender.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder), worldGenRegion, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getPresetLoader().getMaterialReader(preset.getFolderName()), OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 				        						}
 				        	                	catch (InvalidConfigException e)
 				        	                	{

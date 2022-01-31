@@ -43,7 +43,7 @@ public class StructureCommand extends BaseCommand
 			source.sendSuccess(new TextComponent("\u00a7cPermission denied!"), false);
 			return 0;
 		}
-		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator))
 		{
 			source.sendSuccess(new TextComponent("OTG is not enabled in this world"), false);
 			return 0;
@@ -53,13 +53,13 @@ public class StructureCommand extends BaseCommand
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)source.getPosition().x, (int)source.getPosition().z);
 		Path worldSaveFolder = source.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
 		// if the player is in range
-		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getStructureCache(worldSaveFolder).getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()).getStructureCache(worldSaveFolder).getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
 			ILogger logger = OTG.getEngine().getLogger();
 			CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
-			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().generator).getPreset().getFolderName());
+			IMaterialReader materialReader = OTG.getEngine().getPresetLoader().getMaterialReader(((OTGNoiseChunkGenerator)source.getLevel().getChunkSource().getGenerator()).getPreset().getFolderName());
 			CustomObjectResourcesManager manager = OTG.getEngine().getCustomObjectResourcesManager();
 			IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
 			
