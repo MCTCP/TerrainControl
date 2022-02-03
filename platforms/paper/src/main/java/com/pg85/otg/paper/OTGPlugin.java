@@ -174,15 +174,15 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		try
 		{
 			
-			Field finalGenerator = ObfuscationHelper.getField(ServerChunkCache.class, "generator", "d");
+			Field finalGenerator = ObfuscationHelper.getField(ChunkMap.class, "generator", "t");
 			finalGenerator.setAccessible(true);
 
-			finalGenerator.set(serverWorld.getChunkSource(), OTGDelegate);
+			finalGenerator.set(serverWorld.getChunkSource().chunkMap, OTGDelegate);
 
-			Field pcmGen = ObfuscationHelper.getField(ChunkMap.class, "generator", "r");
+			/*Field pcmGen = ObfuscationHelper.getField(ChunkMap.class, "generator", "r");
 			pcmGen.setAccessible(true);
 
-			pcmGen.set(serverWorld.getChunkSource().chunkMap, OTGDelegate);
+			pcmGen.set(serverWorld.getChunkSource().chunkMap, OTGDelegate);*/
 		} catch (ReflectiveOperationException ex)
 		{
 			ex.printStackTrace();
