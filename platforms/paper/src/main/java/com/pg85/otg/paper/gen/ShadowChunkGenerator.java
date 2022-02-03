@@ -71,7 +71,7 @@ public class ShadowChunkGenerator
 	private final FifoMap<ChunkCoordinate, Integer> hasVanillaStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
 	private final FifoMap<ChunkCoordinate, Integer> hasVanillaNoiseStructureChunkCache = new FifoMap<ChunkCoordinate, Integer>(2048);
 
-	static Field heightMaps;
+	/*static Field heightMaps;
 	static Field light;
 	static Field sections;
 
@@ -91,7 +91,7 @@ public class ShadowChunkGenerator
 		{
 			ex.printStackTrace();
 		}
-	}
+	}*/
 
 	@SuppressWarnings("unused")
 	private int cacheHits = 0;
@@ -164,7 +164,18 @@ public class ShadowChunkGenerator
 	public void fillWorldGenChunkFromShadowChunk(ChunkCoordinate chunkCoord, ChunkAccess chunk, ChunkAccess cachedChunk)
 	{
 		// TODO: This is experimental and may be slower than not cloning it
-		try
+		/*
+		* As per the above comment written by Josh, the following code is experimental
+		* This method of doing things requires reflecting variables that were taken
+		* out from 1.18 as they developed a method which no longer required using them
+		* As we are not sure whether this makes it any faster or not, and it
+		* requires reflections and would be a hassle to update, I am commenting
+		* it out. There would be no way to properly do the below without completely
+		* rewriting the way it works. And, of course, there's no proof it makes it run
+		* any faster, it could be slower.
+		* - Frank
+		 */
+		/*try
 		{
 			sections.set((ProtoChunk) chunk, sections.get((ProtoChunk) cachedChunk));
 			light.set((ProtoChunk) chunk, light.get((ProtoChunk) cachedChunk));
@@ -173,7 +184,7 @@ public class ShadowChunkGenerator
 		{
 			e.printStackTrace();
 		}
-
+		 */
 
 		for (int x = 0; x < Constants.CHUNK_SIZE; x++)
 		{
