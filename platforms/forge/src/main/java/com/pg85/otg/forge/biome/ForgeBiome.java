@@ -17,6 +17,7 @@ import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 
 import com.pg85.otg.util.minecraft.EntityCategory;
+import com.pg85.otg.util.minecraft.LegacyRegistry;
 import net.minecraft.sounds.Music;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
@@ -103,9 +104,19 @@ public class ForgeBiome implements IBiome
 				{
 					biomeGenerationSettingsBuilder.addFeature(stage, registry);
 				} else {
-					if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.DECORATION))
-					{
-						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.DECORATION, "Registry() " + registryResource.getFeatureKey() + " could not be found for biomeconfig " + biomeConfig.getName());
+					String newResourceLocation = LegacyRegistry.convertLegacyResourceLocation(registryResource.getFeatureKey());
+					if (newResourceLocation != null) {
+						registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(newResourceLocation));
+						if (registry == null) {
+							OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Somehow you broke the universe! Feature: " + newResourceLocation + " is not in the registry");
+						} else {
+							biomeGenerationSettingsBuilder.addFeature(stage, registry);
+						}
+					} else {
+						if(OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.DECORATION))
+						{
+							OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.DECORATION, "Registry() " + registryResource.getFeatureKey() + " could not be found for biomeconfig " + biomeConfig.getName());
+						}
 					}
 				}
 			}
