@@ -26,6 +26,7 @@ import com.pg85.otg.util.logging.LogLevel;
 
 import com.pg85.otg.util.materials.LocalMaterialBase;
 import com.pg85.otg.util.minecraft.EntityCategory;
+import com.pg85.otg.util.minecraft.LegacyRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -95,7 +96,17 @@ public class PaperBiome implements IBiome
 				PlacedFeature registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
 				if (registry == null)
 				{
-					OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Could not find feature "+registryResource.getFeatureKey()+" in the registry, please check spelling");
+					String newResourceLocation = LegacyRegistry.convertLegacyResourceLocation(registryResource.getFeatureKey());
+					if (newResourceLocation != null) {
+						registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(newResourceLocation));
+						if (registry == null) {
+							OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Somehow you broke the universe! Feature: "+newResourceLocation+"is not in the registry");
+						} else {
+							biomeGenerationSettingsBuilder.addFeature(stage, registry);
+						}
+					} else {
+						OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Could not find feature " + registryResource.getFeatureKey() + " in the registry, please check spelling");
+					}
 				} else {
 					biomeGenerationSettingsBuilder.addFeature(stage, registry);
 				}
