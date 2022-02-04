@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.pg85.otg.config.ConfigFunction;
@@ -33,7 +32,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.*;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -50,9 +48,6 @@ import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.*;
 import net.minecraft.world.level.levelgen.feature.configurations.*;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.OceanRuinFeature;
 
 public class PaperBiome implements IBiome
@@ -97,25 +92,12 @@ public class PaperBiome implements IBiome
 			if (res instanceof RegistryResource registryResource)
 			{
 				GenerationStep.Decoration stage = GenerationStep.Decoration.valueOf(registryResource.getDecorationStage());
-				System.out.println(">>> Configured features:\n");
-				BuiltinRegistries.CONFIGURED_FEATURE.stream().forEach(new Consumer(){
-
-					@Override
-					public void accept(Object o) {
-						if (o instanceof ConfiguredFeature) {
-							System.out.println("- " + (ConfiguredFeature)o);
-						} else {
-							System.out.println("Obj not instance of ConfiguredFeature");
-						}
-					}
-				});
-				ConfiguredFeature<?, ?> registry = BuiltinRegistries.CONFIGURED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
+				PlacedFeature registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(registryResource.getFeatureKey()));
 				if (registry == null)
 				{
 					OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Could not find feature "+registryResource.getFeatureKey()+" in the registry, please check spelling");
 				} else {
-					PlacedFeature feature = registry.placed(PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT);
-					biomeGenerationSettingsBuilder.addFeature(stage, feature);
+					biomeGenerationSettingsBuilder.addFeature(stage, registry);
 				}
 			}
 			if (res instanceof GlowLichenResource glow)
