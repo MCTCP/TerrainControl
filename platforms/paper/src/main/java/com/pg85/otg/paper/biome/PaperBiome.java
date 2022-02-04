@@ -100,7 +100,7 @@ public class PaperBiome implements IBiome
 					if (newResourceLocation != null) {
 						registry = BuiltinRegistries.PLACED_FEATURE.get(new ResourceLocation(newResourceLocation));
 						if (registry == null) {
-							OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Somehow you broke the universe! Feature: "+newResourceLocation+"is not in the registry");
+							OTG.getEngine().getLogger().log(LogLevel.WARN, LogCategory.BIOME_REGISTRY, "Somehow you broke the universe! Feature: "+newResourceLocation+" is not in the registry");
 						} else {
 							biomeGenerationSettingsBuilder.addFeature(stage, registry);
 						}

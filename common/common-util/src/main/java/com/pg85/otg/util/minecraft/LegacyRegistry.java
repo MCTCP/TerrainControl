@@ -29,12 +29,12 @@ public class LegacyRegistry {
             case "seagrass_cold":
             case "seagrass_river":
                 return "minecraft:seagrass_simple";
-            case "batch_berry_sparse":
+            case "patch_berry_sparse":
                 return "minecraft:patch_berry_bush";
             case "bamboo_light":
                 return "minecraft:bamboo_no_podzol";
             case "plain_vegetation":
-                return "minecraft:patch_grass";
+                return "minecraft:trees_plains";
             case "kelp_warm":
             case "kelp_cold":
                 return "minecraft:kelp";
