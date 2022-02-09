@@ -1,5 +1,6 @@
 package com.pg85.otg.paper.gen;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
@@ -12,7 +13,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.pg85.otg.paper.util.ObfuscationHelper;
 import com.pg85.otg.util.gen.DecorationArea;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.chunk.CarvingMask;
@@ -493,11 +497,24 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
 			ChunkBuffer chunkBuffer = new PaperChunkBuffer(protoChunk);
-			CarvingMask carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-			// Disabling this for now due to nms api change
-			//this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, true, true); //TODO: Don't use hardcoded true
+			CarvingMask carvingMaskRaw = protoChunk.getOrCreateCarvingMask(stage);
+			try {
+				Field theRealMask = ObfuscationHelper.getField(CarvingMask.class, "mask", "b");
+				theRealMask.setAccessible(true);
+				BitSet carvingMask = (BitSet)theRealMask.get(carvingMaskRaw);
+
+				this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, true, true); //TODO: Don't use hardcoded true
+			} catch (NoSuchFieldException e) {
+				if (OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MAIN)) {
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "!!! Error obtaining the carving mask! Caves will not generate! Stacktrace:\n" + e.getStackTrace());
+				}
+			} catch (IllegalAccessException e) {
+				if (OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MAIN)) {
+					OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "!!! Error obtaining the carving mask! Caves will not generate! Stacktrace:\n" + e.getStackTrace());
+				}
+			}
 		}
-		// This was changed to abstract? - Frank
+		// Commenting out as abstract implies it is no longer needed.
 		//super.applyCarvers(chunkRegion, seed, biomeManager, structureAccess, chunk, stage);
 	}
 
