@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.gen;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
@@ -44,6 +45,8 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.OTGBiomeResourceLocation;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.JigsawStructureData;
+import com.pg85.otg.util.logging.LogCategory;
+import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -74,15 +77,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.*;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Climate.Sampler;
 import net.minecraft.world.level.biome.Climate.TargetPoint;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.CarvingMask;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
@@ -91,6 +91,7 @@ import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.carver.CarvingContext;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.MineshaftFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
@@ -112,6 +113,7 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
@@ -805,7 +807,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// OTG has its own caves and canyons carvers. We register default carvers to OTG biomes,
 		// then check if they have been overridden by mods before using our own carvers.
-		/*
+
 		if (stage == GenerationStep.Carving.AIR)
 		{
 			ForgeBiome biome = (ForgeBiome)this.getCachedBiomeProvider().getNoiseBiome(chunk.getPos().x << 2, chunk.getPos().z << 2);
@@ -833,12 +835,25 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				ProtoChunk protoChunk = (ProtoChunk) chunk;
 				ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
-				BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
-				this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, cavesEnabled, ravinesEnabled);
+				CarvingMask carvingMaskRaw = protoChunk.getOrCreateCarvingMask(stage);
+				try {
+					Field theRealMask = carvingMaskRaw.getClass().getDeclaredField("mask");
+					theRealMask.setAccessible(true);
+					BitSet carvingMask = (BitSet)theRealMask.get(carvingMaskRaw);
+					this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask, cavesEnabled, ravinesEnabled);
+				} catch (NoSuchFieldException e) {
+					if (OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MAIN)) {
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "!!! Error obtaining the carving mask! Caves will not generate! Stacktrace:\n" + e.getStackTrace());
+					}
+				} catch (IllegalAccessException e) {
+					if (OTG.getEngine().getLogger().getLogCategoryEnabled(LogCategory.MAIN)) {
+						OTG.getEngine().getLogger().log(LogLevel.ERROR, LogCategory.MAIN, "!!! Error obtaining the carving mask! Caves will not generate! Stacktrace:\n" + e.getStackTrace());
+					}
+				}
 			}
 		}
 		applyNonOTGCarvers(seed, biomeManager, chunk, stage);
-		*/
+
 	}
 
 	public void applyNonOTGCarvers(long seed, BiomeManager biomeManager, ChunkAccess chunk, GenerationStep.Carving stage)
