@@ -15,6 +15,10 @@ import javax.annotation.Nullable;
 
 import com.pg85.otg.paper.util.ObfuscationHelper;
 import com.pg85.otg.util.gen.DecorationArea;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import net.minecraft.SharedConstants;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import net.minecraft.world.level.*;
@@ -25,6 +29,7 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.carver.CarvingContext;
 import net.minecraft.world.level.levelgen.feature.structures.JigsawJunction;
 import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 
@@ -73,6 +78,8 @@ import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StrongholdConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class OTGNoiseChunkGenerator extends ChunkGenerator
 {	
@@ -530,122 +537,265 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Population / decoration
 
-	// Does decoration for a given pos/chunk
 	@Override
-	public void applyBiomeDecoration(WorldGenLevel worldGenLevel, ChunkAccess chunk, StructureFeatureManager structureManager)
+	public void applyBiomeDecoration(WorldGenLevel worldGenLevel, ChunkAccess p_187713_, StructureFeatureManager p_187714_)
 	{
 		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
 		{
 			return;
 		}
 
-		WorldGenRegion worldGenRegion = ((WorldGenRegion)worldGenLevel);
-
-		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
-		// Taken from vanilla
-		int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
-		int worldZ = worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
-		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
-		WorldgenRandom sharedseedrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
-		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);
-		
-		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
-		PaperWorldGenRegion spigotWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
-		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
-		IBiome biome1 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2));
-		IBiome biome2 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2) + 4);
-		IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2));
-		IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2) + 4);		
-		IBiomeConfig biomeConfig = biome.getBiomeConfig();
-		// World save folder name may not be identical to level name, fetch it.
-		Path worldSaveFolder = worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath();
-
-		// Get most common biome in chunk and use that for decoration - Frank
-		if (!getPreset().getWorldConfig().improvedBorderDecoration())
+		ChunkPos chunkpos = p_187713_.getPos();
+		if (!SharedConstants.debugVoidTerrain(chunkpos))
 		{
-			List<IBiome> biomes = new ArrayList<IBiome>();
-			biomes.add(biome);
-			biomes.add(biome1);
-			biomes.add(biome2);
-			biomes.add(biome3);
-			biomes.add(biome4);
+			WorldGenRegion worldGenRegion = ((WorldGenRegion)worldGenLevel);
+			SectionPos sectionpos = SectionPos.of(chunkpos, worldGenRegion.getMinSection());
+			BlockPos blockpos = sectionpos.origin();
+			Map<Integer, List<StructureFeature<?>>> map = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy((p_187720_) -> {
+				return p_187720_.step().ordinal();
+			}));
+			List<BiomeSource.StepFeatureData> list = this.biomeSource.featuresPerStep();
+			WorldgenRandom worldgenrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
+			long i = worldgenrandom.setDecorationSeed(worldGenRegion.getSeed(), blockpos.getX(), blockpos.getZ());
 
-			Map<IBiome, Integer> map = new HashMap<>();
-			for (IBiome b : biomes)
-			{
-				Integer val = map.get(b);
-				map.put(b, val == null ? 1 : val + 1);
-			}
+			int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
+			int worldZ =worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
+			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
+			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
+			PaperWorldGenRegion forgeWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
+			// World save folder name may not be identical to level name, fetch it.
+			Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
+			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
 
-			Map.Entry<IBiome, Integer> max = null;
-			for (Map.Entry<IBiome, Integer> ent : map.entrySet())
-			{
-				if (max == null || ent.getValue() > max.getValue())
-				{
-					max = ent;
-				}
-			}
+			Set<Biome> set = new ObjectArraySet<>();
+			//if (this instanceof FlatLevelSource)
+			//{
+			set.addAll(this.biomeSource.possibleBiomes());
+			//} else {
+				/* Behold, the future
+				ChunkPos.rangeClosed(sectionpos.chunk(), 1).forEach((p_196730_) -> {
+					ChunkAccess chunkaccess = p_187712_.getChunk(p_196730_.x, p_196730_.z);
 
-			biome = max.getKey();
-		}
-		
-		try
-		{
-			/*
-			* Here's how the code works that was added for the ImprovedBorderDecoration code.
-			* - List of biome ids is initialized, will be used to ensure biomes are not populated twice.
-			* - Placement is done for the main biome
-			* - If ImprovedBorderDecoration is true, will attempt to perform decoration from any biomes that have not
-			* already been decorated. Thus preventing decoration from happening twice.
-			*
-			* - Frank
-			*/
-			List<Integer> alreadyDecorated = new ArrayList<>();
-			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
-			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
-			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
-			/*
-			* This needs to be redone before we release 1.18
-			* .generate() no longer exists anymore, so we'll have to figure that one out
-			* - Frank
-			 */
-			/*if (getPreset().getWorldConfig().improvedBorderDecoration())
-			{
-				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+					for(LevelChunkSection levelchunksection : chunkaccess.getSections())
+					{
+						levelchunksection.getBiomes().getAll(set::add);
+					}
+				});
+				set.retainAll(this.biomeSource.possibleBiomes());
+				*/
+			//}
+
+			int j = list.size();
+
+			try {
+				Registry<PlacedFeature> registry = worldGenRegion.registryAccess().registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
+				Registry<StructureFeature<?>> registry1 = worldGenRegion.registryAccess().registryOrThrow(Registry.STRUCTURE_FEATURE_REGISTRY);
+				int k = Math.max(GenerationStep.Decoration.values().length, j);
+
+				for(int l = 0; l < k; ++l)
 				{
-					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
+					int i1 = 0;
+					if (p_187714_.shouldGenerateFeatures())
+					{
+						for(StructureFeature<?> structurefeature : map.getOrDefault(l, Collections.emptyList()))
+						{
+							worldgenrandom.setFeatureSeed(i, i1, l);
+							Supplier<String> supplier = () -> {
+								return registry1.getResourceKey(structurefeature).map(Object::toString).orElseGet(structurefeature::toString);
+							};
+
+							try {
+								worldGenRegion.setCurrentlyGenerating(supplier);
+								p_187714_.startsForFeature(sectionpos, structurefeature).forEach((p_196726_) -> {
+									p_196726_.placeInChunk(worldGenRegion, p_187714_, this, worldgenrandom, getWritableArea(p_187713_), chunkpos);
+								});
+							} catch (Exception exception) {
+								CrashReport crashreport1 = CrashReport.forThrowable(exception, "Feature placement");
+								crashreport1.addCategory("Feature").setDetail("Description", supplier::get);
+								throw new ReportedException(crashreport1);
+							}
+
+							++i1;
+						}
+					}
+
+					if (l < j)
+					{
+						IntSet intset = new IntArraySet();
+
+						for(Biome biome2 : set)
+						{
+							List<List<Supplier<PlacedFeature>>> list2 = biome2.getGenerationSettings().features();
+							if (l < list2.size())
+							{
+								List<Supplier<PlacedFeature>> list1 = list2.get(l);
+								BiomeSource.StepFeatureData biomesource$stepfeaturedata1 = list.get(l);
+								list1.stream().map(Supplier::get).forEach((p_196751_) -> {
+									intset.add(biomesource$stepfeaturedata1.indexMapping().applyAsInt(p_196751_));
+								});
+							}
+						}
+
+						int j1 = intset.size();
+						int[] aint = intset.toIntArray();
+						Arrays.sort(aint);
+						BiomeSource.StepFeatureData biomesource$stepfeaturedata = list.get(l);
+
+						for(int k1 = 0; k1 < j1; ++k1)
+						{
+							int l1 = aint[k1];
+							PlacedFeature placedfeature = biomesource$stepfeaturedata.features().get(l1);
+							Supplier<String> supplier1 = () -> {
+								return registry.getResourceKey(placedfeature).map(Object::toString).orElseGet(placedfeature::toString);
+							};
+							worldgenrandom.setFeatureSeed(i, l1, l);
+
+							try {
+								worldGenRegion.setCurrentlyGenerating(supplier1);
+								placedfeature.placeWithBiomeCheck(worldGenRegion, this, worldgenrandom, blockpos);
+							} catch (Exception exception1) {
+								CrashReport crashreport2 = CrashReport.forThrowable(exception1, "Feature placement");
+								crashreport2.addCategory("Feature").setDetail("Description", supplier1::get);
+								throw new ReportedException(crashreport2);
+							}
+						}
+					}
 				}
-				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
-				{
-					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
-				}
-				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
-				{
-					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
-				}
-				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
-				{
-					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
-					((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-				}
-			} else {
-				((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+
+				worldGenRegion.setCurrentlyGenerating((Supplier<String>)null);
+			} catch (Exception exception2) {
+				CrashReport crashreport = CrashReport.forThrowable(exception2, "Biome decoration");
+				crashreport.addCategory("Generation").setDetail("CenterX", chunkpos.x).setDetail("CenterZ", chunkpos.z).setDetail("Seed", i);
+				throw new ReportedException(crashreport);
 			}
-			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);*/
-		}
-		catch (Exception exception)
-		{
-			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
-			crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", decorationSeed);
-			throw new ReportedException(crashreport);
 		}
 	}
+
+	private static BoundingBox getWritableArea(ChunkAccess p_187718_)
+	{
+		ChunkPos chunkpos = p_187718_.getPos();
+		int i = chunkpos.getMinBlockX();
+		int j = chunkpos.getMinBlockZ();
+		LevelHeightAccessor levelheightaccessor = p_187718_.getHeightAccessorForGeneration();
+		int k = levelheightaccessor.getMinBuildHeight() + 1;
+		int l = levelheightaccessor.getMaxBuildHeight() - 1;
+		return new BoundingBox(i, k, j, i + 15, l, j + 15);
+	}
+
+//	// Does decoration for a given pos/chunk
+//	@Override
+//	public void applyBiomeDecoration(WorldGenLevel worldGenLevel, ChunkAccess chunk, StructureFeatureManager structureManager)
+//	{
+//		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())
+//		{
+//			return;
+//		}
+//
+//		WorldGenRegion worldGenRegion = ((WorldGenRegion)worldGenLevel);
+//
+//		// Do OTG resource decoration, then MC decoration for any non-OTG resources registered to this biome, then snow.
+//		// Taken from vanilla
+//		int worldX = worldGenRegion.getCenter().x * Constants.CHUNK_SIZE;
+//		int worldZ = worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
+//		BlockPos blockpos = new BlockPos(worldX, 0, worldZ);
+//		WorldgenRandom sharedseedrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
+//		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), worldX, worldZ);
+//
+//		ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
+//		PaperWorldGenRegion spigotWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
+//		IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
+//		IBiome biome1 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2));
+//		IBiome biome2 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2) + 4);
+//		IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2));
+//		IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2) + 4);
+//		IBiomeConfig biomeConfig = biome.getBiomeConfig();
+//		// World save folder name may not be identical to level name, fetch it.
+//		Path worldSaveFolder = worldGenRegion.getMinecraftWorld().getWorld().getWorldFolder().toPath();
+//
+//		// Get most common biome in chunk and use that for decoration - Frank
+//		if (!getPreset().getWorldConfig().improvedBorderDecoration())
+//		{
+//			List<IBiome> biomes = new ArrayList<IBiome>();
+//			biomes.add(biome);
+//			biomes.add(biome1);
+//			biomes.add(biome2);
+//			biomes.add(biome3);
+//			biomes.add(biome4);
+//
+//			Map<IBiome, Integer> map = new HashMap<>();
+//			for (IBiome b : biomes)
+//			{
+//				Integer val = map.get(b);
+//				map.put(b, val == null ? 1 : val + 1);
+//			}
+//
+//			Map.Entry<IBiome, Integer> max = null;
+//			for (Map.Entry<IBiome, Integer> ent : map.entrySet())
+//			{
+//				if (max == null || ent.getValue() > max.getValue())
+//				{
+//					max = ent;
+//				}
+//			}
+//
+//			biome = max.getKey();
+//		}
+//
+//		try
+//		{
+//			/*
+//			* Here's how the code works that was added for the ImprovedBorderDecoration code.
+//			* - List of biome ids is initialized, will be used to ensure biomes are not populated twice.
+//			* - Placement is done for the main biome
+//			* - If ImprovedBorderDecoration is true, will attempt to perform decoration from any biomes that have not
+//			* already been decorated. Thus preventing decoration from happening twice.
+//			*
+//			* - Frank
+//			*/
+//			List<Integer> alreadyDecorated = new ArrayList<>();
+//			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biomeConfig, getStructureCache(worldSaveFolder));
+//			alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
+//			// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
+////			* This needs to be redone before we release 1.18
+////			* .generate() no longer exists anymore, so we'll have to figure that one out
+////			* - Frank
+//			/*if (getPreset().getWorldConfig().improvedBorderDecoration())
+//			{
+//				if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+//				{
+//					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
+//					((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+//					alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
+//				}
+//				if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+//				{
+//					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
+//					((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+//					alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
+//				}
+//				if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+//				{
+//					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
+//					((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+//					alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
+//				}
+//				if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+//				{
+//					this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, spigotWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
+//					((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+//				}
+//			} else {
+//				((PaperBiome)biome).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+//			}
+//			this.chunkDecorator.doSnowAndIce(spigotWorldGenRegion, chunkBeingDecorated);*/
+//		}
+//		catch (Exception exception)
+//		{
+//			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
+//			crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", decorationSeed);
+//			throw new ReportedException(crashreport);
+//		}
+//	}*/
 
 //	@Override
 //	public void createBiomes (Registry<Biome> biomeRegistry, ChunkAccess chunk)

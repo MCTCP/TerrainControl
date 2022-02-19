@@ -88,6 +88,10 @@ public class PaperBiome implements IBiome
 		// * Carvers are handled by OTG
 
 		// Register any Registry() resources to the biome, to be handled by MC.
+
+		// This is a dummy pickle feature to check what happens with features we add to our biomes
+		// biomeGenerationSettingsBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, OTGTestFeature.PLACED);
+
 		for (ConfigFunction<IBiomeConfig> res : ((BiomeConfig)biomeConfig).getResourceQueue())
 		{
 			if (res instanceof RegistryResource registryResource)

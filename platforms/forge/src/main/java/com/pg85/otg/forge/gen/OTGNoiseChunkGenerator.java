@@ -1032,7 +1032,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 	*/
-	
+
+	@Override
 	public void applyBiomeDecoration(WorldGenLevel worldGenLevel, ChunkAccess p_187713_, StructureFeatureManager p_187714_)
 	{
 		if(!OTG.getEngine().getPluginConfig().getDecorationEnabled())

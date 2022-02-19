@@ -101,6 +101,10 @@ public class ExportCommand extends BaseCommand
 				source.sendSuccess(new TextComponent("Only players can execute this command"), false);
 				return 0;
 			}
+			if (!configMap.containsKey(playerEntity))
+			{
+				configMap.put(playerEntity, new CommandOptions());
+			}
 			CommandOptions options = configMap.get(playerEntity);
 
 			// Extract here; this is kinda complex, would be messy in OTGCommand

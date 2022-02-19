@@ -1,6 +1,9 @@
 package com.pg85.otg.paper.commands;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -21,11 +24,13 @@ import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public class BiomeCommand extends BaseCommand
 {
 	private static final String[] OPTIONS = new String[]
-	{ "info", "spawns" };
+	{ "info", "spawns", "features" };
 
 	public BiomeCommand()
 	{
@@ -90,9 +95,25 @@ public class BiomeCommand extends BaseCommand
 		{
 			case "info" -> showBiomeInfo(source, biome, config);
 			case "spawns" -> showBiomeMobs(source, biome, config);
+			case "features" -> showBiomeFeatures(source, biome, config);
 			default -> {}
 		}
 		return 0;
+	}
+
+	private void showBiomeFeatures(CommandSourceStack source, Biome biome, IBiomeConfig config)
+	{
+		source.sendSuccess(new TextComponent("Vanilla features in this biome: ").withStyle(ChatFormatting.GREEN), false);
+		List<List<Supplier<PlacedFeature>>> featureList = biome.getGenerationSettings().features();
+		for (int i = 0; i < featureList.size(); i++)
+		{
+			List<Supplier<PlacedFeature>> innerList = featureList.get(i);
+			source.sendSuccess(new TextComponent(" "+GenerationStep.Decoration.values()[i].toString().toLowerCase(Locale.ROOT)+":").withStyle(ChatFormatting.GOLD), false);
+			for (Supplier<PlacedFeature> supplier : innerList)
+			{
+				source.sendSuccess(new TextComponent(" - "+supplier.get().toString()).withStyle(ChatFormatting.GREEN), false);
+			}
+		}
 	}
 
 	private void showBiomeInfo(CommandSourceStack source, Biome biome, IBiomeConfig config)
