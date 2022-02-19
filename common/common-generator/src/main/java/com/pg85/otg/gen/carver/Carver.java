@@ -104,7 +104,7 @@ public abstract class Carver
 			carvingMask.set(i);
 
 			LocalMaterialData material = chunkBuffer.getBlock(worldX, y, worldZ);
-			if(material.isNonCaveAir() || material.isMaterial(LocalMaterials.WATER))
+			if(material.isNonCaveAir() || material.isMaterial(LocalMaterials.WATER) || material.isMaterial(LocalMaterials.LAVA))
 			{
 				return false;
 			}
@@ -119,7 +119,7 @@ public abstract class Carver
 			{
 				foundSurface.setValue(true);
 			}				
-			if (material.isSolid() && !blockAbove.isMaterial(LocalMaterials.WATER))
+			if (material.isSolid() && !(blockAbove.isMaterial(LocalMaterials.WATER) || blockAbove.isMaterial(LocalMaterials.LAVA)))
 			{
 				if (y <= this.worldConfig.getCarverLavaBlockHeight())
 				{
@@ -152,7 +152,7 @@ public abstract class Carver
 			{
 				for (int k = minY - 1; k <= maxY + 1; ++k)
 				{
-					if (chunk.getBlock(i + mainChunkX * Constants.CHUNK_SIZE, k, j + mainChunkZ * Constants.CHUNK_SIZE).isMaterial(LocalMaterials.WATER))
+					if (chunk.getBlock(i + mainChunkX * Constants.CHUNK_SIZE, k, j + mainChunkZ * Constants.CHUNK_SIZE).isMaterial(LocalMaterials.WATER) || chunk.getBlock(i + mainChunkX * Constants.CHUNK_SIZE, k, j + mainChunkZ * Constants.CHUNK_SIZE).isMaterial(LocalMaterials.LAVA))
 					{
 						return true;
 					}
