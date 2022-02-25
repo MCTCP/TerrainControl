@@ -148,7 +148,7 @@ public class ShadowChunkGenerator
 			for (int z = 0; z < Constants.CHUNK_SIZE; z++)
 			{
 				int endY = cachedChunk.getHeight(Types.WORLD_SURFACE_WG, x, z);
-				for (int y = 0; y <= endY; y++)
+				for (int y = -64; y <= endY; y++)
 				{
 					BlockPos pos = new BlockPos(x, y, z);
 					data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getBlockState(pos));
