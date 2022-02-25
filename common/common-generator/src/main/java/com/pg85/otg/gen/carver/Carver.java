@@ -47,7 +47,7 @@ public abstract class Carver
 		{
 			int i = Math.max(MathHelper.floor(x - yaw) - chunkX * Constants.CHUNK_SIZE - 1, 0);
 			int j = Math.min(MathHelper.floor(x + yaw) - chunkX * Constants.CHUNK_SIZE + 1, Constants.CHUNK_SIZE);
-			int k = Math.max(MathHelper.floor(y - pitch) - 1, 1);
+			int k = Math.max(MathHelper.floor(y - pitch) - 1, -63);
 			int l = Math.min(MathHelper.floor(y + pitch) + 1, this.heightLimit - 8);
 			int m = Math.max(MathHelper.floor(z - yaw) - chunkZ * Constants.CHUNK_SIZE - 1, 0);
 			int n = Math.min(MathHelper.floor(z + yaw) - chunkZ * Constants.CHUNK_SIZE + 1, Constants.CHUNK_SIZE);
@@ -96,7 +96,8 @@ public abstract class Carver
 
 	protected boolean carveAtPoint(ISurfaceGeneratorNoiseProvider noiseProvider, ChunkBuffer chunkBuffer, BitSet carvingMask, Random random, int seaLevel, int mainChunkX, int mainChunkZ, int worldX, int worldZ, int relativeX, int y, int relativeZ, MutableBoolean foundSurface, IBiomeConfig biomeConfig)
 	{
-		int i = relativeX | relativeZ << 4 | y << 8;
+		// Getting the absolute value here seems icky, but we're reworking everything so whatever... - Frank
+		int i = relativeX | relativeZ << 4 | Math.abs(y << 8);
 		if (carvingMask.get(i))
 		{
 			return false;
