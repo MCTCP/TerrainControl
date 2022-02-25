@@ -227,7 +227,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							// mostly flat terrain, while hills have only a 1 block layer of sand and more sandstone.
 
 							if (
-								groundLayerDepth == -64 &&
+								groundLayerDepth == 0 &&
 								biomeBlocksNoise > 1 &&
 								(layerGroundBlockIsSand || (layer == null && biomeGroundBlockIsSand))
 							)
