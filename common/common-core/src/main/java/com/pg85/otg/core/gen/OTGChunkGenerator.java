@@ -636,8 +636,11 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		// TODO: Change this from stone and deepslate noise
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				for (int y = 0; y > -65; y--) {
-					buffer.setBlock(x, y, z, LocalMaterials.STONE);
+				biomeConfig = biomes[x*16+z].getBiomeConfig();
+				for (int y = 8; y > -65; y--) {
+					// I think bedrock-like generation will do for this - Frank
+					if (y > random.nextInt(8)) continue;
+					buffer.setBlock(x, y, z, biomeConfig.getDefaultDeepslateBlock());
 				}
 			}
 		}

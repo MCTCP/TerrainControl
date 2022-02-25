@@ -114,6 +114,7 @@ public class BiomeStandardValues extends Settings
 
 	public static final Setting<LocalMaterialData>
 		STONE_BLOCK = new MaterialSetting("StoneBlock", LocalMaterials.STONE_NAME),
+		DEEPSLATE_BLOCK = new MaterialSetting("DeepslateBlock", LocalMaterials.DEEPSLATE_NAME),
 		SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", LocalMaterials.GRASS_NAME),
 		UNDER_WATER_SURFACE_BLOCK = new MaterialSetting("UnderWaterSurfaceBlock", ""),				
 		GROUND_BLOCK = new MaterialSetting("GroundBlock", LocalMaterials.DIRT_NAME),

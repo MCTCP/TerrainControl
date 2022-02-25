@@ -16,6 +16,7 @@ public class LocalMaterials
 	public static final String GRASS_NAME = getRegistryKey("grass_block");
 	public static final String DIRT_NAME = getRegistryKey("dirt");
 	public static final String STONE_NAME = getRegistryKey("stone");
+	public static final String DEEPSLATE_NAME = getRegistryKey("deepslate");
 	public static final String BEDROCK_NAME = getRegistryKey("bedrock");
 	public static final String WATER_NAME = getRegistryKey("water");
 	public static final String LAVA_NAME = getRegistryKey("lava");
@@ -46,6 +47,7 @@ public class LocalMaterials
 	public static LocalMaterialData RED_TERRACOTTA;
 	public static LocalMaterialData SILVER_TERRACOTTA;
 	public static LocalMaterialData STONE;
+	public static LocalMaterialData DEEPSLATE;
 	public static LocalMaterialData NETHERRACK;
 	public static LocalMaterialData END_STONE;
 	public static LocalMaterialData SAND;

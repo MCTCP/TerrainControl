@@ -111,6 +111,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		protected LocalMaterialData surfaceBlock;
 		protected LocalMaterialData underWaterSurfaceBlock;
 		protected LocalMaterialData groundBlock;
+		protected LocalMaterialData deepslateBlock;
 		protected LocalMaterialData sandStoneBlock;
 		protected LocalMaterialData redSandStoneBlock;
 		protected SurfaceGenerator surfaceAndGroundControl;
@@ -265,6 +266,11 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public LocalMaterialData getDefaultStoneBlock()
 	{
 		return this.settings.stoneBlock;
+	}
+
+	@Override
+	public LocalMaterialData getDefaultDeepslateBlock() {
+		return this.settings.deepslateBlock;
 	}
 
 	@Override

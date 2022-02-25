@@ -109,6 +109,7 @@ public interface IBiomeConfig
 	LocalMaterialData getDefaultGroundBlock();
 	LocalMaterialData getDefaultStoneBlock();
 	LocalMaterialData getDefaultWaterBlock();
+	LocalMaterialData getDefaultDeepslateBlock();
 	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, int x, int z, IBiome biome);
 	boolean hasReplaceBlocksSettings();
 	ReplaceBlockMatrix getReplaceBlocks();

@@ -185,6 +185,8 @@ public class BiomeConfig extends BiomeConfigBase
 			this.settings.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
 			this.settings.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
 			this.settings.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
+			this.settings.deepslateBlock = reader.getSetting(BiomeStandardValues.DEEPSLATE_BLOCK, logger, materialReader);
+
 			this.settings.underWaterSurfaceBlock = reader.getSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, logger, materialReader);		
 			if(this.settings.underWaterSurfaceBlock == null)
 			{
@@ -248,6 +250,7 @@ public class BiomeConfig extends BiomeConfigBase
 			if(this.settings.templateBiomeType == SettingsEnums.TemplateBiomeType.Nether)
 			{
 				this.settings.stoneBlock = LocalMaterials.NETHERRACK;
+				this.settings.deepslateBlock = LocalMaterials.NETHERRACK;
 				this.settings.surfaceBlock = LocalMaterials.NETHERRACK;
 				this.settings.groundBlock = LocalMaterials.NETHERRACK;
 				this.settings.underWaterSurfaceBlock = LocalMaterials.NETHERRACK;
@@ -255,11 +258,13 @@ public class BiomeConfig extends BiomeConfigBase
 				this.settings.stoneBlock = LocalMaterials.END_STONE;
 				this.settings.surfaceBlock = LocalMaterials.END_STONE;
 				this.settings.groundBlock = LocalMaterials.END_STONE;
+				this.settings.deepslateBlock = LocalMaterials.AIR;
 				this.settings.underWaterSurfaceBlock = LocalMaterials.END_STONE;
 			} else {
 				this.settings.stoneBlock = LocalMaterials.STONE;
 				this.settings.surfaceBlock = LocalMaterials.STONE;
 				this.settings.groundBlock = LocalMaterials.STONE;
+				this.settings.deepslateBlock = LocalMaterials.DEEPSLATE;
 				this.settings.underWaterSurfaceBlock = LocalMaterials.STONE;
 			}
 			this.settings.skyColor = BiomeStandardValues.SKY_COLOR.getDefaultValue();
@@ -631,6 +636,9 @@ public class BiomeConfig extends BiomeConfigBase
 			
 			writer.putSetting(BiomeStandardValues.UNDER_WATER_SURFACE_BLOCK, this.settings.underWaterSurfaceBlock,
 				"The surface block used for the biome when underwater, usually the same as GroundBlock.");
+
+			writer.putSetting(BiomeStandardValues.DEEPSLATE_BLOCK, this.settings.deepslateBlock,
+					"The block that appears in deeper regions of the biome.");
 		}
 
 		writer.putSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, this.settings.surfaceAndGroundControl,
