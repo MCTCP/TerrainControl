@@ -63,7 +63,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 		LocalMaterialData blockOnPreviousPos = null;
 		
 		int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(internalX, internalZ);
-		for (int y = highestBlockInColumn; y >= 0; y--)
+		for (int y = highestBlockInColumn; y >= -64; y--)
 		{
 			if (generatingChunk.mustCreateBedrockAt(biomeConfig.isFlatBedrock(), biomeConfig.isBedrockDisabled(), biomeConfig.isCeilingBedrock(), y))
 			{
@@ -98,7 +98,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 						groundLayerDepth = biomeBlocksNoise;
 						
 						// Set when variable was reset
-						if (biomeBlocksNoise <= 0 && !biomeConfig.isRemoveSurfaceStone())
+						if (biomeBlocksNoise <= -64 && !biomeConfig.isRemoveSurfaceStone())
 						{
 							useAirForSurface = true;
 							useIceForSurface = false;
@@ -227,12 +227,12 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 							// mostly flat terrain, while hills have only a 1 block layer of sand and more sandstone.
 
 							if (
-								groundLayerDepth == 0 &&
+								groundLayerDepth == -64 &&
 								biomeBlocksNoise > 1 &&
 								(layerGroundBlockIsSand || (layer == null && biomeGroundBlockIsSand))
 							)
 							{
-								groundLayerDepth = generatingChunk.random.nextInt(4) + Math.max(0, y - currentWaterLevel);
+								groundLayerDepth = generatingChunk.random.nextInt(4) + Math.max(-64, y - currentWaterLevel);
 								useSandStoneForGround = true;
 							}
 						} 
