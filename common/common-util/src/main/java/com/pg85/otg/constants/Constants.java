@@ -7,7 +7,7 @@ public class Constants
 	// Plugin constants
 	
 	public static final int CHUNK_SIZE = 16;
-	public static final int CHUNK_Y_SIZE = 256;
+	public static final int CHUNK_Y_SIZE = 383;
 
 	// Files
 
