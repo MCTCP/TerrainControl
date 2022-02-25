@@ -37,13 +37,13 @@ public class Constants
 	 * The world depth that the engine supports. Not the actual depth the
 	 * world is capped at. 0 in Minecraft.
 	 */
-	public static final int WORLD_DEPTH = 0;
+	public static final int WORLD_DEPTH = -64;
 	
 	/**
 	 * The world height that the engine supports. Not the actual height the
 	 * world is capped at. 256 in Minecraft.
 	 */
-	public static final int WORLD_HEIGHT = 256;		
+	public static final int WORLD_HEIGHT = 319;
 	
 	// Region size for BO3/BO4 structure data files
 	public static final int REGION_SIZE = 100;

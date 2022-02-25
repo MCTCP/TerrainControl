@@ -12,7 +12,7 @@ import java.util.Random;
 public final class GeneratingChunk
 {
 
-	private static final int BEDROCK_LAYER_HEIGHT = 5;
+	private static final int BEDROCK_LAYER_HEIGHT = -59;
 
 	public final int heightCap;
 	public final Random random;
@@ -68,7 +68,7 @@ public final class GeneratingChunk
 		// Handle flat bedrock
 		if (flatBedrock)
 		{
-			if (!disableBedrock && y == 0)
+			if (!disableBedrock && y == -64)
 			{
 				return true;
 			}
@@ -80,9 +80,9 @@ public final class GeneratingChunk
 		}
 
 		// Otherwise we have normal bedrock
-		if (!disableBedrock && y < 5)
+		if (!disableBedrock && y < -59)
 		{
-			return y <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
+			return y <= this.random.nextInt(5)-64;
 		}
 		if (ceilingBedrock)
 		{
