@@ -367,7 +367,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
 			for(StructureFeature<?> structure : StructureFeature.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
-				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
+				manager.startsForFeature(SectionPos.of(pos, -64), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
 					for(StructurePiece piece : start.getPieces()) {
 						// Check if it intersects with this chunk

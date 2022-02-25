@@ -33,6 +33,7 @@ import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.logging.LogCategory;
 import com.pg85.otg.util.logging.LogLevel;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -442,7 +443,7 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 		OreVeinData data = this.oreVeinGenerator == null ? null : this.oreVeinGenerator.getForChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 		
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
-		int[] waterLevel = new int[256];
+		int[] waterLevel = new int[383];
 
 		int blockX = chunkCoord.getBlockX();
 		int blockZ = chunkCoord.getBlockZ();
@@ -630,6 +631,15 @@ public class OTGChunkGenerator implements ISurfaceGeneratorNoiseProvider
 			xColumn = noiseData[0];
 			noiseData[0] = noiseData[1];
 			noiseData[1] = xColumn;
+		}
+		// Deepslate - Frank
+		// TODO: Change this from stone and deepslate noise
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				for (int y = 0; y > -64; y--) {
+					buffer.setBlock(x, y, z, LocalMaterials.STONE);
+				}
+			}
 		}
 
 		doSurfaceAndGroundControl(biomes, random, worldHeightCap, this.seed, buffer, waterLevel);
