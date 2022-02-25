@@ -562,10 +562,96 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			int worldZ =worldGenRegion.getCenter().z * Constants.CHUNK_SIZE;
 			ChunkCoordinate chunkBeingDecorated = ChunkCoordinate.fromBlockCoords(worldX, worldZ);
 			IBiome biome = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 2, (worldGenRegion.getCenter().z << 2) + 2);
+			IBiome biome1 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2));
+			IBiome biome2 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2), (worldGenRegion.getCenter().z << 2) + 4);
+			IBiome biome3 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2));
+			IBiome biome4 = this.internalGenerator.getCachedBiomeProvider().getNoiseBiome((worldGenRegion.getCenter().x << 2) + 4, (worldGenRegion.getCenter().z << 2) + 4);
+			IBiomeConfig biomeConfig = biome.getBiomeConfig();
 			PaperWorldGenRegion forgeWorldGenRegion = new PaperWorldGenRegion(this.preset.getFolderName(), this.preset.getWorldConfig(), worldGenRegion, this);
 			// World save folder name may not be identical to level name, fetch it.
 			Path worldSaveFolder = worldGenRegion.getLevel().getServer().getWorldPath(LevelResource.PLAYER_DATA_DIR).getParent();
-			this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
+			if (!getPreset().getWorldConfig().improvedBorderDecoration()) {
+				List<IBiome> biomes = new ArrayList<IBiome>();
+
+				biomes.add(biome);
+				biomes.add(biome1);
+				biomes.add(biome2);
+				biomes.add(biome3);
+				biomes.add(biome4);
+
+				Map<IBiome, Integer> map1 = new HashMap<>();
+				for (IBiome b : biomes)
+				{
+					Integer val = map1.get(b);
+					map1.put(b, val == null ? 1 : val + 1);
+				}
+
+				Map.Entry<IBiome, Integer> max = null;
+				for (Map.Entry<IBiome, Integer> ent : map1.entrySet())
+				{
+					if (max == null || ent.getValue() > max.getValue())
+					{
+						max = ent;
+					}
+				}
+
+				biome = max.getKey();
+			}
+
+			try {
+				/*
+				* Here's how the code works that was added for the ImprovedBorderDecoration code.
+				* - List of biome ids is initialized, will be used to ensure biomes are not populated twice.
+				* - Placement is done for the main biome
+				* - If ImprovedBorderDecoration is true, will attempt to perform decoration from any biomes that have not
+				* already been decorated. Thus preventing decoration from happening twice.
+				*
+				* Another note for 1.18+:
+				* I commented out the generators for the vanilla resources, as
+				* defaults to improved
+				*
+				* - Frank
+				*/
+				List<Integer> alreadyDecorated = new ArrayList<>();
+				this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
+				alreadyDecorated.add(biome.getBiomeConfig().getOTGBiomeId());
+				// Attempt to decorate other biomes if ImprovedBiomeDecoration - Frank
+				if (getPreset().getWorldConfig().improvedBorderDecoration())
+				{
+					if (!alreadyDecorated.contains(biome1.getBiomeConfig().getOTGBiomeId()))
+					{
+						this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome1.getBiomeConfig(), getStructureCache(worldSaveFolder));
+						//((PaperBiome) biome1).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome1.getBiomeConfig().getOTGBiomeId());
+					}
+					if (!alreadyDecorated.contains(biome2.getBiomeConfig().getOTGBiomeId()))
+					{
+						this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome2.getBiomeConfig(), getStructureCache(worldSaveFolder));
+						//((PaperBiome) biome2).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome2.getBiomeConfig().getOTGBiomeId());
+					}
+					if (!alreadyDecorated.contains(biome3.getBiomeConfig().getOTGBiomeId()))
+					{
+						this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome3.getBiomeConfig(), getStructureCache(worldSaveFolder));
+						//((PaperBiome) biome3).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+						alreadyDecorated.add(biome3.getBiomeConfig().getOTGBiomeId());
+					}
+					if (!alreadyDecorated.contains(biome4.getBiomeConfig().getOTGBiomeId()))
+					{
+						this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome4.getBiomeConfig(), getStructureCache(worldSaveFolder));
+						//((PaperBiome) biome4).getBiome().generate(structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+					}
+				}
+			}
+			catch (Exception exception)
+			{
+				CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
+				crashreport.addCategory("Generation").setDetail("CenterX", worldX).setDetail("CenterZ", worldZ).setDetail("Seed", worldSeed);
+				throw new ReportedException(crashreport);
+			}
+
+			// This line has been moved up - Frank
+			//this.chunkDecorator.decorate(this.preset.getFolderName(), chunkBeingDecorated, forgeWorldGenRegion, biome.getBiomeConfig(), getStructureCache(worldSaveFolder));
 
 			Set<Biome> set = new ObjectArraySet<>();
 			//if (this instanceof FlatLevelSource)
@@ -623,9 +709,9 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 					{
 						IntSet intset = new IntArraySet();
 
-						for(Biome biome2 : set)
+						for(Biome biome2x : set)
 						{
-							List<List<Supplier<PlacedFeature>>> list2 = biome2.getGenerationSettings().features();
+							List<List<Supplier<PlacedFeature>>> list2 = biome2x.getGenerationSettings().features();
 							if (l < list2.size())
 							{
 								List<Supplier<PlacedFeature>> list1 = list2.get(l);
