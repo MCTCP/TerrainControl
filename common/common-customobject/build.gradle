@@ -1,0 +1,7 @@
+description = "Core files of OpenTerrainGenerator"
+archivesBaseName = 'common-customobject'
+
+dependencies {
+    api(project(":common:common-util"))
+    api(project(":common:common-config"))
+}

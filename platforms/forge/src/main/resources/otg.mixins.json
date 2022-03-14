@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.pg85.otg.forge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "otg.refmap.json",
+  "mixins": [
+	"MixinChunkManager",
+	"MixinLocateCommand",
+	"MixinSpawnLocationHelper"
+  ],
+  "injectors": {
+	"defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

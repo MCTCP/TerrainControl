@@ -1,0 +1,6 @@
+{
+	"variants": {
+        "axis=z": { "model": "otg:block/portalotg_yellow_ew" },
+        "axis=x": { "model": "otg:block/portalotg_yellow_ns" }
+    }
+}

@@ -1,0 +1,20 @@
+# Forge only: Dimension configs are used to set up OTG dimensions for Forge MP servers, and to configure modpacks for SP & MP.
+# Use:
+# Forge MP: Set the name of this config (without .yaml) as server-properties generator-settings.
+# Forge SP: Modpacks can use this config to lock the world creation GUI and use the settings in this config instead, so users can create a world with 1 click.
+# - Rename this file to Modpack.yaml, OTG will automatically replace the world creation GUI with a locked custom world creation screen.
+# For more information, see: https://openterraingen.fandom.com/wiki/Dimension_%26_Modpack_Configuration
+#
+# This config creates a Biomes O' Plenty overworld with OTG Nether and End using the "Skylands" and "SkylandsTall" presets. 
+# It also add a dimension using the "VanillaVistas" preset.
+# Note: The NonOTGGeneratorSettings setting can be used to add a generator-settings JSON string for the "biomesoplenty" overworld.
+---
+Overworld:
+  NonOTGWorldType: "biomesoplenty"
+  NonOTGGeneratorSettings:
+Nether:
+  PresetFolderName: "Skylands"
+End:
+  PresetFolderName: "SkylandsTall"
+Dimensions:
+- PresetFolderName: "VanillaVistas"

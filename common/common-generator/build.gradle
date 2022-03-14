@@ -1,0 +1,11 @@
+description = "Core files of OpenTerrainGenerator"
+archivesBaseName = 'common-generator'
+
+dependencies {
+    api(project(":common:common-util"))
+    api(project(":common:common-config"))
+
+    // Provided by Minecraft
+    compileOnlyApi("it.unimi.dsi:fastutil:8.2.1")
+    compileOnlyApi("com.google.guava:guava:23.0")
+}

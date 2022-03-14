@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "otg",
+  "version": "${version}",
+
+  "name": "Example Mod",
+  "description": "OTG: Generate anything!",
+  "authors": [
+    "Team OTG"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "MIT",
+  "icon": "OTGlogo.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.pg85.otg.fabric.OTGPlugin"
+    ]
+  },
+  "mixins": [
+    "otg-fabric.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.8",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

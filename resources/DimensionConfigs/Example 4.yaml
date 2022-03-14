@@ -1,0 +1,68 @@
+# Forge only: Dimension configs are used to set up OTG dimensions for Forge MP servers, and to configure modpacks for SP & MP.
+# Use:
+# Forge MP: Set the name of this config (without .yaml) as server-properties generator-settings.
+# Forge SP: Modpacks can use this config to lock the world creation GUI and use the settings in this config instead, so users can create a world with 1 click.
+# - Rename this file to Modpack.yaml, OTG will automatically replace the world creation GUI with a locked custom world creation screen.
+# For more information, see: https://openterraingen.fandom.com/wiki/Dimension_%26_Modpack_Configuration
+#
+# This config creates a vanilla "flat" overworld with OTG Nether and End using the "AlienJungle" and "Skylands" presets. 
+# It also adds 2 dimensions using the "Wildlands" and "VanillaVistas" presets.
+# Note: The NonOTGGeneratorSettings setting can be used to add a generator-settings JSON string for the "flat" overworld.
+---
+Version: 1
+ModpackName: "My Awesome Modpack"
+Overworld:
+  NonOTGWorldType: "flat"
+  NonOTGGeneratorSettings:
+Nether:
+  PresetFolderName: "AlienJungle"
+End:
+  PresetFolderName: "Skylands"
+Dimensions:
+- PresetFolderName: "Wildlands"
+  Seed: 14
+  PortalColor: "beige"
+  PortalMob: "minecraft:zombified_piglin"
+  PortalIgnitionSource: "minecraft:flint_and_steel"
+  PortalBlocks: "minecraft:redstone_block"
+- PresetFolderName: "VanillaVistas"
+  Seed: 14
+  PortalColor: "gold"
+  PortalMob: "minecraft:zombified_piglin"
+  PortalIgnitionSource: "minecraft:flint_and_steel"
+  PortalBlocks: "minecraft:diamond_block"  
+Settings:
+  GenerateStructures: true
+  BonusChest: false
+GameRules:
+  DoFireTick: true
+  MobGriefing: true
+  KeepInventory: false
+  DoMobSpawning: true
+  DoMobLoot: true
+  DoTileDrops: true
+  DoEntityDrops: true
+  CommandBlockOutput: true
+  NaturalRegeneration: true
+  DoDaylightCycle: true
+  LogAdminCommands: true
+  ShowDeathMessages: true
+  RandomTickSpeed: 3
+  SendCommandFeedback: true
+  SpectatorsGenerateChunks: true
+  SpawnRadius: 10
+  DisableElytraMovementCheck: false
+  MaxEntityCramming: 24
+  DoWeatherCycle: true
+  DoLimitedCrafting: false
+  MaxCommandChainLength: 65536
+  AnnounceAdvancements: true
+  DisableRaids: false
+  DoInsomnia: true
+  DrowningDamage: true
+  FallDamage: true
+  FireDamage: true
+  DoPatrolSpawning: true
+  DoTraderSpawning: true
+  ForgiveDeadPlayers: true
+  UniversalAnger: false
