@@ -1,0 +1,147 @@
+// Build script for Terrain Control for Forge
+
+buildscript
+        {
+            repositories
+                    {
+                        mavenLocal()
+                        mavenCentral()
+                        jcenter()
+                        maven {
+                            name = 'forge'
+                            url = 'http://files.minecraftforge.net/maven/'
+                        }
+                        maven {
+                            name = 'sponge'
+                            url = 'http://repo.spongepowered.org/maven'
+                        }
+                    }
+            dependencies
+                    {
+                        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+                        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+                        classpath 'org.spongepowered:mixingradle:0.4+'
+                    }
+        }
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+// Project properties
+archivesBaseName = "terraincontrol-forge"
+description = "TerrainControl for Minecraft Forge"
+ext.forgeVersion =
+
+        sourceSets {
+            main {
+                ext.refMap = "mixins.terraincontrol.refmap.json"
+            }
+        }
+
+minecraft {
+    version = "1.12.2-14.23.1.2586"
+    mappings = 'snapshot_20171007'
+    runDir = 'run'
+    useDepAts = true
+
+    coreMod = 'com.khorn.terraincontrol.forge.TerrainControlLoadingPlugin'
+
+    // We don't use the obfuscated dev jar currently
+    makeObfSourceJar = false
+}
+
+deobfMcMCP {failOnAtError = false}
+deobfMcSRG {failOnAtError = false}
+
+repositories
+        {
+            mavenLocal()
+            mavenCentral()
+            maven
+                    {
+                        name = 'forge'
+                        url = 'http://files.minecraftforge.net/maven/'
+                    }
+            maven
+                    {
+                        name = 'oss-sonatype-public'
+                        url = 'https://oss.sonatype.org/content/repositories/public/'
+                    }
+            maven
+                    {
+                        name = 'sponge'
+                        url = 'http://repo.spongepowered.org/maven'
+                    }
+        }
+
+dependencies
+        {
+            compile project(':common')
+            compile 'org.spongepowered:mixin:0.7.4-SNAPSHOT'
+        }
+
+// Replace text in mcmod.info
+processResources
+        {
+            // This will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
+
+            // Replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs)
+                    {
+                        include 'mcmod.info'
+
+                        // Replace version and mcversion
+                        expand 'version': project.version, 'mcversion': project.minecraft.version
+                    }
+
+            // Copy everything else, that's not the mcmod.info
+            from(sourceSets.main.resources.srcDirs)
+                    {
+                        exclude 'mcmod.info'
+                    }
+        }
+
+// Include all Terrain Control files in the jar
+jar
+        {
+            classifier = 'base'
+            from
+                    {
+                        project(":common").sourceSets.main.output.files
+                    }
+            manifest {
+                attributes(
+                        'Built-By': System.properties['user.name'],
+                        'Created-By': System.properties['java.vm.version'] + ' (' + System.properties['java.vm.vendor'] + ')',
+                        'Implementation-Title': project.name,
+                        'Implementation-Version': version,
+                        "FMLCorePlugin": "com.khorn.terraincontrol.forge.TerrainControlLoadingPlugin",
+                        "FMLCorePluginContainsFMLMod": true,
+                        "ForceLoadAsMod": true,
+                        "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+                        "TweakOrder": 0,
+                        "MixinConfigs": "mixins.terraincontrol.core.json",
+                        'FMLAT': "terraincontrol_at.cfg"
+                )
+            }
+        }
+
+shadowJar {
+    mainSpec.sourcePaths.clear()
+    dependsOn reobfJar
+    classifier ''
+    exclude 'dummyThing'
+    dependencies {
+        include dependency('org.spongepowered:mixin')
+    }
+    afterEvaluate {
+        from zipTree(reobfJar.jar)
+    }
+}
+
+artifacts {
+    archives shadowJar
+}

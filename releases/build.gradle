@@ -1,0 +1,72 @@
+// Build script for Terrain Control releases
+// This script simply packs together the Bukkit and Forge jars
+
+import java.util.zip.*;
+
+// Project properties
+description = "TerrainControl Releases"
+
+// Gets the JAR file for the project with the given name
+def getJarFile(Project project)
+{
+    String fileName = project.archivesBaseName + '-' + project.version + ".jar"
+    return new File(project.buildDir, 'distributions/' + fileName)
+}
+
+// Adds all files from the given zip file (source) to the given destination, which
+// must also be a zip file. A set of already added files is maintained to prevent
+// duplicates
+def addToZip(File source, ZipOutputStream destination, Set<String> alreadyAddedFiles)
+{
+    byte[] buffer = new byte[4096]
+    ZipInputStream inputStream = new ZipInputStream(new FileInputStream(source))
+    ZipEntry nextEntry = inputStream.getNextEntry()
+    while (nextEntry != null)
+    {
+        if (!alreadyAddedFiles.contains(nextEntry.name))
+        {
+            // Start new entry
+            alreadyAddedFiles.add(nextEntry.name)
+            destination.putNextEntry(new ZipEntry(nextEntry))
+
+            // Transfer all bytes
+            int bytesRead = inputStream.read(buffer)
+            while (bytesRead > 0)
+            {
+                destination.write(buffer, 0, bytesRead)
+
+                bytesRead = inputStream.read(buffer)
+            }
+        }
+
+        // Done reading this entry, on to the next one
+        nextEntry = inputStream.getNextEntry()
+    }
+
+    inputStream.close()
+}
+
+task createReleaseJar {
+	doLast {
+	    File forgeFile = getJarFile(project(":platforms:forge"))
+	    File bukkitFile = getJarFile(project(":platforms:bukkit"))
+	    File ourFile = getJarFile(project)
+	
+	    if (forgeFile.exists() && bukkitFile.exists())
+	    {
+	        ourFile.getParentFile().mkdirs()
+	        ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
+	        Set<String> alreadyAddedFiles = new HashSet<String>()
+	
+	        addToZip(forgeFile, outputStream, alreadyAddedFiles)
+	        addToZip(bukkitFile, outputStream, alreadyAddedFiles)
+	
+	        outputStream.close()
+	    } else
+	    {
+	        println(" Skipping the release jar, as the Bukkit or Forge file failed")
+			println(" Forge exists: " + forgeFile.exists())
+			println(" Bukkit exists: " + bukkitFile.exists())
+	    }
+    }
+}
